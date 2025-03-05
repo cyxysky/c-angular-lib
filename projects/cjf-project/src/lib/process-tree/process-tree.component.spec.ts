@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CjfProjectComponent } from './cjf-project.component';
+import { ProcessTreeComponent } from './process-tree.component';
 
-describe('CjfProjectComponent', () => {
-  let component: CjfProjectComponent;
-  let fixture: ComponentFixture<CjfProjectComponent>;
+describe('ProcessTreeComponent', () => {
+  let component: ProcessTreeComponent;
+  let fixture: ComponentFixture<ProcessTreeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CjfProjectComponent]
+      imports: [ProcessTreeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CjfProjectComponent);
+    fixture = TestBed.createComponent(ProcessTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
