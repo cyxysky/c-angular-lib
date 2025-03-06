@@ -1,0 +1,55 @@
+.out-box {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  
+    .nodes-box {
+      position: relative;
+  
+      &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: calc(50%);
+        margin: auto;
+        width: 1px;
+        height: 100%;
+        background-color: #CACACA;
+      }
+    }
+  
+    .scale {
+      z-index: 999;
+      position: relative;
+      display: flex;
+      height: 100%;
+      width: 100%;
+      justify-content: flex-end;
+  
+      span {
+        margin: 0 10px;
+        font-size: 15px;
+        color: #7a7a7a;
+        width: 50px;
+      }
+    }
+  }
+  
+  .no-copy {
+    user-select: none;
+    /* 标准语法 */
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE/Edge */
+  }
+  
+  .process-tree-box {
+    margin-top: 10px;
+    transform-origin: 0 0;
+    transition: scale 0.2s ease 0s, translate 0s ease 0s;
+  }

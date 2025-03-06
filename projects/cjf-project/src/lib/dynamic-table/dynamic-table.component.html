@@ -1,1 +1,270 @@
-<p>dynamic-table works!</p>
+<div class="flex" style="height: 100%;">
+    <!-- <qz-spin qzSimple [qzLoading]="loading" ></qz-spin> -->
+    <!-- 智能表格分组区域 -->
+    <div class="flex" style="width: 200px;flex-direction: column;box-shadow: 1px 0px 0px 0px #E7EAED;" *ngIf="editMode">
+      <ng-container
+        *ngIf="qzSideTemplates?.qzTableLeftTemplate"
+        [ngTemplateOutlet]="widgetSource.get(qzSideTemplates.qzTableLeftTemplate)"
+        [ngTemplateOutletContext]="{ $implicit: qzSideTemplates.qzTableLeftTemplate}">
+      </ng-container>
+    </div>
+    <!-- 智能表格主体 -->
+    <div 
+      [style.width]="editMode ? 'calc(100% - 200px)' : '100%' " 
+      class="table-box" 
+      [style.overflow]="virtual !== undefined && !editMode && virtual ? 'auto' : ''" 
+      id="tableBodyScrollContentBox">
+      <div class="flex-grow0" *ngIf="editMode">
+        <ng-container
+          *ngIf="qzSideTemplates?.qzTableTopTemplate"
+          [ngTemplateOutlet]="widgetSource.get(qzSideTemplates.qzTableTopTemplate)"
+          [ngTemplateOutletContext]="{ $implicit: qzSideTemplates.qzTableTopTemplate}">
+        </ng-container>
+      </div>
+      <div 
+        [style.overflow]="qzReloading ? 'hidden' : overflow && editMode ? 'auto' : ''" 
+        style="position: relative;flex-grow: 1;" 
+        id="tableBodyScrollContent">
+        <!-- 加载蒙层 -->
+        <div style="position: absolute;width: 100%;height: calc(100% - 42px);left: 0px;top: 42px;background: #00000099;z-index: 9;" *ngIf="qzReloading">
+          <div style="display: flex;flex-wrap: nowrap;flex-direction: column;align-items: center;position: absolute;top: 45%;width: 100%;">
+            <div style="padding-bottom: 16px;">
+              <qz-button (click)="overlayLoading()" qzIconName="icon-Reload-Outline" qzIconColor="#01CFE2" qzType="thirdly" qzContent="刷新数据"></qz-button>
+            </div>
+            <div style="font-weight: 600;font-size: 16px;color: #FFFFFF;">
+              由于数据量较大，配置后请点击刷新数据查看
+            </div>
+          </div>
+        </div>
+        <qz-table2
+          class="table2"
+          #groupingTable 
+          [qzData]="maxRowsArray" 
+          [qzIsAdaptiveHeight]="false"
+          [qzStickyOption]="tableSticky"
+          [qzShowSideBorder]="qzShowSideBorder"
+          [qzRowHoverable]="qzRowHoverable"
+          [qzColHoverable]="qzColHoverable"
+          [qzShowPagination]="listTable ? true : qzShowPagination"
+          (qzPageIndexAndSizeChange)="qzPageIndexAndSizeChange($event)"
+          (qzReload)="refreshTable()"
+          
+          [qzPageIndex]="qzTableData?.number !== undefined ? qzTableData?.number + 1 : 0"
+          [qzPageSize]="qzTableData?.size"
+          [qzTotal]="qzTableData?.totalElements"
+          >
+          <thead qzThead2 stickyTop (qzFilterQuery)="theadFilterQuery($event, true)" #qzTheadFilter>
+            <ng-container *ngFor="let line of headerFields;let lineIndex = index;">
+              <tr qzTr2 *ngIf="true">
+                <ng-container *ngFor="let item of line;index as colIndex">
+                  <ng-container *ngIf="undefined==item.show || item.show">
+                    <th
+                      qzTh2
+                      [style]="item.style"
+                      [rowSpan]="item.rowspan.value"
+                      [colSpan]="item.colspan.value"
+                      [ngClass]="colIndex === line.length -1 ? 'border-bottom' : 'border'"
+                      [qzMinWidth]='groupFieldMap.get(item.field) ? qzTableSetting?.body?.groupTd?.minWidth : qzTableSetting?.body?.dataTd?.minWidth'
+                      [qzMaxWidth]='groupFieldMap.get(item.field) ? qzTableSetting?.body?.groupTd?.maxWidth : qzTableSetting?.body?.dataTd?.maxWidth'
+                      [qzLeft]="item.left"
+                      [qzRight]="item.right"
+                      [qzFilterOptions]="filterMap.get(item.field)"
+                      (qzFilterQuery)="filterMap.get(item.field) && filterMap.get(item.field)['qzFilterQuery'] ? filterMap.get(item.field).qzFilterQuery($event) : undefined"
+                      >
+                      <span *ngIf="!item.headerRender">
+                        {{item.title}}
+                      </span>
+                      <ng-container
+                        *ngIf="item.headerRender"
+                        [ngTemplateOutlet]="widgetSource.get(item.headerRender)"
+                        [ngTemplateOutletContext]="{ $implicit: item }"
+                      ></ng-container>
+                    </th>
+                  </ng-container>
+                </ng-container>
+              </tr>
+            </ng-container>
+          </thead>
+          <tbody qzTbody2>
+            <ng-container *ngFor="let data of groupingTable.data;index as i;trackBy: trackByFn">
+              <tr qzTr2 *ngIf="listTable === false && virtual === true ? tableRow.includes(i) : true"> 
+                <ng-container>
+                  <!-- 分组列 -->
+                  <ng-container *ngFor="let group of groupArray;index as k" >
+                    <td
+                      *ngIf="groupFieldMap.get(group.field)?.get(data.index)"
+                      [style]="groupFieldMap.get(group.field)?.get(data.index)?.groupStyle"
+                      [ngClass]="(k === groupArray.length -1 && visiableDataArray.length === 0) ? 'border-bottom' : 'border'"
+                      [qzLeft]="fieldMap.get(group.field).left"
+                      [qzRight]="fieldMap.get(group.field).right"
+                      [qzMinWidth]='qzTableSetting?.body?.groupTd?.minWidth'
+                      [qzMaxWidth]='qzTableSetting?.body?.groupTd?.maxWidth'
+                      qzTd2
+                      [rowSpan]="groupFieldMap.get(group.field)?.get(data.index)?.rowCount + ( this.totalConfig && totalConfig?.subtotal?.show ? groupFieldMap.get(group.field)?.get(data.index)?.totalCount : 0 )">
+                      <div >
+                        <div *ngIf="!group.render">
+                          {{ groupFieldMap.get(group.field)?.get(data.index)?.name }}
+                        </div>
+                        <ng-container
+                          *ngIf="group.render"
+                          [ngTemplateOutlet]="widgetSource.get(group.render)"
+                          [ngTemplateOutletContext]="{ $implicit: groupFieldMap.get(group.field)?.get(data.index) , field: group.field , gruop: true }"
+                        ></ng-container>
+                      </div>
+                    </td>
+                  </ng-container>
+                  <!-- 数据列 -->
+                  <ng-container *ngFor="let group of visiableDataArray;index as k" >
+                    <td
+                      qzTd2
+                      *ngIf="dataFieldMap.get(group.field)?.get(data.index) && (group.show ? group.show : true)"
+                      [ngClass]="k === visiableDataArray.length -1 ? 'border-bottom' : 'border'"
+                      [qzMinWidth]='qzTableSetting?.body?.dataTd?.minWidth'
+                      [qzMaxWidth]='qzTableSetting?.body?.dataTd?.maxWidth'
+                      [style]="dataFieldMap.get(group.field)?.get(data.index).dataStyle"
+                      [rowSpan]="dataFieldMap.get(group.field)?.get(data.index).rowCount">
+                      <div >
+                        <div *ngIf="!group.render">
+                          {{ dataFieldMap.get(group.field)?.get(data.index)[group.field] ? dataFieldMap.get(group.field)?.get(data.index)[group.field] : '--' }}
+                        </div>
+                        <ng-container
+                          *ngIf="group.render"
+                          [ngTemplateOutlet]="widgetSource.get(group.render)"
+                          [ngTemplateOutletContext]="{ $implicit: dataFieldMap.get(group.field)?.get(data.index), field: group.field , gruop: false }"
+                        ></ng-container>
+                      </div>
+                    </td>
+                  </ng-container>
+                </ng-container>
+              </tr>
+              <!-- 小计合计 -->
+              <ng-container *ngIf="totalConfig?.subtotal?.show && totalMap.get(data.index)">
+                <ng-container *ngFor="let arrays of totalMap.get(data.index);index as j">
+                  <tr qzTr2  *ngIf="listTable === false && virtual === true ? tableRow.includes(i) : true">
+                    <!-- 分组列 -->
+                    <ng-container *ngFor="let item of groupArray;index as totalGroup" >
+                      <td
+                        *ngIf="totalGroup >= arrays.col"
+                        [style]="totalConfig?.subtotal?.style"
+                        [ngClass]="(totalGroup === groupArray.length -1 && visiableDataArray.length === 0) ? 'border-bottom' : 'border'"
+                        [qzLeft]="fieldMap.get(item.field).left"
+                        [qzMinWidth]='qzTableSetting?.body?.groupTd?.minWidth'
+                        [qzMaxWidth]='qzTableSetting?.body?.groupTd?.maxWidth'
+                        qzTd2>
+                        <div >
+                          <div *ngIf="!totalConfig?.subtotal?.render">
+                            {{ (arrays.value[totalGroup] && arrays.value[totalGroup][item.field]) ? arrays.value[totalGroup][item.field] : '--' }}
+                          </div>
+                          <ng-container
+                            *ngIf="totalConfig?.subtotal?.render"
+                            [ngTemplateOutlet]="widgetSource.get(totalConfig?.subtotal?.render)"
+                            [ngTemplateOutletContext]="{ $implicit: arrays.value , field: item.field , index: totalGroup - arrays.col }"
+                          ></ng-container>
+                        </div>  
+                      </td>
+                    </ng-container>
+                    <!-- 数据列 -->
+                    <ng-container *ngFor="let item of visiableDataArray;index as totalData" >
+                      <!-- 存在边框问题 -->
+                      <td
+                        [ngClass]="totalData === visiableDataArray.length -1 ? 'border-bottom' : 'border'"
+                        [qzMinWidth]='qzTableSetting?.body?.groupTd?.minWidth'
+                        [qzMaxWidth]='qzTableSetting?.body?.groupTd?.maxWidth'
+                        [style]="totalConfig?.subtotal?.style"
+                        qzTd2>
+                        <div >
+                          <div *ngIf="!totalConfig?.subtotal?.render">
+                            {{ (arrays.value[groupArray.length + totalGroup] && arrays.value[groupArray.length + totalGroup][item.field]) ? arrays.value[groupArray.length + totalGroup][item.field] : '--' }}
+                          </div>
+                          <ng-container
+                            *ngIf="totalConfig?.subtotal?.render"
+                            [ngTemplateOutlet]="widgetSource.get(totalConfig?.subtotal?.render)"
+                            [ngTemplateOutletContext]="{ $implicit: arrays.value , field: item.field , index: groupArray.length + totalData - arrays.col }"
+                          ></ng-container>
+                        </div>  
+                      </td>
+                    </ng-container>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <!-- 总计渲染内容 -->
+            <tr qzTr2 *ngIf="totalConfig?.total?.show">
+              <!-- 不合并的情况 -->
+              <ng-container *ngIf="!totalConfig?.total?.merge">
+                <td 
+                  qzTd2
+                  *ngFor="let item of groupArray"
+                  [qzMinWidth]='qzTableSetting?.body?.groupTd?.minWidth'
+                  [qzMaxWidth]='qzTableSetting?.body?.groupTd?.maxWidth'
+                  [qzLeft]="true"
+                  class="border"
+                  [style]="totalConfig?.total?.headerStyle"
+                  >
+                  <div *ngIf="!totalConfig?.total?.headerRender">
+                    {{ totalConfig?.title }}
+                  </div>
+                  <ng-container
+                    *ngIf="totalConfig?.total?.headerRender"
+                    [ngTemplateOutlet]="widgetSource.get(totalConfig?.total?.headerRender)"
+                    [ngTemplateOutletContext]="{ $implicit: item.field }"
+                  ></ng-container>
+                </td>
+              </ng-container>
+              <!-- 合并的情况 -->
+              <ng-container *ngIf="totalConfig?.total?.merge">
+                <td 
+                  qzTd2
+                  class="border"
+                  [colSpan]="groupArray.length"
+                  [qzLeft]="true"
+                  [style]="totalConfig?.total?.headerStyle"
+                  >
+                  <div *ngIf="!totalConfig?.total?.headerRender">
+                    {{ totalConfig?.total?.title }}
+                  </div>
+                  <ng-container
+                    *ngIf="totalConfig?.total?.headerRender"
+                    [ngTemplateOutlet]="widgetSource.get(totalConfig?.total?.headerRender)"
+                    [ngTemplateOutletContext]="{ $implicit: groupArray }"
+                  ></ng-container>
+                </td>
+              </ng-container>
+              <!-- 总计的数据列 -->
+              <td 
+                qzTd2
+                [ngClass]="k === visiableDataArray.length -1 ? 'border-bottom' : 'border'"
+                [style]="totalConfig?.total?.style"
+                [qzMinWidth]='qzTableSetting?.body?.dataTd?.minWidth'
+                [qzMaxWidth]='qzTableSetting?.body?.dataTd?.maxWidth'
+                *ngFor="let group of visiableDataArray;index as k">
+                <ng-container
+                  *ngIf="totalConfig?.total?.render"
+                  [ngTemplateOutlet]="widgetSource.get(totalConfig?.total?.render)"
+                  [ngTemplateOutletContext]="{ $implicit: group.field }"
+                ></ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </qz-table2>
+      </div>
+      <div class="flex-grow0" *ngIf="editMode && totalConfig">
+        <ng-container
+          *ngIf="qzSideTemplates?.qzTableBottomTemplate"
+          [ngTemplateOutlet]="widgetSource.get(qzSideTemplates.qzTableBottomTemplate)"
+          [ngTemplateOutletContext]="{ $implicit: qzSideTemplates.qzTableBottomTemplate}">
+        </ng-container>
+        <div *ngIf="!qzSideTemplates?.qzTableBottomTemplate && !listTable" class="total-box">
+          <div class="total-switch" *ngIf="totalConfig.subtotal">
+            小计
+            <qz-switch [(ngModel)]="totalConfig.subtotal.show" style="padding-left: 8px;display: flex;align-items: center;" (ngModelChange)="refreshTable('total')"></qz-switch>
+          </div>
+          <div class="total-switch" *ngIf="totalConfig.total">
+            总计
+            <qz-switch [(ngModel)]="totalConfig.total.show" style="padding-left: 8px;display: flex;align-items: center;" (ngModelChange)="refreshTable('total')"></qz-switch>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+  

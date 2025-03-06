@@ -1,1 +1,59 @@
-<p>customer-form works!</p>
+<div class="content-box">
+	<div class="left-side">
+		<div *ngFor="let group of groups,index as i" class="component-group">
+			<div class="group-header">
+				<div class="group-expand-icon">
+					<div qzIcon2 qzIconName="icon-Right-Fill" qzIconSize="12" (click)="group.expand = !group.expand"
+						[qzIconAnimation]="group.expand ? 'rotate90' : 'rotate0'"></div>
+				</div>
+				<div class="group-title" (click)="group.expand = !group.expand">
+					{{ group.title }}
+				</div>
+			</div>
+			<div class="group-body" [@qzCollapse]="group.expand ? 'normal' : 'collapse'">
+				<div 
+					#componentItem
+					class="component-item no-copy"
+					*ngFor="let component of group.components;index as k"
+					(mousedown)="addNewComponent(component, componentItem)">
+					<div class="component-item-content">
+						<div class="component-item-icon">
+							<div qzIcon2 qzIconName="icon-Down-Fill" qzIconSize="16"></div>
+						</div>
+						<div class="component-item-title">
+							{{ component.title }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="center" #scroll>
+		<!-- <ng-container
+			[ngTemplateOutlet]="source.get('default')"
+			[ngTemplateOutletContext]="{ $implicit: '123' }">
+		</ng-container> -->
+		<div class="model-preview-content">
+			<div class="model-preview-header-bar"></div>
+			<div class="model-preview-header">
+				<div class="model-preview-title">
+					流程名称
+				</div>
+				<div class="model-preview-icon">
+					<div qzIcon2 qzIconName="icon-Setting-Fill" qzIconSize="16"></div>
+				</div>
+			</div>
+			<div class="model-preview-body">
+				<qz-domp-customer-form-modal [subject]="subject" [data]="group1" (selectComponent)="selectComponent($event)">
+
+				</qz-domp-customer-form-modal>
+			</div>
+		</div>
+		<div class="tip-text">
+			拖拽或点击左侧控件，完成表单配置
+		</div>
+	</div>
+	<div class="right-side">
+
+	</div>
+</div>

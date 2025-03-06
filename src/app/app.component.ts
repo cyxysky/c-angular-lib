@@ -16,15 +16,15 @@ export class AppComponent {
     effect(() => {
       console.log('change')
     })
-    setInterval(() => {
-      this.mySignal.update(value =>  value + 1)
-    }, 2000)
-    resource({
-      request: () => [this.mySignal(), this.show()],
-      loader: async ({request: id}) => {
-        console.log(id);
-      }
-    })
+    // setInterval(() => {
+    //   this.mySignal.update(value =>  value + 1)
+    // }, 2000)
+    // resource({
+    //   request: () => [this.mySignal(), this.show()],
+    //   loader: async ({request: id}) => {
+    //     console.log(id);
+    //   }
+    // })
   }
 
 

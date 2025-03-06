@@ -1,1 +1,174 @@
-<p>generate-png works!</p>
+<form #form="ngForm">
+    <div nz-row style="height: calc(100vh - 100px);">
+        <div nz-col nzSpan="17" id="sss" class="padding-20">
+        </div>
+        <div nz-col nzSpan="1"></div>
+        <div nz-col nzSpan="6" class="padding-20">
+            <nz-card style="padding: 10px;">
+                <div nz-row class="item-config" style="margin: 0px 0px 40px 0px;">
+                    <div nz-col nzSpan="12">模板PNG图片上传</div>
+                    <div nz-col nzSpan="12" *ngIf="true">
+                        <input type="file" (input)="addtplphoto($event)" style="color: white;">
+                    </div>
+                </div>
+                <div style="display: flex;align-items: center;">
+                    <div style="flex: 1;">
+                        <div *ngIf="!switchValue">图片</div>
+                        <div *ngIf="switchValue">文字</div>
+                    </div>
+                    <div>
+                        <nz-switch [(ngModel)]="switchValue" name="switch"></nz-switch>
+                    </div>
+                </div>
+                <div *ngIf="switchValue" style="padding: 10px 0px 0px 0px;">
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">内容标签</div>
+                        <div nz-col nzSpan="18">
+                            <input type="text" nz-input [(ngModel)]="label" name="fontLabel" />
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">字体大小</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="fontsize" (ngModelChange)="onChangeFontSize($event)" [nzMax]="200" name="fontSize"></nz-slider>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">间距</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="widthindant" (ngModelChange)="onChangewidthindant($event)" name="fontSpace"></nz-slider>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">字体</div>
+                        <div nz-col nzSpan="18">
+                            <nz-select [(ngModel)]="fontFamily" nzAllowClear nzPlaceHolder="Choose" [nzOptions]="chineseFonts" name="fontFamily" class="full-width" (ngModelChange)="onChangeFontFamily($event)"></nz-select>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">颜色</div>
+                        <div nz-col nzSpan="18">
+                            <nz-color-picker [nzValue]="fontColor" (nzOnChange)="onChangecolor($event)" name="fontColor"></nz-color-picker>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">字体粗细</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="fontWeight" (ngModelChange)="onChangeFontWeight($event)" name="fontWeight"></nz-slider>
+                        </div>
+                    </div>
+                    <!-- <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">x</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="x" (ngModelChange)="onChangex($event)" name="fontX"></nz-slider>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">y</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="y" (ngModelChange)="onChangey($event)" name="fontY"></nz-slider>
+                        </div>
+                    </div> -->
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">文本内容</div>
+                        <div nz-col nzSpan="18">
+                            <input type="text" nz-input [(ngModel)]="content" (ngModelChange)="onChangecontent($event)" name="fontContent" />
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">每行最大字数</div>
+                        <div nz-col nzSpan="18">
+                            <nz-input-number class="full-width" [(ngModel)]="maxmunTextCount" nzMin="1" nzMax="100" (ngModelChange)="changeMaximumWordCount()" name="fontMaxmunCount"/>
+                        </div>
+                    </div>
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">变量选择</div>
+                        <div nz-col nzSpan="18">
+                            <nz-select [(ngModel)]="variable" nzAllowClear nzPlaceHolder="Choose" [nzOptions]="variables" name="fontVariable" (ngModelChange)="onChangeVariable($event)" class="full-width"></nz-select>
+                        </div>
+                    </div>
+
+                    <div class="item-config" style="display: flex;margin-top: 10px;">
+                        <div>
+                            <button nz-button (click)="addEText()" *ngIf="isAdding">增加</button>
+                            <button nz-button (click)="confirmEditText()" *ngIf="isChangeing" >确认</button>
+                        </div>
+                    </div>
+                    
+                    <div *ngFor="let item of elements;index as i" style="display: flex;padding: 8px 0px;align-items: center;">
+                        <div style="flex-grow: 1;min-height: 32px;">{{item.label}}</div>
+                        <div style="padding-right: 5px;">
+                            <button nz-button (click)="startEditText(i,item.id)" *ngIf="!isChangeing">修改</button>
+                        </div>
+                        <div>
+                            <button nz-button (click)="deleteText(i)" *ngIf="!isChangeing">删除</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="photos" *ngIf="!switchValue">
+
+                    <div nz-row class="item-config" style="padding-top: 15px;">
+                        <div nz-col nzSpan="6">选择图片</div>
+                        <div nz-col nzSpan="18">
+                            <input type="file" (input)="uploadPhoto($event)" style="color: white;">
+                        </div>
+                    </div>
+                    
+
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">x</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="photoX" (ngModelChange)="onChangepx($event)" name="photoX"></nz-slider>
+                        </div>
+                    </div>
+
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">y</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="photoY" (ngModelChange)="onChangepy($event)" name="photoY"></nz-slider>
+                        </div>
+                    </div>
+
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">图片宽度</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="photoWidth" (ngModelChange)="onChangepw($event)" name="photoWidth"></nz-slider>
+                        </div>
+                    </div>
+
+                    <div nz-row class="item-config">
+                        <div nz-col nzSpan="6">图片高度</div>
+                        <div nz-col nzSpan="18">
+                            <nz-slider [(ngModel)]="photoHeight" (ngModelChange)="onChangeph($event)" name="photoHeight"></nz-slider>
+                        </div>
+                    </div>
+
+                    <div class="item-config" style="display: flex;margin-top: 10px;">
+                        <div>
+                            <button nz-button (click)="addphoto()" *ngIf="isAdding">增加</button>
+                            <button nz-button (click)="confirmEditPhoto()" *ngIf="isChangeing" >确认</button>
+                        </div>
+                    </div>
+
+                    <nz-list nzBordered nzSize="small" *ngFor="let item of photos;index as i">
+                        <nz-list-item>{{item.name}}
+                            <button nz-button style="margin-top: 10%;margin-left: 10%;" (click)="startEditPhoto(i)"
+                                *ngIf="!isChangeingPhoto">修改</button>
+                            <button nz-button style="margin-top: 10%;margin-left: 10%;" (click)="deletePhoto(i)"
+                                *ngIf="!isChangeingPhoto">删除</button>
+                        </nz-list-item>
+
+                    </nz-list>
+                </div>
+
+                <div>
+                    <button nz-button (click)="post()">
+                        提交模板
+                    </button>
+                </div>
+            </nz-card>
+        </div>
+    </div>
+</form>

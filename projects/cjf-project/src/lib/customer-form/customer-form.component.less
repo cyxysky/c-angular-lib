@@ -1,0 +1,150 @@
+@action-panel-min-width: 296px;
+@action-panel-max-width: 320px;
+@modal-panel-min-width: 724px;
+
+.content-box {
+	flex-grow: 1;
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+
+	.left-side {
+		min-width: @action-panel-min-width;
+		max-width: @action-panel-max-width;
+		flex-grow: 1;
+		overflow: auto;
+
+		.component-group {
+			padding: 24px 24px 0 24px;
+
+			.group-header {
+				display: flex;
+				align-items: center;
+				padding-bottom: 8px;
+
+				.group-expand-icon {
+					display: 0;
+				}
+
+				.group-title {
+					padding-left: 8px;
+					display: 1;
+					font-weight: 600;
+					font-size: 14px;
+					color: #131C28;
+				}
+			}
+
+			.group-body {
+				display: grid;
+				gap: 8px;
+				grid-template-columns: 1fr 1fr;
+				overflow: hidden;
+
+				
+			}
+		}
+	}
+
+	.right-side {
+		min-width: @action-panel-min-width;
+		max-width: @action-panel-max-width;
+		flex-grow: 1;
+		overflow: auto;
+	}
+
+	.center {
+		min-width: @modal-panel-min-width;
+		flex-grow: 1;
+		overflow: auto;
+		background: #F8FAFC;
+
+		.model-preview-content {
+			flex-grow: 1;
+			margin: 20px;
+			background: white;
+			height: max-content;
+
+			.model-preview-header-bar {
+				width: 100%;
+				height: 4px;
+				background: linear-gradient(225deg, #18D2E4 0%, #33D6CE 100%);
+			}
+
+			.model-preview-header {
+				display: flex;
+				align-items: center;
+				height: 48px;
+				padding: 0 24px;
+				border-bottom: 1px solid #E7EAED;
+
+				.model-preview-title {
+					font-weight: 600;
+					font-size: 16px;
+					color: #131C28;
+					flex-grow: 1;
+				}
+
+				.model-preview-icon {}
+			}
+		}
+	}
+}
+
+.tip-text {
+	font-weight: 400;
+	font-size: 14px;
+	color: #9BACBB;
+	text-align: center;
+}
+
+
+.no-copy {
+	user-select: none;
+	/* 标准语法 */
+	-webkit-user-select: none;
+	/* Safari */
+	-moz-user-select: none;
+	/* Firefox */
+	-ms-user-select: none;
+	/* IE/Edge */
+}
+
+.component-item {
+	display: flex;
+	align-items: center;
+	width: 120px;
+	height: 36px;
+	background: #F4F6F7;
+	border-radius: 2px;
+	cursor: move;
+	border: 1px solid transparent;
+
+	&:hover {
+		background: #F0FCFD;
+		border-radius: 2px 0px 2px 2px;
+		border: 1px solid #01CFE2;
+	}
+
+	.component-item-content {
+		flex-grow: 1;
+		display: flex;
+		align-items: center;
+
+		.component-item-icon {
+			padding: 0 8px 0 12px;
+		}
+
+		.component-item-title {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 80px;
+			font-weight: 400;
+			font-size: 14px;
+			color: #6B798C;
+		}
+
+	}
+
+}
