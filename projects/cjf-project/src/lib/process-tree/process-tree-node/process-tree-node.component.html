@@ -32,56 +32,13 @@
       </ng-container>
       <!-- 流程节点内容 -->
       <div (wheel)="onChildWheel($event)">
-        <!-- 对整个卡片内容进行渲染 -->
-        <ng-container *ngIf="data.template && tableSource.get(data.template)">
-          <div class="template-nodes-card-box">
-            <ng-container [ngTemplateOutlet]="tableSource.get(data.template)"
-              [ngTemplateOutletContext]="{$implicit : data , subject:subject}">
-            </ng-container>
-            <!-- 复制icon -->
-            <!-- <div class="template-node-herder-copy-icon" (click)="add('copy')" *ngIf="data.numberType === NodeNumberType.BRANCH">
-              <span qzIcon2
-                qzIconName="icon-copy" 
-                [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : ''"></span>
-            </div> -->
-            <!-- 关闭icon -->
-            <div class="template-node-herder-close-icon" (click)="add('delete')" *ngIf="data.type !== NodeType.ROOT">
-              <span qzIcon2 
-                qzIconName="icon-Delete-Fill" 
-                [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : ''">
-              </span>
-            </div>
-            <!-- 选择icon -->
-            <div class="template-node-herder-edit-icon" (click)="add('select')" >
-              <span qzIcon2 
-                qzIconName="icon-Edit-Fill" 
-                [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : ''">
-              </span>
-            </div>
-          </div>
-        </ng-container>
         <!-- 默认流程节点内容 -->
         <div 
-          *ngIf="!(data.template && tableSource.get(data.template))"
           (click)="data['error'] = true"
           class="nodes-card" 
           [ngClass]="{'error-border' : data.error}"
           [style.box-shadow]="(selectedNodeID === data.id && !data.error) ? '0px 0px 0px 2px #01CFE2' : ''">
           <!-- 错误icon图标 -->
-          <ng-container *ngIf="data.error">
-            <div
-              qzIcon2
-              qzIconName="icon-Fail-Fill"
-              qzIconColor="gradients-red"
-              class="err-icon"
-              qzTooltip
-              [qzTooltipContent]="data.errorMessage"
-              qzTooltipPosition="right">
-            </div>
-          </ng-container>
           <ng-container>
             <!-- 头部 -->
             <div
@@ -91,7 +48,7 @@
               [ngClass]="{'error-header' : data.error && data.numberType !== NodeNumberType.BRANCH}">
               <div class="header-content">
                 <ng-container
-                  [ngTemplateOutlet]="data.headerConfig && data.headerConfig.template && tableSource.get(data.headerConfig.template) ? tableSource.get(data.headerConfig.template) : headerDefault"
+                  [ngTemplateOutlet]="headerDefault"
                   [ngTemplateOutletContext]="{$implicit : data}">
                 </ng-container>
               </div>
@@ -105,21 +62,14 @@
               </div> -->
               <!-- 编辑 -->
               <div class="header-icon" (click)="add('select')">
-                <span 
-                  qzIcon2 
-                  qzIconName="icon-Edit-Fill" 
-                  [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                  [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : ''">
+                <span>
+                  编辑
                 </span>
               </div>
               <!-- 删除icon -->
               <div *ngIf="data.type !== NodeType.ROOT" class="header-icon" (click)="add('delete')">
-                <span 
-                  *ngIf="data.type !== 'endNode'"
-                  qzIcon2 
-                  qzIconName="icon-Delete-Fill" 
-                  [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                  [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : qzIconColor">
+                <span *ngIf="data.type !== 'endNode'">
+                  删除
                 </span>
               </div>
             </div>
@@ -135,7 +85,7 @@
               <div class="nodes-card-body-content" >
                 <div>
                   <ng-container
-                    [ngTemplateOutlet]="data.bodyConfig && data.bodyConfig.template && tableSource.get(data.bodyConfig.template) ? tableSource.get(data.bodyConfig.template) :  bodyDefault"
+                    [ngTemplateOutlet]="bodyDefault"
                     [ngTemplateOutletContext]="{$implicit : data}">
                   </ng-container>
                 </div>
@@ -150,7 +100,7 @@
             <!-- 底部 -->
             <div class="nodes-card-footer" *ngIf="data.hasFooter !== undefined ? data.hasFooter : true">
               <ng-container
-                [ngTemplateOutlet]="data.footerConfig && data.footerConfig.template && tableSource.get(data.footerConfig.template) ? tableSource.get(data.footerConfig.template) :  footDefault"
+                [ngTemplateOutlet]="footDefault"
                 [ngTemplateOutletContext]="{$implicit : data}">
               </ng-container>
             </div>
@@ -158,13 +108,9 @@
         </div>
         <!-- 添加节点按钮 -->
         <div class="add-node-button-box">
-          <div class="add-node-button" [qzDropDownMenu]="addTemplate" qzTrigger="click" qzPositions="right" tabindex="1">
+          <div class="add-node-button" tabindex="1">
             <span 
-              *ngIf="data.type !== 'endNode'"
-              qzIcon2
-              class="add-node-button-icon"
-              [qzIconName]="qzAddNodeIconName" 
-              [qzIconSize]="qzAddNodeIconSize">
+              *ngIf="data.type !== 'endNode'">
             </span>
           </div>
         </div>
@@ -175,13 +121,13 @@
 
 <!-- 子级节点，单一节点 -->
 <div *ngIf="notEmpty(data.children) && !data.branchs" class="children-node-tree">
-  <qz-domp-process-tree-node [data]="data.children" [subject]="subject" [addNodeConfig]="addNodeConfig" [selectedNodeID]="selectedNodeID"></qz-domp-process-tree-node>
+  <lib-process-tree-node [data]="data.children" [subject]="subject" [addNodeConfig]="addNodeConfig" [selectedNodeID]="selectedNodeID"></lib-process-tree-node>
 </div>
 
 <!-- 分支节点，多层级节点 -->
 <div *ngIf="data.branchs" class="branch-node-tree">
   <ng-container *ngFor="let item of data.branchs;index as i">
-    <qz-domp-process-tree-node 
+    <lib-process-tree-node 
       [ngClass]="data.type !== NodeType.END? 'branch-node-children-box' : 'branch-node-end-box'" 
       [data]="item" 
       [subject]="subject" 
@@ -192,25 +138,21 @@
       <div *ngIf="i === 0" class="line-bot-left"></div>
       <div *ngIf="i === data.branchs.length-1" class="line-top-right"></div>
       <div *ngIf="i === data.branchs.length-1" class="line-bot-right"></div>
-    </qz-domp-process-tree-node>
+    </lib-process-tree-node>
   </ng-container>
 </div>
 
 <!-- 分支节点结束 -->
 <div *ngIf="data.branchs">
   <div *ngIf="data.type !== NodeType.END" class="branchs-node-end-add-button-box">
-    <div class="add-node-button" [qzDropDownMenu]="addTemplates" qzTrigger="click" qzPositions="right" tabindex="2">
+    <div class="add-node-button"  tabindex="2">
       <span 
-        *ngIf="data.type !== NodeType.END"
-        qzIcon2
-        class="add-node-button-icon"
-        [qzIconName]="qzAddNodeIconName" 
-        [qzIconSize]="qzAddNodeIconSize">
+        *ngIf="data.type !== NodeType.END">
       </span>
     </div>
     <!-- 添加节点按钮 -->
     <div *ngIf="notEmpty(data.children)">
-      <qz-domp-process-tree-node [data]="data.children" [subject]="subject" [addNodeConfig]="addNodeConfig" [selectedNodeID]="selectedNodeID"></qz-domp-process-tree-node>
+      <lib-process-tree-node [data]="data.children" [subject]="subject" [addNodeConfig]="addNodeConfig" [selectedNodeID]="selectedNodeID"></lib-process-tree-node>
     </div>
   </div>
 </div>
@@ -230,12 +172,7 @@
   <div class="default-header">
     <div class="default-header-content">
       <!-- 对应的icon -->
-      <span class="default-header-content-icon" 
-        *ngIf="data.headerConfig && data.headerConfig.icon" 
-        qzIcon2
-        [qzIconName]="data.headerConfig.icon"
-        [qzIconSize]="data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-        [qzIconColor]="data.headerConfig.iconColor ? data.headerConfig.iconColor : qzIconColor">
+      <span class="default-header-content-icon" *ngIf="data.headerConfig && data.headerConfig.icon">
       </span>
     </div>
     <!-- 有颜色就颜色，没有默认黑色 -->
@@ -259,19 +196,19 @@
 </ng-template>
 
 <!-- 添加流程节点模板内容 -->
-<qz-dropdown-menu #addTemplate="qzDropDownMenuRef">
+<ng-template #addTemplate>
   <ul class="ul-add-list"  *ngFor="let item of addNodeConfig;index as i" (click)="add(NodeOperateType.ADD,item)">
     <li class="add-list">
       <span class="li-name">{{item.name}}</span>	
     </li>
   </ul>
-</qz-dropdown-menu>
+</ng-template>
 
 <!-- 条件节点末端添加流程节点模板内容 -->
-<qz-dropdown-menu #addTemplates="qzDropDownMenuRef">
+<ng-template #addTemplatesBranchs>
   <ul qz-menu *ngFor="let item of addNodeConfig;index as i" (click)="add('branchEndAdd',item)">
     <li qz-menu-item class="add-list">
       <span class="li-name">{{item.name}}</span>	
     </li>
   </ul>
-</qz-dropdown-menu>
+</ng-template>

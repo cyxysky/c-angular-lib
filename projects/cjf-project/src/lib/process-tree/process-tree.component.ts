@@ -23,7 +23,6 @@ export enum NodeType {
   END = 'END'
 }
 
-
 @Component({
   selector: 'lib-process-tree',
   imports: [ProcessTreeNodeComponent],

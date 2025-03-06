@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Params } from '@angular/router';
-
+import * as _ from 'lodash';
 @Component({
   selector: 'lib-dynamic-table',
   imports: [],
@@ -369,7 +369,7 @@ export class DynamicTableComponent {
     this.initTableGroup(this.groupArray);
     // 初始化所有的数据列
     this.initAllDataArray(_.cloneDeep(this.qzTableFields));
-    let tableData = _.cloneDeep(data);
+    let tableData: any = _.cloneDeep(data);
     this.listTable = false;
     this.maxRowsArray = [];
     this.maxRows = 0;

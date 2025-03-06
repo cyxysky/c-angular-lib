@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
-
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Subject } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import * as _ from 'lodash';
 @Component({
   selector: 'lib-customer-form-modal',
-  imports: [],
+  imports: [FormsModule,CommonModule],
   templateUrl: './customer-form-modal.component.html',
   styleUrl: './customer-form-modal.component.less'
 })
@@ -34,12 +37,10 @@ export class CustomerFormModalComponent {
   /** 列数 */
   @Input() columns: number = 4;
   /** 接收父组件的subject */
-  @Input() subject: Subject<any>;
+  @Input() subject!: Subject<any>;
   /** 选择组件事件 */
   @Output() selectComponent = new EventEmitter<any>();
-  constructor(
-    public source: DompCustomerFormSource
-  ) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.initGrid();
@@ -59,7 +60,7 @@ export class CustomerFormModalComponent {
   }
 
   groupRowCountMap = new Map();
-  columnsGridStyle: string;
+  columnsGridStyle!: string;
   isDropActive = false;
   newComponentData: any = {};
   isAddingComponent: boolean = false;

@@ -59,15 +59,7 @@
 					{{ component.title }}
 				</div>
 				<div class="none-pointer">
-					<ng-container 
-						*ngIf="component.template" 
-						[ngTemplateOutlet]="source.get(component.template)"
-						[ngTemplateOutletContext]="{ $implicit: component }">
-					</ng-container>
-					<ng-container *ngIf="!component.template || (component.template && !source.get(component.template))">
-						<!-- 预定义组件入口,目前考虑使用动态组件，但是会有问题 -->
-						<qz-input qzPlaceholder="我永远喜欢椎名真白"></qz-input>
-					</ng-container>
+					这是内容
 				</div>
 			</div>
 		</div>

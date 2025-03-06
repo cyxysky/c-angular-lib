@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Subject } from 'rxjs';
-
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 export enum NodeOperateType {
   ADD ='add',
   DELETE = 'delete',
@@ -24,7 +25,7 @@ export enum NodeType {
 
 @Component({
   selector: 'lib-process-tree-node',
-  imports: [],
+  imports: [FormsModule, CommonModule],
   templateUrl: './process-tree-node.component.html',
   styleUrl: './process-tree-node.component.less'
 })

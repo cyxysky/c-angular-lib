@@ -1,17 +1,15 @@
 import { Component } from '@angular/core';
-
+import { Subject } from 'rxjs';
+import { CustomerFormModalComponent } from '../project.module';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'lib-customer-form',
-  imports: [],
+  imports: [CustomerFormModalComponent, CommonModule],
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.less'
 })
 export class CustomerFormComponent {
-  constructor(
-    public source: DompCustomerFormSource
-) { 
-
-}
+  constructor() { }
 
 subject: Subject<any> = new Subject<any>();
 
