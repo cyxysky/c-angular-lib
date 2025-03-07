@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { WidgetSource } from '../directive/widget.directive';
 
 @Component({
   selector: 'lib-multi-dimensional-flowchart',
@@ -173,7 +174,8 @@ export class MultiDimensionalFlowchartComponent {
   @Input() nowStage: Array<any> = [{ key: 'asdzxc' }];
   @Input() state: string = 'active'
   @Output() selectNode = new EventEmitter();
-
+  
+  public source = Inject(WidgetSource);
   selectedStage: any = { key: 'asdzxc' };
   // 行数 对应 行的key值
   rowKeyAndIndexMap: Map<any, any> = new Map([]);

@@ -1,31 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-export enum NodeOperateType {
-  ADD ='add',
-  DELETE = 'delete',
-  SELECT = 'select',
-  COPY = 'copy',
-  MOVE = 'move',
-  ADD_BRANCH = 'addBranch',
-  BRANCH_END_ADD = 'branchEndAdd'
-}
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NodeNumberType, NodeOperateType, NodeType } from '../process-tree.component';
+import { WidgetSource } from '../../directive/widget.directive';
 
-export enum NodeNumberType {
-  CHILDREN = 'children',
-  BRANCH = 'branch',
-  BRANCHS = 'branchs'
-}
-
-export enum NodeType {
-  ROOT = 'ROOT',
-  END = 'END'
-}
 
 @Component({
   selector: 'lib-process-tree-node',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, NzDropDownModule],
   templateUrl: './process-tree-node.component.html',
   styleUrl: './process-tree-node.component.less'
 })
@@ -44,6 +28,8 @@ export class ProcessTreeNodeComponent {
   public readonly NodeOperateType = NodeOperateType;
   public readonly NodeNumberType = NodeNumberType;
   public readonly NodeType = NodeType;
+
+  public source = Inject(WidgetSource);
 
   constructor(
   ) {}

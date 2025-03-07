@@ -36,7 +36,7 @@
                                         <div class="nodes-content"
                                             [ngClass]="selectedStage.key === node.key ? 'node-status-selected' : node.statusClass">
                                             <ng-container>
-                                                <ng-container [ngTemplateOutlet]="default"
+                                                <ng-container [ngTemplateOutlet]="source.get(node.template) || default"
                                                     [ngTemplateOutletContext]="{$implicit : node , rowIndex:rowIndex+1 , colIndex:colIndex}">
                                                 </ng-container>
                                             </ng-container>

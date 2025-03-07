@@ -5,11 +5,11 @@
 				<div class="group-expand-icon">
 					<div></div>
 				</div>
-				<div class="group-title" (click)="group.expand = !group.expand">
+				<div class="group-title">
 					{{ group.title }}
 				</div>
 			</div>
-			<div class="group-body" [@qzCollapse]="group.expand ? 'normal' : 'collapse'">
+			<div class="group-body">
 				<div 
 					#componentItem
 					class="component-item no-copy"

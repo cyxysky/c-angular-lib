@@ -10,7 +10,7 @@
     <ng-container *ngIf="data.numberType === NodeNumberType.BRANCHS">
       <div>
         <div class="branchs-node-add-button" (click)="add('addBranch')" *ngIf="data.type !== NodeType.END">
-          添加条件分支
+          添加条件节点
         </div>
         <div class="end-node" *ngIf="data.type === NodeType.END">
           结束
@@ -32,9 +32,8 @@
       </ng-container>
       <!-- 流程节点内容 -->
       <div (wheel)="onChildWheel($event)">
-        <!-- 默认流程节点内容 -->
+        <!-- 默认流程节点内容  (click)="data['error'] = true"-->
         <div 
-          (click)="data['error'] = true"
           class="nodes-card" 
           [ngClass]="{'error-border' : data.error}"
           [style.box-shadow]="(selectedNodeID === data.id && !data.error) ? '0px 0px 0px 2px #01CFE2' : ''">
@@ -48,59 +47,69 @@
               [ngClass]="{'error-header' : data.error && data.numberType !== NodeNumberType.BRANCH}">
               <div class="header-content">
                 <ng-container
-                  [ngTemplateOutlet]="headerDefault"
+                  [ngTemplateOutlet]="source.get(data.headerTemplate) || headerDefault"
                   [ngTemplateOutletContext]="{$implicit : data}">
                 </ng-container>
               </div>
               <!-- 复制icon -->
-              <!-- <div class="header-icon" (click)="add('copy')" *ngIf="data.numberType === NodeNumberType.BRANCH">
-                <span qzIcon2 
-                  qzIconName="icon-copy" 
-                  *ngIf="data.type !== 'endNode'"
-                  [qzIconSize]="data.headerConfig && data.headerConfig.iconSize ? data.headerConfig.iconSize : qzIconSize"
-                  [qzIconColor]="data.headerConfig && data.headerConfig.iconColor ? data.headerConfig.iconColor : qzIconColor"></span>
-              </div> -->
+              <div class="header-icon" (click)="add('copy')" *ngIf="data.numberType === NodeNumberType.BRANCH">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg>
+                </div>
+              </div>
               <!-- 编辑 -->
               <div class="header-icon" (click)="add('select')">
                 <span>
-                  编辑
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                  </svg>
                 </span>
               </div>
               <!-- 删除icon -->
               <div *ngIf="data.type !== NodeType.ROOT" class="header-icon" (click)="add('delete')">
                 <span *ngIf="data.type !== 'endNode'">
-                  删除
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                  </svg>
                 </span>
               </div>
             </div>
             <!-- 节点卡片内容 -->
             <div *ngIf="data.hasBody !== undefined ? data.hasBody : true" class="nodes-card-body">
               <!-- 多分支节点左移动按钮 -->
-              <!-- <div class="nodes-card-body-move-left" (click)="add('move', -1)" *ngIf="(branchIndex === 1 || branchIndex === -1) && data.type !== 'endNode'">
+              <div class="nodes-card-body-move-left" (click)="add('move', -1)" *ngIf="(branchIndex === 1 || branchIndex === -1) && data.type !== 'endNode'">
                 <div class="move-icon">
-                  <span qzIcon2 [qzIconName]="'icon-Left-Outline'" qzIconSize="30"></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                  </svg>
                 </div>
-              </div> -->
+              </div>
               <!-- node内容 (click)="add('select')" -->
               <div class="nodes-card-body-content" >
                 <div>
                   <ng-container
-                    [ngTemplateOutlet]="bodyDefault"
+                    [ngTemplateOutlet]="source.get(data.bodyTemplate) || bodyDefault"
                     [ngTemplateOutletContext]="{$implicit : data}">
                   </ng-container>
                 </div>
               </div>
               <!-- 多分支节点右移动按钮 -->
-              <!-- <div class="nodes-card-body-move-right" (click)="add('move', 1)" *ngIf="(branchIndex === 0 || branchIndex === -1) && data.type !== 'endNode'">
+              <div class="nodes-card-body-move-right" (click)="add('move', 1)" *ngIf="(branchIndex === 0 || branchIndex === -1) && data.type !== 'endNode'">
                 <div class="move-icon">
-                  <span qzIcon2 [qzIconName]="'icon-Right-Outline'" qzIconSize="30"></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                  </svg>
                 </div>
-              </div> -->
+              </div>
             </div>
             <!-- 底部 -->
             <div class="nodes-card-footer" *ngIf="data.hasFooter !== undefined ? data.hasFooter : true">
               <ng-container
-                [ngTemplateOutlet]="footDefault"
+                [ngTemplateOutlet]="source.get(data.footerTemplate) ||footDefault"
                 [ngTemplateOutletContext]="{$implicit : data}">
               </ng-container>
             </div>
@@ -108,10 +117,12 @@
         </div>
         <!-- 添加节点按钮 -->
         <div class="add-node-button-box">
-          <div class="add-node-button" tabindex="1">
-            <span 
-              *ngIf="data.type !== 'endNode'">
-            </span>
+          <div class="add-node-button" nz-dropdown [nzDropdownMenu]="menu">
+            <div *ngIf="data.type !== 'endNode'" style="display: flex;align-items: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -145,10 +156,12 @@
 <!-- 分支节点结束 -->
 <div *ngIf="data.branchs">
   <div *ngIf="data.type !== NodeType.END" class="branchs-node-end-add-button-box">
-    <div class="add-node-button"  tabindex="2">
-      <span 
-        *ngIf="data.type !== NodeType.END">
-      </span>
+    <div class="add-node-button" nz-dropdown [nzDropdownMenu]="menus">
+      <div *ngIf="data.type !== NodeType.END" style="display: flex;align-items: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+        </svg>
+      </div>
     </div>
     <!-- 添加节点按钮 -->
     <div *ngIf="notEmpty(data.children)">
@@ -196,19 +209,19 @@
 </ng-template>
 
 <!-- 添加流程节点模板内容 -->
-<ng-template #addTemplate>
-  <ul class="ul-add-list"  *ngFor="let item of addNodeConfig;index as i" (click)="add(NodeOperateType.ADD,item)">
-    <li class="add-list">
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu  class="ul-add-list"  *ngFor="let item of addNodeConfig;index as i" (click)="add(NodeOperateType.ADD,item)">
+    <li nz-menu-item class="add-list" >
       <span class="li-name">{{item.name}}</span>	
     </li>
   </ul>
-</ng-template>
+</nz-dropdown-menu>
 
 <!-- 条件节点末端添加流程节点模板内容 -->
-<ng-template #addTemplatesBranchs>
-  <ul qz-menu *ngFor="let item of addNodeConfig;index as i" (click)="add('branchEndAdd',item)">
-    <li qz-menu-item class="add-list">
+<nz-dropdown-menu #menus="nzDropdownMenu">
+  <ul nz-menu  *ngFor="let item of addNodeConfig;index as i" (click)="add('branchEndAdd',item)">
+    <li nz-menu-item class="add-list">
       <span class="li-name">{{item.name}}</span>	
     </li>
   </ul>
-</ng-template>
+</nz-dropdown-menu>

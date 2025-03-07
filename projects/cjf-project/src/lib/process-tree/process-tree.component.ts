@@ -2,6 +2,68 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ProcessTreeNodeComponent } from './process-tree-node/process-tree-node.component';
 import { Subject } from 'rxjs';
 
+const showData = {
+  headerConfig: {
+    title: '提交申请',
+    color: 'white',
+    backgroundColor: '#57646f'
+  },
+  hasBody: false,
+  type: "ROOT",
+  name: '发起人',
+  numberType: 'children',
+  select: (data: any) => {
+    console.log(data)
+  },
+  children: {
+    name: '末端节点',
+    type: 'END',
+    numberType: 'branchs'
+  }
+}
+
+const nodeConfig = [
+  {
+    headerConfig: {
+      title: '配置审批',
+      color: 'white',
+      backgroundColor: '#18d2e4'
+    },
+    type: "ROOT",
+    name: '发起人',
+    numberType: 'children',
+    select: (data: any) => {
+      console.log(data)
+    },
+  },
+  {
+    headerConfig: {
+      title: '条件节点',
+      color: 'white',
+      backgroundColor: 'rgb(55, 148 , 62)'
+    },
+    type: "condition",
+    name: '条件节点',
+    numberType: 'branchs',
+    select: (data: any) => {
+      console.log(data)
+    },
+  },
+  {
+    headerConfig: {
+      title: '延时',
+      color: 'white',
+      backgroundColor: 'rgb(87,106,149)'
+    },
+    type: "delay",
+    name: '延时',
+    numberType: 'children',
+    select: (data: any) => {
+      console.log(data)
+    },
+  }
+]
+
 export enum NodeOperateType {
   ADD ='add',
   DELETE = 'delete',
@@ -30,7 +92,7 @@ export enum NodeType {
   styleUrl: './process-tree.component.less'
 })
 export class ProcessTreeComponent {
-  private _data:  any = {};
+  private _data:  any = showData;
   @Input()
   get data() {
     return this._data;
@@ -40,9 +102,8 @@ export class ProcessTreeComponent {
     this.dataChange.emit(this._data);
   }
   //对应的节点配置信息
-  @Input() addNodeConfig!: Array<any>;
+  @Input() addNodeConfig: Array<any> = nodeConfig;
   //对应的根节点配置信息
-  @Input() rootNodeConfig!: any;
   @Input() hasEndNode: boolean = false;
   @Output() dataChange = new EventEmitter<any>();
   //内置通讯服务
@@ -125,62 +186,6 @@ export class ProcessTreeComponent {
   }
 
   ngAfterViewInit() {
-  }
-
-  /**
-   * 在2种情况下初始化root节点，即根节点。1：未传入data对象。2：传入data对象为空,即为{}。
-   */
-  initRootNode() {
-    if (this._data) {
-      let number = Object.keys(this._data)
-      if (number.length === 0) {
-        this._data = {
-          id: "root",
-          name: "发起人",
-          numberType: 'children',
-          type: "ROOT",
-          children: {},
-          parentId: null,
-          headerConfig: {
-            title: '发起人',
-            color: 'white',
-            backgroundColor: 'rgb(55, 148, 62)',
-            icon: 'icon-DefaultHead',
-            iconColor: 'white',
-          }
-        }
-      }
-    } else {
-      this._data = {
-        id: "root",
-        name: "发起人",
-        numberType: 'children',
-        type: "ROOT",
-        children: {},
-        parentId: null,
-        headerConfig: {
-          title: '发起人',
-          color: 'white',
-          backgroundColor: 'rgb(55, 148, 62)',
-          icon: 'icon-DefaultHead',
-          iconColor: 'white',
-        }
-      }
-    }
-    if (this.rootNodeConfig) {
-      this._data = {
-        ...this._data,
-        ...this.rootNodeConfig,
-        headerConfig: {
-          ...this.rootNodeConfig.headerConfig,
-        },
-        bodyConfig: {
-          ...this.rootNodeConfig.bodyConfig,
-        },
-        type: "ROOT",
-        id: "root",
-      }
-    }
   }
 
   //界面的缩放
