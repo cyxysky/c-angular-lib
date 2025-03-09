@@ -16,7 +16,7 @@ export * from './process-tree/process-tree.component';
 export * from './customer-form/customer-form-modal/customer-form-modal.component';
 export * from './multi-dimensional-flowchart/multi-dimensional-flowchart.component';
 export * from './process-tree/process-tree-node/process-tree-node.component';
-export * from './directive/widget.directive'
+export * from './directive/widget.directive';
 @NgModule({
   declarations: [],
   imports: [

@@ -3,9 +3,10 @@ import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import * as _ from 'lodash';
+import { CustomerFormComponentComponent } from '../customer-form-component/customer-form-component.component';
 @Component({
   selector: 'lib-customer-form-modal',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, CustomerFormComponentComponent],
   templateUrl: './customer-form-modal.component.html',
   styleUrl: './customer-form-modal.component.less'
 })
@@ -28,6 +29,7 @@ export class CustomerFormModalComponent {
      * 依次类推，直到所有元素的startIndex和endIndex都不存在重叠为止。
      */
 
+  values: any = 'asd'
   /** 数据 */
   @Input() data: any = [];
   /** 数据变化 */
@@ -35,7 +37,7 @@ export class CustomerFormModalComponent {
   /** 模式 */
   @Input() mode: 'edit' | 'show' = 'edit';
   /** 列数 */
-  @Input() columns: number = 4;
+  @Input() columns: number = 3;
   /** 接收父组件的subject */
   @Input() subject!: Subject<any>;
   /** 选择组件事件 */

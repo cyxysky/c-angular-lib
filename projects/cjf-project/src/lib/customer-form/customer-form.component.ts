@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs';
-import { CustomerFormModalComponent } from '../project.module';
+import { CustomerFormModalComponent } from './customer-form-modal/customer-form-modal.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'lib-customer-form',
-  imports: [CustomerFormModalComponent, CommonModule],
+  imports: [CustomerFormModalComponent, CommonModule, FormsModule],
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.less'
 })

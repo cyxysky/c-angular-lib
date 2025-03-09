@@ -2,9 +2,9 @@
 	<div class="group-title">
 		{{ group.title }}
 	</div>
-	<div class="group-space-line" [style.grid-template-columns]="columnsGridStyle">
+	<!-- <div class="group-space-line" [style.grid-template-columns]="columnsGridStyle">
 		<div *ngFor="let row of range(columns);index as colIndex" (mouseenter)="enterDrag(groupIndex, 0, colIndex + 1, 1)"></div>
-	</div>
+	</div> -->
 	<!-- 组 -->
 	<div 
 		class="group-grid-box" 
@@ -52,7 +52,7 @@
 					{{ component.title }}
 				</div>
 				<div class="none-pointer">
-					这是内容
+					<lib-customer-form-component [(ngModel)]="values"></lib-customer-form-component>
 				</div>
 			</div>
 		</div>

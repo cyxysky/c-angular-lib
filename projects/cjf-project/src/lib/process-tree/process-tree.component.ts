@@ -2,7 +2,31 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ProcessTreeNodeComponent } from './process-tree-node/process-tree-node.component';
 import { Subject } from 'rxjs';
 
-const showData = {
+export interface Node {
+  id?: string;
+  name?: string;
+  parentId?: string;
+  numberType?: string;
+  children?: Node;
+  branchs?: Array<Node>;
+  select?: (data: any) => void;
+  delete?: (data: any) => boolean;
+  add?: (data: any) => boolean;
+  headerConfig?: {
+    title?: string;
+    color?: string;
+    backgroundColor?: string;
+    headerTemplate?: string
+  },
+  hasBody?: boolean;
+  type?: string;
+  bodyConfig?: {
+    bodyTemplate: string
+  }
+  [key: string]: any
+}
+
+const showData: Node = {
   headerConfig: {
     title: '提交申请',
     color: 'white',
@@ -12,24 +36,25 @@ const showData = {
   type: "ROOT",
   name: '发起人',
   numberType: 'children',
+  id: "ROOT",
   select: (data: any) => {
     console.log(data)
   },
   children: {
     name: '末端节点',
     type: 'END',
-    numberType: 'branchs'
+    numberType: 'branchs',
   }
 }
 
-const nodeConfig = [
+const nodeConfig: Array<Node> = [
   {
     headerConfig: {
       title: '配置审批',
       color: 'white',
       backgroundColor: '#18d2e4'
     },
-    type: "ROOT",
+    type: "approval",
     name: '发起人',
     numberType: 'children',
     select: (data: any) => {
@@ -65,7 +90,7 @@ const nodeConfig = [
 ]
 
 export enum NodeOperateType {
-  ADD ='add',
+  ADD = 'add',
   DELETE = 'delete',
   SELECT = 'select',
   COPY = 'copy',
@@ -92,7 +117,7 @@ export enum NodeType {
   styleUrl: './process-tree.component.less'
 })
 export class ProcessTreeComponent {
-  private _data:  any = showData;
+  private _data: any = showData;
   @Input()
   get data() {
     return this._data;
@@ -102,7 +127,7 @@ export class ProcessTreeComponent {
     this.dataChange.emit(this._data);
   }
   //对应的节点配置信息
-  @Input() addNodeConfig: Array<any> = nodeConfig;
+  @Input() addNodeConfig: Array<Node> = nodeConfig;
   //对应的根节点配置信息
   @Input() hasEndNode: boolean = false;
   @Output() dataChange = new EventEmitter<any>();
@@ -160,7 +185,7 @@ export class ProcessTreeComponent {
           }
           break
         case NodeOperateType.SELECT: //选中节点
-          this.setSelectNodeID(res.data.id)
+          this.selectedNodeID = res.data.id;
           if (res.data.select) {
             res.data.select(res.data);
           }
@@ -189,7 +214,7 @@ export class ProcessTreeComponent {
   }
 
   //界面的缩放
-  scaleSizeChange(number: any) {
+  private scaleSizeChange(number: number): void {
     this.scaleSize += number;
   }
 
@@ -197,7 +222,7 @@ export class ProcessTreeComponent {
    * 用于将所有的节点使用父节点id：子节点的形式映射到map中
    * @param node 节点
    */
-  getDomTree(node: any) {
+  private getDomTree(node: Node | any): void {
     this.toMapping(node);
     if (this.isPrimaryNode(node)) {
       this.getDomTree(node.children);
@@ -212,13 +237,11 @@ export class ProcessTreeComponent {
       })
       //继续遍历分支后的节点
       this.getDomTree(node.children);
-    } else {
-      //遍历到了末端，无子节点
     }
   }
 
   //id映射到map，用来向上遍历
-  toMapping(node: any) {
+  private toMapping(node: Node): void {
     node && node.id && this.nodeMap.set(node.id, node);
   }
 
@@ -226,11 +249,11 @@ export class ProcessTreeComponent {
    * 复制分支 暂时不需要
    * @param node 节点
    */
-  copyBranch(node: any) {
+  private copyBranch(node: Node): void {
     let parentNode = this.nodeMap.get(node.parentId);
     let branchNode = JSON.parse(JSON.stringify(node));
     branchNode.name += '-copy';
-    this.forEachNode(parentNode, branchNode, (parent: any, node: any) => {
+    this.forEachNode(parentNode, branchNode, (parent: Node, node: Node) => {
       node.id = this.getRandomId();
       node.parentId = parent.id;
     })
@@ -242,7 +265,7 @@ export class ProcessTreeComponent {
    * @param node 节点
    * @param offset 左右移动，-1 ， 1
    */
-  branchMove(node: any, offset: any) {
+  private branchMove(node: Node, offset: any): void {
     let parentNode = this.nodeMap.get(node.parentId);
     let index = parentNode.branchs.indexOf(node);
     let branch = parentNode.branchs[index + offset];
@@ -254,7 +277,7 @@ export class ProcessTreeComponent {
    * 判断是否为主要业务节点，即单分支节点
    * @param node 节点
    */
-  isPrimaryNode(node: any) {
+  private isPrimaryNode(node: Node): boolean {
     return node && node.numberType === this.NodeNumberType.CHILDREN;
   }
 
@@ -262,7 +285,7 @@ export class ProcessTreeComponent {
    * 判断是否为多分支主节点
    * @param node 节点
    */
-  isBranchNode(node: any) {
+  private isBranchNode(node: Node): boolean {
     return node && node.numberType === this.NodeNumberType.BRANCHS;
   }
 
@@ -270,14 +293,14 @@ export class ProcessTreeComponent {
    * 判断是否为多分支节点子级节点
    * @param node 节点
    */
-  isConditionNode(node: any) {
+  private isConditionNode(node: Node): boolean {
     return node && node.numberType === this.NodeNumberType.BRANCH;
   }
 
   /**
    * 生成随机id
    */
-  getRandomId() {
+  private getRandomId(): string {
     return `node_${new Date().getTime().toString().substring(5)}${Math.round(Math.random() * 9000 + 1000)}`;
   }
 
@@ -286,14 +309,13 @@ export class ProcessTreeComponent {
    * @param nodeConfig 插入的节点配置
    * @param parentNode 父亲节点
    */
-  insertNode(nodeConfig: any, parentNode: any) {
+  private insertNode(nodeConfig: Node, parentNode: Node): Node {
     //缓存一下后面的节点
     let afterNode = parentNode.children;
     //插入新节点
     parentNode.children = {
       id: this.getRandomId(),
       parentId: parentNode.id,
-      props: {},
       numberType: nodeConfig.numberType,
     }
     switch (nodeConfig.numberType) {
@@ -321,7 +343,7 @@ export class ProcessTreeComponent {
    * @param parentNode 父亲节点
    * @param nodeConfig 插入的节点配置
    */
-  insertChildrenNode(parentNode: any, nodeConfig: any) {
+  private insertChildrenNode(parentNode: Node, nodeConfig: Node): void {
     parentNode.children = {
       ...parentNode.children,
       ...nodeConfig
@@ -333,7 +355,10 @@ export class ProcessTreeComponent {
    * @param parentNode 父亲节点
    * @param nodeConfig 插入的节点配置
    */
-  insertBranchsNode(parentNode: any, nodeConfig: any) {
+  private insertBranchsNode(parentNode: Node, nodeConfig: Node): void {
+    if (!parentNode.children) {
+      return;
+    }
     parentNode.children["name"] = nodeConfig.name;
     parentNode.children["type"] = nodeConfig.type;
     parentNode.children["branchs"] = [
@@ -357,7 +382,7 @@ export class ProcessTreeComponent {
    * 获得分支节点末端
    * @param conditionNode 分支节点
    */
-  getBranchEndNode(conditionNode: any): any {
+  private getBranchEndNode(conditionNode: Node): any {
     if (!conditionNode.children || !conditionNode.children.id) {
       return conditionNode;
     }
@@ -368,8 +393,8 @@ export class ProcessTreeComponent {
    * 添加分支节点子节点
    * @param node 节点
    */
-  addBranchNode(node: any, nodeConfig: any) {
-    if (node.branchs.length < 8) {
+  private addBranchNode(node: Node, nodeConfig: Node): void {
+    if (node.branchs && node.branchs.length < 8) {
       node.branchs.push({
         ...nodeConfig,
         name: `条件节点${node.branchs.length + 1}`,
@@ -381,7 +406,7 @@ export class ProcessTreeComponent {
     }
   }
 
-  handleDeleteNode(node: any) {
+  private handleDeleteNode(node: Node): void {
     this.delNode(node);
   }
 
@@ -389,7 +414,7 @@ export class ProcessTreeComponent {
    * 删除节点
    * @param node 节点
    */
-  delNode(node: any) {
+  private delNode(node: Node): void {
     //获取该节点的父节点
     let parentNode = this.nodeMap.get(node.parentId);
     if (parentNode) {
@@ -434,7 +459,7 @@ export class ProcessTreeComponent {
   }
 
   //给定一个起始节点，遍历内部所有节点
-  forEachNode(parent: any, node: any, callback: any) {
+  private forEachNode(parent: Node, node: Node | any, callback: any): void {
     if (this.isBranchNode(node)) {
       callback(parent, node);
       this.forEachNode(node, node.children, callback);
@@ -448,20 +473,20 @@ export class ProcessTreeComponent {
     }
   }
 
-  setSelectNodeID(uuid: string) {
-    this.selectedNodeID = uuid;
-  }
-
-  getPureData() {
-
-  }
-
-  wheel = (event: any) => {
+  /**
+   * 通过鼠标滚轮放大缩小
+   * @param event 滚轮事件
+   */
+  public wheel = (event: any): void => {
     this.scaleSizeChange(-event?.deltaY * 0.0005);
     event.preventDefault();
   }
 
-  mousemove = (event: any) => {
+  /**
+   * 通过鼠标拖拽移动
+   * @param event 鼠标移动事件
+   */
+  public mousemove = (event: any): void => {
     if (this.flag) {
       this.transformX += (event.clientX - this.downX!);
       this.transformY += (event.clientY - this.downY!);
@@ -475,15 +500,27 @@ export class ProcessTreeComponent {
     }
   }
 
-  mouseleave = (event: any) => {
+  /**
+   * 鼠标移出事件
+   * @param event 鼠标移出事件
+   */
+  public mouseleave = (event: any): void => {
     this.flag = false;
   }
 
-  mouseup = (event: any) => {
+  /**
+   * 松开鼠标结束拖拽
+   * @param event 鼠标抬起事件
+   */
+  public mouseup = (event: any): void => {
     this.flag = false;
   }
 
-  mousedown = (event: any) => {
+  /**
+   * 鼠标按下设置初始位置信息
+   * @param event 鼠标按下事件
+   */
+  public mousedown = (event: any): void => {
     this.flag = true;
     this.downX = event.clientX;
     this.downY = event.clientY;

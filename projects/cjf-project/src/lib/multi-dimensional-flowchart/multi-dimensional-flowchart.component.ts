@@ -1,7 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { WidgetSource } from '../directive/widget.directive';
+
+export interface Stage {
+  key: string;
+  name: string;
+  sort: number;
+  background: string;
+  description: string;
+  childrenFlow?: Array<Stage>;
+  stages: Array<Stage>;
+  [key: string]: any;
+}
 
 @Component({
   selector: 'lib-multi-dimensional-flowchart',
@@ -10,6 +21,7 @@ import { WidgetSource } from '../directive/widget.directive';
   styleUrl: './multi-dimensional-flowchart.component.less'
 })
 export class MultiDimensionalFlowchartComponent {
+  public source = inject(WidgetSource);
 
   @Input() stageArray = [[1, 2, 3], [4, 5, 6, 7], [8, 9, 10]];
   @Input() data: any = {
@@ -45,19 +57,19 @@ export class MultiDimensionalFlowchartComponent {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key":"stage1"
+        "key": "stage1"
       },
       {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "AAAAAAA",  // 阶段所处的环节,
-        "key":"stage2"
+        "key": "stage2"
       },
       {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key":"stage3"
+        "key": "stage3"
       },
       {
         "key": "B.STAGE_ISSUE_EVALUATE",
@@ -70,7 +82,7 @@ export class MultiDimensionalFlowchartComponent {
             "stages": [
               {
                 "name": "子流程1",
-                "key":"stage4-1",
+                "key": "stage4-1",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
               },
@@ -78,19 +90,19 @@ export class MultiDimensionalFlowchartComponent {
                 "name": "子程1",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key":"stage4-2"
+                "key": "stage4-2"
               },
               {
                 "name": "子流程1",
                 "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key":"stage4-3"
+                "key": "stage4-3"
               },
               {
                 "name": "子流程1",
                 "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key":"stage4-4"
+                "key": "stage4-4"
               },
             ]
           },
@@ -102,19 +114,19 @@ export class MultiDimensionalFlowchartComponent {
                 "name": "子流程2",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key":"stage4-5"
+                "key": "stage4-5"
               },
               {
                 "name": "子流程2",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key":"stage4-6"
+                "key": "stage4-6"
               },
               {
                 "name": "子流程2",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key":"stage4-7"
+                "key": "stage4-7"
               },
 
             ]
@@ -127,25 +139,25 @@ export class MultiDimensionalFlowchartComponent {
                 "name": "子流程3",
                 "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key":"stage4-8"
+                "key": "stage4-8"
               },
               {
                 "name": "子流程3",
                 "sort": 1,         // 序号
                 "stepKey": "BBBBBB",  // 阶段所处的环节,
-                "key":"stage4-9"
+                "key": "stage4-9"
               },
               {
                 "name": "子流程3",
                 "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key":"stage4-10"
+                "key": "stage4-10"
               },
               {
                 "name": "子流程3",
                 "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key":"stage4-11"
+                "key": "stage4-11"
               },
             ]
           }
@@ -155,27 +167,27 @@ export class MultiDimensionalFlowchartComponent {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "CCCCCC",  // 阶段所处的环节,
-        "key":"stage5"
+        "key": "stage5"
       },
       {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key":"stage6"
+        "key": "stage6"
       },
       {
         "name": "阶段名称",
         "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key":"stage7"
+        "key": "stage7"
       },
     ]
   }
   @Input() nowStage: Array<any> = [{ key: 'asdzxc' }];
   @Input() state: string = 'active'
   @Output() selectNode = new EventEmitter();
-  
-  public source = Inject(WidgetSource);
+
+  // 当前选中的节点
   selectedStage: any = { key: 'asdzxc' };
   // 行数 对应 行的key值
   rowKeyAndIndexMap: Map<any, any> = new Map([]);
@@ -193,7 +205,7 @@ export class MultiDimensionalFlowchartComponent {
    * 选择节点
    * @param node 节点
    */
-  selectStage(node: any) {
+  public selectStage(node: any): void {
     this.selectedStage = node;
     this.selectNode.emit(node);
   }
@@ -204,12 +216,8 @@ export class MultiDimensionalFlowchartComponent {
    * @param number2 大的数字
    * @returns 
    */
-  computerCrossRow = (number1: number, number2: number) => {
-    let res = [];
-    for (let i = number1 + 1; i < number2; i++) {
-      res.push(i);
-    }
-    return res;
+  private computerCrossRow = (number1: number, number2: number): Array<number> => {
+    return Array.from({ length: number2 - number1 - 1 }, (v, k) => k + number1 + 1);
   }
 
   /**
@@ -217,7 +225,7 @@ export class MultiDimensionalFlowchartComponent {
    * @param node 节点数据
    * @returns 线条配置数组
    */
-  showLine(node: any): any {
+  public showLine(node: any): any {
     let res: Array<any> = [];
     let afterNodes: Array<Array<number>> = node.afterCoordinates;
     let nowRow = node.row;
@@ -272,7 +280,7 @@ export class MultiDimensionalFlowchartComponent {
    * 将原始数据进行处理，从中填充map
    * @param data 传入的原始数据
    */
-  transFormData(data: any) {
+  private transFormData(data: any): void {
     // 现在所在阶段数组
     let nowStageMap: Map<any, any> = new Map([]);
     this.nowStage.forEach((stage) => {
@@ -287,21 +295,21 @@ export class MultiDimensionalFlowchartComponent {
     let start = 1;
     let alreadyFinish = true;
     // 对原始数据进行处理
-    data.stages.forEach((stage: any, index: number) => {
+    data.stages.forEach((stage: Stage, index: number) => {
       if (stage.childrenFlow) {
         let childrenFlowLength = 0;
         let nowalreadyFinish = alreadyFinish;
-        stage.childrenFlow.forEach((childrenFlow: any) => {
+        stage.childrenFlow.forEach((childrenFlow: Stage) => {
           let childrenFlowalreadyFinish = nowalreadyFinish;
           // 子流程的流程分支循环
-          childrenFlow.stages.forEach((childrenFlowStage: any, childrenFlowIStageIndex: number) => {
+          childrenFlow.stages.forEach((childrenFlowStage: Stage, childrenFlowIStageIndex: number) => {
             if (childrenFlow.stages[childrenFlowIStageIndex + 1]) {
               childrenFlowStage['afterCoordinates'] = [];
-              childrenFlowStage['afterCoordinates'].push([this.rowKeyAndIndexMap.get(childrenFlow.stages[childrenFlowIStageIndex + 1].stepKey), start + childrenFlowIStageIndex + 1]);
+              childrenFlowStage['afterCoordinates'].push([this.rowKeyAndIndexMap.get(childrenFlow.stages[childrenFlowIStageIndex + 1]['stepKey']), start + childrenFlowIStageIndex + 1]);
             }
             childrenFlowStage['rootStage'] = index;
             childrenFlowStage['stage'] = start + childrenFlowIStageIndex;
-            childrenFlowStage['row'] = this.rowKeyAndIndexMap.get(childrenFlowStage.stepKey);
+            childrenFlowStage['row'] = this.rowKeyAndIndexMap.get(childrenFlowStage['stepKey']);
             if (nowStageMap.get(childrenFlowStage.key)) {
               childrenFlowalreadyFinish = false;
               alreadyFinish = false;
@@ -309,17 +317,17 @@ export class MultiDimensionalFlowchartComponent {
             // 是否是当前阶段
             childrenFlowStage['statusClass'] = nowStageMap.get(childrenFlowStage.key) ? 'node-status-current' : childrenFlowalreadyFinish ? '' : 'node-status-after';
             // 将节点数据填充进节点坐标map中
-            if (!this.nodeCoordinatesMap.get(childrenFlowStage.row)?.get(childrenFlowStage.stage)) {
-              this.nodeCoordinatesMap.get(childrenFlowStage.row)?.set(childrenFlowStage.stage, []);
+            if (!this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.get(childrenFlowStage['stage'])) {
+              this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.set(childrenFlowStage['stage'], []);
             }
-            this.nodeCoordinatesMap.get(childrenFlowStage.row)?.get(childrenFlowStage.stage).push(childrenFlowStage);
+            this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.get(childrenFlowStage['stage']).push(childrenFlowStage);
             // 获取当前行当前阶段的最大节点数量
-            if (this.rowMaxLengthMap.get(childrenFlowStage.row)) {
-              if (this.rowMaxLengthMap.get(childrenFlowStage.row) < this.nodeCoordinatesMap.get(childrenFlowStage.row)?.get(childrenFlowStage.stage).length) {
-                this.rowMaxLengthMap.set(childrenFlowStage.row, this.nodeCoordinatesMap.get(childrenFlowStage.row)?.get(childrenFlowStage.stage).length);
+            if (this.rowMaxLengthMap.get(childrenFlowStage['row'])) {
+              if (this.rowMaxLengthMap.get(childrenFlowStage['row']) < this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.get(childrenFlowStage['stage']).length) {
+                this.rowMaxLengthMap.set(childrenFlowStage['row'], this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.get(childrenFlowStage['stage']).length);
               }
             } else {
-              this.rowMaxLengthMap.set(childrenFlowStage.row, this.nodeCoordinatesMap.get(childrenFlowStage.row)?.get(childrenFlowStage.stage).length);
+              this.rowMaxLengthMap.set(childrenFlowStage['row'], this.nodeCoordinatesMap.get(childrenFlowStage['row'])?.get(childrenFlowStage['stage']).length);
             }
           });
           if (childrenFlow.stages.length > childrenFlowLength) {
@@ -335,19 +343,19 @@ export class MultiDimensionalFlowchartComponent {
         stage['statusClass'] = nowStageMap.get(stage.key) ? 'node-status-current' : alreadyFinish ? '' : 'node-status-after';
         stage['rootStage'] = index;
         stage['stage'] = start;
-        stage['row'] = this.rowKeyAndIndexMap.get(stage.stepKey);
+        stage['row'] = this.rowKeyAndIndexMap.get(stage['stepKey']);
         // 将节点数据填充进节点坐标map中
-        if (!this.nodeCoordinatesMap.get(stage.row)?.get(stage.stage)) {
-          this.nodeCoordinatesMap.get(stage.row)?.set(stage.stage, []);
+        if (!this.nodeCoordinatesMap.get(stage['row'])?.get(stage['stage'])) {
+          this.nodeCoordinatesMap.get(stage['row'])?.set(stage['stage'], []);
         }
-        this.nodeCoordinatesMap.get(stage.row)?.get(stage.stage).push(stage);
+        this.nodeCoordinatesMap.get(stage['row'])?.get(stage['stage']).push(stage);
         // 获取当前行的最大节点数量
-        if (this.rowMaxLengthMap.get(stage.row)) {
-          if (this.rowMaxLengthMap.get(stage.row) < this.nodeCoordinatesMap.get(stage.row)?.get(stage.stage).length) {
-            this.rowMaxLengthMap.set(stage.row, this.nodeCoordinatesMap.get(stage.row)?.get(stage.stage).length);
+        if (this.rowMaxLengthMap.get(stage['row'])) {
+          if (this.rowMaxLengthMap.get(stage['row']) < this.nodeCoordinatesMap.get(stage['row'])?.get(stage['stage']).length) {
+            this.rowMaxLengthMap.set(stage['row'], this.nodeCoordinatesMap.get(stage['row'])?.get(stage['stage']).length);
           }
         } else {
-          this.rowMaxLengthMap.set(stage.row, this.nodeCoordinatesMap.get(stage.row)?.get(stage.stage).length);
+          this.rowMaxLengthMap.set(stage['row'], this.nodeCoordinatesMap.get(stage['row'])?.get(stage['stage']).length);
         }
         start++;
       }
@@ -356,14 +364,14 @@ export class MultiDimensionalFlowchartComponent {
         let aheadNode = data.stages[index - 1];
         let coordinates: Array<any> = [];
         if (stage.childrenFlow) {
-          stage.childrenFlow.forEach((childrenFlows: any) => {
-            coordinates.push([childrenFlows.stages[0].row, childrenFlows.stages[0].stage])
+          stage.childrenFlow.forEach((childrenFlows: Stage) => {
+            coordinates.push([childrenFlows.stages[0]['row'], childrenFlows.stages[0]['stage']])
           })
         } else {
-          coordinates.push([stage.row, stage.stage])
+          coordinates.push([stage['row'], stage['stage']])
         }
         if (aheadNode.childrenFlow) {
-          aheadNode.childrenFlow.forEach((childrenFlows: any) => {
+          aheadNode.childrenFlow.forEach((childrenFlows: Stage) => {
             childrenFlows.stages[childrenFlows.stages.length - 1]['afterCoordinates'] = coordinates;
           })
         } else {
@@ -376,38 +384,46 @@ export class MultiDimensionalFlowchartComponent {
       if (this.rowMaxLengthMap.get(row) > 1) {
         for (const [col, nodes] of colMap) {
           let coefficient = 1 / (this.rowMaxLengthMap.get(row) * 2);
-          nodes.forEach((node: any, index: number) => {
+          nodes.forEach((node: Stage, index: number) => {
             node['rowDetail'] = coefficient * (index * 2 + 1) + coefficient * (this.rowMaxLengthMap.get(row) - nodes.length);
           });
         }
       }
     }
-    // 存在多节点在同一行同一阶段时，对改行，该阶段节点的行进行细分
-    data.stages.forEach((stage: any, index: number) => {
+    this.computerInLineSatge(data.stages)
+  }
+
+  /**
+   * 存在多节点在同一行同一阶段时，对改行，该阶段节点的行进行细分
+   * @param stages 阶段数组
+   */
+  private computerInLineSatge(stages: Array<Stage>): void {
+    if (!stages) return;
+    stages.forEach((stage: Stage, index: number) => {
       if (stage.childrenFlow) {
-        stage.childrenFlow.forEach((childrenFlow: any) => {
+        stage.childrenFlow.forEach((childrenFlow: Stage) => {
           // 子流程的流程分支循环
-          childrenFlow.stages.forEach((childrenFlowStage: any, childrenFlowIStageIndex: number) => {
+          childrenFlow.stages.forEach((childrenFlowStage: Stage, childrenFlowIStageIndex: number) => {
             if (childrenFlow.stages[childrenFlowIStageIndex + 1]) {
               childrenFlowStage['afterCoordinates'] = [];
-              childrenFlowStage['afterCoordinates'].push({ rowDetail: childrenFlow.stages[childrenFlowIStageIndex + 1].rowDetail ? childrenFlow.stages[childrenFlowIStageIndex + 1].rowDetail : undefined, col: childrenFlow.stages[childrenFlowIStageIndex + 1].stage, row: childrenFlow.stages[childrenFlowIStageIndex + 1].row });
+              childrenFlowStage['afterCoordinates'].push({ rowDetail: childrenFlow.stages[childrenFlowIStageIndex + 1]['rowDetail'] ? childrenFlow.stages[childrenFlowIStageIndex + 1]['rowDetail'] : undefined, col: childrenFlow.stages[childrenFlowIStageIndex + 1]['stage'], row: childrenFlow.stages[childrenFlowIStageIndex + 1]['row'] });
             }
           });
         })
       }
       // 将当前所有节点坐标放到上一个节点中
-      if (data.stages[index - 1]) {
-        let aheadNode = data.stages[index - 1];
-        let coordinates: Array<any> = [];
+      if (stages[index - 1]) {
+        let aheadNode = stages[index - 1];
+        let coordinates: Array<{ rowDetail: number | undefined, row: number | undefined, col: number | undefined }> = [];
         if (stage.childrenFlow) {
           stage.childrenFlow.forEach((childrenFlows: any) => {
             coordinates.push({ rowDetail: childrenFlows.stages[0].rowDetail ? childrenFlows.stages[0].rowDetail : undefined, col: childrenFlows.stages[0].stage, row: childrenFlows.stages[0].row });
           })
         } else {
-          coordinates.push({ rowDetail: stage.rowDetail ? stage.rowDetail : undefined, row: stage.row, col: stage.stage });
+          coordinates.push({ rowDetail: stage['rowDetail'] ? stage['rowDetail'] : undefined, row: stage['row'], col: stage['stage'] });
         }
         if (aheadNode.childrenFlow) {
-          aheadNode.childrenFlow.forEach((childrenFlows: any) => {
+          aheadNode.childrenFlow.forEach((childrenFlows: Stage) => {
             childrenFlows.stages[childrenFlows.stages.length - 1]['afterCoordinates'] = coordinates;
           })
         } else {
@@ -422,7 +438,7 @@ export class MultiDimensionalFlowchartComponent {
    * @param length 子流程长度
    * @returns grid分组情况
    */
-  getGridColumns(length: number) {
+  public getGridColumns(length: number): string {
     return `repeat(${length},1fr)`;
   }
 
@@ -430,7 +446,7 @@ export class MultiDimensionalFlowchartComponent {
    * 根据传入的阶段分组获取所有的分组情况
    * @returns grid的分组
    */
-  getTotalStageGridColumns() {
+  public getTotalStageGridColumns(): string {
     let res = '32px ';
     this.stageArray.forEach((stage: Array<number>) => {
       res += `${stage.length}fr `;

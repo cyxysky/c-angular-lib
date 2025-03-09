@@ -2,9 +2,10 @@ import { Component, effect, resource, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ProjectModule } from '../../projects/cjf-project/src/public-api';
 import { of, delay } from 'rxjs';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ProjectModule],
+  imports: [RouterOutlet, ProjectModule, NzMenuModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
@@ -12,6 +13,7 @@ export class AppComponent {
   title = 'project';
   show = signal(false);
   mySignal = signal(0);
+  nowComponent = signal('customer-form')
   constructor() {
     effect(() => {
       console.log('change')

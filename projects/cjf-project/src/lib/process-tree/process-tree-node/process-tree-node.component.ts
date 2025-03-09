@@ -1,4 +1,4 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -11,28 +11,44 @@ import { WidgetSource } from '../../directive/widget.directive';
   selector: 'lib-process-tree-node',
   imports: [FormsModule, CommonModule, NzDropDownModule],
   templateUrl: './process-tree-node.component.html',
-  styleUrl: './process-tree-node.component.less'
+  styleUrl: './process-tree-node.component.less',
+  providers: [WidgetSource]
 })
 export class ProcessTreeNodeComponent {
+  /** 依赖注入 */
+  public source = inject(WidgetSource);
+
+  /** 节点数据 */
   @Input() data: any;
+
+  /** 分支节点子节点索引 */
   @Input() branchIndex: any;
+
+  /** 节点与父节点通信的观察者 */
   @Input() subject?: Subject<any>;
+
+  /** 可添加节点的配置信息 */
   @Input() addNodeConfig?: Array<any>;
+
+  /** 是否存在末端节点 */
   @Input() hasEndNode: boolean = false;
+
+  /** 当前选中的节点id */
   @Input() selectedNodeID?: string;
 
-  public readonly qzIconSize = 16;
-  public readonly qzIconColor = 'rgba(19, 28, 40, 0.65)';
-  public readonly qzAddNodeIconSize = 13;
-  public readonly qzAddNodeIconName = 'icon-Plus-Outline';
+  /** 默认icon颜色 */
+  public readonly color = 'rgba(19, 28, 40, 0.65)';
+
+  /** 节点操作类型 */
   public readonly NodeOperateType = NodeOperateType;
+
+  /** 节点数量类型 */
   public readonly NodeNumberType = NodeNumberType;
+
+  /** 节点类型 */
   public readonly NodeType = NodeType;
 
-  public source = Inject(WidgetSource);
-
-  constructor(
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {}
   
@@ -41,7 +57,7 @@ export class ProcessTreeNodeComponent {
    * @param methods 节点方法
    * @param offset 左右位移时-1，+1。分支节点末端时为节点内容
    */
-  add(methods: string, offset?: number) {
+  public add(methods: string, offset?: number): void {
     let params;
     switch (methods) {
       case NodeOperateType.ADD: //增加时，offser为添加节点的类型
@@ -77,7 +93,12 @@ export class ProcessTreeNodeComponent {
     this.subject?.next(params);
   }
 
-  notEmpty(data: any) {
+  /**
+   * 判断节点内容是否为空
+   * @param data 节点数据
+   * @returns 为空判断
+   */
+  public notEmpty(data: any): boolean {
     if(null != data && data){
       let number = Object.keys(data)
       if (number.length === 0) {
@@ -93,6 +114,4 @@ export class ProcessTreeNodeComponent {
   onChildWheel(event: Event){
     // event.stopPropagation();
   }
-
-
 }

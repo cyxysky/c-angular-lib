@@ -1,16 +1,38 @@
-@if (true){
-    <lib-customer-form></lib-customer-form>
-
-
-}
-@if (false){
-    <lib-dynamic-table></lib-dynamic-table>
-}
-<!-- 
-已完成
-
-<lib-multi-dimensional-flowchart></lib-multi-dimensional-flowchart>
-<lib-generate-png></lib-generate-png>
-    <lib-process-tree></lib-process-tree>
-
--->
+<div style="display: flex;flex-direction: row;height: 100%;">
+    <div>
+        <ul nz-menu nzMode="inline">
+            <li nz-submenu nzTitle="组件" nzOpen>
+                <ul>
+                    <li nz-menu-group>
+                        <ul>
+                            <li nz-menu-item nzSelected (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
+                            <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
+                            <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
+                            <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
+                            <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div style="height: 100%;overflow: auto;flex-grow: 1;padding: 20px;">
+        @switch (nowComponent()) {
+            @case ('customer-form') {
+                <lib-customer-form></lib-customer-form>
+            }
+            @case ('process-tree') {
+                <lib-process-tree></lib-process-tree>
+            }
+            @case ('multi-dimensional-flowchart') {
+                <lib-multi-dimensional-flowchart></lib-multi-dimensional-flowchart>
+            }
+            @case ('generate-png') {
+                <lib-generate-png></lib-generate-png>
+            }
+            @case ('dynamic-table') {
+                <lib-dynamic-table></lib-dynamic-table>
+            }
+        }
+    </div>
+</div>
