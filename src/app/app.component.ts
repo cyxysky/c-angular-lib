@@ -3,9 +3,10 @@ import { RouterOutlet } from '@angular/router';
 import { ProjectModule } from '../../projects/cjf-project/src/public-api';
 import { of, delay } from 'rxjs';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ProjectModule, NzMenuModule],
+  imports: [RouterOutlet, ProjectModule, NzMenuModule, ScrollingModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
@@ -13,7 +14,7 @@ export class AppComponent {
   title = 'project';
   show = signal(false);
   mySignal = signal(0);
-  nowComponent = signal('customer-form')
+  nowComponent = signal('user-select')
   constructor() {
     effect(() => {
       console.log('change')
@@ -41,6 +42,6 @@ export class AppComponent {
     // mySignal.set(1);
     // mySignal.set(2);
     // mySignal.set(3);
-    
+
   }
 }

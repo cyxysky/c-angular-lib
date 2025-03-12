@@ -5,18 +5,19 @@
                 <ul>
                     <li nz-menu-group>
                         <ul>
-                            <li nz-menu-item nzSelected (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
+                            <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
+                            <li nz-menu-item nzSelected (click)="nowComponent.set('user-select')">用户选择</li>
                         </ul>
                     </li>
                 </ul>
             </li>
         </ul>
     </div>
-    <div style="height: 100%;overflow: auto;flex-grow: 1;padding: 20px;">
+    <div style="height: 100%;flex-grow: 1;padding: 20px;" cdkScrollable>
         @switch (nowComponent()) {
             @case ('customer-form') {
                 <lib-customer-form></lib-customer-form>
@@ -32,6 +33,9 @@
             }
             @case ('dynamic-table') {
                 <lib-dynamic-table></lib-dynamic-table>
+            }
+            @case ('user-select') {
+                <lib-user-select style="width: 400px;"></lib-user-select>
             }
         }
     </div>

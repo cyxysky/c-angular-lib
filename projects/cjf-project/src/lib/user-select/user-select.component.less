@@ -1,0 +1,215 @@
+@active-color: rgba(0, 207, 226, .7);
+
+:host {
+    display: block;
+}
+
+.select-box {
+    background-color: #fff;
+    border: 1px solid #e7eaed;
+    border-radius: 2px;
+    transition: .2s ease all;
+    user-select: none;
+    min-height: 34px;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1.5;
+    display: flex;
+    align-items: stretch;
+
+    &:focus {
+        border: 1px solid @active-color;
+    }
+
+    .select-content {
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 4px;
+        gap: 4px;
+
+        .select-tag {
+            height: 24px;
+            background-color: #616f81;
+            color: #fff;
+            border-radius: 2px;
+            float: left;
+            cursor: auto;
+            font-size: 14px;
+            padding: 0 8px;
+            transition: padding .3s cubic-bezier(.645, .045, .355, 1);
+            display: flex;
+            align-items: center;
+            max-width: calc(100% - 20px);
+            animation: 0.2s linear 0s alternate show;
+
+            .select-tag-text {
+                padding-right: 8px;
+            }
+
+            .select-tag-close-icon {
+                display: flex;
+                cursor: pointer;
+                pointer-events: all;
+            }
+        }
+    }
+
+    .suffix-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 0;
+        background: linear-gradient(270deg, #f4f6f7 32px, #fff 0);
+        min-width: 32px;
+        max-width: 32px;
+
+        .clear-icon {
+            display: none;
+        }
+
+        .select-icon {}
+
+        .select-icon-clear {
+            display: block;
+        }
+    }
+
+    &:hover {
+        .suffix-box {
+            .clear-icon {
+                display: block;
+            }
+
+            .select-icon-clear {
+                display: none;
+            }
+        }
+    }
+}
+
+.overlay-select-option-box {
+    background: #fff;
+    box-shadow: 0 4px 8px 0 rgba(19, 28, 40, .06);
+    width: 100%;
+    margin: 5px 0px;
+    opacity: 1;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 36px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #6b798c;
+    border-bottom: 1px solid #e7eaed;
+
+    .order-type {
+        cursor: pointer;
+    }
+}
+
+.selected-order {
+    font-weight: 600;
+    position: relative;
+    font-size: 14px;
+    color: #2E3D4B;
+    &::after {
+        content: '';
+        position: absolute;
+        border-bottom: 3px solid black;
+        width: calc(100% + 16px);
+        height: 1px;
+        left: -8px;
+        bottom: -13px;
+    }
+}
+
+.order-by-name-area {
+    display: flex;
+    height: 100%;
+    position: relative;
+
+    .option-list {
+        flex-grow: 1;
+        overflow: auto;
+
+        .user-option {
+
+            .user-group-letter {
+                height: 40px;
+                margin-left: 25px;
+                display: flex;
+                align-items: center;
+                font-size: 16px;
+            }
+
+            .user {
+                padding-left: 25px;
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    background-color: #f4f6f7;
+                }
+            }
+
+            .select-user {
+                background-color: rgba(1, 207, 226, .1) !important;
+            }
+        }
+
+    }
+
+    .letter-list {
+        height: 100%;
+        flex-grow: 0;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 3px;
+        position: absolute;
+        right: 14px;
+        padding: 0 5px 0 5px;
+        background-color: white;
+
+        .scroll-letter {
+            color: @active-color;
+        }
+
+        .letter {
+            cursor: pointer;
+
+            &:hover {
+                color: aquamarine;
+            }
+        }
+    }
+}
+
+.order-by-organizational-structure {}
+
+.padding-left-8 {
+    padding-left: 8px;
+}
+
+.placeHolder {
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    color: #9bacbb;
+}
+
+@keyframes show {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

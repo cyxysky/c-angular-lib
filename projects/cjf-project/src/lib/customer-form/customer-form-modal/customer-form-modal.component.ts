@@ -219,21 +219,11 @@ export class CustomerFormModalComponent {
   public calculatePosition(index: number, width: number): { x: number, y: number, nextIndex: number } {
     let row = Math.ceil(index / (this.columns + 1));
     let column = index - (row - 1) * (this.columns + 1);
-    let position;
-    if (column + width > (this.columns + 1)) {
-      position = {
-        x: 1,
-        y: row + 1,
-        nextIndex: 1 + row * (this.columns + 1) + width
-      };
-    } else {
-      position = {
-        x: column,
-        y: row,
-        nextIndex: column + (row - 1) * (this.columns + 1) + width
-      };
-    }
-    return position;
+    let condition = (column + width > (this.columns + 1));
+    let x = (condition ? 1 : column);
+    let y = (condition ? row + 1 : row);
+    let nextIndex = (condition ? 1 + row * (this.columns + 1) + width : column + (row - 1) * (this.columns + 1) + width);
+    return { x, y, nextIndex }
   }
 
   /**
@@ -315,13 +305,9 @@ export class CustomerFormModalComponent {
    * @param event 拖拽事件
    */
   public mousemove(event: any): void {
-    if (!this.isDragging) {
-      return;
-    }
+    if (!this.isDragging) return;
     // 获取拖拽元素的初始位置
-    if (!this.dragPosition) {
-      this.dragPosition = { x: event.clientX, y: event.clientY };
-    }
+    if (!this.dragPosition) this.dragPosition = { x: event.clientX, y: event.clientY };
     let element = document.getElementById('dragElement');
     if (element) {
       element.style.transform = `translate(${event.clientX - this.dragPosition.x}px, ${event.clientY - this.dragPosition.y}px)`;
@@ -336,16 +322,12 @@ export class CustomerFormModalComponent {
    * @param enterY 进入的y坐标
    */
   public enterDrag(groupIndex: any, componentIndex: any, enterX: number, enterY: number): void {
-    if (!this.isDragging) {
-      return;
-    }
+    if (!this.isDragging) return;
     if (this.isAddingComponent) {
       this.addComponent(this.newComponentData, groupIndex, enterX, enterY);
       return;
     }
-    if (this.draggedComponentIndex.groupIndex === groupIndex && this.draggedComponentIndex.componentIndex === componentIndex && this.draggedComponentData.x === enterX && this.draggedComponentData.y === enterY) {
-      return;
-    }
+    if (this.draggedComponentIndex.groupIndex === groupIndex && this.draggedComponentIndex.componentIndex === componentIndex && this.draggedComponentData.x === enterX && this.draggedComponentData.y === enterY) return;
     if (this.draggedComponentIndex.groupIndex !== groupIndex) {
       this.handleInterGroupComponentMove(this.draggedComponentData, groupIndex, enterX, enterY);
     }
