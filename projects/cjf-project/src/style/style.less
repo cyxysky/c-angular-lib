@@ -1,0 +1,73 @@
+@primary: #0054e9;
+@primary-contrast: #fff;
+@primary-shade: #004acd;
+@primary-tint: #1a65eb;
+@secondary: #0163aa;
+@secondary-contrast: #fff;
+@secondary-shade: #015796;
+@secondary-tint: #1a73b3;
+@tertiary: #6030ff;
+@tertiary-contrast: #fff;
+@tertiary-shade: #542ae0;
+@tertiary-tint: #7045ff;
+@success: #2dd55b;
+@success-contrast: #000;
+@success-shade: #28bb50;
+@success-tint: #42d96b;
+@warning: #ffc409;
+@warning-contrast: #000;
+@warning-shade: #e0ac08;
+@warning-tint: #ffca22;
+@danger: #c5000f;
+@danger-contrast: #fff;
+@danger-shade: #ad000d;
+@danger-tint: #cb1a27;
+@light: #f4f5f8;
+@light-contrast: #000;
+@light-shade: #d7d8da;
+@light-tint: #f5f6f9;
+@medium: #636469;
+@medium-contrast: #fff;
+@medium-shade: #57585c;
+@medium-tint: #737478;
+@dark: #222428;
+@dark-contrast: #fff;
+@dark-shade: #1e2023;
+@dark-tint: #383a3e;
+@link: #1890ff;
+
+.input {
+    box-sizing: border-box;
+    margin: 0;
+    font-variant: tabular-nums;
+    list-style: none;
+    font-feature-settings: "tnum";
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 11px;
+    color: #000000d9;
+    font-size: 14px;
+    line-height: 1.5715;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all .3s;
+
+    &:hover {
+        border-color: #40a9ff;
+    }
+
+    &:focus {
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+        border-right-width: 1px;
+        outline: 0;
+    }
+}
+
+.disabled {
+    pointer-events: none;
+}

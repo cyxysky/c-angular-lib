@@ -109,8 +109,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/cjf-project/ng-package.json"
-          },
+            "project": "projects/cjf-project/ng-package.json"          },
           "configurations": {
             "production": {
               "tsConfig": "projects/cjf-project/tsconfig.lib.prod.json"

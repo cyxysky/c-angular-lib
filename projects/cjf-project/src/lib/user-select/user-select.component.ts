@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, TemplateRef, viewChild, ViewChild, ViewContainerRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, Renderer2, TemplateRef, viewChild, ViewChild, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { BooleanInput } from 'ng-zorro-antd/core/types';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { timer } from 'rxjs';
 
 export enum ORDER_TYPE {
   LETTER = 'LETTER',
@@ -61,22 +62,29 @@ export class UserSelectComponent implements ControlValueAccessor {
   set allowClear(value: BooleanInput) {
     this._allowClear = coerceBooleanProperty(value);
   }
+  @Input({ transform: booleanAttribute }) search: boolean = true;
   /** 浮层初始位置 */
   @ViewChild(CdkOverlayOrigin, { static: false }) _overlayOrigin!: CdkOverlayOrigin;
   /** 浮层tamplet对象 */
   @ViewChild('overlay', { static: false }) overlayTemplate!: TemplateRef<any>;
   /** 首字母索引滚动盒子 */
   @ViewChild('scrollBox', { static: false }) scrollBox!: ElementRef;
+  /** 搜索盒子 */
+  @ViewChild('searchInput', { static: false }) searchInput!: ElementRef;
+  /** 搜索值 */
+  @ViewChild('searchText', { static: false }) searchText!: ElementRef;
   constructor(
     public overlay: Overlay,
     public viewContainerRef: ViewContainerRef,
-    public cdr: ChangeDetectorRef
+    public cdr: ChangeDetectorRef,
+    public renderer: Renderer2
   ) {
   }
 
   public readonly letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-  public optionAreaHeight = `calc(${this.optionPanelHeight}px - 60px)`;
+  public optionAreaHeight = `calc(${this.optionPanelHeight}px)`;
   public users: Array<any> = [];
+  public originUsers: Array<any> = [];
   public _data: any = [];
   public selectedOrder: ORDER_TYPE = ORDER_TYPE.LETTER;
   public overlayRef!: OverlayRef | null;
@@ -84,10 +92,14 @@ export class UserSelectComponent implements ControlValueAccessor {
   public letterMap: Map<string, number> = new Map();
   public selectedLetter: string = 'A';
   public _allowClear = true;
-  public modalState : 'open' | 'closed' = 'closed';
+  public modalState: 'open' | 'closed' = 'closed';
   public ORDER_TYPE = ORDER_TYPE;
+  public searchValue = '';
+  public searchOnCompositionValue = '';
+
   ngOnInit() {
-    this.users = this.initUserListAndScroll(user);
+    this.originUsers = _.filter(user, user => user.state !== 1).sort((a, b) => a.pinYin[0].localeCompare(b.pinYin[0]));
+    this.users = this.initUserListAndScroll(_.cloneDeep(this.originUsers));
     this.cdr.detectChanges();
   }
 
@@ -96,8 +108,7 @@ export class UserSelectComponent implements ControlValueAccessor {
    * @param users 用户数组
    * @returns 完成排序的用户数组
    */
-  public initUserListAndScroll(users: Array<any>): Array<any> {
-    let user = _.filter(users, user => user.state !== 1).sort((a, b) => a.pinYin[0].localeCompare(b.pinYin[0]));
+  public initUserListAndScroll(user: Array<any>): Array<any> {
     let letterCount = _.countBy(user, item => item.pinYin[0]);
     let usersObj: any = {};
     let userArray = [];
@@ -111,6 +122,7 @@ export class UserSelectComponent implements ControlValueAccessor {
         array: usersObj[key]
       })
     }
+    this.selectedLetter = userArray && userArray.length > 0 ? userArray[0].letter : 'A';
     this.lettersRange = this.initScrollLengthRange(letterCount);
     return userArray;
   }
@@ -151,6 +163,8 @@ export class UserSelectComponent implements ControlValueAccessor {
    * @param userId 用户id
    */
   public selectUser(userId: any): void {
+    // this.resetSearchInputWidth();
+    this.focusSearchInput();
     if (this._data.includes(userId)) {
       _.pull(this._data, userId)
       this.onChange(this._data);
@@ -181,7 +195,7 @@ export class UserSelectComponent implements ControlValueAccessor {
    * @param event 滚动事件
    */
   public onLetterScroll(event: any): void {
-    let scrollTop = event.target.scrollTop;
+    let scrollTop = event.target.scrollTop + 1;
     let letter = _.filter(this.lettersRange, letterPosition => scrollTop >= letterPosition.start && letterPosition.end >= scrollTop);
     letter && letter[0]?.letter && (this.selectedLetter = letter[0].letter);
     this.cdr.detectChanges();
@@ -192,8 +206,9 @@ export class UserSelectComponent implements ControlValueAccessor {
    * @param letter 选择的字母
    */
   public selectLetter(letter: string): void {
-    this.selectedLetter = letter;
+    this.focusSearchInput();
     if (this.letterMap.has(letter)) {
+      this.selectedLetter = letter;
       this.scrollBox.nativeElement.scrollTop = this.letterMap.get(letter) as number;
     }
     this.cdr.detectChanges();
@@ -218,28 +233,65 @@ export class UserSelectComponent implements ControlValueAccessor {
     this._data = [];
     this.onChange(this._data);
     this.cdr.detectChanges();
+    this.resetSearchInputWidth();
+  }
+
+  public onSearch(value: any): void {
+    this.searchOnCompositionValue = value;
+    this.users = this.initUserListAndScroll(_.filter(this.originUsers, user => user.name.includes(value) || user.pinYin.includes(value)));
+    this.searchInputWidthChange();
+  }
+
+  public searchInputWidthChange(): void {
+    timer(0).subscribe(() => {
+      let width = this.searchText.nativeElement.offsetWidth + 20;
+      this.renderer.setStyle(this.searchInput.nativeElement, 'width', `${width}px`);
+      this.updateOverlayRefPosition();
+    });
+  }
+
+  public compositionchange(event: any): void {
+    if (event && event.data) {
+      this.searchOnCompositionValue = this.searchValue + event.data;
+    }
+    this.searchInputWidthChange();
+  }
+
+  public resetSearchInputWidth(): void {
+    this.renderer.setStyle(this.searchInput.nativeElement, 'width', '4px');
+    this.searchValue = '';
+    this.searchOnCompositionValue = '';
+    this.users = this.initUserListAndScroll(_.cloneDeep(this.originUsers));
+    this.cdr.detectChanges();
+  }
+
+  public focusSearchInput(): void {
+    if (this.search) {
+      this.searchInput.nativeElement.focus();
+    }
   }
 
   /**
    * 打开弹窗
    */
   public openModal(): void {
-    if(this.overlayRef) return;
+    this.focusSearchInput();
+    if (this.overlayRef) return;
     const config = new OverlayConfig();
     let positionStrategy = this.overlay.position().flexibleConnectedTo(this._overlayOrigin.elementRef).withPositions([
       {
-        originX: 'center',
+        originX: 'start',
         originY: 'bottom',
-        overlayX: 'center',
+        overlayX: 'start',
         overlayY: 'top',
       },
       {
-        originX: 'center',
+        originX: 'start',
         originY: 'top',
-        overlayX: 'center',
+        overlayX: 'start',
         overlayY: 'bottom',
       }
-    ]).withPush(false).withGrowAfterOpen(true).withLockedPosition(false);
+    ]).withPush(true).withGrowAfterOpen(true).withLockedPosition(false);
     config.scrollStrategy = this.overlay.scrollStrategies.reposition();
     config.positionStrategy = positionStrategy;
     config.hasBackdrop = false;
@@ -250,12 +302,13 @@ export class UserSelectComponent implements ControlValueAccessor {
     this.overlayRef = overlayRef;
     // 点击背景，关闭浮层
     overlayRef.outsidePointerEvents().subscribe(() => {
-      console.log('asdasd')
       this.modalState = 'closed';
       let closeTimer = setTimeout(() => {
         clearTimeout(closeTimer);
         overlayRef.dispose();
         this.overlayRef = null;
+        this.resetSearchInputWidth();
+        console.log('guanbi')
       }, 200)
     });
     overlayRef.attach(new TemplatePortal(this.overlayTemplate, this.viewContainerRef));

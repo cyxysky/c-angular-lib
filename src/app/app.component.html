@@ -5,12 +5,14 @@
                 <ul>
                     <li nz-menu-group>
                         <ul>
+                            <li nz-menu-item (click)="nowComponent.set('button')">按钮</li>
+                            <li nz-menu-item nzSelected (click)="nowComponent.set('input')">输入</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
-                            <li nz-menu-item nzSelected (click)="nowComponent.set('user-select')">用户选择</li>
+                            <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
                         </ul>
                     </li>
                 </ul>
@@ -37,6 +39,13 @@
             @case ('user-select') {
                 <lib-user-select style="width: 400px;"></lib-user-select>
             }
+            @case ('button') {
+                <lib-button>123</lib-button>
+            }
+            @case ('input') {
+                <lib-input [pattern]="test"></lib-input>
+            }
+            
         }
     </div>
 </div>

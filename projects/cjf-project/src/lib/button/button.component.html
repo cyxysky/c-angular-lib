@@ -1,0 +1,18 @@
+<div 
+    (click)="createRipple($event)"
+    [ngClass]="[type() , color() , size() , shape() , 'botton', block() ? 'block' : '', disabled() ? 'disabled' : '']"
+    [attr.disabled]="disabled() ? true : null"
+    >
+    {{ content() }}
+    <ng-content></ng-content>
+    @if(ripple.x){
+    <span 
+        class="ripple" 
+        [@ripple] 
+        [style.left.px]="ripple.x" 
+        [style.top.px]="ripple.y" 
+        [style.width.px]="ripple.size"
+        [style.height.px]="ripple.size">
+    </span>
+    }
+</div>
