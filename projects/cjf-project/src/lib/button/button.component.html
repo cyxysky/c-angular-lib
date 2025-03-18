@@ -1,7 +1,6 @@
 <div 
     (click)="createRipple($event)"
     [ngClass]="[type() , color() , size() , shape() , 'botton', block() ? 'block' : '', disabled() ? 'disabled' : '']"
-    [attr.disabled]="disabled() ? true : null"
     >
     {{ content() }}
     <ng-content></ng-content>

@@ -1,1 +1,16 @@
-<p>tag works!</p>
+<div class="lib-tag" 
+    [class.lib-tag-has-color]="color()" 
+    [class.lib-tag-checkable]="checkable()"
+    [class.lib-tag-checked]="checked()"
+    [class.disabled]="disabled()"
+    [ngClass]="tagCustomClass()"
+    [ngStyle]="tagStyle()"
+    (click)="handleClick()">
+  <span class="lib-tag-content">
+    {{ content() }}
+    <ng-content></ng-content>
+  </span>
+  <span *ngIf="closable()" class="lib-tag-close-icon" (click)="closeTag($event)">
+    <i class="close-icon">×</i>
+  </span>
+</div>

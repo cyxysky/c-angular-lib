@@ -36,10 +36,13 @@ export class ButtonComponent {
 	/** 是否撑满父元素 */
 	block = input(false, { transform: booleanAttribute });
 
-
 	ngOnInit() { }
 
 	ripple: { x?: number; y?: number; size?: number } = {};
+	/**
+	 * 创建波纹
+	 * @param event 事件
+	 */
 	createRipple(event: MouseEvent) {
 		const button = event.target as HTMLElement;
 		const rect = button.getBoundingClientRect();

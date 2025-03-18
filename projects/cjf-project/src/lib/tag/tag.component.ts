@@ -1,11 +1,76 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, input, output, booleanAttribute, model, computed, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'lib-tag',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './tag.component.html',
-  styleUrl: './tag.component.less'
+  styleUrl: './tag.component.less',
+  exportAs: 'libTag'
 })
 export class TagComponent {
+  /** 标签是否可以关闭 */
+  closable = input(false, { transform: booleanAttribute });
+  /** 标签是否可选中 */
+  checkable = input(false, { transform: booleanAttribute });
+  /** 标签色彩，可选值: primary, success, warning, danger 或自定义色值 */
+  color = input<string>('primary');
+  /** 标签的自定义类名 */
+  class = input<string>('');
+  /** 自定义样式对象 */
+  style = input<{ [key: string]: string }>({});
+  /** 标签是否禁用 */
+  disabled = input(false, { transform: booleanAttribute });
+  /** 标签内容 */
+  content = input<string>('');
 
+  /** 标签是否被选中 */
+  checked = model<boolean>(false);
+
+  /** 关闭标签时的事件 */
+  close = output<string>();
+  /** 点击标签时的事件 */
+  checkedChange = output<boolean>();
+
+  // 使用 computed 替代旧的方法
+  isPresetColor = computed(() => {
+    return ['primary', 'success', 'warning', 'danger'].indexOf(this.color() || '') !== -1;
+  });
+
+  // 使用 computed 替代 updateClassMap
+  tagCustomClass = computed(() => {
+    return {
+      [`lib-tag-${this.color()}`]: this.isPresetColor(),
+      [this.class()]: !!this.class()
+    };
+  });
+
+  // 使用 computed 替代 updateStyleMap
+  tagStyle = computed(() => {
+    let styles = { ...this.style() };
+    if (this.color() && !this.isPresetColor()) {
+      styles = {
+        ...styles,
+        backgroundColor: this.color(),
+        color: '#fff'
+      };
+    }
+    return styles;
+  });
+
+  closeTag(e: MouseEvent): void {
+    e.stopPropagation();
+    if (!this.disabled()) {
+      this.close.emit('close');
+    }
+  }
+
+  handleClick(): void {
+    if (this.checkable() && !this.disabled()) {
+      const newValue = !this.checked();
+      this.checked.set(newValue);
+      this.checkedChange.emit(newValue);
+    }
+  }
 }

@@ -21,7 +21,13 @@ export class AppComponent {
     ok: 'false'
   });
   nowComponent = signal('input');
-
+  checked = signal(false);
+  onCheckedChange(checked: boolean) {
+    this.checked.set(checked);
+  }
+  onClose(event: string) {
+    console.log(event);
+  }
   sets() {
     this.mySignal.set({
       ok: 'true'

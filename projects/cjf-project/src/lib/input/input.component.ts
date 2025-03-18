@@ -82,10 +82,11 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
     this.onChange(this._data);
   }
 
-
+  /** ngModel注册事件 */
   public onChange: any = (value: any) => { };
   public onTouched: any = () => { };
   writeValue(obj: any): void {
+    obj && (this._data = obj);
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;

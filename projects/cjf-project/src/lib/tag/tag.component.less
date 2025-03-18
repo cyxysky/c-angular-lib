@@ -1,0 +1,69 @@
+@import '../../style/style.less';
+
+.lib-tag {
+    display: inline-block;
+    height: auto;
+    margin-right: 8px;
+    padding: 0 7px;
+    font-size: 12px;
+    line-height: 20px;
+    white-space: nowrap;
+    background-color: @light;
+    border: 1px solid @light-shade;
+    border-radius: 2px;
+    cursor: default;
+    transition: all 0.3s;
+
+    &.lib-tag-checkable {
+        cursor: pointer;
+        &:hover {
+            opacity: 0.85;
+        }
+        &:active {
+            opacity: 0.8;
+        }
+    }
+
+    &.lib-tag-checked {
+        background-color: @primary;
+        color: @primary-contrast;
+        border-color: transparent;
+    }
+
+    &.lib-tag-has-color {
+        border-color: transparent;
+    }
+
+    &.lib-tag-primary {
+        background-color: @primary;
+        color: @primary-contrast;
+    }
+
+    &.lib-tag-success {
+        background-color: @success;
+        color: @success-contrast;
+    }
+
+    &.lib-tag-warning {
+        background-color: @warning;
+        color: @warning-contrast;
+    }
+
+    &.lib-tag-danger {
+        background-color: @danger;
+        color: @danger-contrast;
+    }
+
+    .lib-tag-close-icon {
+        display: inline-block;
+        margin-left: 3px;
+        color: inherit;
+        font-size: 10px;
+        cursor: pointer;
+    }
+}
+
+.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
