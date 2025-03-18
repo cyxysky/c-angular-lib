@@ -6,6 +6,9 @@
     "paths": {
       "cjf-project": [
         "./dist/cjf-project"
+      ],
+      "@project": [
+        "./projects/cjf-project/src/lib/project.module.ts"
       ]
     },
     "outDir": "./dist/out-tsc",

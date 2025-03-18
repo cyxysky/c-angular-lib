@@ -5,15 +5,17 @@
                 <ul>
                     <li nz-menu-group>
                         <ul>
-                            <li nz-menu-item (click)="nowComponent.set('button')">按钮</li>
-                            <li nz-menu-item nzSelected (click)="nowComponent.set('input')">输入</li>
+                            <li nz-menu-item nzSelected (click)="nowComponent.set('button')">按钮</li>
+                            <li nz-menu-item (click)="nowComponent.set('input')">输入</li>
+                            <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
+                            <li nz-menu-item (click)="nowComponent.set('switch')">开关</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
                             <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
-                            <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
+
                         </ul>
                     </li>
                 </ul>
@@ -22,54 +24,48 @@
     </div>
     <div style="height: 100%;flex-grow: 1;padding: 20px;" cdkScrollable>
         @switch (nowComponent()) {
-            @case ('customer-form') {
-                <lib-customer-form></lib-customer-form>
-            }
-            @case ('process-tree') {
-                <lib-process-tree></lib-process-tree>
-            }
-            @case ('multi-dimensional-flowchart') {
-                <lib-multi-dimensional-flowchart></lib-multi-dimensional-flowchart>
-            }
-            @case ('generate-png') {
-                <lib-generate-png></lib-generate-png>
-            }
-            @case ('dynamic-table') {
-                <lib-dynamic-table></lib-dynamic-table>
-            }
-            @case ('user-select') {
-                <lib-user-select style="width: 400px;"></lib-user-select>
-            }
-            @case ('button') {
-                <lib-button>123</lib-button>
-            }
-            @case ('input') {
-                <lib-input></lib-input>
-            }
-            @case ('tag') {
-                <lib-tag>基本标签</lib-tag>
-
-                <!-- 预设颜色标签 -->
-                <lib-tag color="primary">主要标签</lib-tag>
-                <lib-tag color="success">成功标签</lib-tag>
-                <lib-tag color="warning">警告标签</lib-tag>
-                <lib-tag color="danger">危险标签</lib-tag>
-                
-                <!-- 自定义颜色标签 -->
-                <lib-tag color="#f50">#f50</lib-tag>
-                <lib-tag color="#2db7f5">#2db7f5</lib-tag>
-                <lib-tag color="#87d068">#87d068</lib-tag>
-                
-                <!-- 可关闭标签 -->
-                <lib-tag closable (close)="onClose($event)">可关闭标签</lib-tag>
-                
-                <!-- 可选中标签 -->
-                <lib-tag checkable [(checked)]="checked" (checkedChange)="onCheckedChange($event)">可选中标签 选中状态{{checked()}}</lib-tag>
-                
-                <!-- 禁用标签 -->
-                <lib-tag disabled>禁用标签</lib-tag>
-            }
-            
+        @case ('customer-form') {
+        <lib-customer-form></lib-customer-form>
+        }
+        @case ('process-tree') {
+        <lib-process-tree></lib-process-tree>
+        }
+        @case ('multi-dimensional-flowchart') {
+        <lib-multi-dimensional-flowchart></lib-multi-dimensional-flowchart>
+        }
+        @case ('generate-png') {
+        <lib-generate-png></lib-generate-png>
+        }
+        @case ('dynamic-table') {
+        <lib-dynamic-table></lib-dynamic-table>
+        }
+        @case ('user-select') {
+        <div style="display: flex;flex-direction: row;align-items: center;gap: 16px;">
+            <div>
+                选择模式:
+            </div>
+            <div>
+                <lib-switch [checked]="checked()" (checkedChange)="checked.set($event)" [checkedChildren]="'单选'"
+                    [unCheckedChildren]="'多选'">
+                </lib-switch>
+            </div>
+        </div>
+        <div style="padding-top: 16px;">
+            <lib-user-select style="width: 400px;" [selectMode]="checked() ? 'single' : 'multiple'"></lib-user-select>
+        </div>
+        }
+        @case ('button') {
+        <app-doc-button></app-doc-button>
+        }
+        @case ('input') {
+        <lib-input></lib-input>
+        }
+        @case ('tag') {
+        <app-doc-tag></app-doc-tag>
+        }
+        @case ('switch') {
+        <app-doc-switch></app-doc-switch>
+        }
         }
     </div>
 </div>

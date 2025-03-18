@@ -1,0 +1,160 @@
+.doc-box {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 16px 0;
+  border: 1px solid #f0f0f0;
+  border-radius: 2px;
+  transition: all 0.2s;
+  
+  &:hover {
+    box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 
+                0 3px 6px 0 rgba(0, 0, 0, 0.12), 
+                0 5px 12px 4px rgba(0, 0, 0, 0.09);
+  }
+  
+  .doc-box-demo {
+    padding: 24px;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .doc-box-meta {
+    position: relative;
+    padding: 18px 24px 0px 24px;
+    background-color: #fff;
+    border-radius: 0 0 2px 2px;
+    transition: background-color 0.4s;
+    
+    .doc-box-title {
+      position: relative;
+      color: #000000d9;
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 12px;
+      
+      h4 {
+        margin: 0;
+      }
+    }
+    
+    .doc-box-description {
+      color: #000000a6;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    
+    .doc-box-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0;
+      border-top: 1px dashed #f0f0f0;
+      margin-top: 12px;
+      
+      button {
+        margin-left: 8px;
+        border: 1px solid #d9d9d9;
+        border-radius: 2px;
+        background-color: transparent;
+        cursor: pointer;
+        color: rgba(0, 0, 0, 0.65);
+        padding: 4px 8px;
+        font-size: 14px;
+        
+        &:hover {
+          color: #1890ff;
+          border-color: #1890ff;
+        }
+        
+        i {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+  
+  .doc-box-code {
+    border-top: 1px dashed #f0f0f0;
+    background-color: #f5f5f5;
+    
+    pre {
+      margin: 0;
+      padding: 12px 20px;
+      overflow: auto;
+      
+      code {
+        font-family: monospace;
+        font-size: 13px;
+      }
+    }
+  }
+  
+  &.code-expanded {
+    .doc-box-meta {
+      border-radius: 0;
+    }
+  }
+
+  &.doc-box-expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+    
+    .doc-box-demo {
+      height: 40%;
+      overflow: auto;
+    }
+    
+    .doc-box-code {
+      height: 60%;
+      overflow: auto;
+    }
+  }
+}
+
+// 确保 tab 居中
+::ng-deep .ant-tabs-nav {
+  .ant-tabs-nav-list {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.code-container {
+  position: relative;
+}
+
+.tab-copy-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  z-index: 1;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.tab-copy-button:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.copy-icon{
+    height: 18px;
+    width: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

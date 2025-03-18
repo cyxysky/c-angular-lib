@@ -57,11 +57,11 @@ export class UserSelectComponent implements ControlValueAccessor {
   @Input() type: Array<ORDER_TYPE> = [ORDER_TYPE.LETTER, ORDER_TYPE.ORGA];
   /** 数据为空占位符 */
   @Input() placeHolder: string = '请选择';
+  /** 选择模式 */
+  @Input() selectMode: 'single' | 'multiple' = 'single';
   /** 是否允许清空 */
-  @Input() get allowClear() { return this._allowClear; }
-  set allowClear(value: BooleanInput) {
-    this._allowClear = coerceBooleanProperty(value);
-  }
+  @Input({ transform: booleanAttribute }) allowClear: boolean = true;
+  /** 是否显示搜索框 */
   @Input({ transform: booleanAttribute }) search: boolean = true;
   /** 浮层初始位置 */
   @ViewChild(CdkOverlayOrigin, { static: false }) _overlayOrigin!: CdkOverlayOrigin;
@@ -87,11 +87,10 @@ export class UserSelectComponent implements ControlValueAccessor {
   public originUsers: Array<any> = [];
   public _data: any = [];
   public selectedOrder: ORDER_TYPE = ORDER_TYPE.LETTER;
-  public overlayRef!: OverlayRef | null;
+  public overlayRef: OverlayRef | null = null;
   public lettersRange: Array<{ letter: string, start: number, end: number }> = [];
   public letterMap: Map<string, number> = new Map();
   public selectedLetter: string = 'A';
-  public _allowClear = true;
   public modalState: 'open' | 'closed' = 'closed';
   public ORDER_TYPE = ORDER_TYPE;
   public searchValue = '';
@@ -163,7 +162,15 @@ export class UserSelectComponent implements ControlValueAccessor {
    * @param userId 用户id
    */
   public selectUser(userId: any): void {
-    // this.resetSearchInputWidth();
+    this.resetSearchInputWidth();
+    if (this.selectMode === 'single') {
+      this._data = [userId];
+      this.onChange(this._data.toString());
+      this.updateOverlayRefPosition();
+      this.closeModal(this.overlayRef);
+      this.cdr.detectChanges();
+      return;
+    }
     this.focusSearchInput();
     if (this._data.includes(userId)) {
       _.pull(this._data, userId)
@@ -236,20 +243,31 @@ export class UserSelectComponent implements ControlValueAccessor {
     this.resetSearchInputWidth();
   }
 
+  /**
+   * 搜索
+   * @param value 搜索值
+   */
   public onSearch(value: any): void {
     this.searchOnCompositionValue = value;
     this.users = this.initUserListAndScroll(_.filter(this.originUsers, user => user.name.includes(value) || user.pinYin.includes(value)));
     this.searchInputWidthChange();
   }
 
+  /**
+   * 搜索输入宽度变化
+   */
   public searchInputWidthChange(): void {
     timer(0).subscribe(() => {
-      let width = this.searchText.nativeElement.offsetWidth + 20;
+      let width = (this.searchOnCompositionValue === '' ? 4 : this.searchText.nativeElement.offsetWidth + 20);
       this.renderer.setStyle(this.searchInput.nativeElement, 'width', `${width}px`);
       this.updateOverlayRefPosition();
     });
   }
 
+  /**
+   * 搜索输入宽度变化
+   * @param event 搜索输入宽度变化
+   */
   public compositionchange(event: any): void {
     if (event && event.data) {
       this.searchOnCompositionValue = this.searchValue + event.data;
@@ -257,6 +275,9 @@ export class UserSelectComponent implements ControlValueAccessor {
     this.searchInputWidthChange();
   }
 
+  /**
+   * 重置搜索输入宽度
+   */
   public resetSearchInputWidth(): void {
     this.renderer.setStyle(this.searchInput.nativeElement, 'width', '4px');
     this.searchValue = '';
@@ -265,6 +286,9 @@ export class UserSelectComponent implements ControlValueAccessor {
     this.cdr.detectChanges();
   }
 
+  /**
+   * 聚焦搜索输入
+   */
   public focusSearchInput(): void {
     if (this.search) {
       this.searchInput.nativeElement.focus();
@@ -302,19 +326,23 @@ export class UserSelectComponent implements ControlValueAccessor {
     this.overlayRef = overlayRef;
     // 点击背景，关闭浮层
     overlayRef.outsidePointerEvents().subscribe(() => {
-      this.modalState = 'closed';
-      let closeTimer = setTimeout(() => {
-        clearTimeout(closeTimer);
-        overlayRef.dispose();
-        this.overlayRef = null;
-        this.resetSearchInputWidth();
-        console.log('guanbi')
-      }, 200)
+      this.closeModal(overlayRef);
     });
     overlayRef.attach(new TemplatePortal(this.overlayTemplate, this.viewContainerRef));
     this.modalState = 'open';
     this.cdr.detectChanges();
     this.modalState = 'open';
+  }
+
+  closeModal(overlayRef: OverlayRef | null): void {
+    this.modalState = 'closed';
+    this.resetSearchInputWidth();
+    this.cdr.detectChanges();
+    timer(200).subscribe(() => {
+      overlayRef && overlayRef.dispose();
+      this.overlayRef = null;
+      this.cdr.detectChanges();
+    })
   }
 
   /** ngModel实现接口 */

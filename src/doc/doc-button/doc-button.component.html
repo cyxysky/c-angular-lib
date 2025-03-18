@@ -1,0 +1,125 @@
+<h1>Button 按钮</h1>
+
+<p>按钮是用户界面中最基本的交互元素，用于触发操作或事件。</p>
+
+<h2>何时使用</h2>
+<p>标记了一个（或封装一组）操作命令，响应用户点击行为，触发相应的业务逻辑。</p>
+
+<h2>代码演示</h2>
+
+<div class="button-docs-grid">
+  <!-- 颜色属性 -->
+  <app-doc-box title="按钮颜色" [sourceCode]="colorButtonCode" [htmlCode]="colorButtonHtml" [cssCode]="colorButtonCss">
+    <div demo class="demo-flex">
+      <lib-button [color]="'primary'">主要颜色</lib-button>
+      <lib-button [color]="'success'">成功颜色</lib-button>
+      <lib-button [color]="'warning'">警告颜色</lib-button>
+      <lib-button [color]="'danger'">危险颜色</lib-button>
+      <lib-button [color]="'tertiary'">次要颜色</lib-button>
+      <lib-button [color]="'light'">浅色颜色</lib-button>
+      <lib-button [color]="'dark'">深色颜色</lib-button>
+      <lib-button [color]="'medium'">灰色颜色</lib-button>
+      <lib-button [color]="'ghost'">幽灵颜色</lib-button>
+    </div>
+    <div description>
+      <p>按钮有不同的颜色变体来表示不同的语义：</p>
+      <ul>
+        <li><strong>主要颜色 (primary)</strong>：用于主要操作按钮</li>
+        <li><strong>成功颜色 (success)</strong>：表示成功或确认操作</li>
+        <li><strong>警告颜色 (warning)</strong>：提示用户谨慎操作</li>
+        <li><strong>危险颜色 (danger)</strong>：表示可能的危险操作</li>
+        <li><strong>次要颜色 (tertiary)</strong>：次要操作按钮</li>
+        <li><strong>浅色颜色 (light)</strong>：浅色背景按钮</li>
+        <li><strong>深色颜色 (dark)</strong>：深色背景按钮</li>
+        <li><strong>灰色颜色 (medium)</strong>：灰色背景按钮</li>
+        <li><strong>幽灵颜色 (ghost)</strong>：无背景按钮</li>
+      </ul>
+    </div>
+  </app-doc-box>
+
+  <!-- 按钮类型 -->
+  <app-doc-box title="按钮类型" [sourceCode]="typeButtonCode" [htmlCode]="typeButtonHtml" [cssCode]="typeButtonCss">
+    <div demo class="demo-flex">
+      <lib-button>默认按钮</lib-button>
+      <lib-button [type]="'dashed'" [color]="'ghost'">虚线按钮</lib-button>
+      <lib-button [type]="'text'">文字按钮</lib-button>
+      <lib-button [type]="'link'">链接按钮</lib-button>
+    </div>
+    <div description>
+      <p>按钮有多种类型可供选择：</p>
+      <ul>
+        <li><strong>默认按钮</strong>：标准按钮样式</li>
+        <li><strong>虚线按钮 (dashed)</strong>：使用虚线边框，常用于次要操作</li>
+        <li><strong>文字按钮 (text)</strong>：没有边框和背景，看起来像文本</li>
+        <li><strong>链接按钮 (link)</strong>：看起来像链接的按钮</li>
+      </ul>
+    </div>
+  </app-doc-box>
+
+  <!-- 按钮形状 -->
+  <app-doc-box title="按钮形状" [sourceCode]="shapeButtonCode" [htmlCode]="shapeButtonHtml" [cssCode]="shapeButtonCss">
+    <div demo class="demo-flex">
+      <lib-button>默认形状</lib-button>
+      <lib-button [shape]="'circle'">圆形</lib-button>
+    </div>
+    <div description>
+      <p>按钮可以有不同的形状：</p>
+      <ul>
+        <li><strong>默认形状</strong>：标准矩形按钮</li>
+        <li><strong>圆形按钮 (circle)</strong>：圆形按钮，通常用于图标按钮</li>
+      </ul>
+    </div>
+  </app-doc-box>
+
+  <!-- 按钮尺寸 -->
+  <app-doc-box title="按钮尺寸" [sourceCode]="sizeButtonCode" [htmlCode]="sizeButtonHtml" [cssCode]="sizeButtonCss">
+    <div demo class="demo-flex">
+      <lib-button [size]="'small'">小按钮</lib-button>
+      <lib-button>默认尺寸</lib-button>
+      <lib-button [size]="'large'">大按钮</lib-button>
+    </div>
+    <div description>
+      <p>按钮支持三种尺寸：</p>
+      <ul>
+        <li><strong>小按钮 (small)</strong>：适用于空间有限的区域</li>
+        <li><strong>默认尺寸</strong>：标准按钮大小</li>
+        <li><strong>大按钮 (large)</strong>：需要强调或在移动设备上提供更大点击区域时使用</li>
+      </ul>
+    </div>
+  </app-doc-box>
+
+  <!-- 按钮状态 -->
+  <app-doc-box title="按钮状态" [sourceCode]="stateButtonCode" [htmlCode]="stateButtonHtml" [cssCode]="stateButtonCss">
+    <div demo class="demo-flex">
+      <lib-button>正常状态</lib-button>
+      <lib-button disabled>禁用状态</lib-button>
+    </div>
+    <div description>
+      <p>按钮可以处于不同的状态：</p>
+      <ul>
+        <li><strong>正常状态</strong>：可点击的按钮</li>
+        <li><strong>禁用状态 (disabled)</strong>：不可点击的按钮，通常用于表示操作当前不可用</li>
+      </ul>
+    </div>
+  </app-doc-box>
+
+  <!-- 块级按钮 -->
+  <app-doc-box title="块级按钮" [sourceCode]="blockButtonCode" [htmlCode]="blockButtonHtml" [cssCode]="blockButtonCss">
+    <div demo>
+      <lib-button block>撑满父元素</lib-button>
+      <div style="margin-top: 16px;">
+        <lib-button block [shape]="'circle'">撑满父元素圆形</lib-button>
+      </div>
+    </div>
+    <div description>
+      <p>使用 <code>block</code> 属性可以创建宽度占满父元素的按钮：</p>
+      <ul>
+        <li><strong>块级按钮</strong>：宽度为100%，常用于移动端或需要强调的操作</li>
+        <li>可以与其他属性组合使用，如形状属性</li>
+      </ul>
+    </div>
+  </app-doc-box>
+</div>
+
+<h2>API</h2>
+<app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

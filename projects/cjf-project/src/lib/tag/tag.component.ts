@@ -16,10 +16,6 @@ export class TagComponent {
   checkable = input(false, { transform: booleanAttribute });
   /** 标签色彩，可选值: primary, success, warning, danger 或自定义色值 */
   color = input<string>('primary');
-  /** 标签的自定义类名 */
-  class = input<string>('');
-  /** 自定义样式对象 */
-  style = input<{ [key: string]: string }>({});
   /** 标签是否禁用 */
   disabled = input(false, { transform: booleanAttribute });
   /** 标签内容 */
@@ -42,21 +38,18 @@ export class TagComponent {
   tagCustomClass = computed(() => {
     return {
       [`lib-tag-${this.color()}`]: this.isPresetColor(),
-      [this.class()]: !!this.class()
     };
   });
 
   // 使用 computed 替代 updateStyleMap
   tagStyle = computed(() => {
-    let styles = { ...this.style() };
     if (this.color() && !this.isPresetColor()) {
-      styles = {
-        ...styles,
+      return {
         backgroundColor: this.color(),
         color: '#fff'
       };
     }
-    return styles;
+    return {};
   });
 
   closeTag(e: MouseEvent): void {

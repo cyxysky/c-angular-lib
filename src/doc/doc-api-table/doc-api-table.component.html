@@ -1,0 +1,29 @@
+<div class="api-container">
+    @for (section of apiData; track section.title) {
+      <div class="api-table-container">
+        <h3>{{ section.title }}</h3>
+        <p>{{ section.description }}</p>
+        <p>{{ section.type }}</p>
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>描述</th>
+              <th>类型</th>
+              <th>默认值</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of section.items; track item.name) {
+              <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.default || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>

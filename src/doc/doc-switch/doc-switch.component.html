@@ -1,0 +1,77 @@
+<h1>Switch 开关</h1>
+
+<p>开关组件，用于在两种状态间切换。</p>
+
+<h2>代码演示</h2>
+
+<div class="switch-docs-grid">
+  <!-- 基础用法 -->
+  <app-doc-box title="基础用法" [sourceCode]="basicSwitchSource" [htmlCode]="basicSwitchHTML">
+    <div demo>
+      <lib-switch [(checked)]="basicSwitchChecked"></lib-switch>
+      <p style="margin-top: 8px;">当前状态: {{ basicSwitchChecked ? '开' : '关' }}</p>
+    </div>
+    <div description>
+      最简单的开关用法，点击切换开关状态。
+    </div>
+  </app-doc-box>
+
+  <!-- 禁用状态 -->
+  <app-doc-box title="禁用状态" [sourceCode]="disabledSwitchSource" [htmlCode]="disabledSwitchHTML">
+    <div demo>
+      <lib-switch [disabled]="true" [checked]="disabledSwitchChecked"></lib-switch>
+    </div>
+    <div description>
+      禁用状态下的开关，不响应用户点击事件。
+    </div>
+  </app-doc-box>
+
+  <!-- 加载中状态 -->
+  <app-doc-box title="加载中状态" [sourceCode]="loadingSwitchSource" [htmlCode]="loadingSwitchHTML">
+    <div demo>
+      <lib-switch [loading]="true" [checked]="loadingSwitchChecked"></lib-switch>
+    </div>
+    <div description>
+      加载中状态的开关，通常用于异步操作时防止用户重复点击。
+    </div>
+  </app-doc-box>
+
+  <!-- 带文字的开关 -->
+  <app-doc-box title="带文字的开关" [sourceCode]="textSwitchSource" [htmlCode]="textSwitchHTML">
+    <div demo>
+      <lib-switch 
+        [(checked)]="textSwitchChecked"
+        [checkedChildren]="'开'"
+        [unCheckedChildren]="'关'">
+      </lib-switch>
+    </div>
+    <div description>
+      可以在开关上自定义显示的文字，通过设置 checkedChildren 和 unCheckedChildren 属性。
+    </div>
+  </app-doc-box>
+
+  <!-- 两种大小 -->
+  <app-doc-box title="两种大小" [sourceCode]="smallSwitchSource" [htmlCode]="smallSwitchHTML">
+    <div demo>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div>
+          <p style="margin-bottom: 8px;">默认大小</p>
+          <lib-switch [checked]="smallSwitchChecked" (checkedChange)="smallSwitchChecked = $event"></lib-switch>
+        </div>
+        <div>
+          <p style="margin-bottom: 8px;">小尺寸</p>
+          <lib-switch 
+            [checked]="smallSwitchChecked" 
+            [size]="'small'"
+            (checkedChange)="smallSwitchChecked = $event">
+          </lib-switch>
+        </div>
+      </div>
+    </div>
+    <div description>
+      开关有两种尺寸：默认（default）和小（small），通过设置 size 属性来控制。
+    </div>
+  </app-doc-box>
+</div>
+
+<app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

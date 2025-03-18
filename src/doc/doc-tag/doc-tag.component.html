@@ -1,0 +1,105 @@
+<h1>Tag 标签</h1>
+
+<p>进行标记和分类的小标签。</p>
+
+<h2>何时使用</h2>
+<p>用于标记事物的属性和维度；进行分类。</p>
+
+<h2>代码演示</h2>
+
+<div class="tag-docs-grid">
+  <!-- 基础用法 -->
+  <app-doc-box title="基础用法" [sourceCode]="basicTagSource" [htmlCode]="basicTagHTML">
+    <div demo>
+      <lib-tag [content]="basicTagContent"></lib-tag>
+    </div>
+    <div description>
+      基础标签的用法，展示文本内容。
+    </div>
+  </app-doc-box>
+
+  <!-- 可关闭标签 -->
+  <app-doc-box title="可关闭标签" [sourceCode]="closableTagSource" [htmlCode]="closableTagHTML">
+    <div demo>
+      <lib-tag 
+        *ngFor="let tag of closableTags; let i = index"
+        [content]="tag"
+        [closable]="true"
+        (close)="handleClose(i)"
+        style="margin-right: 8px;">
+      </lib-tag>
+    </div>
+    <div description>
+      设置 closable 属性可以定义一个标签是否可以关闭。关闭标签时会触发 close 事件，从而可以在回调中做一些其他操作。
+    </div>
+  </app-doc-box>
+
+  <!-- 可选择标签 -->
+  <app-doc-box title="可选择标签" [sourceCode]="checkableTagSource" [htmlCode]="checkableTagHTML">
+    <div demo>
+      <lib-tag 
+        *ngFor="let tag of checkableTags"
+        [content]="tag.content"
+        [checkable]="true"
+        [(checked)]="tag.checked"
+        style="margin-right: 8px;">
+      </lib-tag>
+    </div>
+    <div description>
+      设置 checkable 属性可以定义一个标签是否可以选中。可以通过双向绑定 checked 属性控制标签的选中状态。
+    </div>
+  </app-doc-box>
+
+  <!-- 多彩标签 -->
+  <app-doc-box title="多彩标签" [sourceCode]="colorTagSource" [htmlCode]="colorTagHTML">
+    <div demo>
+      <h4>预设颜色</h4>
+      <div style="margin-bottom: 16px;">
+        <lib-tag 
+          *ngFor="let color of presetColors"
+          [content]="color"
+          [color]="color"
+          style="margin-right: 8px; margin-bottom: 8px;">
+        </lib-tag>
+      </div>
+      
+      <h4>自定义颜色</h4>
+      <div>
+        <lib-tag 
+          *ngFor="let color of customColors"
+          [content]="color"
+          [color]="color"
+          style="margin-right: 8px; margin-bottom: 8px;">
+        </lib-tag>
+      </div>
+    </div>
+    <div description>
+      我们提供了多种预设色彩的标签样式：primary、success、warning、danger。<br>
+      您也可以设置自定义颜色。
+    </div>
+  </app-doc-box>
+
+  <!-- 禁用状态 -->
+  <app-doc-box title="禁用状态" [sourceCode]="disabledTagSource" [htmlCode]="disabledTagHTML">
+    <div demo>
+      <lib-tag 
+        [content]="'禁用标签'"
+        [disabled]="true"
+        [closable]="true">
+      </lib-tag>
+
+      <lib-tag 
+        [content]="'禁用可选择标签'"
+        [disabled]="true"
+        [checkable]="true"
+        [checked]="true"
+        style="margin-left: 8px;">
+      </lib-tag>
+    </div>
+    <div description>
+      设置 disabled 属性可以禁用一个标签，使其无法被点击、选中或关闭。
+    </div>
+  </app-doc-box>
+</div>
+
+<app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

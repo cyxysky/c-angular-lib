@@ -1,0 +1,120 @@
+@primary-color: #1890ff;
+@disabled-color: rgba(0, 0, 0, 0.25);
+@disabled-bg: #f5f5f5;
+@border-radius-base: 2px;
+@switch-color: @primary-color;
+@switch-height: 22px;
+@switch-sm-height: 16px;
+@switch-duration: 0.2s;
+
+:host {
+  display: inline-block;
+}
+
+.lib-switch {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 44px;
+  height: @switch-height;
+  line-height: @switch-height;
+  vertical-align: middle;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 0;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all @switch-duration;
+  user-select: none;
+  padding: 0;
+  outline: none;
+
+  &:focus {
+    outline: none;
+  }
+
+  &-focused {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  &-checked {
+    background-color: @switch-color;
+  }
+
+  &-disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &-handle {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: @switch-height - 4px;
+    height: @switch-height - 4px;
+    transition: all @switch-duration;
+    border-radius: 100%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
+  }
+
+  &-checked &-handle {
+    left: calc(100% - @switch-height + 2px);
+  }
+
+  &-loading-icon {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: loadingCircle 1s infinite linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  &-inner {
+    display: block;
+    margin: 0 7px 0 (@switch-height + 2px);
+    color: #fff;
+    font-size: 12px;
+    transition: margin @switch-duration;
+  }
+
+  &-checked &-inner {
+    margin-left: 7px;
+    margin-right: (@switch-height + 2px);
+  }
+
+  &-small {
+    min-width: 28px;
+    height: @switch-sm-height;
+    line-height: @switch-sm-height;
+
+    .lib-switch-handle {
+      width: @switch-sm-height - 4px;
+      height: @switch-sm-height - 4px;
+    }
+
+    &.lib-switch-checked .lib-switch-handle {
+      left: calc(100% - @switch-sm-height + 2px);
+    }
+
+    .lib-switch-inner {
+      margin-left: (@switch-sm-height + 2px);
+      margin-right: 5px;
+      font-size: 12px;
+    }
+
+    &.lib-switch-checked .lib-switch-inner {
+      margin-left: 5px;
+      margin-right: (@switch-sm-height + 2px);
+    }
+  }
+}
+
+@keyframes loadingCircle {
+  100% {
+    transform: rotate(360deg);
+  }
+}
