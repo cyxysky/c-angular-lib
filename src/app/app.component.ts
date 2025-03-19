@@ -7,11 +7,10 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { DocBoxComponent } from '../doc/doc-box/doc-box.component';
 import { DocModule } from '../doc/doc.module';
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, NzInputModule, NzButtonModule, DocBoxComponent, DocModule],
+  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, NzInputModule, NzButtonModule, DocModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })

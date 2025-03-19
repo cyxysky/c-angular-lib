@@ -8,7 +8,7 @@
   <!-- 基础用法 -->
   <app-doc-box title="基础用法" [sourceCode]="basicSwitchSource" [htmlCode]="basicSwitchHTML">
     <div demo>
-      <lib-switch [(checked)]="basicSwitchChecked"></lib-switch>
+      <lib-switch [(ngModel)]="basicSwitchChecked"></lib-switch>
       <p style="margin-top: 8px;">当前状态: {{ basicSwitchChecked ? '开' : '关' }}</p>
     </div>
     <div description>
@@ -19,7 +19,7 @@
   <!-- 禁用状态 -->
   <app-doc-box title="禁用状态" [sourceCode]="disabledSwitchSource" [htmlCode]="disabledSwitchHTML">
     <div demo>
-      <lib-switch [disabled]="true" [checked]="disabledSwitchChecked"></lib-switch>
+      <lib-switch [disabled]="true" [ngModel]="disabledSwitchChecked"></lib-switch>
     </div>
     <div description>
       禁用状态下的开关，不响应用户点击事件。
@@ -29,7 +29,7 @@
   <!-- 加载中状态 -->
   <app-doc-box title="加载中状态" [sourceCode]="loadingSwitchSource" [htmlCode]="loadingSwitchHTML">
     <div demo>
-      <lib-switch [loading]="true" [checked]="loadingSwitchChecked"></lib-switch>
+      <lib-switch [loading]="true" [ngModel]="loadingSwitchChecked"></lib-switch>
     </div>
     <div description>
       加载中状态的开关，通常用于异步操作时防止用户重复点击。
@@ -40,7 +40,7 @@
   <app-doc-box title="带文字的开关" [sourceCode]="textSwitchSource" [htmlCode]="textSwitchHTML">
     <div demo>
       <lib-switch 
-        [(checked)]="textSwitchChecked"
+        [(ngModel)]="textSwitchChecked"
         [checkedChildren]="'开'"
         [unCheckedChildren]="'关'">
       </lib-switch>
@@ -56,14 +56,14 @@
       <div style="display: flex; align-items: center; gap: 16px;">
         <div>
           <p style="margin-bottom: 8px;">默认大小</p>
-          <lib-switch [checked]="smallSwitchChecked" (checkedChange)="smallSwitchChecked = $event"></lib-switch>
+          <lib-switch [ngModel]="smallSwitchChecked" (ngModelChange)="smallSwitchChecked = $event"></lib-switch>
         </div>
         <div>
           <p style="margin-bottom: 8px;">小尺寸</p>
           <lib-switch 
-            [checked]="smallSwitchChecked" 
+            [ngModel]="smallSwitchChecked" 
             [size]="'small'"
-            (checkedChange)="smallSwitchChecked = $event">
+            (ngModelChange)="smallSwitchChecked = $event">
           </lib-switch>
         </div>
       </div>

@@ -1,1 +1,42 @@
-<p>number-input works!</p>
+<div class="lib-number-input-container" 
+     [class.focused]="focused()" 
+     [class.disabled]="disabled()"
+     [class.readonly]="readonly()"
+     [class]="statusClass()">
+  
+  <!-- 前缀 -->
+  <span *ngIf="prefix()" class="lib-number-input-prefix">{{ prefix() }}</span>
+  
+  <div class="lib-number-input-content">
+    <!-- 输入框 -->
+    <input type="number"
+           [style.color]="color()"
+           class="lib-number-input"
+           [(ngModel)]="inputValue"
+           (ngModelChange)="onModelChange($event)"
+           [placeholder]="placeholder()"
+           [disabled]="disabled()"
+           [readonly]="readonly()"
+           (focus)="onFocus()"
+           (blur)="onBlur()">
+  </div>
+  
+  <!-- 后缀 -->
+  <span *ngIf="suffix()" class="lib-number-input-suffix">{{ suffix() }}</span>
+  
+  <!-- 控制按钮 -->
+  <div class="lib-number-input-handler-wrap" *ngIf="!readonly()">
+    <button type="button"
+            class="lib-number-input-handler lib-number-input-handler-up"
+            [disabled]="disabled() || (max() !== null && valueSignal() !== null && valueSignal()! >= max()!)"
+            (click)="increase()">
+      <span class="lib-number-input-handler-up-inner"></span>
+    </button>
+    <button type="button"
+            class="lib-number-input-handler lib-number-input-handler-down"
+            [disabled]="disabled() || (min() !== null && valueSignal() !== null && valueSignal()! <= min()!)"
+            (click)="decrease()">
+      <span class="lib-number-input-handler-down-inner"></span>
+    </button>
+  </div>
+</div>

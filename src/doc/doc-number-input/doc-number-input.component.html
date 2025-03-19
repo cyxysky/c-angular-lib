@@ -1,1 +1,167 @@
-<p>doc-number-input works!</p>
+<div class="doc-container">
+  <h1 class="doc-title">数字输入框 NumberInput</h1>
+  
+  <p class="doc-description">
+    通过鼠标或键盘，输入范围内的数值。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当需要获取标准数值时。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource"
+      [htmlCode]="basicHTML"
+      [cssCode]="basicCSS">
+      <div demo >
+        <div style="display: flex; gap: 10px;">
+            <lib-number-input [(ngModel)]="basicValue"></lib-number-input>
+            <lib-number-input [(ngModel)]="basicValue" [status]="'warning'" [color]="'#faad14'"></lib-number-input>
+            <lib-number-input [(ngModel)]="basicValue" [status]="'error'" [color]="'#ff4d4f'"></lib-number-input>
+        </div>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        数字输入框的基本用法。status有error、warning、normal三种状态。还可以设置color设置展示的颜色
+      </div>
+    </app-doc-box>
+    
+    <!-- 前缀和后缀 -->
+    <app-doc-box
+      title="前缀和后缀"
+      [sourceCode]="prefixSuffixSource"
+      [htmlCode]="prefixSuffixHTML"
+      [cssCode]="prefixSuffixCSS">
+      <div demo>
+        <lib-number-input
+          [prefix]="'¥'"
+          [suffix]="'元'"
+          [(ngModel)]="prefixSuffixValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ prefixSuffixValue }}</p>
+      </div>
+      <div description>
+        在输入框上添加前缀或后缀图标。
+      </div>
+    </app-doc-box>
+    
+    <!-- 精度 -->
+    <app-doc-box
+      title="精度"
+      [sourceCode]="precisionSource"
+      [htmlCode]="precisionHTML"
+      [cssCode]="precisionCSS">
+      <div demo>
+        <lib-number-input
+          [precision]="2"
+          [(ngModel)]="precisionValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ precisionValue }}</p>
+      </div>
+      <div description>
+        通过设置 precision 属性控制小数点位数。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用 -->
+    <app-doc-box
+      title="禁用"
+      [sourceCode]="disabledSource"
+      [htmlCode]="disabledHTML"
+      [cssCode]="disabledCSS">
+      <div demo>
+        <lib-number-input
+          [disabled]="true"
+          [(ngModel)]="disabledValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ disabledValue }}</p>
+      </div>
+      <div description>
+        禁用状态下的数字输入框。
+      </div>
+    </app-doc-box>
+    
+    <!-- 只读 -->
+    <app-doc-box
+      title="只读"
+      [sourceCode]="readonlySource"
+      [htmlCode]="readonlyHTML"
+      [cssCode]="readonlyCSS">
+      <div demo>
+        <lib-number-input
+          [readonly]="true"
+          [(ngModel)]="readonlyValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ readonlyValue }}</p>
+      </div>
+      <div description>
+        只读状态下的数字输入框。
+      </div>
+    </app-doc-box>
+    
+    <!-- 步进 -->
+    <app-doc-box
+      title="步进"
+      [sourceCode]="stepSource"
+      [htmlCode]="stepHTML"
+      [cssCode]="stepCSS">
+      <div demo>
+        <lib-number-input
+          [step]="0.1"
+          [precision]="2"
+          [(ngModel)]="stepValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ stepValue }}</p>
+      </div>
+      <div description>
+        通过设置 step 控制每次点击增加或减少按钮时改变的值。
+      </div>
+    </app-doc-box>
+    
+    <!-- 范围限制 -->
+    <app-doc-box
+      title="范围限制"
+      [sourceCode]="boundedSource"
+      [htmlCode]="boundedHTML"
+      [cssCode]="boundedCSS">
+      <div demo>
+        <lib-number-input
+          [min]="1"
+          [max]="10"
+          [(ngModel)]="boundedValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ boundedValue }}</p>
+      </div>
+      <div description>
+        通过 min 和 max 限制输入范围。
+      </div>
+    </app-doc-box>
+    
+    <!-- 格式化 -->
+    <app-doc-box
+      title="格式化展示"
+      [sourceCode]="formattedSource"
+      [htmlCode]="formattedHTML"
+      [cssCode]="formattedCSS">
+      <div demo>
+        <lib-number-input
+          [formatter]="currencyFormatter"
+          [(ngModel)]="formattedValue">
+        </lib-number-input>
+        <p class="example-value">当前值: {{ formattedValue }}</p>
+      </div>
+      <div description>
+        通过 formatter 格式化数字，以展示具有具体含义的数据。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

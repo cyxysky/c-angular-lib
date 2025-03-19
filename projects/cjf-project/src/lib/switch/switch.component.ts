@@ -2,6 +2,7 @@ import { booleanAttribute, Component, ElementRef, forwardRef, input, model, outp
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { single } from 'rxjs';
 
 @Component({
   selector: 'lib-switch',
@@ -28,7 +29,7 @@ export class SwitchComponent implements ControlValueAccessor {
   size = input<'default' | 'small'>('default');
 
   // 使用model()函数创建双向绑定
-  checked = model(false);
+  checked = signal(false);
 
   // 使用Signal管理内部状态
   private focusedState = signal(false);

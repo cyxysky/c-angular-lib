@@ -1,0 +1,58 @@
+.doc-title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-section-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 40px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-sub-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 24px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 16px;
+}
+
+// 响应式网格布局
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+// 示例内容样式
+.example-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  
+  lib-number-input {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .example-value {
+    margin-top: 16px;
+    color: #666;
+  }
+}
+
+// API 表格样式
+app-doc-api-table {
+  margin-bottom: 32px;
+}

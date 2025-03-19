@@ -9,6 +9,7 @@
                             <li nz-menu-item (click)="nowComponent.set('input')">输入</li>
                             <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
                             <li nz-menu-item (click)="nowComponent.set('switch')">开关</li>
+                            <li nz-menu-item (click)="nowComponent.set('number-input')">数字输入</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
@@ -45,8 +46,7 @@
                 选择模式:
             </div>
             <div>
-                <lib-switch [checked]="checked()" (checkedChange)="checked.set($event)" [checkedChildren]="'单选'"
-                    [unCheckedChildren]="'多选'">
+                <lib-switch [(ngModel)]="checked" [checkedChildren]="'单选'" [unCheckedChildren]="'多选'">
                 </lib-switch>
             </div>
         </div>
@@ -65,6 +65,9 @@
         }
         @case ('switch') {
         <app-doc-switch></app-doc-switch>
+        }
+        @case ('number-input') {
+        <app-doc-number-input></app-doc-number-input>
         }
         }
     </div>
