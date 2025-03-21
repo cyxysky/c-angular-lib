@@ -1,0 +1,55 @@
+<div class="segmented-wrapper" [style.max-width.px]="maxWidth">
+  <div class="segmented" 
+       #rootElement
+       [class.segmented-block]="block"
+       [class.segmented-lg]="size === 'large'"
+       [class.segmented-sm]="size === 'small'"
+       [class.segmented-disabled]="disabled">
+       
+    <!-- 左侧滚动按钮 - 仅在需要时显示 -->
+    <div class="segmented-nav segmented-prev"
+         *ngIf="showScrollButtons"
+         [class.segmented-nav-disabled]="!canScrollLeft || disabled"
+         (click)="scrollLeft($event)">
+      <div class="segmented-nav-icon"></div>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="segmented-container" 
+         #segmentContainer
+         (scroll)="onScroll()">
+      <div class="segmented-group" #segmentGroup>
+        <div *ngFor="let option of options; let i = index"
+             class="segmented-item" 
+             [class.segmented-item-disabled]="disabled || option.disabled"
+             (click)="selectOption(option)"
+             #segmentItem>
+          <div class="segmented-item-label">
+            <span *ngIf="option.icon" class="segmented-item-icon">
+              <i class="{{option.icon}}"></i>
+            </span>
+            <span>{{option.label}}</span>
+          </div>
+        </div>
+        
+        <!-- 滑块 -->
+        <div class="segmented-thumb" 
+             [ngStyle]="{
+               'transform': 'translateX(' + thumbPosition + 'px)',
+               'width.px': thumbWidth,
+               'display': selectedIndex >= 0 && !disabled ? 'block' : 'none'
+             }"
+             #thumb>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右侧滚动按钮 - 仅在需要时显示 -->
+    <div class="segmented-nav segmented-next"
+         *ngIf="showScrollButtons"
+         [class.segmented-nav-disabled]="!canScrollRight || disabled"
+         (click)="scrollRight($event)">
+      <div class="segmented-nav-icon"></div>
+    </div>
+  </div>
+</div>

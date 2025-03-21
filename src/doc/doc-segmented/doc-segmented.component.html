@@ -1,0 +1,140 @@
+<div class="doc-container">
+  <h1 class="doc-title">分段控制器 Segmented</h1>
+  
+  <p class="doc-description">
+    用于展示多个选项并允许用户选择其中单个选项的控件。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当用户需要在有限的互斥选项中做出单选时，可作为Radio的替代品，提供更友好的视觉反馈。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource"
+      [htmlCode]="basicHTML"
+      [cssCode]="basicCSS">
+      <div demo>
+        <lib-segmented
+          [options]="basicOptions"
+          [(ngModel)]="basicValue">
+        </lib-segmented>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        最简单的用法，指定选项列表，以及默认选中的值。
+      </div>
+    </app-doc-box>
+    
+    <!-- 带图标 -->
+    <app-doc-box
+      title="带图标的选项"
+      [sourceCode]="iconSource"
+      [htmlCode]="iconHTML"
+      [cssCode]="iconCSS">
+      <div demo>
+        <lib-segmented
+          [options]="iconOptions"
+          [(ngModel)]="iconValue">
+        </lib-segmented>
+        <p class="example-value">当前值: {{ iconValue }}</p>
+      </div>
+      <div description>
+        分段控制器支持在选项中显示图标。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用 -->
+    <app-doc-box
+      title="禁用状态"
+      [sourceCode]="disabledSource"
+      [htmlCode]="disabledHTML"
+      [cssCode]="disabledCSS">
+      <div demo>
+        <lib-segmented
+          [options]="disabledOptions"
+          [(ngModel)]="disabledValue"
+          [disabled]="componentDisabled">
+        </lib-segmented>
+        <div style="margin-top: 16px;">
+          <button (click)="toggleDisabled()">
+            {{ componentDisabled ? '启用' : '禁用' }}
+          </button>
+        </div>
+        <p class="example-value">当前值: {{ disabledValue }}</p>
+      </div>
+      <div description>
+        可以禁用整个组件或单个选项。
+      </div>
+    </app-doc-box>
+    
+    <!-- 尺寸 -->
+    <app-doc-box
+      title="尺寸"
+      [sourceCode]="sizeSource"
+      [htmlCode]="sizeHTML"
+      [cssCode]="sizeCSS">
+      <div demo>
+        <lib-segmented
+          [options]="sizeOptions"
+          [(ngModel)]="currentSize"
+          (valueChange)="onSizeChange($event)">
+        </lib-segmented>
+        <div style="margin-top: 16px;">
+          <lib-segmented
+            [options]="basicOptions"
+            [(ngModel)]="basicValue"
+            [size]="currentSize">
+          </lib-segmented>
+        </div>
+        <p class="example-value">当前尺寸: {{ currentSize }}</p>
+      </div>
+      <div description>
+        分段控制器有大、中、小三种尺寸。
+      </div>
+    </app-doc-box>
+    
+    <!-- 块级 -->
+    <app-doc-box
+      title="块级分段控制器"
+      [sourceCode]="blockSource"
+      [htmlCode]="blockHTML"
+      [cssCode]="blockCSS">
+      <div demo>
+        <lib-segmented
+          [options]="blockOptions"
+          [ngModel]="isBlock ? 'block' : 'inline'"
+          [maxWidth]="400"
+          (ngModelChange)="onBlockChange($event)">
+        </lib-segmented>
+        <div style="margin-top: 16px;">
+          <lib-segmented
+            [options]="basicOptions"
+            [(ngModel)]="basicValue"
+            [block]="isBlock">
+          </lib-segmented>
+          <!-- 内联模式 -->
+<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+
+<!-- 块级模式 -->
+<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [block]="true"></lib-segmented>
+
+<!-- 设置最大宽度 -->
+<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="500"></lib-segmented>
+        </div>
+        <p class="example-value">当前模式: {{ isBlock ? '块级' : '内联' }}</p>
+      </div>
+      <div description>
+        分段控制器可以占满整个父容器的宽度。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

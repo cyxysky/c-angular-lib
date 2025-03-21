@@ -4,6 +4,7 @@ import { DocButtonComponent } from './doc-button/doc-button.component';
 import { DocSwitchComponent } from './doc-switch/doc-switch.component';
 import { DocTagComponent } from './doc-tag/doc-tag.component';
 import { DocNumberInputComponent } from './doc-number-input/doc-number-input.component';
+import { DocSegmentedComponent } from './doc-segmented/doc-segmented.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -11,13 +12,15 @@ import { DocNumberInputComponent } from './doc-number-input/doc-number-input.com
     DocButtonComponent,
     DocSwitchComponent,
     DocTagComponent,
-    DocNumberInputComponent
+    DocNumberInputComponent,
+    DocSegmentedComponent
   ],
   exports: [
     DocButtonComponent,
     DocSwitchComponent,
     DocTagComponent,
-    DocNumberInputComponent
+    DocNumberInputComponent,
+    DocSegmentedComponent
   ]
 })
 export class DocModule { }

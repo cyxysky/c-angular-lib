@@ -1,0 +1,276 @@
+// 变量定义
+@primary-color: #1890ff;
+@primary-hover-color: #40a9ff;
+@primary-active-color: #096dd9;
+@text-color: rgba(0, 0, 0, 0.85);
+@text-color-secondary: rgba(0, 0, 0, 0.65);
+@disabled-color: rgba(0, 0, 0, 0.25);
+@border-radius-base: 6px;
+@border-radius-item: 4px;
+@transition-duration: 300ms;
+@background-color-item: rgba(0, 0, 0, 0.04);
+@background-color-white: #fff;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.segmented-wrapper {
+  display: inline-block;
+  width: 100%;
+}
+
+.segmented {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+  // 重要：整个控件没有背景色
+  background-color: transparent;
+  
+  &-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 4px;
+    margin: 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  &-group {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    min-width: 100%;
+    padding: 2px;
+    margin: 0;
+    // 只在选项组添加背景色和圆角
+    background-color: @background-color-item;
+    border-radius: @border-radius-base;
+    // 添加这一行以限制背景色不超出选项
+    overflow: hidden;
+  }
+  
+  &-item {
+    position: relative;
+    color: @text-color-secondary;
+    height: 28px;
+    padding: 0 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color @transition-duration;
+    flex: 0 0 auto;
+    z-index: 2;
+    border-radius: @border-radius-item;
+    
+    &-label {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      padding: 0;
+      margin: 0;
+    }
+    
+    &-icon {
+      margin-right: 6px;
+      display: flex;
+      align-items: center;
+    }
+    
+    &-disabled {
+      color: @disabled-color;
+      cursor: not-allowed;
+    }
+    
+    &:not(.segmented-item-disabled):hover {
+      color: @primary-hover-color;
+    }
+    
+    &:not(.segmented-item-disabled):active {
+      color: @primary-active-color;
+    }
+  }
+  
+  &-thumb {
+    position: absolute;
+    // 确保滑块有白色背景
+    background-color: @background-color-white;
+    border-radius: @border-radius-item;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    height: 28px;
+    top: 2px; // 考虑 group 的 padding
+    left: 0; // 会通过JS设置
+    width: auto; // 会通过JS设置
+    z-index: 1;
+    
+    // 滑块动画效果
+    transition: transform @transition-duration cubic-bezier(0.4, 0, 0.2, 1), 
+                width @transition-duration cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, width;
+    pointer-events: none;
+    display: block !important; // 确保滑块显示
+  }
+  
+  &-nav {
+    flex: 0 0 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: @background-color-white;
+    border-radius: @border-radius-item;
+    cursor: pointer;
+    z-index: 3;
+    transition: all @transition-duration;
+    color: @text-color-secondary;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    margin: 0 2px;
+    min-width: 28px;
+    
+    &:hover {
+      background-color: #fafafa;
+      color: @text-color;
+    }
+    
+    &-disabled {
+      cursor: not-allowed;
+      color: @disabled-color;
+      box-shadow: none;
+      opacity: 0.5;
+      
+      &:hover {
+        background-color: @background-color-white;
+        color: @disabled-color;
+      }
+    }
+    
+    &-icon {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      padding: 0;
+      margin: 0;
+    }
+  }
+  
+  &-prev {
+    .segmented-nav-icon {
+      border-width: 4px 6px 4px 0;
+      border-color: transparent currentColor transparent transparent;
+    }
+  }
+  
+  &-next {
+    .segmented-nav-icon {
+      border-width: 4px 0 4px 6px;
+      border-color: transparent transparent transparent currentColor;
+    }
+  }
+  
+  // 块级模式
+  &-block {
+    width: 100%;
+    
+    .segmented-group {
+      width: 100%;
+    }
+    
+    .segmented-item {
+      flex: 1;
+    }
+  }
+  
+  // 大尺寸
+  &-lg {
+    .segmented-group {
+      padding: 3px;
+    }
+    
+    .segmented-item {
+      height: 40px;
+      font-size: 16px;
+    }
+    
+    .segmented-thumb {
+      height: 40px;
+      top: 3px;
+      left: 3px;
+    }
+    
+    .segmented-nav {
+      height: 40px;
+      flex-basis: 32px;
+      
+      &-icon {
+        border-width: 5px 7px 5px 0;
+      }
+    }
+    
+    .segmented-next .segmented-nav-icon {
+      border-width: 5px 0 5px 7px;
+    }
+  }
+  
+  // 小尺寸
+  &-sm {
+    .segmented-group {
+      padding: 1px;
+    }
+    
+    .segmented-item {
+      height: 24px;
+      font-size: 12px;
+    }
+    
+    .segmented-thumb {
+      height: 24px;
+      top: 1px;
+      left: 1px;
+    }
+    
+    .segmented-nav {
+      height: 24px;
+      flex-basis: 24px;
+      
+      &-icon {
+        border-width: 3px 5px 3px 0;
+      }
+    }
+    
+    .segmented-next .segmented-nav-icon {
+      border-width: 3px 0 3px 5px;
+    }
+  }
+  
+  // 禁用状态
+  &-disabled {
+    cursor: not-allowed;
+    
+    .segmented-group {
+      opacity: 0.7;
+    }
+    
+    .segmented-item {
+      color: @disabled-color;
+      cursor: not-allowed;
+    }
+    
+    .segmented-thumb {
+      background-color: rgba(0, 0, 0, 0.04);
+      box-shadow: none;
+    }
+  }
+}

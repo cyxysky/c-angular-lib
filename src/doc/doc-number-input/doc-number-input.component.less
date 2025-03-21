@@ -29,9 +29,14 @@
 // 响应式网格布局
 .doc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: 1fr;
   gap: 24px;
-  margin-bottom: 40px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 // 示例内容样式

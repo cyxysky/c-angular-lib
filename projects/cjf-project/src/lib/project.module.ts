@@ -22,6 +22,7 @@ import { TagComponent } from './tag/tag.component';
 import { TreeSelectComponent } from './tree-select/tree-select.component';
 import { TreeComponent } from './tree/tree.component';
 import { SwitchComponent } from './switch/switch.component';
+import { SegmentedComponent } from './segmented/segmented.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -40,6 +41,7 @@ export * from './tag/tag.component';
 export * from './tree-select/tree-select.component';
 export * from './tree/tree.component';
 export * from './switch/switch.component';
+export * from './segmented/segmented.component';
 // 指令
 export * from './directive/widget.directive';
 
@@ -64,7 +66,8 @@ export * from './directive/widget.directive';
     TagComponent,
     TreeSelectComponent,
     TreeComponent,
-    SwitchComponent
+    SwitchComponent,
+    SegmentedComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -84,7 +87,8 @@ export * from './directive/widget.directive';
     TagComponent,
     TreeSelectComponent,
     TreeComponent,
-    SwitchComponent
+    SwitchComponent,
+    SegmentedComponent
   ]
 })
 export class ProjectModule { }
