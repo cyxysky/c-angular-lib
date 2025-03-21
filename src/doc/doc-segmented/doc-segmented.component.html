@@ -106,28 +106,23 @@
       [htmlCode]="blockHTML"
       [cssCode]="blockCSS">
       <div demo>
-        <lib-segmented
-          [options]="blockOptions"
-          [ngModel]="isBlock ? 'block' : 'inline'"
-          [maxWidth]="400"
-          (ngModelChange)="onBlockChange($event)">
-        </lib-segmented>
         <div style="margin-top: 16px;">
-          <lib-segmented
-            [options]="basicOptions"
-            [(ngModel)]="basicValue"
-            [block]="isBlock">
-          </lib-segmented>
-          <!-- 内联模式 -->
-<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+          <div style="display: grid; gap: 16px;grid-template-columns: 1fr;">
+            <div>
+              <div>
+                默认占满宽度
+              </div>
+              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+            </div>
+            <div style="display: grid; gap: 16px;">
+              <div>
+                设置最大宽度 <lib-number-input [(ngModel)]="maxWidth"></lib-number-input> , 超出宽度出现移动按钮
+              </div>
+              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="maxWidth()"></lib-segmented>
+            </div>
+          </div>
 
-<!-- 块级模式 -->
-<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [block]="true"></lib-segmented>
-
-<!-- 设置最大宽度 -->
-<lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="500"></lib-segmented>
         </div>
-        <p class="example-value">当前模式: {{ isBlock ? '块级' : '内联' }}</p>
       </div>
       <div description>
         分段控制器可以占满整个父容器的宽度。

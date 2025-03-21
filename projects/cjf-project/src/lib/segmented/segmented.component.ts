@@ -185,7 +185,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
       this.applyWidthSettings();
       this.updateScrollButtonsVisibility();
     }
-    
     if (changes['disabled'] && !changes['disabled'].firstChange) {
       // 禁用状态改变时，需要重置滑块
       const updateSub = timer(0).pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -245,6 +244,12 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
         }
       }
     }
+    
+    // 使用更长的延迟，确保DOM完全渲染
+    setTimeout(() => {
+      console.log('宽度设置应用后执行检查');
+      this.updateScrollButtonsVisibility();
+    }, 100); // 延长延迟时间
   }
 
   writeValue(value: string | number | null): void {
@@ -302,12 +307,10 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
       this.onTouched();
       this.valueChange.emit(this.value);
       
-      // 更新选中索引
-      this.selectedIndex = this.options.findIndex(o => o.value === option.value);
-      
       // 找到对应选项的索引和元素
-      if (this.selectedIndex !== -1 && this.segmentItems) {
-        const element = this.segmentItems.toArray()[this.selectedIndex]?.nativeElement;
+      const index = this.options.findIndex(o => o.value === option.value);
+      if (index !== -1 && this.segmentItems) {
+        const element = this.segmentItems.toArray()[index]?.nativeElement;
         if (element) {
           // 直接将滑块移动到目标位置
           this.moveThumbToPosition(element.offsetLeft, element.offsetWidth);
@@ -325,27 +328,57 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   
   // 更新左右滚动按钮的可见性
   updateScrollButtonsVisibility(): void {
-    if (!this.segmentContainer || !this.segmentGroup) return;
+    if (!this.segmentContainer || !this.segmentGroup || !this.rootElement) return;
     
+    // 使用rootElement获取wrapper的宽度
+    const wrapper = this.rootElement.nativeElement;
     const container = this.segmentContainer.nativeElement;
     const group = this.segmentGroup.nativeElement;
     
-    // 确保有合理的滚动宽度和容器宽度
-    if (container.clientWidth <= 0 || group.scrollWidth <= 0) return;
+    // 检查真实的内容是否溢出wrapper宽度
+    const wrapperWidth = wrapper.clientWidth;
+    const contentWidth = group.scrollWidth;
+    const hasOverflow = contentWidth > wrapperWidth + 2; // 添加一点容差
     
-    // 检查是否有内容溢出
-    const hasOverflow = group.scrollWidth > container.clientWidth + 2; // 添加2像素的容差
+    // 添加调试日志
+    console.log(`外层容器宽度: ${wrapperWidth}, 内容宽度: ${contentWidth}, 是否溢出: ${hasOverflow}`);
     
-    // 只有当有内容溢出时才显示滚动按钮
+    // 更新显示状态
     const oldState = this.showScrollButtons;
     this.showScrollButtons = hasOverflow;
     
-    // 同时检查左右滚动状态
-    this.updateScrollButtonState();
+    // 强制更新滚动按钮状态
+    if (!hasOverflow) {
+      this.canScrollLeft = false;
+      this.canScrollRight = false;
+      
+      // 强制滚动回起始位置
+      if (container.scrollLeft > 0) {
+        container.scrollLeft = 0;
+      }
+    } else {
+      // 重新检查滚动状态
+      this.checkScrollButtons();
+    }
     
     if (oldState !== this.showScrollButtons) {
+      console.log(`滚动按钮显示状态改变: ${oldState} -> ${this.showScrollButtons}`);
       this.cdr.detectChanges();
     }
+  }
+  
+  // 添加新方法：计算所有选项的实际宽度总和
+  private calculateTotalOptionsWidth(): number {
+    if (!this.segmentItems || this.segmentItems.length === 0) return 0;
+    
+    // 获取所有选项元素的实际宽度总和
+    let totalWidth = 0;
+    this.segmentItems.forEach(item => {
+      totalWidth += item.nativeElement.offsetWidth;
+    });
+    
+    // 添加额外边距，确保准确性
+    return totalWidth;
   }
   
   // 计算并存储所有选项的位置
@@ -369,86 +402,33 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   
   // 更新滑块位置的方法
   updateThumbPosition(immediate = false): void {
-    if (this.value === null || this.disabled) {
-      // 如果没有选中值或组件被禁用，不显示滑块
-      this.selectedIndex = -1;
-      this.thumbPosition = 0;
-      this.thumbWidth = 0;
-      return;
-    }
-
-    // 寻找当前选中项的索引
+    // 确保滑块元素存在且有选中项
+    if (!this.thumbElement || this.value === null) return;
+    
+    // 找到选中项的索引
     this.selectedIndex = this.options.findIndex(option => option.value === this.value);
+    if (this.selectedIndex === -1 || !this.segmentItems) return;
     
-    if (this.selectedIndex === -1 || !this.segmentItems || this.segmentItems.length === 0) {
-      return;
-    }
-
-    const selectedItem = this.segmentItems.toArray()[this.selectedIndex]?.nativeElement;
-    if (!selectedItem) return;
+    // 获取选中项元素
+    const selectedElement = this.segmentItems.toArray()[this.selectedIndex]?.nativeElement;
+    if (!selectedElement) return;
     
-    // 直接使用DOM元素的offsetLeft和offsetWidth计算
-    this.thumbPosition = selectedItem.offsetLeft;
-    this.thumbWidth = selectedItem.offsetWidth;
+    // 获取选中项的尺寸和位置
+    const width = selectedElement.offsetWidth;
+    const left = selectedElement.offsetLeft;
     
-    // 使用moveThumbToPosition方法更新滑块位置
-    this.moveThumbToPosition(this.thumbPosition, this.thumbWidth, immediate);
-  }
-  
-  // 滚动到选中项
-  scrollToSelected(): void {
-    if (this.selectedIndex < 0 || !this.segmentItems || !this.segmentContainer) return;
-    
-    const container = this.segmentContainer.nativeElement;
-    const selectedItem = this.segmentItems.toArray()[this.selectedIndex]?.nativeElement;
-    if (!selectedItem) return;
-    
-    // 获取选中项和容器的位置信息
-    const itemLeft = selectedItem.offsetLeft;
-    const itemWidth = selectedItem.offsetWidth;
-    const itemRight = itemLeft + itemWidth;
-    const containerWidth = container.clientWidth;
-    const scrollLeft = container.scrollLeft;
-    const scrollRight = scrollLeft + containerWidth;
-    
-    // 确保选中项完全可见
-    if (itemLeft < scrollLeft) {
-      // 如果选中项在左侧不可见区域
-      container.scrollTo({
-        left: Math.max(0, itemLeft - 8), // 添加左侧间距
-        behavior: this.firstRender ? 'auto' : 'smooth'
-      });
-    } else if (itemRight > scrollRight) {
-      // 如果选中项在右侧不可见区域
-      const newScrollLeft = Math.min(
-        itemRight - containerWidth + 8, // 添加右侧间距
-        container.scrollWidth - containerWidth
-      );
-      container.scrollTo({
-        left: Math.max(0, newScrollLeft),
-        behavior: this.firstRender ? 'auto' : 'smooth'
-      });
-    }
-    
-    // 更新按钮状态
-    setTimeout(() => {
-      this.updateScrollButtonState();
-    }, this.firstRender ? 0 : 300);
+    // 移动滑块到目标位置
+    this.moveThumbToPosition(left, width, immediate);
   }
   
   // 移动滑块到指定位置
   private moveThumbToPosition(left: number, width: number, immediate = false): void {
     if (!this.thumbElement) return;
     
-    // 重要：更新组件属性，确保模板绑定生效
-    this.thumbPosition = left;
-    this.thumbWidth = width;
-    
     const thumbElement = this.thumbElement.nativeElement;
     
-    // 关键：确保设置了滑块的基本样式
-    this.renderer.setStyle(thumbElement, 'background-color', '#fff');
-    this.renderer.setStyle(thumbElement, 'display', 'block');
+    // 显示调试信息
+    console.log(`Moving thumb to: left=${left}, width=${width}, immediate=${immediate}`);
     
     if (immediate || this.firstRender) {
       // 无动画移动
@@ -473,6 +453,9 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
         this.renderer.setStyle(thumbElement, 'transform', `translateX(${left}px)`);
       });
     }
+    
+    // 确保滑块可见
+    thumbElement.style.display = 'block';
     
     // 确保变化被检测
     this.cdr.detectChanges();
@@ -503,39 +486,85 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   }
   
   // 向左滚动
-  scrollLeft(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
+  scrollLeft(): void {
+    if (!this.segmentContainer || !this.canScrollLeft) return;
     
-    if (this.canScrollLeft && !this.disabled && this.segmentContainer) {
-      const container = this.segmentContainer.nativeElement;
-      // 使用更合理的滚动量
-      const scrollAmount = Math.min(100, container.clientWidth / 2);
-      container.scrollLeft -= scrollAmount;
-      
-      // 确保立即更新按钮状态
-      setTimeout(() => {
-        this.checkScrollButtons();
-      }, 10);
-    }
+    const container = this.segmentContainer.nativeElement;
+    container.scrollBy({
+      left: -this.scrollStep,
+      behavior: 'smooth'
+    });
+    
+    const updateSub = timer(300).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateThumbPosition();
+      this.checkScrollButtons();
+    });
+    
+    this.subscriptions.push(updateSub);
   }
   
   // 向右滚动
-  scrollRight(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
+  scrollRight(): void {
+    if (!this.segmentContainer || !this.canScrollRight) return;
     
-    if (this.canScrollRight && !this.disabled && this.segmentContainer) {
-      const container = this.segmentContainer.nativeElement;
-      // 使用更合理的滚动量
-      const scrollAmount = Math.min(100, container.clientWidth / 2);
-      container.scrollLeft += scrollAmount;
-      
-      // 确保立即更新按钮状态
-      setTimeout(() => {
-        this.checkScrollButtons();
-      }, 10);
+    const container = this.segmentContainer.nativeElement;
+    container.scrollBy({
+      left: this.scrollStep,
+      behavior: 'smooth'
+    });
+    
+    const updateSub = timer(300).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateThumbPosition();
+      this.checkScrollButtons();
+    });
+    
+    this.subscriptions.push(updateSub);
+  }
+  
+  // 滚动到选中项
+  scrollToSelected(): void {
+    if (!this.segmentItems || !this.segmentContainer) return;
+    
+    const selectedIndex = this.options.findIndex(option => this.isSelected(option));
+    if (selectedIndex === -1) return;
+    
+    const container = this.segmentContainer.nativeElement;
+    const selectedItem = this.segmentItems.toArray()[selectedIndex]?.nativeElement;
+    if (!selectedItem) return;
+    
+    // 获取选中项和容器的位置信息
+    const itemLeft = selectedItem.offsetLeft;
+    const itemWidth = selectedItem.offsetWidth;
+    const itemRight = itemLeft + itemWidth;
+    const containerWidth = container.clientWidth;
+    const scrollLeft = container.scrollLeft;
+    const scrollRight = scrollLeft + containerWidth;
+    
+    // 确保选中项完全可见
+    if (itemLeft < scrollLeft) {
+      // 如果选中项在左侧不可见区域
+      container.scrollTo({
+        left: itemLeft,
+        behavior: this.firstRender ? 'auto' : 'smooth'
+      });
+    } else if (itemRight > scrollRight) {
+      // 如果选中项在右侧不可见区域
+      const newScrollLeft = Math.min(
+        itemRight - containerWidth,
+        container.scrollWidth - containerWidth
+      );
+      container.scrollTo({
+        left: newScrollLeft,
+        behavior: this.firstRender ? 'auto' : 'smooth'
+      });
     }
+    
+    // 更新按钮状态
+    const updateSub = timer(300).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.checkScrollButtons();
+    });
+    
+    this.subscriptions.push(updateSub);
   }
   
   // 监听滚动事件
@@ -549,23 +578,5 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
     });
     
     this.subscriptions.push(scrollSub);
-  }
-
-  // 更新滚动按钮状态
-  updateScrollButtonState(): void {
-    if (!this.segmentContainer) return;
-    
-    const container = this.segmentContainer.nativeElement;
-    
-    // 确保容器宽度有效
-    if (container.clientWidth <= 0) return;
-    
-    // 使用1px的容差值来判断是否可以滚动
-    this.canScrollLeft = container.scrollLeft > 1;
-    this.canScrollRight = Math.abs(
-      (container.scrollWidth - container.scrollLeft - container.clientWidth)
-    ) > 1;
-    
-    this.cdr.markForCheck();
   }
 }

@@ -10,7 +10,7 @@
     <div class="segmented-nav segmented-prev"
          *ngIf="showScrollButtons"
          [class.segmented-nav-disabled]="!canScrollLeft || disabled"
-         (click)="scrollLeft($event)">
+         (click)="scrollLeft()">
       <div class="segmented-nav-icon"></div>
     </div>
     
@@ -19,6 +19,7 @@
          #segmentContainer
          (scroll)="onScroll()">
       <div class="segmented-group" #segmentGroup>
+        <!-- 选项区域 -->
         <div *ngFor="let option of options; let i = index"
              class="segmented-item" 
              [class.segmented-item-disabled]="disabled || option.disabled"
@@ -34,11 +35,7 @@
         
         <!-- 滑块 -->
         <div class="segmented-thumb" 
-             [ngStyle]="{
-               'transform': 'translateX(' + thumbPosition + 'px)',
-               'width.px': thumbWidth,
-               'display': selectedIndex >= 0 && !disabled ? 'block' : 'none'
-             }"
+             [style.display]="'block'"
              #thumb>
         </div>
       </div>
@@ -48,8 +45,9 @@
     <div class="segmented-nav segmented-next"
          *ngIf="showScrollButtons"
          [class.segmented-nav-disabled]="!canScrollRight || disabled"
-         (click)="scrollRight($event)">
+         (click)="scrollRight()">
       <div class="segmented-nav-icon"></div>
     </div>
   </div>
 </div>
+

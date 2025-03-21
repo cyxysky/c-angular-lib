@@ -1,19 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { SegmentedComponent } from '@project';
+import { ProjectModule } from "../../../projects/cjf-project/src/lib/project.module";
+import { NumberInputComponent } from "../../../projects/cjf-project/src/lib/number-input/number-input.component";
 
 @Component({
   selector: 'app-doc-segmented',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     DocBoxComponent,
     DocApiTableComponent,
-    SegmentedComponent
+    SegmentedComponent,
+    ProjectModule,
+    NumberInputComponent
   ],
   templateUrl: './doc-segmented.component.html',
   styleUrl: './doc-segmented.component.less'
@@ -32,16 +35,10 @@ export class DocSegmentedComponent {
     { value: 'years1', label: '年' },
     { value: 'years2', label: '年' },
     { value: 'years3', label: '年' },
-    { value: 'years4', label: '年' },
-    { value: 'years5', label: '年' },
-    { value: 'years6', label: '年' },
-    { value: 'years7', label: '年' },
-    { value: 'years8', label: '年' },
-    { value: 'years9', label: '年' },
-    { value: 'years10', label: '年' },
 
   ];
-  
+  maxWidth = signal(900);
+
   // 带图标示例
   iconValue: string = 'list';
   iconOptions = [
@@ -49,7 +46,7 @@ export class DocSegmentedComponent {
     { value: 'kanban', label: '看板', icon: 'icon-appstore' },
     { value: 'calendar', label: '日历', icon: 'icon-calendar' }
   ];
-  
+
   // 禁用示例
   disabledValue: string = 'apple';
   disabledOptions = [
@@ -58,7 +55,7 @@ export class DocSegmentedComponent {
     { value: 'banana', label: '香蕉', disabled: true }
   ];
   componentDisabled = false;
-  
+
   // 尺寸示例
   currentSize: 'large' | 'default' | 'small' = 'default';
   sizeOptions = [
@@ -66,14 +63,14 @@ export class DocSegmentedComponent {
     { value: 'default', label: '默认' },
     { value: 'small', label: '小' }
   ];
-  
+
   // 块级示例
   isBlock = true;
   blockOptions = [
     { value: 'inline', label: '内联' },
     { value: 'block', label: '块级' }
   ];
-  
+
   // API 文档
   apiSections: ApiData[] = [
     {
@@ -101,7 +98,7 @@ export class DocSegmentedComponent {
       ]
     }
   ];
-  
+
   // 演示代码
   // 基本用法
   basicSource = `
@@ -128,13 +125,14 @@ export class BasicDemoComponent {
     { value: 'month', label: '月' }
   ];
 }`;
-  basicHTML = `<lib-segmented
+  basicHTML = `
+<lib-segmented
   [options]="options"
   [(ngModel)]="value">
 </lib-segmented>
 <p>当前值: {{ value }}</p>`;
   basicCSS = ``;
-  
+
   // 带图标
   iconSource = `
 import { Component } from '@angular/core';
@@ -160,13 +158,14 @@ export class IconDemoComponent {
     { value: 'calendar', label: '日历', icon: 'icon-calendar' }
   ];
 }`;
-  iconHTML = `<lib-segmented
+  iconHTML = `
+<lib-segmented
   [options]="options"
   [(ngModel)]="value">
 </lib-segmented>
 <p>当前值: {{ value }}</p>`;
   iconCSS = ``;
-  
+
   // 禁用
   disabledSource = `
 import { Component } from '@angular/core';
@@ -197,7 +196,8 @@ export class DisabledDemoComponent {
   ];
   componentDisabled = false;
 }`;
-  disabledHTML = `<lib-segmented
+  disabledHTML = `
+<lib-segmented
   [options]="options"
   [(ngModel)]="value"
   [disabled]="componentDisabled">
@@ -207,7 +207,7 @@ export class DisabledDemoComponent {
 </button>
 <p>当前值: {{ value }}</p>`;
   disabledCSS = ``;
-  
+
   // 尺寸
   sizeSource = `
 import { Component } from '@angular/core';
@@ -246,7 +246,8 @@ export class SizeDemoComponent {
     { value: 'small', label: '小' }
   ];
 }`;
-  sizeHTML = `<lib-segmented
+  sizeHTML = `
+<lib-segmented
   [options]="sizeOptions"
   [(ngModel)]="currentSize">
 </lib-segmented>
@@ -259,7 +260,7 @@ export class SizeDemoComponent {
 </div>
 <p>当前尺寸: {{ currentSize }}</p>`;
   sizeCSS = ``;
-  
+
   // 块级
   blockSource = `
 import { Component } from '@angular/core';
@@ -270,19 +271,26 @@ import { SegmentedComponent } from 'your-lib';
   standalone: true,
   imports: [SegmentedComponent],
   template: \`
-    <lib-segmented
-      [options]="blockOptions"
-      [(ngModel)]="isBlock ? 'block' : 'inline'"
-      (valueChange)="isBlock = $event === 'block'">
-    </lib-segmented>
     <div style="margin-top: 16px;">
-      <lib-segmented
-        [options]="options"
-        [(ngModel)]="value"
-        [block]="isBlock">
-      </lib-segmented>
-    </div>
-    <p>当前模式: {{ isBlock ? '块级' : '内联' }}</p>
+          <div style="display: grid; gap: 16px;grid-template-columns: 1fr;">
+            <div>
+              <div>
+                默认占满宽度
+              </div>
+              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+            </div>
+            <div>
+              <div>
+                设置最大宽度 500px, 超出宽度出现移动按钮
+              </div>
+              <div>
+                <lib-number-input [(ngModel)]="maxWidth"></lib-number-input>
+              </div>
+              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="maxWidth"></lib-segmented>
+            </div>
+          </div>
+        </div>
+
   \`,
 })
 export class BlockDemoComponent {
@@ -298,7 +306,8 @@ export class BlockDemoComponent {
     { value: 'block', label: '块级' }
   ];
 }`;
-  blockHTML = `<lib-segmented
+  blockHTML = `
+<lib-segmented
   [options]="blockOptions"
   [(ngModel)]="isBlock ? 'block' : 'inline'"
   (valueChange)="isBlock = $event === 'block'">
@@ -312,15 +321,15 @@ export class BlockDemoComponent {
 </div>
 <p>当前模式: {{ isBlock ? '块级' : '内联' }}</p>`;
   blockCSS = ``;
-  
+
   toggleDisabled(): void {
     this.componentDisabled = !this.componentDisabled;
   }
-  
+
   onSizeChange(size: any): void {
     this.currentSize = size;
   }
-  
+
   onBlockChange(value: any): void {
     this.isBlock = value === 'block';
   }
