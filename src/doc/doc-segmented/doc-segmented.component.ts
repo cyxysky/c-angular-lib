@@ -125,12 +125,7 @@ export class BasicDemoComponent {
     { value: 'month', label: '月' }
   ];
 }`;
-  basicHTML = `
-<lib-segmented
-  [options]="options"
-  [(ngModel)]="value">
-</lib-segmented>
-<p>当前值: {{ value }}</p>`;
+  basicHTML = ``;
   basicCSS = ``;
 
   // 带图标
@@ -158,12 +153,7 @@ export class IconDemoComponent {
     { value: 'calendar', label: '日历', icon: 'icon-calendar' }
   ];
 }`;
-  iconHTML = `
-<lib-segmented
-  [options]="options"
-  [(ngModel)]="value">
-</lib-segmented>
-<p>当前值: {{ value }}</p>`;
+  iconHTML = ``;
   iconCSS = ``;
 
   // 禁用
@@ -196,16 +186,7 @@ export class DisabledDemoComponent {
   ];
   componentDisabled = false;
 }`;
-  disabledHTML = `
-<lib-segmented
-  [options]="options"
-  [(ngModel)]="value"
-  [disabled]="componentDisabled">
-</lib-segmented>
-<button (click)="componentDisabled = !componentDisabled">
-  {{ componentDisabled ? '启用' : '禁用' }}
-</button>
-<p>当前值: {{ value }}</p>`;
+  disabledHTML = ``;
   disabledCSS = ``;
 
   // 尺寸
@@ -246,19 +227,7 @@ export class SizeDemoComponent {
     { value: 'small', label: '小' }
   ];
 }`;
-  sizeHTML = `
-<lib-segmented
-  [options]="sizeOptions"
-  [(ngModel)]="currentSize">
-</lib-segmented>
-<div style="margin-top: 16px;">
-  <lib-segmented
-    [options]="options"
-    [(ngModel)]="value"
-    [size]="currentSize">
-  </lib-segmented>
-</div>
-<p>当前尺寸: {{ currentSize }}</p>`;
+  sizeHTML = ``;
   sizeCSS = ``;
 
   // 块级
@@ -306,20 +275,7 @@ export class BlockDemoComponent {
     { value: 'block', label: '块级' }
   ];
 }`;
-  blockHTML = `
-<lib-segmented
-  [options]="blockOptions"
-  [(ngModel)]="isBlock ? 'block' : 'inline'"
-  (valueChange)="isBlock = $event === 'block'">
-</lib-segmented>
-<div style="margin-top: 16px;">
-  <lib-segmented
-    [options]="options"
-    [(ngModel)]="value"
-    [block]="isBlock">
-  </lib-segmented>
-</div>
-<p>当前模式: {{ isBlock ? '块级' : '内联' }}</p>`;
+  blockHTML = ``;
   blockCSS = ``;
 
   toggleDisabled(): void {

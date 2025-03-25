@@ -144,23 +144,10 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
         });
       });
       
-      // 监听多个元素的大小变化
-      if (this.rootElement?.nativeElement) {
-        this.resizeObserver.observe(this.rootElement.nativeElement);
-      }
-      
-      if (this.segmentContainer?.nativeElement) {
-        this.resizeObserver.observe(this.segmentContainer.nativeElement);
-      }
-      
-      if (this.segmentGroup?.nativeElement) {
-        this.resizeObserver.observe(this.segmentGroup.nativeElement);
-      }
-      
       // 监听父容器大小变化
-      const parent = this.el.nativeElement.parentElement;
-      if (parent) {
-        this.resizeObserver.observe(parent);
+      const body = document.body;
+      if (body) {
+        this.resizeObserver.observe(body);
       }
     });
   }
@@ -219,14 +206,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   
   // 应用宽度设置 - 完全重写
   private applyWidthSettings() {
-    // 确保我们使用宿主元素来应用最大宽度
-    if (this.maxWidth && this.maxWidth > 0) {
-      // 直接设置宿主元素的样式
-      this.renderer.setStyle(this.el.nativeElement, 'max-width', `${this.maxWidth}px`);
-    } else {
-      this.renderer.removeStyle(this.el.nativeElement, 'max-width');
-    }
-    
     // 应用父容器宽度适配
     if (this.adaptParentWidth) {
       this.renderer.setStyle(this.el.nativeElement, 'width', '100%');
@@ -244,12 +223,9 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
         }
       }
     }
-    
-    // 使用更长的延迟，确保DOM完全渲染
-    setTimeout(() => {
-      console.log('宽度设置应用后执行检查');
+    timer(100).subscribe(() => {
       this.updateScrollButtonsVisibility();
-    }, 100); // 延长延迟时间
+    });
   }
 
   writeValue(value: string | number | null): void {
@@ -316,7 +292,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
           this.moveThumbToPosition(element.offsetLeft, element.offsetWidth);
         }
       }
-      
       // 滚动到选中项
       this.scrollToSelected();
     }
@@ -337,11 +312,10 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
     
     // 检查真实的内容是否溢出wrapper宽度
     const wrapperWidth = wrapper.clientWidth;
-    const contentWidth = group.scrollWidth;
-    const hasOverflow = contentWidth > wrapperWidth + 2; // 添加一点容差
+    const contentWidth = group.getBoundingClientRect().width;
+    const hasOverflow = contentWidth > wrapperWidth + 4; // 添加一点容差
     
     // 添加调试日志
-    console.log(`外层容器宽度: ${wrapperWidth}, 内容宽度: ${contentWidth}, 是否溢出: ${hasOverflow}`);
     
     // 更新显示状态
     const oldState = this.showScrollButtons;
@@ -362,23 +336,8 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
     }
     
     if (oldState !== this.showScrollButtons) {
-      console.log(`滚动按钮显示状态改变: ${oldState} -> ${this.showScrollButtons}`);
       this.cdr.detectChanges();
     }
-  }
-  
-  // 添加新方法：计算所有选项的实际宽度总和
-  private calculateTotalOptionsWidth(): number {
-    if (!this.segmentItems || this.segmentItems.length === 0) return 0;
-    
-    // 获取所有选项元素的实际宽度总和
-    let totalWidth = 0;
-    this.segmentItems.forEach(item => {
-      totalWidth += item.nativeElement.offsetWidth;
-    });
-    
-    // 添加额外边距，确保准确性
-    return totalWidth;
   }
   
   // 计算并存储所有选项的位置
@@ -428,7 +387,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
     const thumbElement = this.thumbElement.nativeElement;
     
     // 显示调试信息
-    console.log(`Moving thumb to: left=${left}, width=${width}, immediate=${immediate}`);
     
     if (immediate || this.firstRender) {
       // 无动画移动

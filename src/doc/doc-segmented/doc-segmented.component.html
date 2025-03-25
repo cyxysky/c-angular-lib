@@ -62,9 +62,9 @@
           [disabled]="componentDisabled">
         </lib-segmented>
         <div style="margin-top: 16px;">
-          <button (click)="toggleDisabled()">
+          <lib-button (click)="toggleDisabled()">
             {{ componentDisabled ? '启用' : '禁用' }}
-          </button>
+          </lib-button>
         </div>
         <p class="example-value">当前值: {{ disabledValue }}</p>
       </div>

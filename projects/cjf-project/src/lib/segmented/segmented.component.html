@@ -1,6 +1,5 @@
-<div class="segmented-wrapper" [style.max-width.px]="maxWidth">
+<div class="segmented-wrapper" [style.max-width.px]="maxWidth" #rootElement>
   <div class="segmented" 
-       #rootElement
        [class.segmented-block]="block"
        [class.segmented-lg]="size === 'large'"
        [class.segmented-sm]="size === 'small'"
