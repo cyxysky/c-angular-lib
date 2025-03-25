@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { SegmentedComponent } from '@project';
-import { ProjectModule } from "../../../projects/cjf-project/src/lib/project.module";
-import { NumberInputComponent } from "../../../projects/cjf-project/src/lib/number-input/number-input.component";
+import { ProjectModule } from "../../../projects/project/src/lib/project.module";
+import { NumberInputComponent } from "../../../projects/project/src/lib/number-input/number-input.component";
 
 @Component({
   selector: 'app-doc-segmented',

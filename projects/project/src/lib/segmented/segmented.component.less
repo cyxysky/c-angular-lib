@@ -1,3 +1,5 @@
+@import '../../style/style.less';
+
 :host {
   display: inline-block;
   width: 100%;
@@ -235,14 +237,10 @@
   }
 }
 
-@primary-color: #1890ff;
-@primary-hover-color: #40a9ff;
-@primary-active-color: #096dd9;
-
 .segmented-item:not(.segmented-item-disabled):hover {
-  color: @primary-hover-color;
+  color: @primary;
 }
 
 .segmented-item:not(.segmented-item-disabled):active {
-  color: @primary-active-color;
+  color: @primary;
 }

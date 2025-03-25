@@ -1,6 +1,6 @@
 import { Component, effect, resource, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ProjectModule } from '../../projects/cjf-project/src/public-api';
+import { ProjectModule } from '../../projects/project/src/public-api';
 import { of, delay, interval } from 'rxjs';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -56,9 +56,7 @@ export class AppComponent {
       console.log(data)
       this.show.set(data)
     })
-    interval(1000).subscribe((data) => {
-      console.log(this.text())
-      })
+
     // const obs$ = toObservable(this.mySignal);
     // obs$.subscribe(value => console.log(value));
     // mySignal.set(1);

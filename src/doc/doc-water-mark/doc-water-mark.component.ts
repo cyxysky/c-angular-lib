@@ -71,7 +71,7 @@ export class DocWaterMarkComponent {
   // 基本用法
   basicSource = `
 import { Component } from '@angular/core';
-import { WaterMarkComponent } from '@cjf-project/water-mark';
+import { WaterMarkComponent } from '@project/water-mark';
 
 @Component({
   selector: 'app-basic-demo',
@@ -95,7 +95,7 @@ export class BasicDemoComponent {}
   customSource = `
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, NumberInputComponent } from '@cjf-project/water-mark';
+import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, NumberInputComponent } from '@project/water-mark';
 
 @Component({
   selector: 'app-custom-demo',
@@ -159,7 +159,7 @@ export class CustomDemoComponent {
   // 图片水印
   imageSource = `
 import { Component } from '@angular/core';
-import { WaterMarkComponent } from '@cjf-project/water-mark';
+import { WaterMarkComponent } from '@project/water-mark';
 
 @Component({
   selector: 'app-image-demo',
@@ -187,7 +187,7 @@ export class ImageDemoComponent {
   // 指令用法
   directiveSource = `
 import { Component } from '@angular/core';
-import { WaterMarkDirectiveDirective } from '@cjf-project/water-mark';
+import { WaterMarkDirectiveDirective } from '@project/water-mark';
 
 @Component({
   selector: 'app-directive-demo',
@@ -211,7 +211,7 @@ export class DirectiveDemoComponent {}
   tamperProofSource = `
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WaterMarkComponent, ButtonComponent } from '@cjf-project/water-mark';
+import { WaterMarkComponent, ButtonComponent } from '@project/water-mark';
 
 @Component({
   selector: 'app-tamper-proof-demo',

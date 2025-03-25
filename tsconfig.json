@@ -4,11 +4,11 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "cjf-project": [
-        "./dist/cjf-project"
+      "project": [
+        "./dist/project"
       ],
       "@project": [
-        "./projects/cjf-project/src/lib/project.module.ts"
+        "./projects/project/src/lib/project.module.ts"
       ]
     },
     "outDir": "./dist/out-tsc",

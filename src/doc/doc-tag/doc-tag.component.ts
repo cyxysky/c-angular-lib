@@ -45,7 +45,7 @@ export class DocTagComponent implements OnInit {
   // 代码示例
   basicTagSource = `
 import { Component } from '@angular/core';
-import { TagComponent } from 'cjf-project';
+import { TagComponent } from 'project';
 
 @Component({
   selector: 'app-basic-tag-demo',
@@ -61,7 +61,7 @@ export class BasicTagDemoComponent {
   closableTagSource = `
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagComponent } from 'cjf-project';
+import { TagComponent } from 'project';
 
 @Component({
   selector: 'app-closable-tag-demo',
@@ -87,7 +87,7 @@ export class ClosableTagDemoComponent {
   checkableTagSource = `
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagComponent } from 'cjf-project';
+import { TagComponent } from 'project';
 
 @Component({
   selector: 'app-checkable-tag-demo',
@@ -114,7 +114,7 @@ export class CheckableTagDemoComponent {
   colorTagSource = `
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagComponent } from 'cjf-project';
+import { TagComponent } from 'project';
 
 @Component({
   selector: 'app-color-tag-demo',
@@ -149,7 +149,7 @@ export class ColorTagDemoComponent {
 
   disabledTagSource = `
 import { Component } from '@angular/core';
-import { TagComponent } from 'cjf-project';
+import { TagComponent } from 'project';
 
 @Component({
   selector: 'app-disabled-tag-demo',

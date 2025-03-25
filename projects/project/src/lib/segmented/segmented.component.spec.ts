@@ -42,17 +42,17 @@ describe('SegmentedComponent', () => {
   });
 
   it('should not select disabled options', () => {
-    const disabledItem = fixture.debugElement.queryAll(By.css('.cjf-segmented-item'))[2];
+    const disabledItem = fixture.debugElement.queryAll(By.css('.segmented-item'))[2];
     disabledItem.nativeElement.click();
     fixture.detectChanges();
 
     expect(component.value).not.toBe('3');
-    expect(disabledItem.nativeElement.classList).toContain('cjf-segmented-item-disabled');
+    expect(disabledItem.nativeElement.classList).toContain('segmented-item-disabled');
   });
 
   it('should emit valueChange event when selection changes', () => {
     spyOn(component.valueChange, 'emit');
-    const items = fixture.debugElement.queryAll(By.css('.cjf-segmented-item'));
+    const items = fixture.debugElement.queryAll(By.css('.segmented-item'));
     items[1].nativeElement.click();
     fixture.detectChanges();
 
@@ -62,11 +62,11 @@ describe('SegmentedComponent', () => {
   it('should apply different sizes', () => {
     component.size = 'large';
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('.cjf-segmented-lg'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.segmented-lg'))).toBeTruthy();
 
     component.size = 'small';
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('.cjf-segmented-sm'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.segmented-sm'))).toBeTruthy();
   });
 
   it('should show scroll buttons when content overflows', () => {
