@@ -37,7 +37,7 @@ export class DocSegmentedComponent {
     { value: 'years3', label: '年' },
 
   ];
-  maxWidth = signal(900);
+  maxWidth = signal(500);
 
   // 带图标示例
   iconValue: string = 'list';

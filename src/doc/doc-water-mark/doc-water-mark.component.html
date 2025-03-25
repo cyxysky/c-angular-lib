@@ -1,1 +1,144 @@
-<p>doc-water-mark works!</p>
+<div class="doc-container">
+  <h1 class="doc-title"> Water Mark 水印</h1>
+  
+  <p class="doc-description">
+    给页面的某个区域加上水印。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    页面需要添加水印标识版权或敏感信息时使用。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource"
+      [htmlCode]="basicHTML"
+      [cssCode]="basicCSS">
+      <div demo>
+        <div class="demo-water-mark-container">
+          <lib-water-mark [text]="'公司内部文件'">
+            <div style="height: 300px;width: 100%;padding: 20px;">
+              <h3>水印组件基本使用</h3>
+              <p>水印将显示在这个区域内部</p>
+            </div>
+          </lib-water-mark>
+        </div>
+      </div>
+      <div description>
+        最简单的水印用法，指定水印文本内容即可。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义样式 -->
+    <app-doc-box
+      title="自定义样式"
+      [sourceCode]="customSource"
+      [htmlCode]="customHTML"
+      [cssCode]="customCSS">
+      <div demo>
+        <div class="demo-water-mark-container">
+          <lib-water-mark 
+            [text]="customText" 
+            [fontColor]="customColor"
+            [fontSize]="fontSize"
+            [rotate]="rotation">
+            <div style="height: 300px;width: 100%;padding: 20px;">
+              <h3>自定义水印样式</h3>
+              <p>可以调整下方参数查看效果</p>
+              <div class="control-row">
+                <label>文字内容：</label>
+                <lib-input [(ngModel)]="customText"></lib-input>
+              </div>
+              <div class="control-row">
+                <label>字体颜色：</label>
+                <lib-input [(ngModel)]="customColor"></lib-input>
+              </div>
+              <div class="control-row">
+                <label>字体大小：</label>
+                <lib-number-input [(ngModel)]="fontSize" [min]="8" [max]="32"></lib-number-input>
+              </div>
+              <div class="control-row">
+                <label>旋转角度：</label>
+                <lib-number-input [(ngModel)]="rotation" [min]="-90" [max]="90"></lib-number-input>
+              </div>
+            </div>
+          </lib-water-mark>
+        </div>
+      </div>
+      <div description>
+        可以自定义字体颜色、大小和旋转角度等样式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 图片水印 -->
+    <app-doc-box
+      title="图片水印"
+      [sourceCode]="imageSource"
+      [htmlCode]="imageHTML"
+      [cssCode]="imageCSS">
+      <div demo>
+        <div class="demo-water-mark-container">
+          <lib-water-mark 
+            [text]="'公司内部文件'" 
+            [imageBase64]="logoUrl">
+            <div style="height: 300px;width: 100%;padding: 20px;">
+              <h3>图片水印</h3>
+              <p>结合图片和文字实现品牌水印</p>
+            </div>
+          </lib-water-mark>
+        </div>
+      </div>
+      <div description>
+        水印组件支持使用图片（Base64或URL），可以同时显示图片和文字。
+      </div>
+    </app-doc-box>
+    
+    <!-- 指令用法 -->
+    <app-doc-box
+      title="指令用法"
+      [sourceCode]="directiveSource"
+      [htmlCode]="directiveHTML"
+      [cssCode]="directiveCSS">
+      <div demo>
+        <div style="height: 300px;width: 100%;padding: 20px;" libWaterMarkDirective [text]="'水印指令应用'">
+          <h3>水印指令</h3>
+          <p>可以直接在任意元素上应用水印指令</p>
+        </div>
+      </div>
+      <div description>
+        除了组件方式，还可以使用指令方式添加水印，用法更加灵活。
+      </div>
+    </app-doc-box>
+    
+    <!-- 防篡改 -->
+    <app-doc-box
+      title="防篡改功能"
+      [sourceCode]="tamperProofSource"
+      [htmlCode]="tamperProofHTML"
+      [cssCode]="tamperProofCSS">
+      <div demo>
+        <div class="demo-water-mark-container">
+          <lib-water-mark [text]="'防篡改水印'" [fontColor]="'rgba(233, 66, 66, 0.2)'">
+            <div style="height: 300px;width: 100%;padding: 20px;">
+              <h3>防篡改功能</h3>
+              <p>尝试使用开发者工具删除或修改水印元素，水印将自动恢复</p>
+              <lib-button (click)="showTamperMessage()">点击演示防篡改</lib-button>
+              <p *ngIf="tamperMessage" class="tamper-message">{{ tamperMessage }}</p>
+            </div>
+          </lib-water-mark>
+        </div>
+      </div>
+      <div description>
+        水印组件内置防篡改保护，当尝试通过浏览器开发工具删除或修改水印时，水印会自动恢复。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 // 指令
 import { WidgetDirective } from './directive/widget.directive';
-
+import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.directive';
 // 组件
 import { CustomerFormComponent } from './customer-form/customer-form.component';
 import { CustomerFormModalComponent } from './customer-form/customer-form-modal/customer-form-modal.component';
@@ -23,6 +23,7 @@ import { TreeSelectComponent } from './tree-select/tree-select.component';
 import { TreeComponent } from './tree/tree.component';
 import { SwitchComponent } from './switch/switch.component';
 import { SegmentedComponent } from './segmented/segmented.component';
+import { WaterMarkComponent } from './water-mark/water-mark.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -42,8 +43,10 @@ export * from './tree-select/tree-select.component';
 export * from './tree/tree.component';
 export * from './switch/switch.component';
 export * from './segmented/segmented.component';
+export * from './water-mark/water-mark.component';
 // 指令
 export * from './directive/widget.directive';
+export * from './water-mark/water-mark-directive.directive';
 
 @NgModule({
   declarations: [],
@@ -67,7 +70,9 @@ export * from './directive/widget.directive';
     TreeSelectComponent,
     TreeComponent,
     SwitchComponent,
-    SegmentedComponent
+    SegmentedComponent,
+    WaterMarkComponent,
+    WaterMarkDirectiveDirective
   ],
   exports: [
     CustomerFormComponent,
@@ -88,7 +93,9 @@ export * from './directive/widget.directive';
     TreeSelectComponent,
     TreeComponent,
     SwitchComponent,
-    SegmentedComponent
+    SegmentedComponent,
+    WaterMarkComponent,
+    WaterMarkDirectiveDirective
   ]
 })
 export class ProjectModule { }

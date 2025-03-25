@@ -17,6 +17,7 @@
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
                             <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
                             <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
+                            <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
                         </ul>
                     </li>
                 </ul>
@@ -71,6 +72,9 @@
         }
         @case ('segmented') {
         <app-doc-segmented></app-doc-segmented>
+        }
+        @case ('water-mark') {
+        <app-doc-water-mark></app-doc-water-mark>
         }
         }
     </div>

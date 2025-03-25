@@ -1,14 +1,9 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
-@Component({
-  selector: 'lib-water-mark',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './water-mark.component.html',
-  styleUrl: './water-mark.component.less',
-  encapsulation: ViewEncapsulation.None
+import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[libWaterMarkDirective]'
 })
-export class WaterMarkComponent implements OnInit, OnDestroy {
+export class WaterMarkDirectiveDirective {
   @Input() text = '水印文字';
   @Input() fontColor = 'rgba(0, 0, 0, 0.15)';
   @Input() fontSize = 16;
@@ -41,10 +36,6 @@ export class WaterMarkComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.removeWatermark();
     this.removeTamperingProtection();
-  }
-
-  ngOnChanges(changes: any): void {
-    this.createWatermark();
   }
 
   private createWatermark(): void {
