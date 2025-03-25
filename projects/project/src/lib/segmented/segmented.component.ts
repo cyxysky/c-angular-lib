@@ -32,7 +32,7 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   @Input() size: 'large' | 'default' | 'small' = 'default';
   @Input() maxWidth?: number;
   @Input() adaptParentWidth = true;  // 是否适应父容器宽度
-  @Output() valueChange = new EventEmitter<string | number>();
+  @Output() valueChange = new EventEmitter<any>();
 
   @ViewChildren('segmentItem') segmentItems!: QueryList<ElementRef>;
   @ViewChild('segmentContainer') segmentContainer!: ElementRef;

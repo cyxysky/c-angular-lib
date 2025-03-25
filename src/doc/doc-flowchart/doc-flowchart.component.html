@@ -1,0 +1,61 @@
+<div class="doc-container">
+    <h1 class="doc-title">多维流程图 MultiDimensionalFlowchart</h1>
+
+    <p class="doc-description">
+        用于展示具有多个维度的流程图，支持主流程和子流程的可视化展示。
+    </p>
+
+    <h2 class="doc-section-title">何时使用</h2>
+    <p class="doc-description">
+        当需要展示复杂的流程关系，特别是包含多个分支或多个层级的流程时，比如项目开发流程、工作流程、业务流程等需要展示层级关系的场景。
+    </p>
+
+    <h2 class="doc-section-title">代码演示</h2>
+
+    <div class="doc-grid">
+        <!-- 基本用法 -->
+        <app-doc-box title="基本用法" [sourceCode]="basicSource" [htmlCode]="basicHTML" [cssCode]="basicCSS">
+            <div demo>
+                <lib-multi-dimensional-flowchart [data]="basicData" [nowStage]="currentStage" [stageArray]="basicStageArray"
+                    (selectNode)="handleSelectNode($event)">
+                </lib-multi-dimensional-flowchart>
+            </div>
+            <div description>
+                最基本的流程图展示，配置数据中的steps定义流程步骤，stages定义流程阶段，通过nowStage指定当前所处阶段。
+                背景颜色可以自定义
+            </div>
+        </app-doc-box>
+
+        <!-- 自定义布局 -->
+        <app-doc-box title="自定义布局" [sourceCode]="customSource" [htmlCode]="customHTML" [cssCode]="customCSS">
+            <div demo>
+                <p class="doc-description">
+                    通过配置stageArray可以自定义每个阶段的布局，以满足不同复杂度的流程图展示需求。
+                </p>
+                <p class="doc-description">
+                    通过配置state可以设置流程的当前状态，支持active、hold、close三种状态。
+                </p>
+                <lib-segmented [options]="states" [(ngModel)]="state" style="margin: 10px 0;"></lib-segmented>
+                <lib-multi-dimensional-flowchart
+                    [state]="state"
+                    [data]="complexData" 
+                    [nowStage]="currentStage2" 
+                    [stageArray]="complexStageArray"
+                    [stateText]="'非活跃状态'"
+                    (selectNode)="handleSelectNode($event)">
+                </lib-multi-dimensional-flowchart>
+            </div>
+            <div description>
+                组件支持自定义阶段的布局，通过stageArray属性配置多维数组，每个子数组表示一个阶段组，数组中的数字表示该阶段组中包含的阶段数量。
+            </div>
+        </app-doc-box>
+    </div>
+
+    <h2 class="doc-section-title">API</h2>
+    <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+
+    <h2 class="doc-section-title">数据结构说明</h2>
+
+    <h3 class="doc-sub-title">流程图数据结构</h3>
+
+</div>

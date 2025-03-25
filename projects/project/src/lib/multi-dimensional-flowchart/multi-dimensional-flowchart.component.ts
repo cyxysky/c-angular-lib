@@ -23,136 +23,15 @@ export interface Stage {
 export class MultiDimensionalFlowchartComponent {
   public source = inject(WidgetSource);
 
-  @Input() stageArray = [[1, 2, 3], [4, 5, 6, 7], [8, 9, 10]];
-  @Input() data: any = {
-    "steps": [
-      {
-        "key": "AAAAAAA",  // 环节的唯一标记
-        "name": '流程1',         // 环节名称
-        "background": "linear-gradient( 90deg, rgba(1,207,226,0.1) 0%, rgba(1,207,226,0) 100%)", // 背景色
-      },
-      {
-        "key": "BBBBBB",  // 环节的唯一标记
-        "name": '流程2',         // 环节名称
-        "background": "linear-gradient( 90deg, rgba(215,238,244,0.5) 0%, rgba(215,238,244,0) 100%)", // 背景色
-      },
-      {
-        "key": "CCCCCC",  // 环节的唯一标记
-        "name": '流程3',         // 环节名称
-        "background": "linear-gradient( 90deg, rgba(135,211,129,0.1) 0%, rgba(135,211,129,0) 100%)", // 背景色
-      },
-    ],
-    "stages": [
-      {
-        "name": "阶段名称",
-        "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key": "stage1"
-      },
-      {
-        "name": "阶段名称",
-        "stepKey": "AAAAAAA",  // 阶段所处的环节,
-        "key": "stage2"
-      },
-      {
-        "name": "阶段名称",
-        "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key": "stage3"
-      },
-      {
-        "childrenFlow": [
-          {
-            "stages": [
-              {
-                "name": "子流程1",
-                "key": "stage4-1",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-              },
-              {
-                "name": "子程1",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key": "stage4-2"
-              },
-              {
-                "name": "子流程1",
-                "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key": "stage4-3"
-              },
-              {
-                "name": "子流程1",
-                "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key": "stage4-4"
-              },
-            ]
-          },
-          {
-            "stages": [
-              {
-                "name": "子流程2",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key": "stage4-5"
-              },
-              {
-                "name": "子流程2",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key": "stage4-6"
-              },
-              {
-                "name": "子流程2",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key": "stage4-7"
-              },
-
-            ]
-          },
-          {
-            "stages": [
-              {
-                "name": "子流程3",
-                "stepKey": "CCCCCC",  // 阶段所处的环节,
-                "key": "stage4-8"
-              },
-              {
-                "name": "子流程3",
-                "stepKey": "BBBBBB",  // 阶段所处的环节,
-                "key": "stage4-9"
-              },
-              {
-                "name": "子流程3",
-                "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key": "stage4-10"
-              },
-              {
-                "name": "子流程3",
-                "stepKey": "AAAAAAA",  // 阶段所处的环节,
-                "key": "stage4-11"
-              },
-            ]
-          }
-        ]
-      },
-      {
-        "name": "阶段名称",
-        "stepKey": "CCCCCC",  // 阶段所处的环节,
-        "key": "stage5"
-      },
-      {
-        "name": "阶段名称",
-        "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key": "stage6"
-      },
-      {
-        "name": "阶段名称",
-        "stepKey": "BBBBBB",  // 阶段所处的环节,
-        "key": "stage7"
-      },
-    ]
-  }
-  @Input() nowStage: Array<any> = [{ key: 'asdzxc' }];
-  @Input() state: string = 'hold'
+  @Input() stageArray: Array<Array<number>> = [];
+  @Input() data: any = {};
+  @Input() nowStage: Array<any> = [];
+  @Input() state: string = 'active';
+  @Input() stateText: string = '';
   @Output() selectNode = new EventEmitter();
 
   // 当前选中的节点
-  selectedStage: any = { key: 'asdzxc' };
+  selectedStage: any = {};
   // 行数 对应 行的key值
   rowKeyAndIndexMap: Map<any, any> = new Map([]);
   // 节点坐标map

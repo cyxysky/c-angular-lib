@@ -1,6 +1,8 @@
 <div class="flex">
     <div class="flex-grow1 none-display">
-        <div *ngIf="state !== 'active' " class="stateLine" [ngClass]="state === 'hold' ? 'hold' : 'close'"></div>
+        <div *ngIf="state !== 'active' " class="stateLine" [ngClass]="state === 'hold' ? 'hold' : 'close'">
+            {{ stateText}}
+        </div>
         <div class="flex column" [ngClass]="state === 'active' ? '' : 'colse-flow'">
             <div *ngFor="let items of data.steps;index as rowIndex" class="grid flex-grow-1" [style.grid-template-columns]="getTotalStageGridColumns()">
                 <div [style.background]="items.background" class="title">
@@ -22,7 +24,7 @@
                                 *ngFor="let node of nodeCoordinatesMap!.get(rowIndex+1)!.get(colIndex);index as nodeIndex">
                                 <div class="flex flex-grow1 nodes relative"
                                     [style.padding-left]="rootStage !==0 && groupStageIndex === 0 ? '16px' : '16px'">
-                                    <div class="flex flex-grow1" (click)="selectStage(node)">
+                                    <div class="flex flex-grow1 nodes-contents" (click)="selectStage(node)">
                                         <!-- 节点左侧的箭头 -->
                                         <div class="aheadArrow" *ngIf="colIndex!==1">
                                             <div class="inner-arrow1 nodes-content-arrow"
@@ -95,10 +97,5 @@
         {{data.name}}
     </div>
 </ng-template>
-
-<div class="none-display">
-    <div class="stateLine"></div>
-    <div class="colse-flow"></div>
-</div>
 
         
