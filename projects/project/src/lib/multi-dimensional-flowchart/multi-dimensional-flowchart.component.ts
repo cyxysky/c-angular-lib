@@ -25,106 +25,79 @@ export class MultiDimensionalFlowchartComponent {
 
   @Input() stageArray = [[1, 2, 3], [4, 5, 6, 7], [8, 9, 10]];
   @Input() data: any = {
-    "id": 7,
-    "module": "ipd.issue",
-    "key": "domp",
-    "name": "DOMP需求",
     "steps": [
       {
         "key": "AAAAAAA",  // 环节的唯一标记
         "name": '流程1',         // 环节名称
-        "sort": false,     // 环节序号
         "background": "linear-gradient( 90deg, rgba(1,207,226,0.1) 0%, rgba(1,207,226,0) 100%)", // 背景色
-        "description": "",   // 描述
       },
       {
         "key": "BBBBBB",  // 环节的唯一标记
         "name": '流程2',         // 环节名称
-        "sort": false,     // 环节序号
         "background": "linear-gradient( 90deg, rgba(215,238,244,0.5) 0%, rgba(215,238,244,0) 100%)", // 背景色
-        "description": "",   // 描述
       },
       {
         "key": "CCCCCC",  // 环节的唯一标记
         "name": '流程3',         // 环节名称
-        "sort": false,     // 环节序号
         "background": "linear-gradient( 90deg, rgba(135,211,129,0.1) 0%, rgba(135,211,129,0) 100%)", // 背景色
-        "description": "",   // 描述
       },
     ],
     "stages": [
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
         "key": "stage1"
       },
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "AAAAAAA",  // 阶段所处的环节,
         "key": "stage2"
       },
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
         "key": "stage3"
       },
       {
-        "key": "B.STAGE_ISSUE_EVALUATE",
-        "name": "test",
-        "sort": 2,
         "childrenFlow": [
           {
-            "key": "test",
-            "name": "test",
             "stages": [
               {
                 "name": "子流程1",
                 "key": "stage4-1",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
               },
               {
                 "name": "子程1",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
                 "key": "stage4-2"
               },
               {
                 "name": "子流程1",
-                "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
                 "key": "stage4-3"
               },
               {
                 "name": "子流程1",
-                "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
                 "key": "stage4-4"
               },
             ]
           },
           {
-            "key": "test",
-            "name": "test",
             "stages": [
               {
                 "name": "子流程2",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
                 "key": "stage4-5"
               },
               {
                 "name": "子流程2",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
                 "key": "stage4-6"
               },
               {
                 "name": "子流程2",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
                 "key": "stage4-7"
               },
@@ -132,30 +105,24 @@ export class MultiDimensionalFlowchartComponent {
             ]
           },
           {
-            "key": "test",
-            "name": "test",
             "stages": [
               {
                 "name": "子流程3",
-                "sort": 1,         // 序号
                 "stepKey": "CCCCCC",  // 阶段所处的环节,
                 "key": "stage4-8"
               },
               {
                 "name": "子流程3",
-                "sort": 1,         // 序号
                 "stepKey": "BBBBBB",  // 阶段所处的环节,
                 "key": "stage4-9"
               },
               {
                 "name": "子流程3",
-                "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
                 "key": "stage4-10"
               },
               {
                 "name": "子流程3",
-                "sort": 1,         // 序号
                 "stepKey": "AAAAAAA",  // 阶段所处的环节,
                 "key": "stage4-11"
               },
@@ -165,26 +132,23 @@ export class MultiDimensionalFlowchartComponent {
       },
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "CCCCCC",  // 阶段所处的环节,
         "key": "stage5"
       },
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
         "key": "stage6"
       },
       {
         "name": "阶段名称",
-        "sort": 2,         // 序号
         "stepKey": "BBBBBB",  // 阶段所处的环节,
         "key": "stage7"
       },
     ]
   }
   @Input() nowStage: Array<any> = [{ key: 'asdzxc' }];
-  @Input() state: string = 'active'
+  @Input() state: string = 'hold'
   @Output() selectNode = new EventEmitter();
 
   // 当前选中的节点

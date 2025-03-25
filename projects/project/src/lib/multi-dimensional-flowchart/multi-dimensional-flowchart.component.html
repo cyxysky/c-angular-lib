@@ -1,5 +1,5 @@
 <div class="flex">
-    <div class="flex-grow1 test3">
+    <div class="flex-grow1 none-display">
         <div *ngIf="state !== 'active' " class="stateLine" [ngClass]="state === 'hold' ? 'hold' : 'close'"></div>
         <div class="flex column" [ngClass]="state === 'active' ? '' : 'colse-flow'">
             <div *ngFor="let items of data.steps;index as rowIndex" class="grid flex-grow-1" [style.grid-template-columns]="getTotalStageGridColumns()">
@@ -96,7 +96,7 @@
     </div>
 </ng-template>
 
-<div class="test3">
+<div class="none-display">
     <div class="stateLine"></div>
     <div class="colse-flow"></div>
 </div>

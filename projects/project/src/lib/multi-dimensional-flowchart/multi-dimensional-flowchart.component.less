@@ -8,7 +8,7 @@
 @left-line-margin-right: -193%;
 @line-z-index: 0;
 @min-height: 40px;
-
+@border: 1px solid #9BACBB;
 .arrow {
     width: 0;
     height: 0;
@@ -62,7 +62,7 @@
 
 .flat {
     position: absolute;
-    border-top: 1px solid #9BACBB;
+    border-top: @border;
     top: 50%;
     width: 100%;
     left: 50%;
@@ -125,13 +125,13 @@
 
 .bottom-line {
     position: relative;
-    border-left: 1px solid #9BACBB;
+    border-left: @border;
     border-bottom-left-radius: 15px;
     height: 35.25px;
     top: 50%;
     width: 100%;
     left: 15px;
-    border-bottom: 1px solid #9BACBB;
+    border-bottom: @border;
     border-top-left-radius: 0px;
     z-index: 0;
     box-sizing: content-box;
@@ -139,11 +139,11 @@
 
 .top-line {
     position: absolute;
-    border-top: 1px solid #9BACBB;
+    border-top: @border;
     height: 35.25px;
     width: 100%;
     top: -103%;
-    border-left: 1px solid #9BACBB;
+    border-left: @border;
     border-top-left-radius: 15px;
     transform-origin: top left;
     transform: rotateZ(180deg) scale(1, -1);
@@ -162,8 +162,8 @@
         height: 50%;
         width: 100%;
         content: '';
-        border-top: 1px solid #9BACBB;
-        border-right: 1px solid #9BACBB;
+        border-top: @border;
+        border-right: @border;
         box-sizing: content-box;
         border-top-right-radius: 15px;
     }
@@ -181,8 +181,8 @@
         height: 50%;
         width: 100%;
         content: '';
-        border-bottom: 1px solid #9BACBB;
-        border-left: 1px solid #9BACBB;
+        border-bottom: @border;
+        border-left: @border;
         box-sizing: content-box;
         border-bottom-left-radius: 15px;
     }
@@ -217,28 +217,6 @@
     left: calc(-50% + 16px);
 }
 
-.test3{
-    .stateLine:hover{
-        display: none;
-    }
-    
-    .colse-flow:hover {
-        display: block;   
-    }
-    
-    .stateLine:hover ~ .colse-flow {
-        display: block;
-    }
-
-    &:hover .stateLine{
-        display: none;
-    }
-}
-
-
-
-
-
 .colse-flow{
     display: none;
 }
@@ -259,4 +237,22 @@
     font-weight: 600;
     line-height: 20px;
     padding:0 7px;
+}
+
+.none-display{
+    .stateLine:hover{
+        display: none;
+    }
+    
+    .colse-flow:hover {
+        display: block;   
+    }
+    
+    .stateLine:hover ~ .colse-flow {
+        display: block;
+    }
+
+    &:hover .stateLine{
+        display: none;
+    }
 }
