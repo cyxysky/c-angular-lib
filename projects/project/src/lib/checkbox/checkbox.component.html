@@ -1,0 +1,24 @@
+<div class="checkbox-group" [class.checkbox-vertical]="direction === 'vertical'" [class.checkbox-horizontal]="direction === 'horizontal'">  
+  <div class="checkbox-options">
+    <label class="checkbox-wrapper" *ngFor="let option of options" [class.checkbox-disabled]="disabled || option.disabled">
+      <span class="checkbox-input">
+        <input 
+          type="checkbox" 
+          [checked]="isChecked[getOptionKey(option.value)]" 
+          [indeterminate]="option.indeterminate"
+          [disabled]="disabled || option.disabled"
+          (change)="toggleOption(option)"
+        />
+        <span class="checkbox-inner" 
+          [class.indeterminate]="option.indeterminate"
+          [style.borderColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"
+          [style.backgroundColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"></span>
+      </span>
+      <ng-container *ngTemplateOutlet="labelTemplate || defaultLabel; context: { $implicit: option }"></ng-container>
+    </label>
+  </div>
+</div>
+
+<ng-template #defaultLabel let-option>
+    <span class="checkbox-label">{{ option.label }}</span>
+</ng-template>

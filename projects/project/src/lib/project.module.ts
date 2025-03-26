@@ -26,6 +26,7 @@ import { SegmentedComponent } from './segmented/segmented.component';
 import { WaterMarkComponent } from './water-mark/water-mark.component';
 import { TooltipDirective } from './tooltip/tooltip.directive';
 import { TooltipComponent } from './tooltip/tooltip.component';
+import { CheckboxComponent } from './checkbox/checkbox.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -47,6 +48,7 @@ export * from './switch/switch.component';
 export * from './segmented/segmented.component';
 export * from './water-mark/water-mark.component';
 export * from './tooltip/tooltip.component';
+export * from './checkbox/checkbox.component';
 // 指令
 export * from './directive/widget.directive';
 export * from './water-mark/water-mark-directive.directive';
@@ -78,7 +80,8 @@ export * from './tooltip/tooltip.directive';
     WaterMarkComponent,
     WaterMarkDirectiveDirective,
     TooltipDirective,
-    TooltipComponent
+    TooltipComponent,
+    CheckboxComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -103,7 +106,8 @@ export * from './tooltip/tooltip.directive';
     WaterMarkComponent,
     WaterMarkDirectiveDirective,
     TooltipDirective,
-    TooltipComponent
+    TooltipComponent,
+    CheckboxComponent
   ]
 })
 export class ProjectModule { }

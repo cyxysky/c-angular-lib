@@ -9,6 +9,7 @@ import { DocWaterMarkComponent } from './doc-water-mark/doc-water-mark.component
 import { DocFlowchartComponent } from './doc-flowchart/doc-flowchart.component';
 import { DocInputComponent } from './doc-input/doc-input.component';
 import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
+import { DocCheckboxComponent } from './doc-checkbox/doc-checkbox.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -21,7 +22,8 @@ import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
     DocWaterMarkComponent,
     DocFlowchartComponent,
     DocInputComponent,
-    DocTooltipComponent
+    DocTooltipComponent,
+    DocCheckboxComponent
   ],
   exports: [
     DocButtonComponent,
@@ -32,7 +34,8 @@ import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
     DocWaterMarkComponent,
     DocFlowchartComponent,
     DocInputComponent,
-    DocTooltipComponent
+    DocTooltipComponent,
+    DocCheckboxComponent
   ]
 })
 export class DocModule { }

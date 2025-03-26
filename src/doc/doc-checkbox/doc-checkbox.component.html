@@ -1,0 +1,122 @@
+<div class="doc-container">
+  <h1 class="doc-title">复选框 Checkbox</h1>
+  
+  <p class="doc-description">
+    用于在一组可选项中进行多项选择。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当用户需要从一组数据中选择多个选项时；
+    当用户需要表示开启/关闭两种状态时，可以使用单个复选框。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="basicValues" 
+          [options]="basicOptions">
+        </lib-checkbox>
+        <p class="example-value">当前值: {{ basicValues | json }}</p>
+      </div>
+      <div description>
+        最简单的用法，展示多个复选框选项。
+      </div>
+    </app-doc-box>
+    
+    <!-- 垂直排列 -->
+    <app-doc-box
+      title="垂直排列"
+      [sourceCode]="verticalSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="verticalValues" 
+          [options]="basicOptions"
+          direction="vertical">
+        </lib-checkbox>
+        <p class="example-value">当前值: {{ verticalValues | json }}</p>
+      </div>
+      <div description>
+        通过设置 direction="vertical" 属性使复选框垂直排列。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义颜色 -->
+    <app-doc-box
+      title="自定义颜色"
+      [sourceCode]="colorSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="colorValues" 
+          [options]="basicOptions"
+          checkboxColor="#ff4d4f">
+        </lib-checkbox>
+        <p class="example-value">当前值: {{ colorValues | json }}</p>
+      </div>
+      <div description>
+        可以自定义复选框的选中颜色。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用状态 -->
+    <app-doc-box
+      title="禁用某个选项状态"
+      [sourceCode]="disabledSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="disabledValues" 
+          [options]="disabledOptions">
+        </lib-checkbox>
+        <p class="example-value">当前值: {{ disabledValues | json }}</p>
+      </div>
+      <div description>
+        可以禁用整个组件或单个选项。
+      </div>
+    </app-doc-box>
+    
+    <!-- 半选状态 -->
+    <app-doc-box
+      title="半选状态"
+      [sourceCode]="indeterminateSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="indeterminateValues" 
+          [options]="indeterminateOptions">
+        </lib-checkbox>
+        <p class="example-value">当前值: {{ indeterminateValues | json }}</p>
+      </div>
+      <div description>
+        复选框支持半选状态，通常用于表示子选项部分选中的父级节点。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义模板 -->
+    <app-doc-box
+      title="自定义标签模板"
+      [sourceCode]="templateSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="templateValues" 
+          [options]="basicOptions"
+          [labelTemplate]="customLabel">
+        </lib-checkbox>
+        <ng-template #customLabel let-option>
+          <span class="custom-label">{{option.label}} - 自定义 (值: {{option.value}})</span>
+        </ng-template>
+        <p class="example-value">当前值: {{ templateValues | json }}</p>
+      </div>
+      <div description>
+        可以使用模板自定义复选框标签的显示方式。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

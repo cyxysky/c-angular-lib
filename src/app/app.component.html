@@ -13,6 +13,7 @@
                             <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
                             <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
                             <li nz-menu-item (click)="nowComponent.set('tooltip')">提示</li>
+                            <li nz-menu-item (click)="nowComponent.set('checkbox')">复选框</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
@@ -80,6 +81,9 @@
         }
         @case ('tooltip') {
         <app-doc-tooltip></app-doc-tooltip>
+        }
+        @case ('checkbox') {
+        <app-doc-checkbox></app-doc-checkbox>
         }
         }
     </div>
