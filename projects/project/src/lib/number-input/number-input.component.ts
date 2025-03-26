@@ -28,6 +28,8 @@ export class NumberInputComponent implements ControlValueAccessor {
   color = input<string>('black');
   prefix = input<string>('');
   suffix = input<string>('');
+  prefixIcon = input<string>('');
+  suffixIcon = input<string>('');
   status = input<'normal' | 'error' | 'warning'>('normal');
   formatter = input<(value: number) => any>(value => value);
   

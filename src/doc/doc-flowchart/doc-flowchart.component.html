@@ -14,7 +14,7 @@
 
     <div class="doc-grid">
         <!-- 基本用法 -->
-        <app-doc-box title="基本用法" [sourceCode]="basicSource" [htmlCode]="basicHTML" [cssCode]="basicCSS">
+        <app-doc-box title="基本用法" [sourceCode]="basicSource">
             <div demo>
                 <lib-multi-dimensional-flowchart [data]="basicData" [nowStage]="currentStage" [stageArray]="basicStageArray"
                     (selectNode)="handleSelectNode($event)">
@@ -27,7 +27,7 @@
         </app-doc-box>
 
         <!-- 自定义布局 -->
-        <app-doc-box title="自定义布局" [sourceCode]="customSource" [htmlCode]="customHTML" [cssCode]="customCSS">
+        <app-doc-box title="自定义布局" [sourceCode]="customSource">
             <div demo>
                 <p class="doc-description">
                     通过配置stageArray可以自定义每个阶段的布局，以满足不同复杂度的流程图展示需求。

@@ -1,1 +1,12 @@
-<p>tooltip works!</p>
+<div class="lib-tooltip" 
+     [class.lib-tooltip-visible]="isVisible"
+     [class]="'lib-tooltip-' + placement"
+     [style.background]="color">
+  <div class="lib-tooltip-arrow" [style.background]="color"></div>
+  <div class="lib-tooltip-content">
+    <ng-container *ngIf="isTemplateRef(content); else stringTemplate">
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </ng-container>
+    <ng-template #stringTemplate>{{content}}</ng-template>
+  </div>
+</div>

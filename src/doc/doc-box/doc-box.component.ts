@@ -21,8 +21,6 @@ interface CodeTab {
 export class DocBoxComponent implements OnInit, OnDestroy {
   @Input() title: string = '';
   @Input() sourceCode: string = '';
-  @Input() htmlCode: string = '';
-  @Input() cssCode: string = '';
   
   tabs: CodeTab[] = [];
   showTabs: boolean = false;
@@ -40,26 +38,6 @@ export class DocBoxComponent implements OnInit, OnDestroy {
         title: 'TS',
         language: 'typescript',
         content: this.sourceCode,
-        copied: false
-      });
-      this.showTabs = true;
-    }
-    
-    if (this.htmlCode) {
-      this.tabs.push({
-        title: 'HTML',
-        language: 'html',
-        content: this.htmlCode,
-        copied: false
-      });
-      this.showTabs = true;
-    }
-    
-    if (this.cssCode) {
-      this.tabs.push({
-        title: 'CSS',
-        language: 'css',
-        content: this.cssCode,
         copied: false
       });
       this.showTabs = true;

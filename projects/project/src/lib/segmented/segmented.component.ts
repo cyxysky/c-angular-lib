@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, ViewChildren, QueryList, ElementRef, AfterViewInit, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, OnDestroy, NgZone, Renderer2 } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ViewChildren, QueryList, ElementRef, AfterViewInit, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, OnDestroy, NgZone, Renderer2, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { Subject, timer, Subscription } from 'rxjs';
@@ -32,6 +32,7 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   @Input() size: 'large' | 'default' | 'small' = 'default';
   @Input() maxWidth?: number;
   @Input() adaptParentWidth = true;  // 是否适应父容器宽度
+  @Input() template: TemplateRef<any> | null = null;
   @Output() valueChange = new EventEmitter<any>();
 
   @ViewChildren('segmentItem') segmentItems!: QueryList<ElementRef>;

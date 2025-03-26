@@ -10,14 +10,16 @@
                             <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
                             <li nz-menu-item (click)="nowComponent.set('switch')">开关</li>
                             <li nz-menu-item (click)="nowComponent.set('number-input')">数字输入</li>
+                            <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
+                            <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
+                            <li nz-menu-item (click)="nowComponent.set('tooltip')">提示</li>
+                            <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
-                            <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
                             <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
-                            <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
-                            <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
+
                         </ul>
                     </li>
                 </ul>
@@ -59,7 +61,7 @@
         <app-doc-button></app-doc-button>
         }
         @case ('input') {
-        <lib-input></lib-input>
+        <app-doc-input></app-doc-input>
         }
         @case ('tag') {
         <app-doc-tag></app-doc-tag>
@@ -75,6 +77,9 @@
         }
         @case ('water-mark') {
         <app-doc-water-mark></app-doc-water-mark>
+        }
+        @case ('tooltip') {
+        <app-doc-tooltip></app-doc-tooltip>
         }
         }
     </div>

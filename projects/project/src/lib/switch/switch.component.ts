@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, ElementRef, forwardRef, input, model, output, signal, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, forwardRef, input, model, output, signal, TemplateRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -24,8 +24,8 @@ export class SwitchComponent implements ControlValueAccessor {
   // 使用input()函数替代@Input装饰器
   disabled = input(false, { transform: booleanAttribute });
   loading = input(false, { transform: booleanAttribute });
-  checkedChildren = input<string>('');
-  unCheckedChildren = input<string>('');
+  checkedChildren = input<any>('');
+  unCheckedChildren = input<any>('');
   size = input<'default' | 'small'>('default');
 
   // 使用model()函数创建双向绑定
@@ -46,6 +46,20 @@ export class SwitchComponent implements ControlValueAccessor {
     const newValue = !this.checked();
     this.checked.set(newValue);
     this.onChange(newValue);
+  }
+
+  isString(value: any): boolean {
+    if (!value) {
+      return false;
+    }
+    return typeof value === 'string';
+  }
+
+  isTemplate(value: any): boolean {
+    if (!value) {
+      return false;
+    }
+    return value instanceof TemplateRef;
   }
 
   // ControlValueAccessor接口方法

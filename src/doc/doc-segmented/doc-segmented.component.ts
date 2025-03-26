@@ -35,16 +35,15 @@ export class DocSegmentedComponent {
     { value: 'years1', label: '年' },
     { value: 'years2', label: '年' },
     { value: 'years3', label: '年' },
-
   ];
   maxWidth = signal(500);
 
   // 带图标示例
   iconValue: string = 'list';
   iconOptions = [
-    { value: 'list', label: '列表', icon: 'icon-list' },
-    { value: 'kanban', label: '看板', icon: 'icon-appstore' },
-    { value: 'calendar', label: '日历', icon: 'icon-calendar' }
+    { value: 'list', label: '列表', icon: 'bi-card-checklist' },
+    { value: 'kanban', label: '看板', icon: 'bi-bag-dash' },
+    { value: 'calendar', label: '日历', icon: 'bi-calendar-day-fill' }
   ];
 
   // 禁用示例
@@ -117,7 +116,7 @@ import { SegmentedComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class BasicDemoComponent {
+export class SegmentedComponent {
   value: string = 'day';
   options = [
     { value: 'day', label: '日' },
@@ -125,8 +124,6 @@ export class BasicDemoComponent {
     { value: 'month', label: '月' }
   ];
 }`;
-  basicHTML = ``;
-  basicCSS = ``;
 
   // 带图标
   iconSource = `
@@ -143,18 +140,24 @@ import { SegmentedComponent } from 'your-lib';
       [(ngModel)]="value">
     </lib-segmented>
     <p>当前值: {{ value }}</p>
+    <lib-segmented
+      [options]="iconOptions"
+      [template]="iconTemplate"
+      [(ngModel)]="iconValue">
+    </lib-segmented>
+    <ng-template #iconTemplate let-option>
+      <span>{{option.label}} 自定义</span>
+    </ng-template>
   \`,
 })
-export class IconDemoComponent {
+export class SegmentedComponent {
   value: string = 'list';
-  options = [
-    { value: 'list', label: '列表', icon: 'icon-list' },
-    { value: 'kanban', label: '看板', icon: 'icon-appstore' },
-    { value: 'calendar', label: '日历', icon: 'icon-calendar' }
+  iconOptions = [
+    { value: 'list', label: '列表', icon: 'bi-card-checklist' },
+    { value: 'kanban', label: '看板', icon: 'bi-bag-dash' },
+    { value: 'calendar', label: '日历', icon: 'bi-calendar-day-fill' }
   ];
 }`;
-  iconHTML = ``;
-  iconCSS = ``;
 
   // 禁用
   disabledSource = `
@@ -177,7 +180,7 @@ import { SegmentedComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class DisabledDemoComponent {
+export class SegmentedComponent {
   value: string = 'apple';
   options = [
     { value: 'apple', label: '苹果' },
@@ -186,8 +189,6 @@ export class DisabledDemoComponent {
   ];
   componentDisabled = false;
 }`;
-  disabledHTML = ``;
-  disabledCSS = ``;
 
   // 尺寸
   sizeSource = `
@@ -213,7 +214,7 @@ import { SegmentedComponent } from 'your-lib';
     <p>当前尺寸: {{ currentSize }}</p>
   \`,
 })
-export class SizeDemoComponent {
+export class SegmentedComponent {
   value: string = 'day';
   currentSize: 'large' | 'default' | 'small' = 'default';
   options = [
@@ -227,8 +228,6 @@ export class SizeDemoComponent {
     { value: 'small', label: '小' }
   ];
 }`;
-  sizeHTML = ``;
-  sizeCSS = ``;
 
   // 块级
   blockSource = `
@@ -262,7 +261,7 @@ import { SegmentedComponent } from 'your-lib';
 
   \`,
 })
-export class BlockDemoComponent {
+export class SegmentedComponent {
   value: string = 'day';
   isBlock = true;
   options = [
@@ -275,8 +274,6 @@ export class BlockDemoComponent {
     { value: 'block', label: '块级' }
   ];
 }`;
-  blockHTML = ``;
-  blockCSS = ``;
 
   toggleDisabled(): void {
     this.componentDisabled = !this.componentDisabled;

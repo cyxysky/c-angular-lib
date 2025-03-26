@@ -258,6 +258,7 @@ export class WaterMarkComponent implements OnInit, OnDestroy {
   }
 
   private addProtectiveCSSRules(className: string): void {
+    return;
     // 创建一个样式表来保护水印元素
     const styleEl = this.renderer.createElement('style');
     const styleContent = `

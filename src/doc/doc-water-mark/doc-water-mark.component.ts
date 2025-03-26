@@ -74,7 +74,7 @@ import { Component } from '@angular/core';
 import { WaterMarkComponent } from '@project/water-mark';
 
 @Component({
-  selector: 'app-basic-demo',
+  selector: 'lib-water-mark',
   standalone: true,
   imports: [WaterMarkComponent],
   template: \`
@@ -86,10 +86,8 @@ import { WaterMarkComponent } from '@project/water-mark';
     </lib-water-mark>
   \`
 })
-export class BasicDemoComponent {}
+export class WaterMarkComponent {}
   `;
-  basicHTML = ``;
-  basicCSS = ``;
 
   // 自定义样式
   customSource = `
@@ -98,7 +96,7 @@ import { FormsModule } from '@angular/forms';
 import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, NumberInputComponent } from '@project/water-mark';
 
 @Component({
-  selector: 'app-custom-demo',
+  selector: 'lib-water-mark',
   standalone: true,
   imports: [FormsModule, WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, NumberInputComponent],
   template: \`
@@ -146,15 +144,13 @@ import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, N
     }
   \`
 })
-export class CustomDemoComponent {
+export class WaterMarkComponent {
   customText: string = '自定义水印文本';
   customColor: string = 'rgba(0, 0, 0, 0.15)';
   fontSize: number = 16;
   rotation: number = -22;
 }
   `;
-  customHTML = ``;
-  customCSS = ``;
 
   // 图片水印
   imageSource = `
@@ -162,7 +158,7 @@ import { Component } from '@angular/core';
 import { WaterMarkComponent } from '@project/water-mark';
 
 @Component({
-  selector: 'app-image-demo',
+  selector: 'lib-water-mark',
   standalone: true,
   imports: [WaterMarkComponent],
   template: \`
@@ -176,13 +172,11 @@ import { WaterMarkComponent } from '@project/water-mark';
     </lib-water-mark>
   \`
 })
-export class ImageDemoComponent {
+export class WaterMarkComponent {
   // 此处应设置为你的Logo的Base64字符串
   logoUrl: string = 'data:image/svg+xml;base64,...';
 }
   `;
-  imageHTML = ``;
-  imageCSS = ``;
 
   // 指令用法
   directiveSource = `
@@ -190,7 +184,7 @@ import { Component } from '@angular/core';
 import { WaterMarkDirectiveDirective } from '@project/water-mark';
 
 @Component({
-  selector: 'app-directive-demo',
+  selector: 'lib-water-mark',
   standalone: true,
   imports: [WaterMarkDirectiveDirective],
   template: \`
@@ -202,10 +196,8 @@ import { WaterMarkDirectiveDirective } from '@project/water-mark';
     </div>
   \`
 })
-export class DirectiveDemoComponent {}
+export class WaterMarkComponent {}
   `;
-  directiveHTML = ``;
-  directiveCSS = ``;
 
   // 防篡改
   tamperProofSource = `
@@ -214,7 +206,7 @@ import { CommonModule } from '@angular/common';
 import { WaterMarkComponent, ButtonComponent } from '@project/water-mark';
 
 @Component({
-  selector: 'app-tamper-proof-demo',
+  selector: 'lib-water-mark',
   standalone: true,
   imports: [CommonModule, WaterMarkComponent, ButtonComponent],
   template: \`
@@ -234,7 +226,7 @@ import { WaterMarkComponent, ButtonComponent } from '@project/water-mark';
     }
   \`
 })
-export class TamperProofDemoComponent {
+export class WaterMarkComponent {
   tamperMessage: string = '';
 
   showTamperMessage() {
@@ -243,8 +235,6 @@ export class TamperProofDemoComponent {
   }
 }
   `;
-  tamperProofHTML = ``;
-  tamperProofCSS = ``;
 
   // 防篡改功能演示
   showTamperMessage() {

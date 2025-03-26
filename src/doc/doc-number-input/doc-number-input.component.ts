@@ -22,31 +22,31 @@ import { ProjectModule } from '@project';
 export class DocNumberInputComponent {
   // 基本用法示例
   basicValue: number | null = 3;
-  
+
   // 前缀后缀示例
   prefixSuffixValue: number | null = 100;
-  
+
   // 精度示例
   precisionValue: number | null = 1.234;
-  
+
   // 禁用示例
   disabledValue: number = 99;
   disabledControl = new FormControl(this.disabledValue);
-  
+
   // 只读示例
   readonlyValue: number = 88;
-  
+
   // 步进示例
   stepValue: number | null = 5;
-  
+
   // 最大最小值示例
   boundedValue: number | null = 5;
-  
+
   // 格式化示例
   formattedValue: number | null = 1000;
   currencyFormatter = (value: number) => `${value}`.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   currencyParser = (value: string) => parseFloat(value.replace(/\$\s?|(,*)/g, ''));
-  
+
   // API 文档 - 修改为与tag组件一致的格式
   apiSections: ApiData[] = [
     {
@@ -60,7 +60,9 @@ export class DocNumberInputComponent {
         { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
         { name: 'readonly', description: '是否只读', type: 'boolean', default: 'false' },
         { name: 'prefix', description: '带有前缀图标的输入框', type: 'string', default: '""' },
+        { name: 'prefixIcon', description: '带有前缀图标的输入框', type: 'string', default: '""' },
         { name: 'suffix', description: '带有后缀图标的输入框', type: 'string', default: '""' },
+        { name: 'suffixIcon', description: '带有后缀图标的输入框', type: 'string', default: '""' },
         { name: 'formatter', description: '指定输入框展示值的格式', type: '(value: number) => string | number', default: 'value => value' },
         { name: 'color', description: '输入框字体颜色', type: 'string', default: 'black' },
         { name: 'status', description: '输入框状态', type: '\'normal\' | \'error\' | \'warning\'', default: '\'normal\'' }
@@ -73,7 +75,9 @@ export class DocNumberInputComponent {
       ]
     }
   ];
-  
+
+  htmlPreCode = '<span prefix>$</span><span suffix>美元</span>';
+
   // 演示代码 - 使用单独的source、HTML和CSS属性
   // 基本用法
   basicSource = `
@@ -81,7 +85,7 @@ import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-basic-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -89,20 +93,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class BasicDemoComponent {
+export class NumberInputComponent {
   value: number | null = 3;
 }`;
-  basicHTML = `<lib-number-input [(value)]="value"></lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  basicCSS = ``; // 如果没有特定的CSS，可以保留为空字符串
-  
+
   // 前缀后缀
   prefixSuffixSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-prefix-suffix-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -112,26 +113,24 @@ import { NumberInputComponent } from 'your-lib';
       [(value)]="value">
     </lib-number-input>
     <p>当前值: {{ value }}</p>
+    <lib-number-input
+      [(ngModel)]="prefixSuffixValue">
+      <span prefix>$</span>
+      <span suffix>美元</span>
+    </lib-number-input>
   \`,
 })
-export class PrefixSuffixDemoComponent {
+export class NumberInputComponent {
   value: number | null = 100;
 }`;
-  prefixSuffixHTML = `<lib-number-input
-  [prefix]="'¥'"
-  [suffix]="'元'"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  prefixSuffixCSS = ``;
-  
+
   // 精度
   precisionSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-precision-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -142,23 +141,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class PrecisionDemoComponent {
+export class NumberInputComponent {
   value: number | null = 1.234;
 }`;
-  precisionHTML = `<lib-number-input
-  [precision]="2"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  precisionCSS = ``;
-  
+
   // 禁用
   disabledSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-disabled-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -169,23 +162,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class DisabledDemoComponent {
+export class NumberInputComponent {
   value: number = 99;
 }`;
-  disabledHTML = `<lib-number-input
-  [disabled]="true"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  disabledCSS = ``;
-  
+
   // 只读
   readonlySource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-readonly-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -196,23 +183,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class ReadonlyDemoComponent {
+export class NumberInputComponent {
   value: number = 88;
 }`;
-  readonlyHTML = `<lib-number-input
-  [readonly]="true"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  readonlyCSS = ``;
-  
+
   // 步进
   stepSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-step-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -223,23 +204,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class StepDemoComponent {
+export class NumberInputComponent {
   value: number | null = 5;
 }`;
-  stepHTML = `<lib-number-input
-  [step]="0.1"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  stepCSS = ``;
-  
+
   // 范围限制
   boundedSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-bounded-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -251,24 +226,17 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class BoundedDemoComponent {
+export class NumberInputComponent {
   value: number | null = 5;
 }`;
-  boundedHTML = `<lib-number-input
-  [min]="1"
-  [max]="10"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  boundedCSS = ``;
-  
+
   // 格式化
   formattedSource = `
 import { Component } from '@angular/core';
 import { NumberInputComponent } from 'your-lib';
 
 @Component({
-  selector: 'app-formatted-demo',
+  selector: 'lib-number-input',
   standalone: true,
   imports: [NumberInputComponent],
   template: \`
@@ -280,17 +248,10 @@ import { NumberInputComponent } from 'your-lib';
     <p>当前值: {{ value }}</p>
   \`,
 })
-export class FormattedDemoComponent {
+export class NumberInputComponent {
   value: number | null = 1000;
   
   currencyFormatter = (value: number) => \`\${value}\`.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');
   currencyParser = (value: string) => parseFloat(value.replace(/\\$\\s?|(,*)/g, ''));
 }`;
-  formattedHTML = `<lib-number-input
-  [formatter]="currencyFormatter"
-  [parser]="currencyParser"
-  [(value)]="value">
-</lib-number-input>
-<p>当前值: {{ value }}</p>`;
-  formattedCSS = ``;
 }

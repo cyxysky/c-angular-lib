@@ -7,8 +7,8 @@ import { DocNumberInputComponent } from './doc-number-input/doc-number-input.com
 import { DocSegmentedComponent } from './doc-segmented/doc-segmented.component';
 import { DocWaterMarkComponent } from './doc-water-mark/doc-water-mark.component';
 import { DocFlowchartComponent } from './doc-flowchart/doc-flowchart.component';
-
-
+import { DocInputComponent } from './doc-input/doc-input.component';
+import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -19,7 +19,9 @@ import { DocFlowchartComponent } from './doc-flowchart/doc-flowchart.component';
     DocNumberInputComponent,
     DocSegmentedComponent,
     DocWaterMarkComponent,
-    DocFlowchartComponent
+    DocFlowchartComponent,
+    DocInputComponent,
+    DocTooltipComponent
   ],
   exports: [
     DocButtonComponent,
@@ -28,7 +30,9 @@ import { DocFlowchartComponent } from './doc-flowchart/doc-flowchart.component';
     DocNumberInputComponent,
     DocSegmentedComponent,
     DocWaterMarkComponent,
-    DocFlowchartComponent
+    DocFlowchartComponent,
+    DocInputComponent,
+    DocTooltipComponent
   ]
 })
 export class DocModule { }

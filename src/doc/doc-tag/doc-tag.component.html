@@ -9,7 +9,7 @@
 
 <div class="tag-docs-grid">
   <!-- 基础用法 -->
-  <app-doc-box title="基础用法" [sourceCode]="basicTagSource" [htmlCode]="basicTagHTML">
+  <app-doc-box title="基础用法" [sourceCode]="basicTagSource">
     <div demo>
       <lib-tag [content]="basicTagContent"></lib-tag>
     </div>
@@ -19,7 +19,7 @@
   </app-doc-box>
 
   <!-- 可关闭标签 -->
-  <app-doc-box title="可关闭标签" [sourceCode]="closableTagSource" [htmlCode]="closableTagHTML">
+  <app-doc-box title="可关闭标签" [sourceCode]="closableTagSource">
     <div demo>
       <lib-tag 
         *ngFor="let tag of closableTags; let i = index"
@@ -35,7 +35,7 @@
   </app-doc-box>
 
   <!-- 可选择标签 -->
-  <app-doc-box title="可选择标签" [sourceCode]="checkableTagSource" [htmlCode]="checkableTagHTML">
+  <app-doc-box title="可选择标签" [sourceCode]="checkableTagSource">
     <div demo>
       <lib-tag 
         *ngFor="let tag of checkableTags"
@@ -51,7 +51,7 @@
   </app-doc-box>
 
   <!-- 多彩标签 -->
-  <app-doc-box title="多彩标签" [sourceCode]="colorTagSource" [htmlCode]="colorTagHTML">
+  <app-doc-box title="多彩标签" [sourceCode]="colorTagSource">
     <div demo>
       <h4>预设颜色</h4>
       <div style="margin-bottom: 16px;">
@@ -80,7 +80,7 @@
   </app-doc-box>
 
   <!-- 禁用状态 -->
-  <app-doc-box title="禁用状态" [sourceCode]="disabledTagSource" [htmlCode]="disabledTagHTML">
+  <app-doc-box title="禁用状态" [sourceCode]="disabledTagSource">
     <div demo>
       <lib-tag 
         [content]="'禁用标签'"

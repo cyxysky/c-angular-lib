@@ -16,9 +16,7 @@
     <!-- 基本用法 -->
     <app-doc-box
       title="基本用法"
-      [sourceCode]="basicSource"
-      [htmlCode]="basicHTML"
-      [cssCode]="basicCSS">
+      [sourceCode]="basicSource">
       <div demo >
         <div style="display: flex; gap: 10px;">
             <lib-number-input [(ngModel)]="basicValue"></lib-number-input>
@@ -35,9 +33,7 @@
     <!-- 前缀和后缀 -->
     <app-doc-box
       title="前缀和后缀"
-      [sourceCode]="prefixSuffixSource"
-      [htmlCode]="prefixSuffixHTML"
-      [cssCode]="prefixSuffixCSS">
+      [sourceCode]="prefixSuffixSource">
       <div demo>
         <lib-number-input
           [prefix]="'¥'"
@@ -45,6 +41,15 @@
           [(ngModel)]="prefixSuffixValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ prefixSuffixValue }}</p>
+        <p>
+          也可以通过html代码进行自定义前后缀,最好使用span元素，如
+        </p>
+        <p>{{ htmlPreCode }}</p>
+        <lib-number-input
+          [(ngModel)]="prefixSuffixValue">
+          <span prefix>$</span>
+          <span suffix>美元</span>
+        </lib-number-input>
       </div>
       <div description>
         在输入框上添加前缀或后缀图标。
@@ -54,9 +59,7 @@
     <!-- 精度 -->
     <app-doc-box
       title="精度"
-      [sourceCode]="precisionSource"
-      [htmlCode]="precisionHTML"
-      [cssCode]="precisionCSS">
+      [sourceCode]="precisionSource">
       <div demo>
         <lib-number-input
           [precision]="2"
@@ -72,9 +75,7 @@
     <!-- 禁用 -->
     <app-doc-box
       title="禁用"
-      [sourceCode]="disabledSource"
-      [htmlCode]="disabledHTML"
-      [cssCode]="disabledCSS">
+      [sourceCode]="disabledSource">
       <div demo>
         <lib-number-input
           [disabled]="true"
@@ -90,9 +91,7 @@
     <!-- 只读 -->
     <app-doc-box
       title="只读"
-      [sourceCode]="readonlySource"
-      [htmlCode]="readonlyHTML"
-      [cssCode]="readonlyCSS">
+      [sourceCode]="readonlySource">
       <div demo>
         <lib-number-input
           [readonly]="true"
@@ -108,9 +107,7 @@
     <!-- 步进 -->
     <app-doc-box
       title="步进"
-      [sourceCode]="stepSource"
-      [htmlCode]="stepHTML"
-      [cssCode]="stepCSS">
+      [sourceCode]="stepSource">
       <div demo>
         <lib-number-input
           [step]="0.1"
@@ -127,9 +124,7 @@
     <!-- 范围限制 -->
     <app-doc-box
       title="范围限制"
-      [sourceCode]="boundedSource"
-      [htmlCode]="boundedHTML"
-      [cssCode]="boundedCSS">
+      [sourceCode]="boundedSource">
       <div demo>
         <lib-number-input
           [min]="1"
@@ -146,9 +141,7 @@
     <!-- 格式化 -->
     <app-doc-box
       title="格式化展示"
-      [sourceCode]="formattedSource"
-      [htmlCode]="formattedHTML"
-      [cssCode]="formattedCSS">
+      [sourceCode]="formattedSource">
       <div demo>
         <lib-number-input
           [formatter]="currencyFormatter"

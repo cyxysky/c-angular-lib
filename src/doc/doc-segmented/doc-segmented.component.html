@@ -16,9 +16,7 @@
     <!-- 基本用法 -->
     <app-doc-box
       title="基本用法"
-      [sourceCode]="basicSource"
-      [htmlCode]="basicHTML"
-      [cssCode]="basicCSS">
+      [sourceCode]="basicSource">
       <div demo>
         <lib-segmented
           [options]="basicOptions"
@@ -34,15 +32,22 @@
     <!-- 带图标 -->
     <app-doc-box
       title="带图标的选项"
-      [sourceCode]="iconSource"
-      [htmlCode]="iconHTML"
-      [cssCode]="iconCSS">
+      [sourceCode]="iconSource">
       <div demo>
         <lib-segmented
           [options]="iconOptions"
           [(ngModel)]="iconValue">
         </lib-segmented>
         <p class="example-value">当前值: {{ iconValue }}</p>
+        <p>支持自定义渲染</p>
+        <lib-segmented
+          [options]="iconOptions"
+          [template]="iconTemplate"
+          [(ngModel)]="iconValue">
+        </lib-segmented>
+        <ng-template #iconTemplate let-option>
+          <span>{{option.label}} 自定义</span>
+        </ng-template>
       </div>
       <div description>
         分段控制器支持在选项中显示图标。
@@ -52,9 +57,7 @@
     <!-- 禁用 -->
     <app-doc-box
       title="禁用状态"
-      [sourceCode]="disabledSource"
-      [htmlCode]="disabledHTML"
-      [cssCode]="disabledCSS">
+      [sourceCode]="disabledSource">
       <div demo>
         <lib-segmented
           [options]="disabledOptions"
@@ -76,9 +79,7 @@
     <!-- 尺寸 -->
     <app-doc-box
       title="尺寸"
-      [sourceCode]="sizeSource"
-      [htmlCode]="sizeHTML"
-      [cssCode]="sizeCSS">
+      [sourceCode]="sizeSource">
       <div demo>
         <lib-segmented
           [options]="sizeOptions"
@@ -102,9 +103,7 @@
     <!-- 块级 -->
     <app-doc-box
       title="块级分段控制器"
-      [sourceCode]="blockSource"
-      [htmlCode]="blockHTML"
-      [cssCode]="blockCSS">
+      [sourceCode]="blockSource">
       <div demo>
         <div style="margin-top: 16px;">
           <div style="display: grid; gap: 16px;grid-template-columns: 1fr;">

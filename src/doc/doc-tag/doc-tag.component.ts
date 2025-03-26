@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
+
 @Component({
   selector: 'app-doc-tag',
   standalone: true,
@@ -18,8 +19,6 @@ import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.co
   styleUrl: './doc-tag.component.less'
 })
 export class DocTagComponent implements OnInit {
-
-  
   // 基础标签
   basicTagContent = '标签';
   
@@ -55,7 +54,7 @@ import { TagComponent } from 'project';
     <lib-tag [content]="'标签'"></lib-tag>
   \`,
 })
-export class BasicTagDemoComponent {
+export class TagComponent {
 }`;
 
   closableTagSource = `
@@ -76,7 +75,7 @@ import { TagComponent } from 'project';
     </lib-tag>
   \`,
 })
-export class ClosableTagDemoComponent {
+export class TagComponent {
   tags: string[] = ['标签1', '标签2', '标签3'];
   
   handleClose(index: number): void {
@@ -103,7 +102,7 @@ import { TagComponent } from 'project';
     </lib-tag>
   \`,
 })
-export class CheckableTagDemoComponent {
+export class TagComponent {
   tags: Array<{content: string, checked: boolean}> = [
     { content: '选项一', checked: true },
     { content: '选项二', checked: false },
@@ -142,7 +141,7 @@ import { TagComponent } from 'project';
     </div>
   \`,
 })
-export class ColorTagDemoComponent {
+export class TagComponent {
   presetColors: string[] = ['primary', 'success', 'warning', 'danger'];
   customColors: string[] = ['#f50', '#2db7f5', '#87d068', '#108ee9', '#7265e6'];
 }`;
@@ -171,63 +170,8 @@ import { TagComponent } from 'project';
     </lib-tag>
   \`,
 })
-export class DisabledTagDemoComponent {
+export class TagComponent {
 }`;
-
-  basicTagHTML = `<lib-tag [content]="'标签'"></lib-tag>`;
-
-  closableTagHTML = `
-<lib-tag 
-  *ngFor="let tag of tags; let i = index"
-  [content]="tag"
-  [closable]="true"
-  (close)="handleClose(i)">
-</lib-tag>`;
-
-  checkableTagHTML = `
-<lib-tag 
-  *ngFor="let tag of tags"
-  [content]="tag.content"
-  [checkable]="true"
-  [(checked)]="tag.checked"
-  style="margin-right: 8px;">
-</lib-tag>`;
-
-  colorTagHTML = `
-<h4>预设颜色</h4>
-<div>
-  <lib-tag 
-    *ngFor="let color of presetColors"
-    [content]="color"
-    [color]="color"
-    style="margin-right: 8px;">
-  </lib-tag>
-</div>
-
-<h4 style="margin-top: 16px;">自定义颜色</h4>
-<div>
-  <lib-tag 
-    *ngFor="let color of customColors"
-    [content]="color"
-    [color]="color"
-    style="margin-right: 8px;">
-  </lib-tag>
-</div>`;
-
-  disabledTagHTML = `
-<lib-tag 
-  [content]="'禁用标签'"
-  [disabled]="true"
-  [closable]="true">
-</lib-tag>
-
-<lib-tag 
-  [content]="'禁用可选择标签'"
-  [disabled]="true"
-  [checkable]="true"
-  [checked]="true"
-  style="margin-left: 8px;">
-</lib-tag>`;
 
   ngOnInit(): void {
     // 初始化逻辑（如果需要）

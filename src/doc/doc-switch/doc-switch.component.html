@@ -6,7 +6,7 @@
 
 <div class="switch-docs-grid">
   <!-- 基础用法 -->
-  <app-doc-box title="基础用法" [sourceCode]="basicSwitchSource" [htmlCode]="basicSwitchHTML">
+  <app-doc-box title="基础用法" [sourceCode]="basicSwitchSource">
     <div demo>
       <lib-switch [(ngModel)]="basicSwitchChecked"></lib-switch>
       <p style="margin-top: 8px;">当前状态: {{ basicSwitchChecked ? '开' : '关' }}</p>
@@ -17,7 +17,7 @@
   </app-doc-box>
 
   <!-- 禁用状态 -->
-  <app-doc-box title="禁用状态" [sourceCode]="disabledSwitchSource" [htmlCode]="disabledSwitchHTML">
+  <app-doc-box title="禁用状态" [sourceCode]="disabledSwitchSource">
     <div demo>
       <lib-switch [disabled]="true" [ngModel]="disabledSwitchChecked"></lib-switch>
     </div>
@@ -27,7 +27,7 @@
   </app-doc-box>
 
   <!-- 加载中状态 -->
-  <app-doc-box title="加载中状态" [sourceCode]="loadingSwitchSource" [htmlCode]="loadingSwitchHTML">
+  <app-doc-box title="加载中状态" [sourceCode]="loadingSwitchSource">
     <div demo>
       <lib-switch [loading]="true" [ngModel]="loadingSwitchChecked"></lib-switch>
     </div>
@@ -37,12 +37,33 @@
   </app-doc-box>
 
   <!-- 带文字的开关 -->
-  <app-doc-box title="带文字的开关" [sourceCode]="textSwitchSource" [htmlCode]="textSwitchHTML">
+  <app-doc-box title="带文字的开关" [sourceCode]="textSwitchSource">
     <div demo>
       <lib-switch 
         [(ngModel)]="textSwitchChecked"
         [checkedChildren]="'开'"
         [unCheckedChildren]="'关'">
+      </lib-switch>
+      <lib-switch 
+        [(ngModel)]="textSwitchChecked"
+        [checkedChildren]="checkedChildren"
+        [unCheckedChildren]="unCheckedChildren">
+      </lib-switch>
+      <ng-template #checkedChildren>
+        使用template 开
+      </ng-template>
+      <ng-template #unCheckedChildren>
+        使用template 关
+      </ng-template>
+      <lib-switch 
+        [(ngModel)]="textSwitchChecked"
+        >
+        <span checkedChildren>
+          <i class="bi bi-check2"></i>
+        </span>
+        <span unCheckedChildren>
+          <i class="bi bi-x"></i>
+        </span>
       </lib-switch>
     </div>
     <div description>
@@ -51,7 +72,7 @@
   </app-doc-box>
 
   <!-- 两种大小 -->
-  <app-doc-box title="两种大小" [sourceCode]="smallSwitchSource" [htmlCode]="smallSwitchHTML">
+  <app-doc-box title="两种大小" [sourceCode]="smallSwitchSource">
     <div demo>
       <div style="display: flex; align-items: center; gap: 16px;">
         <div>

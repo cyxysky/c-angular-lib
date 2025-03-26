@@ -19,10 +19,14 @@
     </span>
   </div>
   
-  <span *ngIf="checked() && checkedChildren()" class="lib-switch-inner lib-switch-inner-checked">
-    {{ checkedChildren() }}
+  <span *ngIf="checked()" class="lib-switch-inner lib-switch-inner-checked">
+    {{ isString(checkedChildren()) ? checkedChildren() : '' }}
+    <ng-content select="[checkedChildren]"></ng-content>
+    <ng-container *ngIf="isTemplate(checkedChildren())" [ngTemplateOutlet]="checkedChildren()"></ng-container>
   </span>
-  <span *ngIf="!checked() && unCheckedChildren()" class="lib-switch-inner lib-switch-inner-unchecked">
-    {{ unCheckedChildren() }}
+  <span *ngIf="!checked()" class="lib-switch-inner lib-switch-inner-unchecked">
+    {{ isString(unCheckedChildren()) ? unCheckedChildren() : '' }}
+    <ng-content select="[unCheckedChildren]"></ng-content>
+    <ng-container *ngIf="isTemplate(unCheckedChildren())" [ngTemplateOutlet]="unCheckedChildren()"></ng-container>
   </span>
 </button>

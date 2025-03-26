@@ -24,6 +24,8 @@ import { TreeComponent } from './tree/tree.component';
 import { SwitchComponent } from './switch/switch.component';
 import { SegmentedComponent } from './segmented/segmented.component';
 import { WaterMarkComponent } from './water-mark/water-mark.component';
+import { TooltipDirective } from './tooltip/tooltip.directive';
+import { TooltipComponent } from './tooltip/tooltip.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -44,9 +46,11 @@ export * from './tree/tree.component';
 export * from './switch/switch.component';
 export * from './segmented/segmented.component';
 export * from './water-mark/water-mark.component';
+export * from './tooltip/tooltip.component';
 // 指令
 export * from './directive/widget.directive';
 export * from './water-mark/water-mark-directive.directive';
+export * from './tooltip/tooltip.directive';
 
 @NgModule({
   declarations: [],
@@ -72,7 +76,9 @@ export * from './water-mark/water-mark-directive.directive';
     SwitchComponent,
     SegmentedComponent,
     WaterMarkComponent,
-    WaterMarkDirectiveDirective
+    WaterMarkDirectiveDirective,
+    TooltipDirective,
+    TooltipComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -95,7 +101,9 @@ export * from './water-mark/water-mark-directive.directive';
     SwitchComponent,
     SegmentedComponent,
     WaterMarkComponent,
-    WaterMarkDirectiveDirective
+    WaterMarkDirectiveDirective,
+    TooltipDirective,
+    TooltipComponent
   ]
 })
 export class ProjectModule { }

@@ -25,10 +25,7 @@
              (click)="selectOption(option)"
              #segmentItem>
           <div class="segmented-item-label">
-            <span *ngIf="option.icon" class="segmented-item-icon">
-              <i class="{{option.icon}}"></i>
-            </span>
-            <span>{{option.label}}</span>
+            <ng-container *ngTemplateOutlet="template || defaultLabel; context: { $implicit: option }"></ng-container>
           </div>
         </div>
         
@@ -50,3 +47,9 @@
   </div>
 </div>
 
+<ng-template #defaultLabel let-option>
+  <span *ngIf="option.icon" class="segmented-item-icon">
+    <i class="{{option.icon}}"></i>
+  </span>
+  <span>{{option.label}}</span>
+</ng-template>

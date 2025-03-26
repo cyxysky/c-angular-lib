@@ -124,8 +124,6 @@ export class BasicDemoComponent implements OnInit {
     console.log('选中节点:', node);
   }
 }`;
-  basicHTML = ``;
-  basicCSS = ``;
 
   // 自定义流程图示例
   customSource = `
@@ -269,8 +267,6 @@ export class CustomDemoComponent {
     console.log('选中自定义节点:', node);
   }
 }`;
-  customHTML = ``;
-  customCSS = ``;
 
   // API 文档
   apiSections: ApiData[] = [

@@ -1,0 +1,49 @@
+.doc-title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-section-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 40px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 16px;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.placement-demo {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+lib-button {
+  margin: 0 8px 8px 0;
+}
+
+.example-description {
+  margin-top: 16px;
+  color: #666;
+}

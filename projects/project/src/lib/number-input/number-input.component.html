@@ -5,7 +5,11 @@
      [class]="statusClass()">
   
   <!-- 前缀 -->
-  <span *ngIf="prefix()" class="lib-number-input-prefix">{{ prefix() }}</span>
+  <span class="lib-number-input-prefix">
+    <ng-content select="[prefix]"></ng-content>
+    {{ prefix() }}
+    <i *ngIf="prefixIcon()" [class]="prefixIcon()"></i>
+  </span>
   
   <div class="lib-number-input-content">
     <!-- 输入框 -->
@@ -22,7 +26,11 @@
   </div>
   
   <!-- 后缀 -->
-  <span *ngIf="suffix()" class="lib-number-input-suffix">{{ suffix() }}</span>
+  <span class="lib-number-input-suffix">
+    <ng-content select="[suffix]"></ng-content>
+    {{ suffix() }}
+    <i *ngIf="suffixIcon()" [class]="suffixIcon()"></i>
+  </span>
   
   <!-- 控制按钮 -->
   <div class="lib-number-input-handler-wrap" *ngIf="!readonly()">

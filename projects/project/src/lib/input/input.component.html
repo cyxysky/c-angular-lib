@@ -1,20 +1,49 @@
-<div class="input-box">
-    <div class="prefix">
-        {{ prefix() }}
-    </div>
-    <input 
-        [ngModel]="_data"
-        [disabled]="disabled()"
-        (ngModelChange)="changeValue($event)" 
-        class="input"
-        [style.padding-right.px]="allowClear() ? 26 : 0"
-    />
-    <div class="suffix">
-        {{ suffix() }}
-    </div>
-    <div class="clear-icon" (click)="clear($event)" *ngIf="allowClear() && _data">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16" >
-            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-          </svg>
-    </div>
+<div class="input-container" [class]="getInputClass()">
+
+  <span class="input-prefix" *ngIf="prefix() || prefixIcon()">
+    <i *ngIf="prefixIcon()" class="input-prefix-icon" [class]="prefixIcon()"></i>
+    <span *ngIf="prefix()">{{ prefix() }}</span>
+  </span>
+  
+  <input 
+    [ngModel]="_data"
+    [disabled]="disabled()"
+    [maxlength]="maxlength()"
+    [minlength]="minlength()"
+    [placeholder]="placeholder()"
+    [readonly]="readonly()"
+    [type]="type()"
+    [attr.id]="id()"
+    [attr.autocomplete]="autocomplete()"
+    [style.padding-left.px]="paddingLeft()"
+    [style.padding-right.px]="paddingRight()"
+    (ngModelChange)="changeValue($event)" 
+    (focus)="onFocus($event)"
+    (blur)="onBlur($event)"
+    (keydown)="onKeyDown($event)"
+    (keyup)="onKeyUp($event)"
+    (keypress)="onKeyPress($event)"
+    (click)="onClick($event)"
+    [attr.autofocus]="autofocus() ? 'autofocus' : null"
+    class="input-control"
+  />
+  
+  <span class="input-suffix" *ngIf="suffix() || suffixIcon() || (allowClear() && _data) || (showCount() && maxlength())">
+    <!-- 后缀 -->
+    <span *ngIf="suffix()">{{ suffix() }}</span>
+    <!-- 图标 -->
+    <i *ngIf="suffixIcon()" class="input-suffix-icon" [class]="suffixIcon()"></i>
+    <!-- 字数统计 -->
+    <span class="char-count" *ngIf="showCount() && maxlength()">
+      {{ getCharCount() }}
+    </span>
+    <!-- 清除 -->
+    <span class="clear-icon" (click)="clear($event)" *ngIf="allowClear() && _data && !disabled() && !readonly()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+      </svg>
+    </span>
+  </span>
+  
+  <div class="input-error" *ngIf="error">{{ error }}</div>
 </div>

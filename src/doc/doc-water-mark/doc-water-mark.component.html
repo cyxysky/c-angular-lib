@@ -16,9 +16,7 @@
     <!-- 基本用法 -->
     <app-doc-box
       title="基本用法"
-      [sourceCode]="basicSource"
-      [htmlCode]="basicHTML"
-      [cssCode]="basicCSS">
+      [sourceCode]="basicSource">
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark [text]="'公司内部文件'">
@@ -37,9 +35,7 @@
     <!-- 自定义样式 -->
     <app-doc-box
       title="自定义样式"
-      [sourceCode]="customSource"
-      [htmlCode]="customHTML"
-      [cssCode]="customCSS">
+      [sourceCode]="customSource">
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark 
@@ -78,9 +74,7 @@
     <!-- 图片水印 -->
     <app-doc-box
       title="图片水印"
-      [sourceCode]="imageSource"
-      [htmlCode]="imageHTML"
-      [cssCode]="imageCSS">
+      [sourceCode]="imageSource">
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark 
@@ -101,9 +95,7 @@
     <!-- 指令用法 -->
     <app-doc-box
       title="指令用法"
-      [sourceCode]="directiveSource"
-      [htmlCode]="directiveHTML"
-      [cssCode]="directiveCSS">
+      [sourceCode]="directiveSource">
       <div demo>
         <div style="height: 300px;width: 100%;padding: 20px;" libWaterMarkDirective [text]="'水印指令应用'">
           <h3>水印指令</h3>
@@ -118,9 +110,7 @@
     <!-- 防篡改 -->
     <app-doc-box
       title="防篡改功能"
-      [sourceCode]="tamperProofSource"
-      [htmlCode]="tamperProofHTML"
-      [cssCode]="tamperProofCSS">
+      [sourceCode]="tamperProofSource">
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark [text]="'防篡改水印'" [fontColor]="'rgba(233, 66, 66, 0.2)'">

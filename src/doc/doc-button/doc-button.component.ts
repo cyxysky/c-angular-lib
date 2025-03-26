@@ -71,23 +71,11 @@ export class DocButtonComponent {
       ]
     }
   ];
-  // 颜色按钮示例代码
-  colorButtonHtml = `
-<lib-button [color]="'primary'">主要颜色</lib-button>
-<lib-button [color]="'success'">成功颜色</lib-button>
-<lib-button [color]="'warning'">警告颜色</lib-button>
-<lib-button [color]="'danger'">危险颜色</lib-button>
-<lib-button [color]="'tertiary'">次要颜色</lib-button>
-<lib-button [color]="'light'">浅色颜色</lib-button>
-<lib-button [color]="'dark'">深色颜色</lib-button>
-<lib-button [color]="'medium'">灰色颜色</lib-button>
-<lib-button [color]="'ghost'">幽灵颜色</lib-button>
-`;
-
+  
   colorButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-color-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button [color]="'primary'">主要颜色</lib-button>
     <lib-button [color]="'success'">成功颜色</lib-button>
@@ -102,19 +90,10 @@ import { Component } from '@angular/core';
 })
 export class ButtonComponent { }`;
 
-  colorButtonCss = ``;
-
-  // 按钮类型示例代码
-  typeButtonHtml = `
-<lib-button>默认按钮</lib-button>
-<lib-button [type]="'dashed'" [color]="'ghost'">虚线按钮</lib-button>
-<lib-button [type]="'text'">文字按钮</lib-button>
-<lib-button [type]="'link'">链接按钮</lib-button>`;
-
   typeButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-type-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button>默认按钮</lib-button>
     <lib-button [type]="'dashed'" [color]="'ghost'">虚线按钮</lib-button>
@@ -124,17 +103,10 @@ import { Component } from '@angular/core';
 })
 export class ButtonComponent { }`;
 
-  typeButtonCss = ``;
-
-  // 按钮形状示例代码
-  shapeButtonHtml = `
-<lib-button>默认形状</lib-button>
-<lib-button [shape]="'circle'">圆形</lib-button>`;
-
   shapeButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-shape-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button>默认形状</lib-button>
     <lib-button [shape]="'circle'">圆形</lib-button>
@@ -142,18 +114,10 @@ import { Component } from '@angular/core';
 })
 export class ButtonComponent { }`;
 
-  shapeButtonCss = `allowClear`;
-
-  // 按钮尺寸示例代码
-  sizeButtonHtml = `
-<lib-button [size]="'small'">小按钮</lib-button>
-<lib-button>默认尺寸</lib-button>
-<lib-button [size]="'large'">大按钮</lib-button>`;
-
   sizeButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-size-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button [size]="'small'">小按钮</lib-button>
     <lib-button>默认尺寸</lib-button>
@@ -162,17 +126,10 @@ import { Component } from '@angular/core';
 })
 export class ButtonComponent { }`;
 
-  sizeButtonCss = ``;
-
-  // 按钮状态示例代码
-  stateButtonHtml = `
-<lib-button>正常状态</lib-button>
-<lib-button disabled>禁用状态</lib-button>`;
-
   stateButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-state-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button>正常状态</lib-button>
     <lib-button disabled>禁用状态</lib-button>
@@ -180,19 +137,10 @@ import { Component } from '@angular/core';
 })
 export class ButtonComponent { }`;
 
-  stateButtonCss = ``;
-
-  // 块级按钮示例代码
-  blockButtonHtml = `
-<lib-button block>撑满父元素</lib-button>
-<div style="margin-top: 16px;">
-  <lib-button block [shape]="'circle'">撑满父元素圆形</lib-button>
-</div>`;
-
   blockButtonCode = `
 import { Component } from '@angular/core';
 @Component({
-  selector: 'app-block-button-demo',
+  selector: 'lib-button',
   template: \`
     <lib-button block>撑满父元素</lib-button>
     <div style="margin-top: 16px;">
@@ -201,6 +149,4 @@ import { Component } from '@angular/core';
   \`
 })
 export class ButtonComponent { }`;
-
-  blockButtonCss = ``;
 }

@@ -1,1 +1,192 @@
-<p>doc-input works!</p>
+<div class="doc-container">
+  <h1 class="doc-title">输入框 Input</h1>
+  
+  <p class="doc-description">
+    基本的表单输入组件，用于接收用户输入的信息。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    需要用户输入文本内容时，可以使用输入框组件。适用于表单数据收集、搜索框、用户名密码等各类场景。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-input 
+          placeholder="请输入内容" 
+          [(ngModel)]="basicValue">
+        </lib-input>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        最简单的用法，指定输入框的提示文字和默认值。
+      </div>
+    </app-doc-box>
+    
+    <!-- 三种大小 -->
+    <app-doc-box
+      title="三种大小"
+      [sourceCode]="sizeSource">
+      <div demo>
+        <div class="size-demo">
+          <lib-input 
+            placeholder="大尺寸" 
+            size="large"
+            [(ngModel)]="largeValue">
+          </lib-input>
+          <lib-input 
+            placeholder="默认尺寸" 
+            [(ngModel)]="defaultValue">
+          </lib-input>
+          <lib-input 
+            placeholder="小尺寸" 
+            size="small"
+            [(ngModel)]="smallValue">
+          </lib-input>
+        </div>
+      </div>
+      <div description>
+        输入框有三种尺寸：大、默认和小，可以根据不同场景选择合适的尺寸。
+      </div>
+    </app-doc-box>
+    
+    <!-- 前缀和后缀 -->
+    <app-doc-box
+      title="前缀和后缀"
+      [sourceCode]="affixSource">
+      <div demo>
+        <div class="affix-demo">
+          <lib-input 
+            placeholder="前缀" 
+            prefix="￥"
+            [(ngModel)]="prefixValue">
+          </lib-input>
+          <lib-input 
+            placeholder="后缀" 
+            suffix="RMB"
+            [(ngModel)]="suffixValue">
+          </lib-input>
+          <lib-input 
+            placeholder="前缀图标" 
+            prefixIcon="bi-truck-flatbed"
+            [(ngModel)]="prefixIconValue">
+          </lib-input>
+          <lib-input 
+            placeholder="后缀图标" 
+            suffixIcon="bi-tiktok"
+            [(ngModel)]="suffixIconValue">
+          </lib-input>
+        </div>
+      </div>
+      <div description>
+        可以添加前缀和后缀，用于在输入框前后添加文本或图标。
+      </div>
+    </app-doc-box>
+    
+    <!-- 允许清除 -->
+    <app-doc-box
+      title="允许清除"
+      [sourceCode]="clearSource">
+      <div demo>
+        <lib-input 
+          placeholder="输入后显示清除按钮" 
+          [allowClear]="true"
+          [(ngModel)]="clearValue">
+        </lib-input>
+      </div>
+      <div description>
+        可以添加清除按钮，点击清除按钮可以一键清除输入框内容。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用和只读 -->
+    <app-doc-box
+      title="禁用和只读"
+      [sourceCode]="disabledSource">
+      <div demo>
+        <div class="disabled-demo">
+          <lib-input 
+            placeholder="禁用状态" 
+            [disabled]="true"
+            [(ngModel)]="disabledValue">
+          </lib-input>
+          <lib-input 
+            placeholder="只读状态" 
+            [readonly]="true"
+            [(ngModel)]="readonlyValue">
+          </lib-input>
+        </div>
+      </div>
+      <div description>
+        输入框可以设置为禁用或只读状态，禁用状态下不可编辑，只读状态下可以选择但不能修改。
+      </div>
+    </app-doc-box>
+    
+    <!-- 状态 -->
+    <app-doc-box
+      title="状态"
+      [sourceCode]="statusSource">
+      <div demo>
+        <div class="status-demo">
+          <lib-input 
+            placeholder="错误状态" 
+            status="error"
+            [(ngModel)]="errorValue">
+          </lib-input>
+          <lib-input 
+            placeholder="警告状态" 
+            status="warning"
+            [(ngModel)]="warningValue">
+          </lib-input>
+        </div>
+      </div>
+      <div description>
+        输入框可以有不同的状态，用于表示错误或警告信息。
+      </div>
+    </app-doc-box>
+    
+    <!-- 限制输入长度 -->
+    <app-doc-box
+      title="字数限制"
+      [sourceCode]="countSource">
+      <div demo>
+        <lib-input 
+          placeholder="最多输入10个字符" 
+          [maxlength]="10"
+          [showCount]="true"
+          [(ngModel)]="countValue">
+        </lib-input>
+      </div>
+      <div description>
+        可以限制输入字符的最大数量，并显示字数统计。
+      </div>
+    </app-doc-box>
+    
+    <!-- 无边框 -->
+    <app-doc-box
+      title="无边框"
+      [sourceCode]="borderlessSource">
+      <div demo>
+        <div class="borderless-demo">
+          <lib-input 
+            placeholder="无边框输入框" 
+            [bordered]="false"
+            [(ngModel)]="borderlessValue">
+          </lib-input>
+        </div>
+      </div>
+      <div description>
+        无边框样式的输入框，适用于特定场景。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

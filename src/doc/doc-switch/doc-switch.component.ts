@@ -49,7 +49,7 @@ import { SwitchComponent } from 'project';
     <p>当前状态: {{ checked ? '开' : '关' }}</p>
   \`,
 })
-export class BasicSwitchDemoComponent {
+export class SwitchComponent {
   checked = false;
 }`;
 
@@ -65,7 +65,7 @@ import { SwitchComponent } from 'project';
     <lib-switch [disabled]="true" [checked]="checked"></lib-switch>
   \`,
 })
-export class DisabledSwitchDemoComponent {
+export class SwitchComponent {
   checked = true;
 }`;
 
@@ -81,7 +81,7 @@ import { SwitchComponent } from 'project';
     <lib-switch [loading]="true" [checked]="checked"></lib-switch>
   \`,
 })
-export class LoadingSwitchDemoComponent {
+export class SwitchComponent {
   checked = false;
 }`;
 
@@ -96,13 +96,34 @@ import { SwitchComponent } from 'project';
   imports: [FormsModule, SwitchComponent],
   template: \`
     <lib-switch 
-      [(checked)]="checked"
-      [checkedChildren]="'开'"
-      [unCheckedChildren]="'关'">
-    </lib-switch>
+        [(ngModel)]="textSwitchChecked"
+        [checkedChildren]="'开'"
+        [unCheckedChildren]="'关'">
+      </lib-switch>
+      <lib-switch 
+        [(ngModel)]="textSwitchChecked"
+        [checkedChildren]="checkedChildren"
+        [unCheckedChildren]="unCheckedChildren">
+      </lib-switch>
+      <ng-template #checkedChildren>
+        使用template 开
+      </ng-template>
+      <ng-template #unCheckedChildren>
+        使用template 关
+      </ng-template>
+      <lib-switch 
+        [(ngModel)]="textSwitchChecked"
+        >
+        <span checkedChildren>
+          <i class="bi bi-check2"></i>
+        </span>
+        <span unCheckedChildren>
+          <i class="bi bi-x"></i>
+        </span>
+      </lib-switch>
   \`,
 })
-export class TextSwitchDemoComponent {
+export class SwitchComponent {
   checked = true;
 }`;
 
@@ -122,30 +143,9 @@ import { SwitchComponent } from 'project';
     </lib-switch>
   \`,
 })
-export class SmallSwitchDemoComponent {
+export class SwitchComponent {
   checked = false;
 }`;
-
-  basicSwitchHTML = `
-<lib-switch [(checked)]="checked"></lib-switch>
-<p>当前状态: {{ checked ? '开' : '关' }}</p>`;
-
-  disabledSwitchHTML = `<lib-switch [disabled]="true" [checked]="checked"></lib-switch>`;
-
-  loadingSwitchHTML = `<lib-switch [loading]="true" [checked]="checked"></lib-switch>`;
-
-  textSwitchHTML = `
-<lib-switch 
-  [(checked)]="checked"
-  [checkedChildren]="'开'"
-  [unCheckedChildren]="'关'">
-</lib-switch>`;
-
-  smallSwitchHTML = `
-<lib-switch 
-  [(checked)]="checked"
-  [size]="'small'">
-</lib-switch>`;
 
   ngOnInit(): void {
     // 初始化逻辑（如果需要）
@@ -185,13 +185,13 @@ export class SmallSwitchDemoComponent {
         {
           name: 'checkedChildren',
           description: '选中时的内容',
-          type: 'string',
+          type: 'string | TemplateRef<any>',
           default: '-'
         },
         {
           name: 'unCheckedChildren',
           description: '非选中时的内容',
-          type: 'string',
+          type: 'string | TemplateRef<any>',
           default: '-'
         },
         {
