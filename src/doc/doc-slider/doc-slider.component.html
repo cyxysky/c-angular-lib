@@ -1,0 +1,160 @@
+<div class="doc-container">
+  <h1 class="doc-title">滑动条 Slider</h1>
+  
+  <p class="doc-description">
+    滑动型输入器，展示当前值和可选范围。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当用户需要在数值区间内进行选择时；
+    当需要展示连续区间的值选择时；
+    当需要选择多个区间值时。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="basicValue">
+        </lib-slider>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        最简单的滑动条，展示当前值和可拖拽的滑块。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义颜色 -->
+    <app-doc-box
+      title="自定义颜色"
+      [sourceCode]="colorSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="colorValue" 
+          [trackColor]="'#ff4d4f'">
+        </lib-slider>
+        <p class="example-value">当前值: {{ colorValue }}</p>
+      </div>
+      <div description>
+        可以自定义滑动条的轨道颜色。
+      </div>
+    </app-doc-box>
+    
+    <!-- 设置步长 -->
+    <app-doc-box
+      title="设置步长"
+      [sourceCode]="stepSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="stepValue"
+          [step]="10"
+          [min]="0"
+          [max]="100">
+        </lib-slider>
+        <p class="example-value">当前值: {{ stepValue }}</p>
+      </div>
+      <div description>
+        设置 step 可以控制滑块的步长，默认为 1。
+      </div>
+    </app-doc-box>
+    
+    <!-- 范围滑块 -->
+    <app-doc-box
+      title="范围滑块"
+      [sourceCode]="rangeSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="rangeValue"
+          [isRange]="true">
+        </lib-slider>
+        <p class="example-value">当前范围: [{{ rangeValue[0] }}, {{ rangeValue[1] }}]</p>
+      </div>
+      <div description>
+        设置 isRange 为 true 可以使用范围滑块，用于选择一个区间。
+      </div>
+    </app-doc-box>
+    
+    <!-- 刻度 -->
+    <app-doc-box
+      title="带刻度的滑块"
+      [sourceCode]="marksSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="marksValue"
+          [marks]="sliderMarks">
+        </lib-slider>
+        <p class="example-value">当前值: {{ marksValue }}</p>
+        <lib-slider 
+          [(ngModel)]="marksValue"
+          [marks]="sliderMarks"
+          [labelTemplate]="customMarkLabel">
+        </lib-slider>
+        <ng-template #customMarkLabel let-mark>
+            <div style="color: #1890ff;">{{ mark.label }}</div>
+        </ng-template>
+      </div>
+      <div description>
+        使用 marks 属性可以显示刻度标记。标记可自定义
+      </div>
+    </app-doc-box>
+    
+    <!-- 对齐刻度 -->
+    <app-doc-box
+      title="对齐刻度"
+      [sourceCode]="snapSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="snapValue"
+          [marks]="sliderMarks"
+          [snapToMarks]="true">
+        </lib-slider>
+        <p class="example-value">当前值: {{ snapValue }}</p>
+      </div>
+      <div description>
+        设置 snapToMarks 为 true 可以让滑块只能对齐到刻度上。
+      </div>
+    </app-doc-box>
+    
+    <!-- 提示格式化 -->
+    <app-doc-box
+      title="提示格式化"
+      [sourceCode]="tooltipSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="tooltipValue"
+          [tipFormatter]="formatTooltip">
+        </lib-slider>
+        <p class="example-value">当前值: {{ tooltipValue }}</p>
+      </div>
+      <div description>
+        通过 tipFormatter 函数可以自定义提示的显示格式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 事件监听 -->
+    <app-doc-box
+      title="事件监听"
+      [sourceCode]="eventSource">
+      <div demo>
+        <lib-slider 
+          [(ngModel)]="eventValue"
+          (ngModelChange)="onValueChange($event)">
+        </lib-slider>
+        <p class="example-value">当前值: {{ eventValue }}</p>
+        <p class="example-value">上次改变: {{ lastChangedValue }}</p>
+      </div>
+      <div description>
+        可以监听滑块值的变化事件。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

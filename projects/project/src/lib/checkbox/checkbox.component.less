@@ -1,3 +1,4 @@
+@import '../../style/style.less';
 .checkbox-group {
   display: flex;
   flex-direction: column;
@@ -69,7 +70,7 @@
         left: 50%;
         width: 8px;
         height: 2px;
-        background-color: #fff;
+        background-color: @checkbox-inner-color;
         transform: translate(-50%, -50%);
         content: ' ';
       }
@@ -80,9 +81,9 @@
       display: inline-block;
       width: 16px;
       height: 16px;
-      border: 1px solid #d9d9d9;
+      border: 1px solid @checkbox-border-color;
       border-radius: 2px;
-      background-color: #fff;
+      background-color: @checkbox-inner-color;
       transition: all 0.3s;
       left: 0;
       top: 0;
@@ -90,13 +91,13 @@
       &::after {
         position: absolute;
         top: 50%;
-        left: 24.5%;
+        left: 22.5%;
         display: table;
         width: 5.71428571px;
         height: 9.14285714px;
         position: absolute;
         display: table;
-        border: 2px solid #fff;
+        border: 2px solid @checkbox-inner-color;
         border-top: 0;
         border-left: 0;
         transform: rotate(45deg) scale(1) translate(-50%, -50%);
@@ -134,8 +135,13 @@
   display: block;
   width: 8px;
   height: 2px;
-  background-color: #fff;
+  background-color: @checkbox-inner-color;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.checked{
+  background-color: @checkbox-checked-background-color;
+  border-color: @checkbox-checked-border-color;
 }

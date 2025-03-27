@@ -9,7 +9,7 @@ export class WaterMarkDirectiveDirective {
   @Input() fontSize = 16;
   @Input() fontFamily = '"Microsoft YaHei", "PingFang SC", Arial, sans-serif';
   @Input() fontWeight = '200';
-  @Input() gap = 40;
+  @Input() gap = 30;
   @Input() zIndex = 9999;
   @Input() rotate = -22;
   @Input() width = 240;

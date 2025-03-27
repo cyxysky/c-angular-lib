@@ -23,6 +23,10 @@ import { WaterMarkComponent, WaterMarkDirectiveDirective, InputComponent, Number
   styleUrl: './doc-water-mark.component.less'
 })
 export class DocWaterMarkComponent {
+
+  conss(a: any){
+    console.log(a)
+  }
   // 自定义样式示例
   customText: string = '自定义水印文本';
   customColor: string = 'rgba(0, 0, 0, 0.15)';

@@ -19,9 +19,9 @@
       [sourceCode]="basicSource">
       <div demo>
         <div class="demo-water-mark-container">
-          <lib-water-mark [text]="'公司内部文件'">
+          <lib-water-mark [text]="'公司内部文件'" #asdasdasdasd>
             <div style="height: 300px;width: 100%;padding: 20px;">
-              <h3>水印组件基本使用</h3>
+              <h3 (click)="conss(asdasdasdasd)">水印组件基本使用</h3>
               <p>水印将显示在这个区域内部</p>
             </div>
           </lib-water-mark>

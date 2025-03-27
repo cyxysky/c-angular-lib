@@ -14,6 +14,8 @@
                             <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
                             <li nz-menu-item (click)="nowComponent.set('tooltip')">提示</li>
                             <li nz-menu-item (click)="nowComponent.set('checkbox')">复选框</li>
+                            <li nz-menu-item (click)="nowComponent.set('radio')">单选框</li>
+                            <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
@@ -84,6 +86,12 @@
         }
         @case ('checkbox') {
         <app-doc-checkbox></app-doc-checkbox>
+        }
+        @case ('radio') {
+        <app-doc-radio></app-doc-radio>
+        }
+        @case ('slider') {
+        <app-doc-slider></app-doc-slider>
         }
         }
     </div>

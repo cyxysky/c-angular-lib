@@ -1,8 +1,6 @@
 import { booleanAttribute, Component, ElementRef, forwardRef, input, model, output, signal, TemplateRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { single } from 'rxjs';
 
 @Component({
   selector: 'lib-switch',

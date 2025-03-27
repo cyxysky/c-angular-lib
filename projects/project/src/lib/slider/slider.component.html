@@ -1,0 +1,60 @@
+<div class="lib-slider-container" [class.lib-slider-with-marks]="marks">
+  <div class="lib-slider-rail"></div>
+  <div 
+    class="lib-slider-track" 
+    [ngStyle]="{'background-color': trackColor, 'width': trackWidth, 'left': isRange ? rangeValues[0] + '%' : '0'}"
+  ></div>
+  
+  <!-- 单滑块 -->
+  <div 
+    *ngIf="!isRange"
+    class="lib-slider-handle" 
+    [ngStyle]="{'left': value + '%', 'border-color': handleColor}"
+    libTooltip
+    #singalSliderTooltip="libTooltip"
+    [libTooltipStrictVisiable]="singalSliderHandleVisible"
+    [libTooltip]="toString(tipFormatter ? tipFormatter(value) : value)"
+    [libTooltipVisible]="singalSliderHandleVisible"
+    (mousedown)="onHandleMouseDown($event, 0, 'single', singalSliderTooltip)"
+  ></div>
+  
+  <!-- 范围滑块 -->
+  <div 
+    *ngIf="isRange"
+    class="lib-slider-handle" 
+    [ngStyle]="{'left': rangeValues[0] + '%', 'border-color': handleColor}"
+    libTooltip
+    [libTooltipStrictVisiable]="rangeLeftSliderHandleVisible"
+    #rangeLeftSliderTooltip="libTooltip"
+    [libTooltip]="toString(tipFormatter ? tipFormatter(rangeValues[0]) : rangeValues[0])"
+    [libTooltipVisible]="rangeLeftSliderHandleVisible"
+    (mousedown)="onHandleMouseDown($event, 0, 'left', rangeLeftSliderTooltip)"
+  ></div>
+  <div 
+    *ngIf="isRange"
+    class="lib-slider-handle" 
+    [ngStyle]="{'left': rangeValues[1] + '%', 'border-color': handleColor}"
+    libTooltip
+    [libTooltipStrictVisiable]="rangeRightSliderHandleVisible"
+    #rangeRightSliderTooltip="libTooltip"
+    [libTooltip]="toString(tipFormatter ? tipFormatter(rangeValues[1]) : rangeValues[1])"
+    [libTooltipVisible]="rangeRightSliderHandleVisible"
+    (mousedown)="onHandleMouseDown($event, 1, 'right', rangeRightSliderTooltip)"
+  ></div>
+  
+  <!-- 刻度 -->
+  <div *ngIf="marks" class="lib-slider-marks">
+    <span 
+      *ngFor="let mark of markList" 
+      class="lib-slider-mark" 
+      [ngStyle]="{'left': mark.value + '%'}"
+    >
+      <ng-container *ngTemplateOutlet="labelTemplate || defaultMarkLabel; context: { $implicit: mark }"></ng-container>
+    </span>
+  </div>
+</div>
+
+
+<ng-template #defaultMarkLabel let-mark>
+  {{ mark.label }}
+</ng-template>

@@ -9,6 +9,8 @@ export interface CheckboxOption {
   indeterminate?: boolean;
 }
 
+export type CheckboxDirection = 'horizontal' | 'vertical';
+
 @Component({
   selector: 'lib-checkbox',
   standalone: true,
@@ -24,10 +26,15 @@ export interface CheckboxOption {
   ]
 })
 export class CheckboxComponent implements ControlValueAccessor, OnInit {
+  /** 选项 */
   @Input() options: CheckboxOption[] = [];
-  @Input() direction: 'horizontal' | 'vertical' = 'horizontal';
+  /** 方向 */
+  @Input() direction: CheckboxDirection = 'horizontal';
+  /** 复选框颜色 */
   @Input() checkboxColor: string = '#1890ff';
+  /** 是否禁用 */
   @Input() indeterminate: boolean = false;
+  /** 标签模板 */
   @Input() labelTemplate: TemplateRef<any> | null = null;
 
   value: any[] = [];
@@ -119,9 +126,7 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
 
   toggleAll(): void {
     if (this.disabled) return;
-    
     const shouldCheckAll = !this.isAllChecked();
-    
     if (shouldCheckAll) {
       // 选中所有未禁用的选项
       this.value = this.options
@@ -131,7 +136,6 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
       // 取消所有选中
       this.value = [];
     }
-    
     this.updateCheckedStatus();
     this.onChange(this.value);
     this.onTouched();

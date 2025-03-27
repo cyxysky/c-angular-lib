@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, input, output, booleanAttribute, model, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+export type TagColor = 'primary' | 'success' | 'warning' | 'danger' | string;
+
 @Component({
   selector: 'lib-tag',
   standalone: true,
@@ -15,15 +17,13 @@ export class TagComponent {
   /** 标签是否可选中 */
   checkable = input(false, { transform: booleanAttribute });
   /** 标签色彩，可选值: primary, success, warning, danger 或自定义色值 */
-  color = input<string>('primary');
+  color = input<TagColor>('primary');
   /** 标签是否禁用 */
   disabled = input(false, { transform: booleanAttribute });
   /** 标签内容 */
   content = input<string>('');
-
   /** 标签是否被选中 */
   checked = model<boolean>(false);
-
   /** 关闭标签时的事件 */
   close = output<string>();
   /** 点击标签时的事件 */

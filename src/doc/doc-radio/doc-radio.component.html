@@ -1,0 +1,112 @@
+<div class="doc-container">
+  <h1 class="doc-title">单选框 Radio</h1>
+  
+  <p class="doc-description">
+    用于在一组互斥选项中选择一个选项。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当用户需要从一组数据中选择单个选项时；
+    当用户只能选择一个选项且选项数量较少时。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-radio 
+          [(ngModel)]="basicValue" 
+          [options]="basicOptions">
+        </lib-radio>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        最简单的用法，展示多个单选框选项。
+      </div>
+    </app-doc-box>
+    
+    <!-- 垂直排列 -->
+    <app-doc-box
+      title="垂直排列"
+      [sourceCode]="verticalSource">
+      <div demo>
+        <lib-radio 
+          [(ngModel)]="verticalValue" 
+          [options]="basicOptions"
+          direction="vertical">
+        </lib-radio>
+        <p class="example-value">当前值: {{ verticalValue }}</p>
+      </div>
+      <div description>
+        通过设置 direction="vertical" 属性使单选框垂直排列。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义颜色 -->
+    <app-doc-box
+      title="自定义颜色,自定义选项"
+      [sourceCode]="colorSource">
+      <div demo>
+        <lib-radio 
+          [(ngModel)]="colorValue" 
+          [options]="basicOptions"
+          [color]="'#ff4d4f'">
+        </lib-radio>
+        <lib-radio 
+          [(ngModel)]="colorValue" 
+          [options]="basicOptions"
+          [labelTemplate]="customLabelTemplate">
+        </lib-radio>
+        <ng-template #customLabelTemplate let-option>
+            <span class="custom-label">自定义 - {{ option.label }}</span>
+        </ng-template>
+        <p class="example-value">当前值: {{ colorValue }}</p>
+      </div>
+      <div description>
+        可以自定义单选框的选中颜色。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用状态 -->
+    <app-doc-box
+      title="禁用某个选项状态"
+      [sourceCode]="disabledSource">
+      <div demo>
+        <lib-radio 
+          [(ngModel)]="disabledValue" 
+          [options]="disabledOptions">
+        </lib-radio>
+        <p class="example-value">当前值: {{ disabledValue }}</p>
+      </div>
+      <div description>
+        可以禁用单个选项。
+      </div>
+    </app-doc-box>
+    
+    <!-- 事件监听 -->
+    <app-doc-box
+      title="事件监听"
+      [sourceCode]="eventSource">
+      <div demo>
+        <lib-radio 
+          [(ngModel)]="eventValue" 
+          [options]="basicOptions"
+          (valueChange)="onValueChange($event)">
+        </lib-radio>
+        <p class="example-value">当前值: {{ eventValue }}</p>
+        <p class="example-value">上次改变: {{ lastChangedValue }}</p>
+      </div>
+      <div description>
+        可以监听选中值的变化事件。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

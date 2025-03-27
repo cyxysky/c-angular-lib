@@ -1,8 +1,4 @@
 @import url('../../style/style.less');
-@default-color: #1890ff;
-@error-color: #ff4d4f;
-@warning-color: #faad14;
-@disabled-color: #f5f5f5;
 :host {
     display: inline-block;
     width: 100%;
@@ -15,37 +11,37 @@
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-    font-size: 14px;
-    line-height: 1.5715;
+    font-size: @input-font-size;
+    line-height: @input-line-height;
 }
 
 // 基础输入框样式
 .input-control {
     box-sizing: border-box;
     margin: 0;
-    padding: 4px 11px;
-    color: rgba(0, 0, 0, 0.85);
-    font-size: 14px;
-    line-height: 1.5715;
+    padding: @input-padding;
+    color: @input-color;
+    font-size: @input-font-size;
+    line-height: @input-line-height;
     background-color: #fff;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-    transition: all 0.3s;
+    border: 1px solid @input-border-color;
+    border-radius: @border-radius-base;
+    transition: @input-transition;
     width: 100%;
     outline: none;
 
     &:hover {
-        border-color: @default-color;
+        border-color: @input-default-color;
     }
 
     &:focus {
-        border-color: @default-color;
-        box-shadow: 0 0 0 2px rgba(@default-color, 0.2);
+        border-color: @input-default-color;
+        box-shadow: @input-focus-box-shadow;
         outline: 0;
     }
 
     &::placeholder {
-        color: rgba(0, 0, 0, 0.25);
+        color: @input-placeholder-color;
     }
 }
 
@@ -55,9 +51,9 @@
     display: inline-flex;
     box-sizing: border-box;
     width: 100%;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-    transition: all 0.3s;
+    border: 1px solid @input-border-color;
+    border-radius: @border-radius-base;
+    transition: @input-transition;
     
     .input-control {
         border: none;
@@ -71,141 +67,141 @@
     }
     
     &:hover {
-        border-color: @default-color;
+        border-color: @input-default-color;
     }
     
     &.lib-input-focused {
-        border-color: @default-color;
-        box-shadow: 0 0 0 2px rgba(@default-color, 0.2);
+        border-color: @input-default-color;
+        box-shadow: @input-focus-box-shadow;
     }
 }
 
 // 前缀样式
 .input-prefix {
-    margin-right: 4px;
+    margin-right: @input-affix-margin;
     display: flex;
     align-items: center;
-    padding-left: 11px;
-    color: rgba(0, 0, 0, 0.65);
+    padding-left: @input-affix-padding-left;
+    color: @input-affix-color;
     
     .input-prefix-icon {
-        margin-right: 4px;
+        margin-right: @input-affix-margin;
     }
 }
 
 // 后缀样式
 .input-suffix {
-    margin-left: 4px;
+    margin-left: @input-affix-margin;
     display: flex;
     align-items: center;
-    padding-right: 11px;
-    color: rgba(0, 0, 0, 0.65);
+    padding-right: @input-affix-padding-right;
+    color: @input-affix-color;
     
     .input-suffix-icon {
-        margin-left: 4px;
+        margin-left: @input-affix-margin;
     }
 }
 
 // 清除图标
 .clear-icon {
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.25);
+    color: @input-clear-icon-color;
     transition: color 0.3s;
-    margin-left: 4px;
+    margin-left: @input-clear-icon-margin;
     
     &:hover {
-        color: rgba(0, 0, 0, 0.45);
+        color: @input-clear-icon-hover-color;
     }
 }
 
 // 字数统计
 .char-count {
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 12px;
-    margin-left: 8px;
+    color: @input-count-color;
+    font-size: @input-count-font-size;
+    margin-left: @input-count-margin;
 }
 
 // 尺寸变体
 .lib-input-lg {
     .input-control {
-        padding: 6.5px 11px;
-        font-size: 16px;
+        padding: @input-lg-padding;
+        font-size: @input-lg-font-size;
     }
 }
 
 .lib-input-sm {
     .input-control {
-        padding: 0 7px;
-        font-size: 12px;
+        padding: @input-sm-padding;
+        font-size: @input-sm-font-size;
     }
 }
 
 // 状态样式
 .lib-input-status-error {
-    border-color: @error-color;
+    border-color: @input-error-color;
     
     .input-control {
         &:hover {
-            border-color: @error-color;
+            border-color: @input-error-color;
         }
         
         &:focus {
-            border-color: @error-color;
+            border-color: @input-error-color;
         }
     }
     
     &:hover {
-        border-color: @error-color;
+        border-color: @input-error-color;
     }
     
     &.lib-input-focused {
-        border-color: @error-color;
-        box-shadow: 0 0 0 2px rgba(@error-color, 0.2);
+        border-color: @input-error-color;
+        box-shadow: @input-error-box-shadow;
     }
 }
 
 .lib-input-status-warning {
-    border-color: @warning-color;
+    border-color: @input-warning-color;
     
     .input-control {
         &:hover {
-            border-color: @warning-color;
+            border-color: @input-warning-color;
         }
         
         &:focus {
-            border-color: @warning-color;
+            border-color: @input-warning-color;
         }
     }
     
     &:hover {
-        border-color: @warning-color;
+        border-color: @input-warning-color;
     }
     
     &.lib-input-focused {
-        border-color: @warning-color;
-        box-shadow: 0 0 0 2px rgba(@warning-color, 0.2);
+        border-color: @input-warning-color;
+        box-shadow: @input-warning-box-shadow;
     }
 }
 
 // 禁用状态
 .lib-input-disabled {
-    background-color: @disabled-color;
-    border-color: #d9d9d9;
-    color: rgba(0, 0, 0, 0.25);
+    background-color: @input-disabled-color;
+    border-color: @input-border-color;
+    color: @disabled-color;
     cursor: not-allowed;
     
     .input-control {
-        background-color: @disabled-color;
-        color: rgba(0, 0, 0, 0.25);
+        background-color: @input-disabled-color;
+        color: @disabled-color;
         cursor: not-allowed;
         
         &:hover {
-            border-color: #d9d9d9;
+            border-color: @input-border-color;
         }
     }
     
     .input-prefix, .input-suffix {
-        color: rgba(0, 0, 0, 0.25);
+        color: @disabled-color;
     }
 }
 
@@ -228,9 +224,9 @@
 
 // 错误信息
 .input-error {
-    color: @error-color;
-    font-size: 12px;
-    line-height: 1.5;
-    margin-top: 3px;
+    color: @input-error-color;
+    font-size: @input-error-font-size;
+    line-height: @input-error-line-height;
+    margin-top: @input-error-margin-top;
     display: block;
 }

@@ -10,6 +10,8 @@ import { DocFlowchartComponent } from './doc-flowchart/doc-flowchart.component';
 import { DocInputComponent } from './doc-input/doc-input.component';
 import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
 import { DocCheckboxComponent } from './doc-checkbox/doc-checkbox.component';
+import { DocRadioComponent } from './doc-radio/doc-radio.component';
+import { DocSliderComponent } from './doc-slider/doc-slider.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -23,7 +25,9 @@ import { DocCheckboxComponent } from './doc-checkbox/doc-checkbox.component';
     DocFlowchartComponent,
     DocInputComponent,
     DocTooltipComponent,
-    DocCheckboxComponent
+    DocCheckboxComponent,
+    DocRadioComponent,
+    DocSliderComponent
   ],
   exports: [
     DocButtonComponent,
@@ -35,7 +39,9 @@ import { DocCheckboxComponent } from './doc-checkbox/doc-checkbox.component';
     DocFlowchartComponent,
     DocInputComponent,
     DocTooltipComponent,
-    DocCheckboxComponent
+    DocCheckboxComponent,
+    DocRadioComponent,
+    DocSliderComponent
   ]
 })
 export class DocModule { }

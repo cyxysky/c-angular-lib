@@ -11,6 +11,7 @@
         />
         <span class="checkbox-inner" 
           [class.indeterminate]="option.indeterminate"
+          [class.checked]="isChecked[getOptionKey(option.value)]"
           [style.borderColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"
           [style.backgroundColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"></span>
       </span>

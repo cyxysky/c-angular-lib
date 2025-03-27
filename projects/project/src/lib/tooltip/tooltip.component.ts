@@ -1,7 +1,7 @@
 import { style } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Input, TemplateRef } from '@angular/core';
-
+import { OverlayBasicPosition } from '../overlay/overlay-basic.directive';
 @Component({
   selector: 'lib-tooltip',
   standalone: true,
@@ -14,9 +14,9 @@ import { Component, Input, TemplateRef } from '@angular/core';
 })
 export class TooltipComponent {
   @Input() content: string | TemplateRef<any> = '';
-  @Input() placement: 'top' | 'bottom' | 'left' | 'right' | 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'top';
-  @Input() isVisible = false;
-  @Input() color = '#000';
+  @Input() placement: OverlayBasicPosition = 'top';
+  @Input() isVisible: boolean = false;
+  @Input() color: string = '#000';
 
   isTemplateRef(value: any): value is TemplateRef<any> {
     return value instanceof TemplateRef;
