@@ -55,11 +55,11 @@ export class DocRadioComponent {
     {
       title: '属性',
       items: [
-        { name: 'options', description: '选项列表', type: 'RadioOption[]', default: '[]' },
+        { name: 'radioOptions', description: '选项列表', type: 'RadioOption[]', default: '[]' },
         { name: 'disabled', description: '是否禁用整个组件', type: 'boolean', default: 'false' },
-        { name: 'direction', description: '排列方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
-        { name: 'color', description: '单选框选中状态的颜色', type: 'string', default: '#1890ff' },
-        { name: 'labelTemplate', description: '选项标签模板', type: 'TemplateRef<any>', default: 'null' }
+        { name: 'radioDirection', description: '排列方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+        { name: 'radioColor', description: '单选框选中状态的颜色', type: 'string', default: '#1890ff' },
+        { name: 'radioLabelTemplate', description: '选项标签模板', type: 'TemplateRef<any>', default: 'null' }
       ]
     },
     {
@@ -92,7 +92,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-radio 
       [(ngModel)]="value" 
-      [options]="options">
+      [radioOptions]="options">
     </lib-radio>
     <p>当前值: {{ value }}</p>
   \`,
@@ -119,8 +119,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-radio 
       [(ngModel)]="value" 
-      [options]="options"
-      direction="vertical">
+      [radioOptions]="options"
+      radioDirection="vertical">
     </lib-radio>
     <p>当前值: {{ value }}</p>
   \`,
@@ -147,13 +147,13 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-radio 
       [(ngModel)]="colorValue" 
-      [options]="basicOptions"
-      [color]="'#ff4d4f'">
+      [radioOptions]="basicOptions"
+      [radioColor]="'#ff4d4f'">
     </lib-radio>
     <lib-radio 
       [(ngModel)]="colorValue" 
-      [options]="basicOptions"
-      [labelTemplate]="customLabelTemplate">
+      [radioOptions]="basicOptions"
+      [radioLabelTemplate]="customLabelTemplate">
     </lib-radio>
     <ng-template #customLabelTemplate let-option>
       <span class="custom-label">自定义 - {{ option.label }}</span>
@@ -183,7 +183,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-radio 
       [(ngModel)]="value" 
-      [options]="options">
+      [radioOptions]="options">
     </lib-radio>
     <p>当前值: {{ value }}</p>
   \`,
@@ -210,7 +210,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-radio 
       [(ngModel)]="value" 
-      [options]="options"
+      [radioOptions]="options"
       (valueChange)="onValueChange($event)">
     </lib-radio>
     <p>当前值: {{ value }}</p>

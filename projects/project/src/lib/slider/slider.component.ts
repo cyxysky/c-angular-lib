@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TooltipDirective } from '@project';
 import { OverlayBasicDirective } from '../overlay/overlay-basic.directive';
+import * as _ from 'lodash';
 interface Mark {
   value: number;
   label: string;
@@ -23,10 +24,12 @@ interface Mark {
   ]
 })
 export class SliderComponent implements OnInit, ControlValueAccessor {
-  // 输入属性
-  @Input() min = 0;
-  @Input() max = 100;
-  @Input() set step(value: number) {
+  /** 最小值 */
+  @Input({ alias: 'sliderMin' }) min = 0;
+  /** 最大值 */
+  @Input({ alias: 'sliderMax' }) max = 100;
+  /** 步长 */
+  @Input({ alias: 'sliderStep' }) set step(value: number) {
     // 确保步长为正整数
     this._step = Math.max(1, Math.round(value));
   }
@@ -34,14 +37,20 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     return this._step;
   }
   private _step = 1;
-
-  @Input() trackColor = '#1890ff';
-  @Input() handleColor = '';
-  @Input() isRange = false;
-  @Input() marks: Record<number, string> | null = null;
-  @Input() snapToMarks = false;
-  @Input() tipFormatter: ((value: number) => string) | null = null;
-  @Input() labelTemplate: TemplateRef<any> | null = null;
+  /** 轨道颜色 */
+  @Input({ alias: 'sliderTrackColor' }) trackColor = '#1890ff';
+  /** 手柄颜色 */
+  @Input({ alias: 'sliderHandleColor' }) handleColor = '';
+  /** 是否范围 */
+  @Input({ alias: 'sliderIsRange' }) isRange = false;
+  /** 刻度 */
+  @Input({ alias: 'sliderMarks' }) marks: Record<number, string> | null = null;
+  /** 是否吸附到刻度 */
+  @Input({ alias: 'sliderSnapToMarks' }) snapToMarks = false;
+  /** 提示格式化 */
+  @Input({ alias: 'sliderTipFormatter' }) tipFormatter: ((value: number) => string) | null = null;
+  /** 标签模板 */
+  @Input({ alias: 'sliderLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
 
   // 内部状态
   value = 0;
@@ -51,7 +60,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   singalSliderHandleVisible = false;
   rangeLeftSliderHandleVisible = false;
   rangeRightSliderHandleVisible = false;
-  private tooltip: OverlayBasicDirective | null = null;
+  private tooltip: TooltipDirective | null = null;
   private isDragging = false;
   private currentHandle = 0;
   // ControlValueAccessor 接口实现
@@ -118,7 +127,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     this.tooltip?.updateContent(value);
   }
 
-  onHandleMouseDown(event: MouseEvent, handleIndex: number, direction: 'left' | 'right' | 'single', tooltip: OverlayBasicDirective): void {
+  onHandleMouseDown(event: MouseEvent, handleIndex: number, direction: 'left' | 'right' | 'single', tooltip: TooltipDirective): void {
     this.tooltip = tooltip;
     switch (direction) {
       case 'left':
@@ -161,11 +170,13 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
       } else {
         this.rangeValues[1] = percentValue;
       }
+      this.rangeValues = this.rangeValues.map(value => _.round(value));
       this.updateTrackWidth();
       this.onChange([this.valueFromPercent(this.rangeValues[0] / 100 * (this.max - this.min) + this.min),
       this.valueFromPercent(this.rangeValues[1] / 100 * (this.max - this.min) + this.min)]);
     } else {
       this.value = this.percentOf(newValue);
+      this.value = _.round(this.value);
       this.updateTrackWidth();
       this.onChange(newValue);
     }
@@ -189,12 +200,13 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
       } else if (this.currentHandle === 1 && this.rangeValues[1] < this.rangeValues[0]) {
         this.rangeValues[1] = this.rangeValues[0];
       }
-
+      this.rangeValues = this.rangeValues.map(value => _.round(value));
       this.updateTrackWidth();
       this.onChange([this.valueFromPercent(this.rangeValues[0] / 100 * (this.max - this.min) + this.min),
       this.valueFromPercent(this.rangeValues[1] / 100 * (this.max - this.min) + this.min)]);
     } else {
       this.value = this.percentOf(newValue);
+      this.value = _.round(this.value);
       this.updateTrackWidth();
       this.onChange(newValue);
     }

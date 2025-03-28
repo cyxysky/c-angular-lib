@@ -12,6 +12,8 @@ import { DocTooltipComponent } from './doc-tooltip/doc-tooltip.component';
 import { DocCheckboxComponent } from './doc-checkbox/doc-checkbox.component';
 import { DocRadioComponent } from './doc-radio/doc-radio.component';
 import { DocSliderComponent } from './doc-slider/doc-slider.component';
+import { DocPopoverComponent } from './doc-popover/doc-popover.component';
+import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -27,7 +29,9 @@ import { DocSliderComponent } from './doc-slider/doc-slider.component';
     DocTooltipComponent,
     DocCheckboxComponent,
     DocRadioComponent,
-    DocSliderComponent
+    DocSliderComponent,
+    DocPopoverComponent,
+    DocPopconfirmComponent
   ],
   exports: [
     DocButtonComponent,
@@ -41,7 +45,9 @@ import { DocSliderComponent } from './doc-slider/doc-slider.component';
     DocTooltipComponent,
     DocCheckboxComponent,
     DocRadioComponent,
-    DocSliderComponent
+    DocSliderComponent,
+    DocPopoverComponent,
+    DocPopconfirmComponent
   ]
 })
 export class DocModule { }

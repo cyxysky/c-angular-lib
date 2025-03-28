@@ -22,19 +22,19 @@ import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.compo
 export class ButtonComponent {
 	constructor() { }
 	/** 按钮大小 */
-	size = input<ButtonSize>('middle');
+	size = input<ButtonSize>('middle', { alias: 'buttonSize' });
 	/** 按钮类型 */
-	type = input<ButtonType>('default');
+	type = input<ButtonType>('default', { alias: 'buttonType' });
 	/** 按钮形状 */
-	shape = input<ButtonShape>('default');
+	shape = input<ButtonShape>('default', { alias: 'buttonShape' });
 	/** 是否禁用 */
-	disabled = input(false, { transform: booleanAttribute });
+	disabled = input(false, { transform: booleanAttribute, alias: 'buttonDisabled' });
 	/** 按钮颜色 */
-	color = input<ButtonColor>('primary');
+	color = input<ButtonColor>('primary', { alias: 'buttonColor' });
 	/** 内容 */
-	content = input<string>();
+	content = input<string>(undefined, { alias: 'buttonContent' });
 	/** 是否撑满父元素 */
-	block = input(false, { transform: booleanAttribute });
+	block = input(false, { transform: booleanAttribute, alias: 'buttonBlock' });
 
 	ngOnInit() { }
 
@@ -53,7 +53,7 @@ export class ButtonComponent {
 		// 移除波纹
 		setTimeout(() => {
 			this.ripple = {};
-		}, 600);
+		}, 800);
 	}
 }
 

@@ -37,7 +37,7 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="colorValue" 
-          [trackColor]="'#ff4d4f'">
+          [sliderTrackColor]="'#ff4d4f'">
         </lib-slider>
         <p class="example-value">当前值: {{ colorValue }}</p>
       </div>
@@ -53,9 +53,9 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="stepValue"
-          [step]="10"
-          [min]="0"
-          [max]="100">
+          [sliderStep]="10"
+          [sliderMin]="0"
+          [sliderMax]="100">
         </lib-slider>
         <p class="example-value">当前值: {{ stepValue }}</p>
       </div>
@@ -71,7 +71,7 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="rangeValue"
-          [isRange]="true">
+          [sliderIsRange]="true">
         </lib-slider>
         <p class="example-value">当前范围: [{{ rangeValue[0] }}, {{ rangeValue[1] }}]</p>
       </div>
@@ -87,13 +87,13 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="marksValue"
-          [marks]="sliderMarks">
+          [sliderMarks]="sliderMarks">
         </lib-slider>
         <p class="example-value">当前值: {{ marksValue }}</p>
         <lib-slider 
           [(ngModel)]="marksValue"
-          [marks]="sliderMarks"
-          [labelTemplate]="customMarkLabel">
+          [sliderMarks]="sliderMarks"
+          [sliderLabelTemplate]="customMarkLabel">
         </lib-slider>
         <ng-template #customMarkLabel let-mark>
             <div style="color: #1890ff;">{{ mark.label }}</div>
@@ -111,8 +111,8 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="snapValue"
-          [marks]="sliderMarks"
-          [snapToMarks]="true">
+          [sliderMarks]="sliderMarks"
+          [sliderSnapToMarks]="true">
         </lib-slider>
         <p class="example-value">当前值: {{ snapValue }}</p>
       </div>
@@ -128,7 +128,7 @@
       <div demo>
         <lib-slider 
           [(ngModel)]="tooltipValue"
-          [tipFormatter]="formatTooltip">
+          [sliderTipFormatter]="formatTooltip">
         </lib-slider>
         <p class="example-value">当前值: {{ tooltipValue }}</p>
       </div>

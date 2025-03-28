@@ -19,13 +19,16 @@ import { CommonModule } from '@angular/common';
 export class SwitchComponent implements ControlValueAccessor {
   @ViewChild('switchButton') switchButton!: ElementRef;
 
-  // 使用input()函数替代@Input装饰器
-  disabled = input(false, { transform: booleanAttribute });
-  loading = input(false, { transform: booleanAttribute });
-  checkedChildren = input<any>('');
-  unCheckedChildren = input<any>('');
-  size = input<'default' | 'small'>('default');
-
+  /** 是否禁用 */
+  disabled = input(false, { transform: booleanAttribute, alias: 'switchDisabled' });
+  /** 是否加载中 */
+  loading = input(false, { transform: booleanAttribute, alias: 'switchLoading' });
+  /** 选中时的内容 */
+  checkedChildren = input<any>('', { alias: 'switchCheckedChildren' });
+  /** 未选中时的内容 */
+  unCheckedChildren = input<any>('', { alias: 'switchUnCheckedChildren' });
+  /** 大小 */
+  size = input<'default' | 'small'>('default', { alias: 'switchSize' });
   // 使用model()函数创建双向绑定
   checked = signal(false);
 

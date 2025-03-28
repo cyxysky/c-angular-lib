@@ -4,6 +4,10 @@ import { CommonModule } from '@angular/common';
 // 指令
 import { WidgetDirective } from './directive/widget.directive';
 import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.directive';
+import { PopoverDirective } from './popover/popover.directive';
+import { PopconfirmDirective } from './popconfirm/popconfirm.directive';
+import { TooltipDirective } from './tooltip/tooltip.directive';
+
 // 组件
 import { CustomerFormComponent } from './customer-form/customer-form.component';
 import { CustomerFormModalComponent } from './customer-form/customer-form-modal/customer-form-modal.component';
@@ -24,11 +28,11 @@ import { TreeComponent } from './tree/tree.component';
 import { SwitchComponent } from './switch/switch.component';
 import { SegmentedComponent } from './segmented/segmented.component';
 import { WaterMarkComponent } from './water-mark/water-mark.component';
-import { TooltipDirective } from './tooltip/tooltip.directive';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
 import { RadioComponent } from './radio/radio.component';
 import { SliderComponent } from './slider/slider.component';
+import { PopoverComponent } from './popover/popover.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -53,10 +57,13 @@ export * from './tooltip/tooltip.component';
 export * from './checkbox/checkbox.component';
 export * from './radio/radio.component';  
 export * from './slider/slider.component';
+export * from './popover/popover.component';
 // 指令
 export * from './directive/widget.directive';
 export * from './water-mark/water-mark-directive.directive';
 export * from './tooltip/tooltip.directive';
+export * from './popover/popover.directive';
+export * from './popconfirm/popconfirm.directive';
 
 @NgModule({
   declarations: [],
@@ -87,7 +94,10 @@ export * from './tooltip/tooltip.directive';
     TooltipComponent,
     CheckboxComponent,
     RadioComponent,
-    SliderComponent
+    SliderComponent,
+    PopoverDirective,
+    PopoverComponent,
+    PopconfirmDirective,
   ],
   exports: [
     CustomerFormComponent,
@@ -115,7 +125,10 @@ export * from './tooltip/tooltip.directive';
     TooltipComponent,
     CheckboxComponent,
     RadioComponent,
-    SliderComponent
+    SliderComponent,
+    PopoverDirective,
+    PopoverComponent,
+    PopconfirmDirective,
   ]
 })
 export class ProjectModule { }

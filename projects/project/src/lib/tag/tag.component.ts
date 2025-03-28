@@ -13,15 +13,15 @@ export type TagColor = 'primary' | 'success' | 'warning' | 'danger' | string;
 })
 export class TagComponent {
   /** 标签是否可以关闭 */
-  closable = input(false, { transform: booleanAttribute });
+  closable = input(false, { transform: booleanAttribute, alias: 'tagClosable' });
   /** 标签是否可选中 */
-  checkable = input(false, { transform: booleanAttribute });
+  checkable = input(false, { transform: booleanAttribute, alias: 'tagCheckable' });
   /** 标签色彩，可选值: primary, success, warning, danger 或自定义色值 */
-  color = input<TagColor>('primary');
+  color = input<TagColor>('primary', { alias: 'tagColor' });
   /** 标签是否禁用 */
-  disabled = input(false, { transform: booleanAttribute });
+  disabled = input(false, { transform: booleanAttribute, alias: 'tagDisabled' });
   /** 标签内容 */
-  content = input<string>('');
+  content = input<string>('', { alias: 'tagContent' });
   /** 标签是否被选中 */
   checked = model<boolean>(false);
   /** 关闭标签时的事件 */

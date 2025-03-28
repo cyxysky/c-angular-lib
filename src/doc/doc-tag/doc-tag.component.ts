@@ -51,7 +51,7 @@ import { TagComponent } from 'project';
   standalone: true,
   imports: [TagComponent],
   template: \`
-    <lib-tag [content]="'标签'"></lib-tag>
+    <lib-tag [tagContent]="'标签'"></lib-tag>
   \`,
 })
 export class TagComponent {
@@ -69,8 +69,8 @@ import { TagComponent } from 'project';
   template: \`
     <lib-tag 
       *ngFor="let tag of tags; let i = index"
-      [content]="tag"
-      [closable]="true"
+      [tagContent]="tag"
+      [tagClosable]="true"
       (close)="handleClose(i)">
     </lib-tag>
   \`,
@@ -95,8 +95,8 @@ import { TagComponent } from 'project';
   template: \`
     <lib-tag 
       *ngFor="let tag of tags"
-      [content]="tag.content"
-      [checkable]="true"
+      [tagContent]="tag.content"
+      [tagCheckable]="true"
       [(checked)]="tag.checked"
       style="margin-right: 8px;">
     </lib-tag>
@@ -124,8 +124,8 @@ import { TagComponent } from 'project';
     <div>
       <lib-tag 
         *ngFor="let color of presetColors"
-        [content]="color"
-        [color]="color"
+        [tagContent]="color"
+        [tagColor]="color"
         style="margin-right: 8px;">
       </lib-tag>
     </div>
@@ -134,8 +134,8 @@ import { TagComponent } from 'project';
     <div>
       <lib-tag 
         *ngFor="let color of customColors"
-        [content]="color"
-        [color]="color"
+        [tagContent]="color"
+        [tagColor]="color"
         style="margin-right: 8px;">
       </lib-tag>
     </div>
@@ -156,15 +156,15 @@ import { TagComponent } from 'project';
   imports: [TagComponent],
   template: \`
     <lib-tag 
-      [content]="'禁用标签'"
-      [disabled]="true"
-      [closable]="true">
+      [tagContent]="'禁用标签'"
+      [tagDisabled]="true"
+      [tagClosable]="true">
     </lib-tag>
 
     <lib-tag 
-      [content]="'禁用可选择标签'"
-      [disabled]="true"
-      [checkable]="true"
+      [tagContent]="'禁用可选择标签'"
+      [tagDisabled]="true"
+      [tagCheckable]="true"
       [checked]="true"
       style="margin-left: 8px;">
     </lib-tag>
@@ -187,13 +187,13 @@ export class TagComponent {
       title: '属性',
       items: [
         {
-          name: 'closable',
+          name: 'tagClosable',
           description: '标签是否可以关闭',
           type: 'boolean',
           default: 'false'
         },
         {
-          name: 'checkable',
+          name: 'tagCheckable',
           description: '标签是否可选中',
           type: 'boolean',
           default: 'false'
@@ -205,19 +205,19 @@ export class TagComponent {
           default: 'false'
         },
         {
-          name: 'color',
+          name: 'tagColor',
           description: '标签色彩，可选值: primary, success, warning, danger 或自定义色值',
           type: 'string',
           default: "'primary'"
         },
         {
-          name: 'disabled',
+          name: 'tagDisabled',
           description: '标签是否禁用',
           type: 'boolean',
           default: 'false'
         },
         {
-          name: 'content',
+          name: 'tagContent',
           description: '标签内容',
           type: 'string',
           default: "''"

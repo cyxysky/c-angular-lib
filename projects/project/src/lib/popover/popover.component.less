@@ -1,0 +1,184 @@
+@import '../../style/popover.less';
+
+.lib-Popover {
+    position: @popover-position;
+    min-width: @popover-min-width;
+    border-radius: @popover-border-radius;
+    box-shadow: @popover-box-shadow;
+    transform: @popover-transform-hidden;
+    opacity: @popover-opacity-hidden;
+    transition: @popover-transition;
+    background-color: @popover-background-color;
+
+    &.lib-Popover-visible {
+        opacity: @popover-opacity-visible;
+        transform: @popover-transform-visible;
+    }
+
+    .lib-Popover-content {
+        min-height: @popover-content-min-height;
+        padding: @popover-content-padding;
+        overflow-wrap: @popover-word-wrap;
+        word-wrap: @popover-word-wrap;
+    }
+
+    .lib-Popover-title {
+        margin: @popover-title-margin;
+        padding: @popover-title-padding;
+        font-weight: @popover-title-font-weight;
+        border-bottom: @popover-title-border;
+    }
+
+    .lib-Popover-arrow {
+        position: @popover-arrow-position;
+        width: @popover-arrow-width;
+        height: @popover-arrow-height;
+    }
+
+    // 基础方向
+    &.lib-Popover-top {
+        .lib-Popover-arrow {
+            bottom: @popover-arrow-margin-offset;
+            left: @popover-arrow-position-center;
+            margin-left: @popover-arrow-margin-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-top: @popover-arrow-border-top;
+            filter: @popover-arrow-shadow-top;
+        }
+    }
+
+    &.lib-Popover-bottom {
+        .lib-Popover-arrow {
+            top: @popover-arrow-margin-offset;
+            left: @popover-arrow-position-center;
+            margin-left: @popover-arrow-margin-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-bottom;
+            filter: @popover-arrow-shadow-bottom;
+        }
+    }
+
+    &.lib-Popover-left {
+        .lib-Popover-arrow {
+            top: @popover-arrow-position-center;
+            right: @popover-arrow-margin-offset;
+            margin-top: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-left: @popover-arrow-border-left;
+            filter: @popover-arrow-shadow-left;
+        }
+    }
+
+    &.lib-Popover-right {
+        .lib-Popover-arrow {
+            top: @popover-arrow-position-center;
+            left: @popover-arrow-margin-offset;
+            margin-top: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-right;
+            filter: @popover-arrow-shadow-right;
+        }
+    }
+
+    // 左侧系列
+    &.lib-Popover-left-top {
+        .lib-Popover-arrow {
+            top: @popover-arrow-position-offset;
+            right: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-left: @popover-arrow-border-left;
+            filter: @popover-arrow-shadow-left;
+        }
+    }
+
+    &.lib-Popover-left-bottom {
+        .lib-Popover-arrow {
+            bottom: @popover-arrow-position-offset;
+            right: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-left: @popover-arrow-border-left;
+            filter: @popover-arrow-shadow-left;
+        }
+    }
+
+    // 右侧系列
+    &.lib-Popover-right-top {
+        .lib-Popover-arrow {
+            top: @popover-arrow-position-offset;
+            left: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-right;
+            filter: @popover-arrow-shadow-right;
+        }
+    }
+
+    &.lib-Popover-right-bottom {
+        .lib-Popover-arrow {
+            bottom: @popover-arrow-position-offset;
+            left: @popover-arrow-margin-offset;
+            border-top: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-right;
+            filter: @popover-arrow-shadow-right;
+        }
+    }
+
+    // 顶部系列
+    &.lib-Popover-top-left {
+        .lib-Popover-arrow {
+            bottom: @popover-arrow-margin-offset;
+            left: @popover-arrow-position-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-top: @popover-arrow-border-top;
+            filter: @popover-arrow-shadow-top;
+        }
+    }
+
+    &.lib-Popover-top-right {
+        .lib-Popover-arrow {
+            bottom: @popover-arrow-margin-offset;
+            right: @popover-arrow-position-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-top: @popover-arrow-border-top;
+            filter: @popover-arrow-shadow-top;
+        }
+    }
+
+    // 底部系列
+    &.lib-Popover-bottom-left {
+        .lib-Popover-arrow {
+            top: @popover-arrow-margin-offset;
+            left: @popover-arrow-position-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-bottom;
+            filter: @popover-arrow-shadow-bottom;
+        }
+    }
+
+    &.lib-Popover-bottom-right {
+        .lib-Popover-arrow {
+            top: @popover-arrow-margin-offset;
+            right: @popover-arrow-position-offset;
+            border-left: @popover-arrow-border-transparent;
+            border-right: @popover-arrow-border-transparent;
+            border-bottom: @popover-arrow-border-bottom;
+            filter: @popover-arrow-shadow-bottom;
+        }
+    }
+}
+
+.lib-Popover-footer{
+    display: @popover-footer-display;
+    gap: @popover-footer-gap;
+    padding: @popover-footer-padding;
+}

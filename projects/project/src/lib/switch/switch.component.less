@@ -1,107 +1,107 @@
-@import '../../style/style.less';
+@import '../../style/switch.less';
 
 :host {
-  display: inline-block;
+  display: @switch-display;
 }
 
 .lib-switch {
-  position: relative;
-  display: inline-block;
-  box-sizing: border-box;
-  min-width: 44px;
+  position: @switch-position;
+  display: @switch-display;
+  box-sizing: @switch-box-sizing;
+  min-width: @switch-min-width;
   height: @switch-height;
   line-height: @switch-height;
-  vertical-align: middle;
-  background-color: rgba(0, 0, 0, 0.25);
-  border: 0;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all @switch-duration;
-  user-select: none;
-  padding: 0;
-  outline: none;
+  vertical-align: @switch-vertical-align;
+  background-color: @switch-unchecked-color;
+  border: @switch-border;
+  border-radius: @switch-border-radius;
+  cursor: @switch-cursor;
+  transition: @switch-transition;
+  user-select: @switch-user-select;
+  padding: @switch-padding;
+  outline: @switch-outline;
 
   &:focus {
-    outline: none;
+    outline: @switch-outline;
   }
 
   &-focused {
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: @switch-box-shadow-focus;
   }
 
   &-checked {
-    background-color: @default;
+    background-color: @switch-default-color;
   }
 
   &-disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
+    cursor: @switch-cursor-disabled;
+    opacity: @switch-disabled-opacity;
   }
 
   &-handle {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: @switch-height - 4px;
-    height: @switch-height - 4px;
-    transition: all @switch-duration;
-    border-radius: 100%;
-    background-color: #fff;
-    box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
+    position: @switch-handle-position;
+    top: @switch-handle-top;
+    left: @switch-handle-left;
+    width: @switch-handle-size;
+    height: @switch-handle-size;
+    transition: @switch-transition;
+    border-radius: @switch-handle-border-radius;
+    background-color: @switch-handle-color;
+    box-shadow: @switch-handle-box-shadow;
   }
 
   &-checked &-handle {
-    left: calc(100% - @switch-height + 2px);
+    left: @switch-handle-checked-left;
   }
 
   &-loading-icon {
-    position: relative;
-    display: block;
+    position: @switch-position;
+    display: @switch-display;
     width: 100%;
     height: 100%;
-    animation: loadingCircle 1s infinite linear;
+    animation: @switch-loading-animation;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(0, 0, 0, 0.65);
+    color: @switch-loading-color;
   }
 
   &-inner {
-    display: block;
-    margin: 0 7px 0 (@switch-height + 2px);
-    color: #fff;
-    font-size: 12px;
-    transition: margin @switch-duration;
+    display: @switch-inner-display;
+    margin: 0 @switch-inner-margin-right 0 @switch-inner-margin-left;
+    color: @switch-inner-color;
+    font-size: @switch-inner-font-size;
+    transition: @switch-inner-transition;
   }
 
   &-checked &-inner {
-    margin-left: 7px;
-    margin-right: (@switch-height + 2px);
+    margin-left: @switch-inner-checked-margin-left;
+    margin-right: @switch-inner-checked-margin-right;
   }
 
   &-small {
-    min-width: 28px;
+    min-width: @switch-sm-min-width;
     height: @switch-sm-height;
     line-height: @switch-sm-height;
 
     .lib-switch-handle {
-      width: @switch-sm-height - 4px;
-      height: @switch-sm-height - 4px;
+      width: @switch-sm-handle-size;
+      height: @switch-sm-handle-size;
     }
 
     &.lib-switch-checked .lib-switch-handle {
-      left: calc(100% - @switch-sm-height + 2px);
+      left: @switch-sm-handle-checked-left;
     }
 
     .lib-switch-inner {
-      margin-left: (@switch-sm-height + 2px);
-      margin-right: 5px;
-      font-size: 12px;
+      margin-left: @switch-sm-inner-margin-left;
+      margin-right: @switch-sm-inner-margin-right;
+      font-size: @switch-sm-inner-font-size;
     }
 
     &.lib-switch-checked .lib-switch-inner {
-      margin-left: 5px;
-      margin-right: (@switch-sm-height + 2px);
+      margin-left: @switch-sm-inner-checked-margin-left;
+      margin-right: @switch-sm-inner-checked-margin-right;
     }
   }
 }

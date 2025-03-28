@@ -1,37 +1,37 @@
-@import '../../style/style.less';
+@import '../../style/tag.less';
 
 .lib-tag {
-    display: inline-block;
-    height: auto;
-    margin-right: 8px;
-    padding: 0 7px;
-    font-size: 12px;
-    line-height: 20px;
-    white-space: nowrap;
+    display: @tag-display;
+    height: @tag-height;
+    margin-right: @tag-margin-right;
+    padding: @tag-padding;
+    font-size: @tag-font-size;
+    line-height: @tag-line-height;
+    white-space: @tag-white-space;
     background-color: @light;
-    border: 1px solid @light-shade;
-    border-radius: 2px;
-    cursor: default;
-    transition: all 0.3s;
+    border: @tag-border-width @tag-border-style @light-shade;
+    border-radius: @tag-border-radius;
+    cursor: @tag-cursor-default;
+    transition: @tag-transition;
 
     &.lib-tag-checkable {
-        cursor: pointer;
+        cursor: @tag-cursor-pointer;
         &:hover {
-            opacity: 0.85;
+            opacity: @tag-hover-opacity;
         }
         &:active {
-            opacity: 0.8;
+            opacity: @tag-active-opacity;
         }
     }
 
     &.lib-tag-checked {
         background-color: @primary;
         color: @primary-contrast;
-        border-color: transparent;
+        border-color: @tag-border-transparent;
     }
 
     &.lib-tag-has-color {
-        border-color: transparent;
+        border-color: @tag-border-transparent;
     }
 
     &.lib-tag-primary {
@@ -55,15 +55,15 @@
     }
 
     .lib-tag-close-icon {
-        display: inline-block;
-        margin-left: 3px;
+        display: @tag-close-icon-display;
+        margin-left: @tag-close-icon-margin-left;
         color: inherit;
-        font-size: 10px;
-        cursor: pointer;
+        font-size: @tag-close-icon-font-size;
+        cursor: @tag-close-icon-cursor;
     }
 }
 
 .disabled {
-    opacity: 0.6;
-    pointer-events: none;
+    opacity: @tag-disabled-opacity;
+    pointer-events: @tag-disabled-events;
 }

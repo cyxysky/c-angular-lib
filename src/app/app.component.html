@@ -13,6 +13,8 @@
                             <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
                             <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
                             <li nz-menu-item (click)="nowComponent.set('tooltip')">提示</li>
+                            <li nz-menu-item (click)="nowComponent.set('popover')">气泡</li>
+                            <li nz-menu-item (click)="nowComponent.set('popconfirm')">气泡确认</li>
                             <li nz-menu-item (click)="nowComponent.set('checkbox')">复选框</li>
                             <li nz-menu-item (click)="nowComponent.set('radio')">单选框</li>
                             <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
@@ -52,7 +54,7 @@
                 选择模式:
             </div>
             <div>
-                <lib-switch [(ngModel)]="checked" [checkedChildren]="'单选'" [unCheckedChildren]="'多选'">
+                <lib-switch [(ngModel)]="checked" [switchCheckedChildren]="'单选'" [switchUnCheckedChildren]="'多选'">
                 </lib-switch>
             </div>
         </div>
@@ -92,6 +94,12 @@
         }
         @case ('slider') {
         <app-doc-slider></app-doc-slider>
+        }
+        @case ('popover') {
+        <app-doc-popover></app-doc-popover>
+        }
+        @case ('popconfirm') {
+        <app-doc-popconfirm></app-doc-popconfirm>
         }
         }
     </div>

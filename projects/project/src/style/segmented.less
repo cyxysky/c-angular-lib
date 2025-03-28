@@ -1,0 +1,131 @@
+@primary: #0054e9;
+
+// 分段控制器基础变量
+@segmented-display: inline-block;
+@segmented-width: 100%;
+@segmented-position-relative: relative;
+@segmented-box-sizing: border-box;
+@segmented-background-color: #f0f0f0;
+@segmented-border-radius: 6px;
+@segmented-padding: 2px;
+@segmented-max-width: 100%;
+@segmented-gap: 4px;
+
+// 分段控制器容器变量
+@segmented-container-flex: 1;
+@segmented-container-min-width: 0;
+@segmented-container-padding: 0;
+@segmented-container-margin: 0;
+@segmented-container-overflow-x: auto;
+@segmented-container-overflow-y: hidden;
+
+// 分段控制器组变量
+@segmented-group-display: flex;
+@segmented-group-flex-wrap: nowrap;
+@segmented-group-width-fit: fit-content;
+@segmented-group-min-width: 100%;
+@segmented-group-padding: 0;
+@segmented-group-margin: 0;
+
+// 分段控制器项目变量
+@segmented-item-position: relative;
+@segmented-item-color: rgba(0, 0, 0, 0.65);
+@segmented-item-color-selected: rgba(0, 0, 0, 0.85);
+@segmented-item-color-disabled: rgba(0, 0, 0, 0.25);
+@segmented-item-height: 28px;
+@segmented-item-padding: 0 12px;
+@segmented-item-margin: 0;
+@segmented-item-display: flex;
+@segmented-item-align-items: center;
+@segmented-item-justify-content: center;
+@segmented-item-cursor: pointer;
+@segmented-item-cursor-disabled: not-allowed;
+@segmented-item-transition: color 0.3s;
+@segmented-item-flex: 0 0 auto;
+@segmented-item-z-index: 2;
+@segmented-item-icon-margin-right: 6px;
+
+// 分段控制器标签变量
+@segmented-label-display: flex;
+@segmented-label-align-items: center;
+@segmented-label-white-space: nowrap;
+@segmented-label-padding: 0;
+@segmented-label-margin: 0;
+
+// 分段控制器滑块变量
+@segmented-thumb-position: absolute;
+@segmented-thumb-background-color: #fff;
+@segmented-thumb-background-color-disabled: rgba(0, 0, 0, 0.04);
+@segmented-thumb-border-radius: 4px;
+@segmented-thumb-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+@segmented-thumb-box-shadow-disabled: none;
+@segmented-thumb-transition-transform: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+@segmented-thumb-transition-width: width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+@segmented-thumb-height: 28px;
+@segmented-thumb-top: 0;
+@segmented-thumb-left: 0;
+@segmented-thumb-z-index: 1;
+@segmented-thumb-margin: 0;
+@segmented-thumb-padding: 0;
+@segmented-thumb-width: 0;
+
+// 分段控制器导航按钮变量
+@segmented-nav-flex: 0 0 28px;
+@segmented-nav-height: 28px;
+@segmented-nav-display: flex;
+@segmented-nav-align-items: center;
+@segmented-nav-justify-content: center;
+@segmented-nav-background-color: #fff;
+@segmented-nav-background-hover: #fafafa;
+@segmented-nav-background-disabled: #fff;
+@segmented-nav-background-disabled-hover: rgba(0, 0, 0, 0.04);
+@segmented-nav-border-radius: 4px;
+@segmented-nav-cursor: pointer;
+@segmented-nav-cursor-disabled: not-allowed;
+@segmented-nav-z-index: 3;
+@segmented-nav-transition: all 0.3s;
+@segmented-nav-color: rgba(0, 0, 0, 0.45);
+@segmented-nav-color-hover: rgba(0, 0, 0, 0.85);
+@segmented-nav-color-disabled: rgba(0, 0, 0, 0.25);
+@segmented-nav-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+@segmented-nav-box-shadow-disabled: none;
+
+// 分段控制器导航图标变量
+@segmented-nav-icon-width: 0;
+@segmented-nav-icon-height: 0;
+@segmented-nav-icon-border-style: solid;
+@segmented-nav-icon-padding: 0;
+@segmented-nav-icon-margin: 0;
+@segmented-nav-prev-border-width: 4px 6px 4px 0;
+@segmented-nav-prev-border-color: transparent currentColor transparent transparent;
+@segmented-nav-next-border-width: 4px 0 4px 6px;
+@segmented-nav-next-border-color: transparent transparent transparent currentColor;
+
+// 分段控制器大小变量
+@segmented-lg-padding: 3px;
+@segmented-lg-item-height: 40px;
+@segmented-lg-item-font-size: 16px;
+@segmented-lg-nav-height: 40px;
+@segmented-lg-nav-flex-basis: 32px;
+@segmented-lg-nav-icon-border-width-prev: 5px 7px 5px 0;
+@segmented-lg-nav-icon-border-width-next: 5px 0 5px 7px;
+@segmented-lg-thumb-height: 40px;
+
+@segmented-sm-padding: 1px;
+@segmented-sm-item-height: 24px;
+@segmented-sm-item-font-size: 12px;
+@segmented-sm-nav-height: 24px;
+@segmented-sm-nav-flex-basis: 24px;
+@segmented-sm-nav-icon-border-width-prev: 3px 5px 3px 0;
+@segmented-sm-nav-icon-border-width-next: 3px 0 3px 5px;
+@segmented-sm-thumb-height: 24px;
+
+// 分段控制器块级变量
+@segmented-block-display: flex;
+@segmented-block-width: 100%;
+@segmented-block-group-justify-content: space-between;
+@segmented-block-item-flex: 1 1 0%;
+
+// 交互状态颜色
+@segmented-hover-color: @primary;
+@segmented-active-color: @primary;

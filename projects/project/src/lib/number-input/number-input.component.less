@@ -1,112 +1,112 @@
-@import '../../style/style.less';
+@import '../../style/number-input.less';
 
 :host {
-    display: inline-flex;
+    display: @number-input-display;
 }
 
 .lib-number-input-error {
-    border-color: @danger !important;
+    border-color: @number-input-color-error ;
 
     &:active {
-        box-shadow: 0 0 0 2px @number-input-error-color-box-shadow !important;
+        box-shadow: @number-input-box-shadow-size @number-input-error-color-box-shadow ;
     }
 
     &.focused {
-        box-shadow: 0 0 0 2px @number-input-error-color-box-shadow !important;
+        box-shadow: @number-input-box-shadow-size @number-input-error-color-box-shadow ;
     }
 
     .lib-number-input-handler {
         &:hover {
             .lib-number-input-handler-up-inner {
-                border-bottom-color: @danger !important;
+                border-bottom-color: @number-input-color-error ;
             }
 
             .lib-number-input-handler-down-inner {
-                border-top-color: @danger !important;
+                border-top-color: @number-input-color-error ;
             }
         }
     }
 
     .lib-number-input-container:hover & {
-        border-color: @danger !important;
+        border-color: @number-input-color-error ;
     }
 }
 
 .lib-number-input-warning {
-    border-color: @warning !important;
+    border-color: @number-input-color-warning ;
 
     &:active {
-        box-shadow: 0 0 0 2px @number-input-warning-color-box-shadow !important;
+        box-shadow: @number-input-box-shadow-size @number-input-warning-color-box-shadow ;
     }
 
     &.focused {
-        box-shadow: 0 0 0 2px @number-input-warning-color-box-shadow !important;
+        box-shadow: @number-input-box-shadow-size @number-input-warning-color-box-shadow ;
     }
 
     .lib-number-input-handler {
         &:hover {
             .lib-number-input-handler-up-inner {
-                border-bottom-color: @warning !important;
+                border-bottom-color: @number-input-color-warning ;
             }
 
             .lib-number-input-handler-down-inner {
-                border-top-color: @warning !important;
+                border-top-color: @number-input-color-warning ;
             }
         }
     }
 
     .lib-number-input-container:hover & {
-        border-color: @warning !important;
+        border-color: @number-input-color-warning ;
     }
 }
 
 .lib-number-input-container {
-    position: relative;
+    position: @number-input-position-relative;
     width: @number-input-min-width;
     /* 默认宽度 */
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 11px;
-    border: 1px solid @number-input-border-color;
-    border-radius: @border-radius-base;
-    transition: all 0.3s;
-    box-sizing: border-box;
+    display: @number-input-display-flex;
+    align-items: @number-input-align-items;
+    padding: @number-input-padding;
+    border: @number-input-border-width @number-input-border-style @number-input-border-color;
+    border-radius: @number-input-border-radius;
+    transition: @number-input-transition;
+    box-sizing: @number-input-box-sizing;
 
     &:hover {
-        border-color: @default;
+        border-color: @number-input-color-default;
     }
 
     &.focused {
-        border-color: @default;
-        box-shadow: 0 0 0 2px @number-input-default-color-box-shadow;
+        border-color: @number-input-color-default;
+        box-shadow: @number-input-box-shadow-size @number-input-default-color-box-shadow;
     }
 
     &.disabled {
         background-color: @number-input-disabled-bg;
         border-color: @number-input-border-color;
-        color: @disabled-color;
-        cursor: not-allowed;
+        color: @number-input-color-disabled;
+        cursor: @number-input-handler-cursor-disabled;
 
         input {
             background-color: @number-input-disabled-bg;
-            color: @disabled-color;
-            cursor: not-allowed;
+            color: @number-input-color-disabled;
+            cursor: @number-input-handler-cursor-disabled;
         }
     }
 
     &.readonly {
         .lib-number-input-handler-wrap {
-            display: none;
+            display: @number-input-display-none;
         }
     }
 }
 
 .lib-number-input {
-    width: 100%;
-    border: none;
-    outline: none;
+    width: @number-input-width-full;
+    border: @number-input-border-none;
+    outline: @number-input-outline;
     padding: 0;
-    background: transparent;
+    background: @number-input-background-transparent;
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -117,99 +117,99 @@
 
 .lib-number-input-prefix,
 .lib-number-input-suffix {
-    display: flex;
-    flex: none;
-    align-items: center;
-    color: rgba(0, 0, 0, 0.65);
+    display: @number-input-display-flex;
+    flex: @number-input-flex-none;
+    align-items: @number-input-align-items;
+    color: @number-input-text-color;
 }
 
 .lib-number-input-prefix {
-    margin-right: 4px;
+    margin-right: @number-input-affix-margin;
 }
 
 .lib-number-input-suffix {
-    margin-left: 4px;
-    margin-right: 16px;
+    margin-left: @number-input-affix-margin;
+    margin-right: @number-input-suffix-margin-right;
     /* 为步进按钮留出空间 */
 }
 
 .lib-number-input-content {
-    width: calc(100% - 16px);
-    display: flex;
-    align-items: center;
-    overflow: hidden;
+    width: @number-input-width-calc;
+    display: @number-input-display-flex;
+    align-items: @number-input-align-items;
+    overflow: @number-input-overflow;
 }
 
 .lib-number-input-handler-wrap {
     position: absolute;
     top: 0;
     right: 0;
-    width: 22px;
-    height: 100%;
-    border-left: 1px solid @number-input-border-color;
-    display: flex;
-    flex-direction: column;
+    width: @number-input-handler-width;
+    height: @number-input-width-full;
+    border-left: @number-input-border-width @number-input-border-style @number-input-border-color;
+    display: @number-input-display-flex;
+    flex-direction: @number-input-flex-direction-column;
 }
 
 .lib-number-input-handler {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50%;
-    width: 100%;
-    border: none;
-    background: transparent;
+    display: @number-input-display-flex;
+    align-items: @number-input-align-items;
+    justify-content: @number-input-justify-content;
+    height: @number-input-handler-height-half;
+    width: @number-input-width-full;
+    border: @number-input-border-none;
+    background: @number-input-background-transparent;
     padding: 0;
-    cursor: pointer;
-    transition: all 0.3s;
-    outline: none;
+    cursor: @number-input-handler-cursor;
+    transition: @number-input-transition;
+    outline: @number-input-outline;
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.03);
+        background-color: @number-input-background-hover;
 
         .lib-number-input-handler-up-inner {
-            border-bottom-color: @default;
+            border-bottom-color: @number-input-color-default;
         }
 
         .lib-number-input-handler-down-inner {
-            border-top-color: @default;
+            border-top-color: @number-input-color-default;
         }
     }
 
     &:disabled {
-        cursor: not-allowed;
+        cursor: @number-input-handler-cursor-disabled;
 
         .lib-number-input-handler-up-inner {
-            border-bottom-color: @disabled-color;
+            border-bottom-color: @number-input-color-disabled;
         }
 
         .lib-number-input-handler-down-inner {
-            border-top-color: @disabled-color;
+            border-top-color: @number-input-color-disabled;
         }
     }
 }
 
 .lib-number-input-handler-up {
-    border-bottom: 1px solid @number-input-border-color;
+    border-bottom: @number-input-border-width @number-input-border-style @number-input-border-color;
 }
 
 /* 正确的三角形方向 */
 .lib-number-input-handler-up-inner {
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 0;
-    border-bottom: 4px solid rgba(0, 0, 0, 0.45);
-    display: inline-block;
+    width: @number-input-arrow-width;
+    height: @number-input-arrow-height;
+    border-left: @number-input-arrow-border-transparent;
+    border-right: @number-input-arrow-border-transparent;
+    border-top: @number-input-arrow-border-none;
+    border-bottom: @number-input-arrow-border-bottom;
+    display: @number-input-arrow-display;
 }
 
 .lib-number-input-handler-down-inner {
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 0;
-    border-top: 4px solid rgba(0, 0, 0, 0.45);
-    display: inline-block;
+    width: @number-input-arrow-width;
+    height: @number-input-arrow-height;
+    border-left: @number-input-arrow-border-transparent;
+    border-right: @number-input-arrow-border-transparent;
+    border-bottom: @number-input-arrow-border-none;
+    border-top: @number-input-arrow-border-top;
+    display: @number-input-arrow-display;
 }

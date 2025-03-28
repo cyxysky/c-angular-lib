@@ -21,7 +21,7 @@
       <div demo>
         <lib-radio 
           [(ngModel)]="basicValue" 
-          [options]="basicOptions">
+          [radioOptions]="basicOptions">
         </lib-radio>
         <p class="example-value">当前值: {{ basicValue }}</p>
       </div>
@@ -37,13 +37,13 @@
       <div demo>
         <lib-radio 
           [(ngModel)]="verticalValue" 
-          [options]="basicOptions"
-          direction="vertical">
+          [radioOptions]="basicOptions"
+          radioDirection="vertical">
         </lib-radio>
         <p class="example-value">当前值: {{ verticalValue }}</p>
       </div>
       <div description>
-        通过设置 direction="vertical" 属性使单选框垂直排列。
+        通过设置 radioDirection="vertical" 属性使单选框垂直排列。
       </div>
     </app-doc-box>
     
@@ -54,13 +54,13 @@
       <div demo>
         <lib-radio 
           [(ngModel)]="colorValue" 
-          [options]="basicOptions"
-          [color]="'#ff4d4f'">
+          [radioOptions]="basicOptions"
+          [radioColor]="'#ff4d4f'">
         </lib-radio>
         <lib-radio 
           [(ngModel)]="colorValue" 
-          [options]="basicOptions"
-          [labelTemplate]="customLabelTemplate">
+          [radioOptions]="basicOptions"
+          [radioLabelTemplate]="customLabelTemplate">
         </lib-radio>
         <ng-template #customLabelTemplate let-option>
             <span class="custom-label">自定义 - {{ option.label }}</span>
@@ -79,7 +79,7 @@
       <div demo>
         <lib-radio 
           [(ngModel)]="disabledValue" 
-          [options]="disabledOptions">
+          [radioOptions]="disabledOptions">
         </lib-radio>
         <p class="example-value">当前值: {{ disabledValue }}</p>
       </div>
@@ -95,7 +95,7 @@
       <div demo>
         <lib-radio 
           [(ngModel)]="eventValue" 
-          [options]="basicOptions"
+          [radioOptions]="basicOptions"
           (valueChange)="onValueChange($event)">
         </lib-radio>
         <p class="example-value">当前值: {{ eventValue }}</p>

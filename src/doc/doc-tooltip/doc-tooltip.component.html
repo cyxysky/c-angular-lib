@@ -18,11 +18,11 @@
       title="基本用法"
       [sourceCode]="basicSource">
       <div demo>
-        <lib-button libTooltip="提示文本">基础用法</lib-button>
+        <lib-button libTooltip tooltip="提示文本">基础用法</lib-button>
         <p class="example-description">最简单的用法，鼠标移入即可显示提示。</p>
       </div>
       <div description>
-        最基本的用法，通过 libTooltip 指令添加文字提示。
+        最基本的用法，通过 tooltip 指令添加文字提示。
       </div>
     </app-doc-box>
 
@@ -32,23 +32,23 @@
       [sourceCode]="placementSource">
       <div demo>
         <div class="placement-demo">
-          <lib-button libTooltip="顶部提示" libTooltipPlacement="top">顶部</lib-button>
-          <lib-button libTooltip="顶部提示" libTooltipPlacement="top-left">上左</lib-button>
-          <lib-button libTooltip="顶部提示" libTooltipPlacement="top-right">上右</lib-button>
-          <lib-button libTooltip="底部提示" libTooltipPlacement="bottom">底部</lib-button>
-          <lib-button libTooltip="底部提示" libTooltipPlacement="bottom-left">下左</lib-button>
-          <lib-button libTooltip="底部提示" libTooltipPlacement="bottom-right">下右</lib-button>
-          <lib-button libTooltip="左侧提示" libTooltipPlacement="left">左侧</lib-button>
-          <lib-button libTooltip="左侧提示" libTooltipPlacement="left-top">左上</lib-button>
-          <lib-button libTooltip="左侧提示" libTooltipPlacement="left-bottom">左下</lib-button>
-          <lib-button libTooltip="右侧提示" libTooltipPlacement="right">右侧</lib-button>
-          <lib-button libTooltip="右侧提示" libTooltipPlacement="right-top">右上</lib-button>
-          <lib-button libTooltip="右侧提示" libTooltipPlacement="right-bottom">右下</lib-button>
+          <lib-button libTooltip tooltip="顶部提示" tooltipPlacement="top">顶部</lib-button>
+          <lib-button libTooltip tooltip="顶部提示" tooltipPlacement="top-left">上左</lib-button>
+          <lib-button libTooltip tooltip="顶部提示" tooltipPlacement="top-right">上右</lib-button>
+          <lib-button libTooltip tooltip="底部提示" tooltipPlacement="bottom">底部</lib-button>
+          <lib-button libTooltip tooltip="底部提示" tooltipPlacement="bottom-left">下左</lib-button>
+          <lib-button libTooltip tooltip="底部提示" tooltipPlacement="bottom-right">下右</lib-button>
+          <lib-button libTooltip tooltip="左侧提示" tooltipPlacement="left">左侧</lib-button>
+          <lib-button libTooltip tooltip="左侧提示" tooltipPlacement="left-top">左上</lib-button>
+          <lib-button libTooltip tooltip="左侧提示" tooltipPlacement="left-bottom">左下</lib-button>
+          <lib-button libTooltip tooltip="右侧提示" tooltipPlacement="right">右侧</lib-button>
+          <lib-button libTooltip tooltip="右侧提示" tooltipPlacement="right-top">右上</lib-button>
+          <lib-button libTooltip tooltip="右侧提示" tooltipPlacement="right-bottom">右下</lib-button>
         </div>
         <p class="example-description">支持12个不同的方位。</p>
       </div>
       <div description>
-        通过 libTooltipPlacement 属性设置提示显示的位置，支持12个方位。
+        通过 tooltipPlacement 属性设置提示显示的位置，支持12个方位。
       </div>
     </app-doc-box>
 
@@ -57,11 +57,11 @@
       title="触发方式"
       [sourceCode]="triggerSource">
       <div demo>
-        <lib-button libTooltip="鼠标移入触发" libTooltipTrigger="hover">移入</lib-button>
-        <lib-button libTooltip="点击触发" libTooltipTrigger="click">点击</lib-button>
+        <lib-button libTooltip tooltip="鼠标移入触发" tooltipTrigger="hover">移入</lib-button>
+        <lib-button libTooltip tooltip="点击触发" tooltipTrigger="click">点击</lib-button>
       </div>
       <div description>
-        通过 libTooltipTrigger 属性设置触发方式，支持hover和click两种方式。
+        通过 tooltipTrigger 属性设置触发方式，支持hover和click两种方式。
       </div>
     </app-doc-box>
 
@@ -73,9 +73,9 @@
         <ng-template #tplContent>
           <div>自定义<b>HTML</b>内容</div>
         </ng-template>
-        <lib-button [libTooltip]="tplContent">模板内容</lib-button>
-        <lib-button [libTooltip]="tplContent" [libTooltipColor]="'red'">自定义颜色</lib-button>
-        <lib-button [libTooltip]="tplContent" [libTooltipColor]="'#6030ff'">自定义颜色</lib-button>
+        <lib-button libTooltip [tooltip]="tplContent">模板内容</lib-button>
+        <lib-button libTooltip [tooltip]="tplContent" [tooltipColor]="'red'">自定义颜色</lib-button>
+        <lib-button libTooltip [tooltip]="tplContent" [tooltipColor]="'#6030ff'">自定义颜色</lib-button>
       </div>
       <div description>
         通过传入 TemplateRef 来自定义提示内容。同时可以设置颜色
@@ -87,16 +87,16 @@
       title="受控模式"
       [sourceCode]="controlledSource">
       <div demo>
-        <lib-button libTooltip="编程控制显示隐藏" 
-                    [libTooltipVisible]="isVisible" 
-                    #tooltip="libTooltip">
+        <lib-button libTooltip tooltip="编程控制显示隐藏" 
+                    [tooltipVisible]="isVisible" 
+                    #libTooltip="libTooltip">
           提示框
         </lib-button>
-        <lib-button (click)="tooltip.show()">显示</lib-button>
-        <lib-button (click)="tooltip.hide()">隐藏</lib-button>
+        <lib-button (click)="libTooltip.show()">显示</lib-button>
+        <lib-button (click)="libTooltip.hide()">隐藏</lib-button>
       </div>
       <div description>
-        通过 libTooltipVisible 属性和模板引用来控制提示的显示和隐藏。
+        通过 tooltipVisible 属性和模板引用来控制提示的显示和隐藏。
       </div>
     </app-doc-box>
   </div>

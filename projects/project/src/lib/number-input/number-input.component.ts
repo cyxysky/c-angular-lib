@@ -17,21 +17,34 @@ import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/f
   ]
 })
 export class NumberInputComponent implements ControlValueAccessor {
-  // 输入信号
-  min = input<number | null>(null);
-  max = input<number | null>(null);
-  step = input<number>(1);
-  precision = input<number>(0); // 小数精度
-  placeholder = input<string>('');
-  disabled = input<boolean>(false);
-  readonly = input<boolean>(false);
-  color = input<string>('black');
-  prefix = input<string>('');
-  suffix = input<string>('');
-  prefixIcon = input<string>('');
-  suffixIcon = input<string>('');
-  status = input<'normal' | 'error' | 'warning'>('normal');
-  formatter = input<(value: number) => any>(value => value);
+  /** 最小值 */
+  min = input<number | null>(null, { alias: 'numberInputMin' });
+  /** 最大值 */
+  max = input<number | null>(null, { alias: 'numberInputMax' });
+  /** 步长 */
+  step = input<number>(1, { alias: 'numberInputStep' });
+  /** 小数精度 */
+  precision = input<number>(0, { alias: 'numberInputPrecision' });
+  /** 占位符 */
+  placeholder = input<string>('', { alias: 'numberInputPlaceholder' });
+  /** 是否禁用 */
+  disabled = input<boolean>(false, { alias: 'numberInputDisabled' });
+  /** 是否只读 */
+  readonly = input<boolean>(false, { alias: 'numberInputReadonly' });
+  /** 颜色 */
+  color = input<string>('black', { alias: 'numberInputColor' });
+  /** 前缀 */
+  prefix = input<string>('', { alias: 'numberInputPrefix' });
+  /** 后缀 */
+  suffix = input<string>('', { alias: 'numberInputSuffix' });
+  /** 前缀图标 */
+  prefixIcon = input<string>('', { alias: 'numberInputPrefixIcon' });
+  /** 后缀图标 */
+  suffixIcon = input<string>('', { alias: 'numberInputSuffixIcon' });
+  /** 状态 */
+  status = input<'normal' | 'error' | 'warning'>('normal', { alias: 'numberInputStatus' });
+  /** 格式化函数 */
+  formatter = input<(value: number) => any>(value => value, { alias: 'numberInputFormatter' });
   
   // 内部状态
   valueSignal = signal<number | null>(null);

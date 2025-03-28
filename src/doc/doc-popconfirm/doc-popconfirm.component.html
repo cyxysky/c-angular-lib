@@ -1,0 +1,337 @@
+<div class="doc-container">
+  <h1 class="doc-title">气泡确认框 Popconfirm</h1>
+  
+  <p class="doc-description">
+    点击元素，弹出气泡式的确认框。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当目标操作需要用户进一步确认时，在元素附近弹出浮层提示，询问用户。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <div class="demo-buttons">
+          <lib-button 
+            libPopconfirm 
+            popconfirmTitle="确认操作" 
+            popconfirmContent="确定要执行此操作吗？" 
+            popconfirmPlacement="top"
+            popconfirmConfirmButtonContent="确认"
+            popconfirmCancelButtonContent="取消"
+            (popconfirmOnConfirm)="onConfirm('基本操作')"
+            (popconfirmOnCancel)="onCancel('基本操作')">
+            点击确认
+          </lib-button>
+        </div>
+        <div *ngIf="lastAction" class="example-value">
+          最近操作: {{ lastAction }}
+        </div>
+      </div>
+      <div description>
+        最简单的用法，通过指令在按钮上添加气泡确认框。
+      </div>
+    </app-doc-box>
+    
+    <!-- 不同位置 -->
+    <app-doc-box
+      title="不同位置"
+      [sourceCode]="placementSource">
+      <div demo>
+        <div style="margin-bottom: 16px;">基本方向：</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 420px; margin: auto;">
+          <!-- 上方 -->
+          <div style="grid-column: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="top"
+              (popconfirmOnConfirm)="onConfirm('顶部')"
+              (popconfirmOnCancel)="onCancel('顶部')">
+              顶部
+            </lib-button>
+          </div>
+          
+          <!-- 左侧 -->
+          <div style="grid-column: 1; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="left"
+              (popconfirmOnConfirm)="onConfirm('左侧')"
+              (popconfirmOnCancel)="onCancel('左侧')">
+              左侧
+            </lib-button>
+          </div>
+          
+          <!-- 右侧 -->
+          <div style="grid-column: 3; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="right"
+              (popconfirmOnConfirm)="onConfirm('右侧')"
+              (popconfirmOnCancel)="onCancel('右侧')">
+              右侧
+            </lib-button>
+          </div>
+          
+          <!-- 下方 -->
+          <div style="grid-column: 2; grid-row: 3;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="bottom"
+              (popconfirmOnConfirm)="onConfirm('底部')"
+              (popconfirmOnCancel)="onCancel('底部')">
+              底部
+            </lib-button>
+          </div>
+        </div>
+        
+        <div style="margin: 24px 0 16px;">复合方向：</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 560px; margin: auto;">
+          <!-- 上方相关位置 -->
+          <div style="grid-column: 1; grid-row: 1;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="top-left"
+              (popconfirmOnConfirm)="onConfirm('上-左')"
+              (popconfirmOnCancel)="onCancel('上-左')">
+              上-左
+            </lib-button>
+          </div>
+          
+          <div style="grid-column: 2; grid-row: 1;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="top-right"
+              (popconfirmOnConfirm)="onConfirm('上-右')"
+              (popconfirmOnCancel)="onCancel('上-右')">
+              上-右
+            </lib-button>
+          </div>
+          
+          <!-- 下方相关位置 -->
+          <div style="grid-column: 1; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="bottom-left"
+              (popconfirmOnConfirm)="onConfirm('下-左')"
+              (popconfirmOnCancel)="onCancel('下-左')">
+              下-左
+            </lib-button>
+          </div>
+          
+          <div style="grid-column: 2; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="bottom-right"
+              (popconfirmOnConfirm)="onConfirm('下-右')"
+              (popconfirmOnCancel)="onCancel('下-右')">
+              下-右
+            </lib-button>
+          </div>
+          
+          <!-- 左侧相关位置 -->
+          <div style="grid-column: 3; grid-row: 1;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="left-top"
+              (popconfirmOnConfirm)="onConfirm('左-上')"
+              (popconfirmOnCancel)="onCancel('左-上')">
+              左-上
+            </lib-button>
+          </div>
+          
+          <div style="grid-column: 3; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="left-bottom"
+              (popconfirmOnConfirm)="onConfirm('左-下')"
+              (popconfirmOnCancel)="onCancel('左-下')">
+              左-下
+            </lib-button>
+          </div>
+          
+          <!-- 右侧相关位置 -->
+          <div style="grid-column: 4; grid-row: 1;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="right-top"
+              (popconfirmOnConfirm)="onConfirm('右-上')"
+              (popconfirmOnCancel)="onCancel('右-上')">
+              右-上
+            </lib-button>
+          </div>
+          
+          <div style="grid-column: 4; grid-row: 2;">
+            <lib-button 
+              libPopconfirm 
+              popconfirmTitle="确认操作" 
+              popconfirmContent="确定要执行此操作吗？" 
+              popconfirmPlacement="right-bottom"
+              (popconfirmOnConfirm)="onConfirm('右-下')"
+              (popconfirmOnCancel)="onCancel('右-下')">
+              右-下
+            </lib-button>
+          </div>
+        </div>
+      </div>
+      <div description>
+        气泡确认框支持12个位置：4个基本方向（上、下、左、右）和8个复合方向（上左、上右、下左、下右、左上、左下、右上、右下）。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义按钮文本 -->
+    <app-doc-box
+      title="自定义按钮文本"
+      [sourceCode]="customButtonSource">
+      <div demo>
+        <div class="demo-buttons">
+          <lib-button 
+            libPopconfirm 
+            popconfirmTitle="自定义确认" 
+            popconfirmContent="是否确认删除此项？" 
+            popconfirmPlacement="top"
+            popconfirmConfirmButtonContent="删除"
+            popconfirmCancelButtonContent="返回"
+            popconfirmConfirmButtonColor="danger"
+            (popconfirmOnConfirm)="onConfirm('删除操作')"
+            (popconfirmOnCancel)="onCancel('删除操作')">
+            删除
+          </lib-button>
+        </div>
+      </div>
+      <div description>
+        通过设置属性自定义确认框按钮的文本和颜色。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义模板 -->
+    <app-doc-box
+      title="自定义内容模板"
+      [sourceCode]="templateSource">
+      <div demo>
+        <div class="demo-buttons">
+          <lib-button 
+            libPopconfirm 
+            [popconfirmTitle]="customTitle" 
+            [popconfirmContent]="customContent"
+            popconfirmPlacement="right"
+            popconfirmConfirmButtonContent="确认"
+            popconfirmCancelButtonContent="取消"
+            (popconfirmOnConfirm)="onConfirm('模板确认')"
+            (popconfirmOnCancel)="onCancel('模板确认')">
+            自定义模板
+          </lib-button>
+        </div>
+        
+        <ng-template #customTitle>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>重要提示</span>
+          </div>
+        </ng-template>
+        
+        <ng-template #customContent>
+          <div>
+            <p>这是一条<strong style="color: red;">重要</strong>的确认信息</p>
+            <p>请仔细阅读后再确认</p>
+          </div>
+        </ng-template>
+      </div>
+      <div description>
+        支持使用TemplateRef自定义标题和内容，实现更丰富的展现形式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 受控模式 -->
+    <app-doc-box
+      title="受控模式"
+      [sourceCode]="controlledSource">
+      <div demo>
+        <div class="demo-buttons">
+          <lib-button 
+            libPopconfirm 
+            popconfirmTitle="受控确认框" 
+            popconfirmContent="这是一个受控的确认框示例"
+            popconfirmPlacement="top"
+            [popconfirmVisible]="visible"
+            popconfirmConfirmButtonContent="确认"
+            popconfirmCancelButtonContent="取消"
+            (popconfirmOnConfirm)="handleConfirm()"
+            (popconfirmOnCancel)="handleCancel()">
+            点击显示
+          </lib-button>
+          
+          <lib-button (click)="toggleVisible()">
+            {{ visible ? '隐藏' : '显示' }}确认框
+          </lib-button>
+        </div>
+      </div>
+      <div description>
+        可以通过popconfirmVisible控制确认框的显示和隐藏。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义底部 -->
+    <app-doc-box
+      title="自定义底部"
+      [sourceCode]="bottomTemplate">
+      <div demo>
+        <div class="demo-buttons">
+          <lib-button 
+            libPopconfirm 
+            popconfirmTitle="自定义底部" 
+            popconfirmContent="这是一个带自定义底部的确认框"
+            [popconfirmBottomTemplate]="customBottom"
+            popconfirmPlacement="bottom">
+            自定义底部
+          </lib-button>
+        </div>
+        
+        <ng-template #customBottom>
+          <div style="display: flex; justify-content: space-between; width: 100%;">
+            <lib-button size="small" (click)="onSpecialAction()">特殊操作</lib-button>
+            <div style="display: flex; gap: 8px;">
+              <lib-button size="small" buttonType="dashed" (click)="onCancel('自定义底部')">取消</lib-button>
+              <lib-button size="small" buttonColor="primary" (click)="onConfirm('自定义底部')">确认</lib-button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <div description>
+        可以通过popconfirmBottomTemplate自定义确认框底部区域内容。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

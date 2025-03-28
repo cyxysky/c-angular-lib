@@ -12,9 +12,9 @@
     [ngStyle]="{'left': value + '%', 'border-color': handleColor}"
     libTooltip
     #singalSliderTooltip="libTooltip"
-    [libTooltipStrictVisiable]="singalSliderHandleVisible"
-    [libTooltip]="toString(tipFormatter ? tipFormatter(value) : value)"
-    [libTooltipVisible]="singalSliderHandleVisible"
+    [tooltipStrictVisiable]="singalSliderHandleVisible"
+    [tooltip]="toString(tipFormatter ? tipFormatter(value) : value)"
+    [tooltipVisible]="singalSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 0, 'single', singalSliderTooltip)"
   ></div>
   
@@ -24,10 +24,10 @@
     class="lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[0] + '%', 'border-color': handleColor}"
     libTooltip
-    [libTooltipStrictVisiable]="rangeLeftSliderHandleVisible"
+    [tooltipStrictVisiable]="rangeLeftSliderHandleVisible"
     #rangeLeftSliderTooltip="libTooltip"
-    [libTooltip]="toString(tipFormatter ? tipFormatter(rangeValues[0]) : rangeValues[0])"
-    [libTooltipVisible]="rangeLeftSliderHandleVisible"
+    [tooltip]="toString(tipFormatter ? tipFormatter(rangeValues[0]) : rangeValues[0])"
+    [tooltipVisible]="rangeLeftSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 0, 'left', rangeLeftSliderTooltip)"
   ></div>
   <div 
@@ -35,10 +35,10 @@
     class="lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[1] + '%', 'border-color': handleColor}"
     libTooltip
-    [libTooltipStrictVisiable]="rangeRightSliderHandleVisible"
+    [tooltipStrictVisiable]="rangeRightSliderHandleVisible"
     #rangeRightSliderTooltip="libTooltip"
-    [libTooltip]="toString(tipFormatter ? tipFormatter(rangeValues[1]) : rangeValues[1])"
-    [libTooltipVisible]="rangeRightSliderHandleVisible"
+    [tooltip]="toString(tipFormatter ? tipFormatter(rangeValues[1]) : rangeValues[1])"
+    [tooltipVisible]="rangeRightSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 1, 'right', rangeRightSliderTooltip)"
   ></div>
   

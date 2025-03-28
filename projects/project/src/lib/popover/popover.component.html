@@ -1,0 +1,34 @@
+<div class="lib-Popover" 
+     [class.lib-Popover-visible]="isVisible"
+     [class]="'lib-Popover-' + placement">
+  <!-- 箭头 -->
+  <div class="lib-Popover-arrow"></div>
+  <!-- 内容 -->
+  <div class="lib-Popover-content-box">
+    <div class="lib-Popover-title">
+      <ng-container *ngIf="isTemplateRef(title); else titleTemplate">
+        <ng-container [ngTemplateOutlet]="title"></ng-container>
+      </ng-container>
+      <ng-template #titleTemplate>{{title}}</ng-template>
+    </div>
+    <div class="lib-Popover-content">
+      <ng-container *ngIf="isTemplateRef(content); else contentTemplate">
+        <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </ng-container>
+    <ng-template #contentTemplate>{{content}}</ng-template>
+  </div>
+  <div class="lib-Popover-footer" *ngIf="confirm">
+    <ng-container [ngTemplateOutlet]="bottomTemplate || defaultBottomTemplate"></ng-container>
+    <ng-template #defaultBottomTemplate>
+      <div style="flex-grow: 1;"></div>
+      <lib-button [buttonColor]="cancelButtonColor || 'ghost'" buttonSize="small" (click)="onCancelClick()">
+        <ng-container *ngIf="isTemplateRef(cancelButtonContent); else cancelButtonContentTemplate"></ng-container>
+        <ng-template #cancelButtonContentTemplate>{{cancelButtonContent}}</ng-template>
+      </lib-button>
+      <lib-button [buttonColor]="confirmButtonColor || 'primary'" buttonSize="small" (click)="onConfirmClick()">
+        <ng-container *ngIf="isTemplateRef(confirmButtonContent); else confirmButtonContentTemplate"></ng-container>
+        <ng-template #confirmButtonContentTemplate>{{confirmButtonContent}}</ng-template>
+      </lib-button>
+    </ng-template>
+  </div>
+</div>

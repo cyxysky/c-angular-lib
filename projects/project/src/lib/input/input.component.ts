@@ -22,59 +22,46 @@ export type InputStatus = 'error' | 'warning' | '';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
-  
-  ngOnInit(): void {
-    // 初始化时计算左右内边距
-    this.calculatePadding();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // 属性变更时重新计算内边距
-    if (changes['prefix'] || changes['suffix'] || changes['allowClear']) {
-      this.calculatePadding();
-    }
-  }
-
   /** 输入框大小 */
-  size = input<InputSize>('default');
+  size = input<InputSize>('default', { alias: 'inputSize' });
   /** 输入框前缀 */
-  prefix = input<string>('');
+  prefix = input<string>('', { alias: 'inputPrefix' });
   /** 输入框后缀 */
-  suffix = input<string>('');
+  suffix = input<string>('', { alias: 'inputSuffix' });
   /** 前缀图标 */
-  prefixIcon = input<string>('');
+  prefixIcon = input<string>('', { alias: 'inputPrefixIcon' });
   /** 后缀图标 */
-  suffixIcon = input<string>('');
+  suffixIcon = input<string>('', { alias: 'inputSuffixIcon' });
   /** 输入框提示 */
-  placeholder = input<string>('');
+  placeholder = input<string>('', { alias: 'inputPlaceholder' });
   /** 输入框禁用 */
-  disabled = input(false, { transform: coerceBooleanProperty });
+  disabled = input(false, { transform: coerceBooleanProperty, alias: 'inputDisabled' });
   /** 输入框只读 */
-  readonly = input(false, { transform: coerceBooleanProperty });
+  readonly = input(false, { transform: coerceBooleanProperty, alias: 'inputReadonly' });
   /** 允许清除 */
-  allowClear = input(true, { transform: coerceBooleanProperty });
+  allowClear = input(true, { transform: coerceBooleanProperty, alias: 'inputAllowClear' });
   /** 输入框最大长度 */
-  maxlength = input<number | null>(null);
+  maxlength = input<number | null>(null, { alias: 'inputMaxlength' });
   /** 输入框最小长度 */
-  minlength = input<number | null>(null);
+  minlength = input<number | null>(null, { alias: 'inputMinlength' });
   /** 输入框类型 */
-  type = input<string>('text');
+  type = input<string>('text', { alias: 'inputType' });
   /** 输入框状态 */
-  status = input<InputStatus>('');
+  status = input<InputStatus>('', { alias: 'inputStatus' });
   /** 边框 */
-  bordered = input(true, { transform: coerceBooleanProperty });
+  bordered = input(true, { transform: coerceBooleanProperty, alias: 'inputBordered' });
   /** 是否显示字数统计 */
-  showCount = input(false, { transform: coerceBooleanProperty });
+  showCount = input(false, { transform: coerceBooleanProperty, alias: 'inputShowCount' });
   /** 自动获取焦点 */
-  autofocus = input(false, { transform: coerceBooleanProperty });
+  autofocus = input(false, { transform: coerceBooleanProperty, alias: 'inputAutofocus' });
   /** 是否自动调整大小 */
-  autosize = input<boolean | { minRows: number; maxRows: number }>(false);
+  autosize = input<boolean | { minRows: number; maxRows: number }>(false, { alias: 'inputAutosize' });
   /** 输入框id */
-  id = input<string>('');
+  id = input<string>('', { alias: 'inputId' });
   /** 输入框校验规则 */
-  pattern = input<((value: string) => boolean) | RegExp | null>(null);
+  pattern = input<((value: string) => boolean) | RegExp | null>(null, { alias: 'inputPattern' });
   /** 输入框自动完成 */
-  autocomplete = input<string>('off');
+  autocomplete = input<string>('off', { alias: 'inputAutocomplete' });
   
   /** 内部状态 */
   hasFocus = signal<boolean>(false);
@@ -101,6 +88,18 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
 
   /** 内部数据 */
   _data: any = '';
+
+  ngOnInit(): void {
+    // 初始化时计算左右内边距
+    this.calculatePadding();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // 属性变更时重新计算内边距
+    if (changes['prefix'] || changes['suffix'] || changes['allowClear']) {
+      this.calculatePadding();
+    }
+  }
 
   /** 事件处理方法 */
   onFocus(event: FocusEvent): void {
@@ -193,7 +192,6 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   /** 获取元素类名 */
   getInputClass(): string {
     const classNames = ['lib-input'];
-    
     if (this.size() === 'small') classNames.push('lib-input-sm');
     if (this.size() === 'large') classNames.push('lib-input-lg');
     if (this.disabled()) classNames.push('lib-input-disabled');

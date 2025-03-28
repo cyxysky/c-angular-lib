@@ -19,7 +19,7 @@
       [sourceCode]="basicSource">
       <div demo>
         <div class="demo-water-mark-container">
-          <lib-water-mark [text]="'公司内部文件'" #asdasdasdasd>
+          <lib-water-mark [waterMarkText]="'公司内部文件'" #asdasdasdasd>
             <div style="height: 300px;width: 100%;padding: 20px;">
               <h3 (click)="conss(asdasdasdasd)">水印组件基本使用</h3>
               <p>水印将显示在这个区域内部</p>
@@ -39,10 +39,10 @@
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark 
-            [text]="customText" 
-            [fontColor]="customColor"
-            [fontSize]="fontSize"
-            [rotate]="rotation">
+            [waterMarkText]="customText" 
+            [waterMarkFontColor]="customColor"
+            [waterMarkFontSize]="fontSize"
+            [waterMarkRotate]="rotation">
             <div style="height: 300px;width: 100%;padding: 20px;">
               <h3>自定义水印样式</h3>
               <p>可以调整下方参数查看效果</p>
@@ -56,11 +56,11 @@
               </div>
               <div class="control-row">
                 <label>字体大小：</label>
-                <lib-number-input [(ngModel)]="fontSize" [min]="8" [max]="32"></lib-number-input>
+                <lib-number-input [(ngModel)]="fontSize" [numberInputMin]="8" [numberInputMax]="32"></lib-number-input>
               </div>
               <div class="control-row">
                 <label>旋转角度：</label>
-                <lib-number-input [(ngModel)]="rotation" [min]="-90" [max]="90"></lib-number-input>
+                <lib-number-input [(ngModel)]="rotation" [numberInputMin]="-90" [numberInputMax]="90"></lib-number-input>
               </div>
             </div>
           </lib-water-mark>
@@ -78,8 +78,8 @@
       <div demo>
         <div class="demo-water-mark-container">
           <lib-water-mark 
-            [text]="'公司内部文件'" 
-            [imageBase64]="logoUrl">
+            [waterMarkText]="'公司内部文件'" 
+            [waterMarkImageBase64]="logoUrl">
             <div style="height: 300px;width: 100%;padding: 20px;">
               <h3>图片水印</h3>
               <p>结合图片和文字实现品牌水印</p>
@@ -97,7 +97,7 @@
       title="指令用法"
       [sourceCode]="directiveSource">
       <div demo>
-        <div style="height: 300px;width: 100%;padding: 20px;" libWaterMarkDirective [text]="'水印指令应用'">
+        <div style="height: 300px;width: 100%;padding: 20px;" libWaterMarkDirective [waterMarkText]="'水印指令应用'">
           <h3>水印指令</h3>
           <p>可以直接在任意元素上应用水印指令</p>
         </div>
@@ -113,7 +113,7 @@
       [sourceCode]="tamperProofSource">
       <div demo>
         <div class="demo-water-mark-container">
-          <lib-water-mark [text]="'防篡改水印'" [fontColor]="'rgba(233, 66, 66, 0.2)'">
+          <lib-water-mark [waterMarkText]="'防篡改水印'" [waterMarkFontColor]="'rgba(233, 66, 66, 0.2)'">
             <div style="height: 300px;width: 100%;padding: 20px;">
               <h3>防篡改功能</h3>
               <p>尝试使用开发者工具删除或修改水印元素，水印将自动恢复</p>

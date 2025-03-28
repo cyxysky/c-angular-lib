@@ -1,34 +1,35 @@
-@import url('../../style/style.less');
+@import '../../style/input.less';
+
 :host {
-    display: inline-block;
-    width: 100%;
+    display: @input-display;
+    width: @input-width;
 }
 
 // 输入框容器
 .input-container {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
+    position: @input-position-relative;
+    display: @input-display-flex;
+    align-items: @input-affix-align-items;
+    width: @input-width;
+    box-sizing: @input-box-sizing;
     font-size: @input-font-size;
     line-height: @input-line-height;
 }
 
 // 基础输入框样式
 .input-control {
-    box-sizing: border-box;
-    margin: 0;
+    box-sizing: @input-box-sizing;
+    margin: @input-margin;
     padding: @input-padding;
     color: @input-color;
     font-size: @input-font-size;
     line-height: @input-line-height;
-    background-color: #fff;
-    border: 1px solid @input-border-color;
-    border-radius: @border-radius-base;
+    background-color: @input-background-color;
+    border: @input-border-width @input-border-style @input-border-color;
+    border-radius: @input-border-radius;
     transition: @input-transition;
-    width: 100%;
-    outline: none;
+    width: @input-width;
+    outline: @input-outline;
 
     &:hover {
         border-color: @input-default-color;
@@ -37,7 +38,7 @@
     &:focus {
         border-color: @input-default-color;
         box-shadow: @input-focus-box-shadow;
-        outline: 0;
+        outline: @input-outline-focus;
     }
 
     &::placeholder {
@@ -47,22 +48,22 @@
 
 // 带前缀和后缀的输入框
 .lib-input-affix-wrapper {
-    align-items: stretch;
-    display: inline-flex;
-    box-sizing: border-box;
-    width: 100%;
-    border: 1px solid @input-border-color;
-    border-radius: @border-radius-base;
+    align-items: @input-affix-align-items-stretch;
+    display: @input-display-flex;
+    box-sizing: @input-box-sizing;
+    width: @input-width;
+    border: @input-border-width @input-border-style @input-border-color;
+    border-radius: @input-border-radius;
     transition: @input-transition;
     
     .input-control {
-        border: none;
-        box-shadow: none;
-        padding-left: 5px;
-        padding-right: 5px;
+        border: @input-border-none;
+        box-shadow: @input-box-shadow-none;
+        padding-left: @input-padding-reduced;
+        padding-right: @input-padding-reduced;
         
         &:hover, &:focus {
-            box-shadow: none;
+            box-shadow: @input-box-shadow-none;
         }
     }
     
@@ -79,8 +80,8 @@
 // 前缀样式
 .input-prefix {
     margin-right: @input-affix-margin;
-    display: flex;
-    align-items: center;
+    display: @input-display-flex-normal;
+    align-items: @input-affix-align-items;
     padding-left: @input-affix-padding-left;
     color: @input-affix-color;
     
@@ -92,8 +93,8 @@
 // 后缀样式
 .input-suffix {
     margin-left: @input-affix-margin;
-    display: flex;
-    align-items: center;
+    display: @input-display-flex-normal;
+    align-items: @input-affix-align-items;
     padding-right: @input-affix-padding-right;
     color: @input-affix-color;
     
@@ -104,9 +105,9 @@
 
 // 清除图标
 .clear-icon {
-    cursor: pointer;
+    cursor: @input-clear-icon-cursor;
     color: @input-clear-icon-color;
-    transition: color 0.3s;
+    transition: @input-transition-color;
     margin-left: @input-clear-icon-margin;
     
     &:hover {
@@ -188,12 +189,12 @@
     background-color: @input-disabled-color;
     border-color: @input-border-color;
     color: @disabled-color;
-    cursor: not-allowed;
+    cursor: @input-disabled-cursor;
     
     .input-control {
         background-color: @input-disabled-color;
         color: @disabled-color;
-        cursor: not-allowed;
+        cursor: @input-disabled-cursor;
         
         &:hover {
             border-color: @input-border-color;
@@ -207,17 +208,17 @@
 
 // 无边框样式
 .lib-input-borderless {
-    border: none;
-    box-shadow: none;
-    background-color: #fff;
+    border: @input-border-none;
+    box-shadow: @input-box-shadow-none;
+    background-color: @input-background-color;
     
     .input-control {
-        border: none;
-        box-shadow: none;
+        border: @input-border-none;
+        box-shadow: @input-box-shadow-none;
         
         &:hover, &:focus {
-            border: none;
-            box-shadow: none;
+            border: @input-border-none;
+            box-shadow: @input-box-shadow-none;
         }
     }
 }
@@ -228,5 +229,5 @@
     font-size: @input-error-font-size;
     line-height: @input-error-line-height;
     margin-top: @input-error-margin-top;
-    display: block;
+    display: @input-error-display;
 }

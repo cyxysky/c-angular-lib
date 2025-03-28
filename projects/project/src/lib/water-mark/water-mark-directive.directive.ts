@@ -4,19 +4,19 @@ import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
   selector: '[libWaterMarkDirective]'
 })
 export class WaterMarkDirectiveDirective {
-  @Input() text = '水印文字';
-  @Input() fontColor = 'rgba(0, 0, 0, 0.15)';
-  @Input() fontSize = 16;
-  @Input() fontFamily = '"Microsoft YaHei", "PingFang SC", Arial, sans-serif';
-  @Input() fontWeight = '200';
-  @Input() gap = 30;
-  @Input() zIndex = 9999;
-  @Input() rotate = -22;
-  @Input() width = 240;
-  @Input() height = 120;
-  @Input() offsetLeft = 0;
-  @Input() offsetTop = 0;
-  @Input() imageBase64: string | null = null;
+  @Input({ alias: 'waterMarkText' }) text = '水印文字';
+  @Input({ alias: 'waterMarkFontColor' }) fontColor = 'rgba(0, 0, 0, 0.15)';
+  @Input({ alias: 'waterMarkFontSize' }) fontSize = 16;
+  @Input({ alias: 'waterMarkFontFamily' }) fontFamily = '"Microsoft YaHei", "PingFang SC", Arial, sans-serif';
+  @Input({ alias: 'waterMarkFontWeight' }) fontWeight = '200';
+  @Input({ alias: 'waterMarkGap' }) gap = 30;
+  @Input({ alias: 'waterMarkZIndex' }) zIndex = 9999;
+  @Input({ alias: 'waterMarkRotate' }) rotate = -22;
+  @Input({ alias: 'waterMarkWidth' }) width = 240;
+  @Input({ alias: 'waterMarkHeight' }) height = 120;
+  @Input({ alias: 'waterMarkOffsetLeft' }) offsetLeft = 0;
+  @Input({ alias: 'waterMarkOffsetTop' }) offsetTop = 0;
+  @Input({ alias: 'waterMarkImageBase64' }) imageBase64: string | null = null;
 
   private watermarkElement?: HTMLDivElement;
   private observer?: MutationObserver;

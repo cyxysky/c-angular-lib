@@ -11,15 +11,15 @@
   <!-- 颜色属性 -->
   <app-doc-box title="按钮颜色" [sourceCode]="colorButtonCode">
     <div demo class="demo-flex">
-      <lib-button [color]="'primary'">主要颜色</lib-button>
-      <lib-button [color]="'success'">成功颜色</lib-button>
-      <lib-button [color]="'warning'">警告颜色</lib-button>
-      <lib-button [color]="'danger'">危险颜色</lib-button>
-      <lib-button [color]="'tertiary'">次要颜色</lib-button>
-      <lib-button [color]="'light'">浅色颜色</lib-button>
-      <lib-button [color]="'dark'">深色颜色</lib-button>
-      <lib-button [color]="'medium'">灰色颜色</lib-button>
-      <lib-button [color]="'ghost'">幽灵颜色</lib-button>
+      <lib-button [buttonColor]="'primary'">主要颜色</lib-button>
+      <lib-button [buttonColor]="'success'">成功颜色</lib-button>
+      <lib-button [buttonColor]="'warning'">警告颜色</lib-button>
+      <lib-button [buttonColor]="'danger'">危险颜色</lib-button>
+      <lib-button [buttonColor]="'tertiary'">次要颜色</lib-button>
+      <lib-button [buttonColor]="'light'">浅色颜色</lib-button>
+      <lib-button [buttonColor]="'dark'">深色颜色</lib-button>
+      <lib-button [buttonColor]="'medium'">灰色颜色</lib-button>
+      <lib-button [buttonColor]="'ghost'">幽灵颜色</lib-button>
     </div>
     <div description>
       <p>按钮有不同的颜色变体来表示不同的语义：</p>
@@ -41,9 +41,9 @@
   <app-doc-box title="按钮类型" [sourceCode]="typeButtonCode">
     <div demo class="demo-flex">
       <lib-button>默认按钮</lib-button>
-      <lib-button [type]="'dashed'" [color]="'ghost'">虚线按钮</lib-button>
-      <lib-button [type]="'text'">文字按钮</lib-button>
-      <lib-button [type]="'link'">链接按钮</lib-button>
+      <lib-button [buttonType]="'dashed'" [buttonColor]="'ghost'">虚线按钮</lib-button>
+      <lib-button [buttonType]="'text'">文字按钮</lib-button>
+      <lib-button [buttonType]="'link'">链接按钮</lib-button>
     </div>
     <div description>
       <p>按钮有多种类型可供选择：</p>
@@ -60,7 +60,7 @@
   <app-doc-box title="按钮形状" [sourceCode]="shapeButtonCode">
     <div demo class="demo-flex">
       <lib-button>默认形状</lib-button>
-      <lib-button [shape]="'circle'">圆形</lib-button>
+      <lib-button [buttonShape]="'circle'">圆形</lib-button>
     </div>
     <div description>
       <p>按钮可以有不同的形状：</p>
@@ -74,9 +74,9 @@
   <!-- 按钮尺寸 -->
   <app-doc-box title="按钮尺寸" [sourceCode]="sizeButtonCode">
     <div demo class="demo-flex">
-      <lib-button [size]="'small'">小按钮</lib-button>
+      <lib-button [buttonSize]="'small'">小按钮</lib-button>
       <lib-button>默认尺寸</lib-button>
-      <lib-button [size]="'large'">大按钮</lib-button>
+      <lib-button [buttonSize]="'large'">大按钮</lib-button>
     </div>
     <div description>
       <p>按钮支持三种尺寸：</p>
@@ -92,7 +92,7 @@
   <app-doc-box title="按钮状态" [sourceCode]="stateButtonCode">
     <div demo class="demo-flex">
       <lib-button>正常状态</lib-button>
-      <lib-button disabled>禁用状态</lib-button>
+      <lib-button buttonDisabled>禁用状态</lib-button>
     </div>
     <div description>
       <p>按钮可以处于不同的状态：</p>
@@ -106,9 +106,9 @@
   <!-- 块级按钮 -->
   <app-doc-box title="块级按钮" [sourceCode]="blockButtonCode">
     <div demo>
-      <lib-button block>撑满父元素</lib-button>
+      <lib-button buttonBlock>撑满父元素</lib-button>
       <div style="margin-top: 16px;">
-        <lib-button block [shape]="'circle'">撑满父元素圆形</lib-button>
+        <lib-button buttonBlock [buttonShape]="'circle'">撑满父元素圆形</lib-button>
       </div>
     </div>
     <div description>

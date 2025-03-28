@@ -21,7 +21,7 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="basicValues" 
-          [options]="basicOptions">
+          [checkboxOptions]="basicOptions">
         </lib-checkbox>
         <p class="example-value">当前值: {{ basicValues | json }}</p>
       </div>
@@ -37,13 +37,13 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="verticalValues" 
-          [options]="basicOptions"
-          direction="vertical">
+          [checkboxOptions]="basicOptions"
+          checkboxDirection="vertical">
         </lib-checkbox>
         <p class="example-value">当前值: {{ verticalValues | json }}</p>
       </div>
       <div description>
-        通过设置 direction="vertical" 属性使复选框垂直排列。
+        通过设置 checkboxDirection="vertical" 属性使复选框垂直排列。
       </div>
     </app-doc-box>
     
@@ -54,7 +54,7 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="colorValues" 
-          [options]="basicOptions"
+          [checkboxOptions]="basicOptions"
           checkboxColor="#ff4d4f">
         </lib-checkbox>
         <p class="example-value">当前值: {{ colorValues | json }}</p>
@@ -71,7 +71,7 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="disabledValues" 
-          [options]="disabledOptions">
+          [checkboxOptions]="disabledOptions">
         </lib-checkbox>
         <p class="example-value">当前值: {{ disabledValues | json }}</p>
       </div>
@@ -87,7 +87,8 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="indeterminateValues" 
-          [options]="indeterminateOptions">
+          [checkboxOptions]="indeterminateOptions"
+          [checkboxIndeterminate]="true">
         </lib-checkbox>
         <p class="example-value">当前值: {{ indeterminateValues | json }}</p>
       </div>
@@ -103,8 +104,8 @@
       <div demo>
         <lib-checkbox 
           [(ngModel)]="templateValues" 
-          [options]="basicOptions"
-          [labelTemplate]="customLabel">
+          [checkboxOptions]="basicOptions"
+          [checkboxLabelTemplate]="customLabel">
         </lib-checkbox>
         <ng-template #customLabel let-option>
           <span class="custom-label">{{option.label}} - 自定义 (值: {{option.value}})</span>

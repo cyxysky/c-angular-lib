@@ -57,25 +57,25 @@ export class DocInputComponent {
     {
       title: '属性',
       items: [
-        { name: 'placeholder', description: '输入框提示文本', type: 'string', default: "''" },
-        { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
-        { name: 'readonly', description: '是否只读', type: 'boolean', default: 'false' },
-        { name: 'size', description: '输入框大小', type: "'large' | 'default' | 'small'", default: "'default'" },
-        { name: 'prefix', description: '输入框前缀文本', type: 'string', default: "''" },
-        { name: 'suffix', description: '输入框后缀文本', type: 'string', default: "''" },
-        { name: 'prefixIcon', description: '输入框前缀图标', type: 'string', default: "''" },
-        { name: 'suffixIcon', description: '输入框后缀图标', type: 'string', default: "''" },
-        { name: 'allowClear', description: '是否允许清除', type: 'boolean', default: 'true' },
-        { name: 'maxlength', description: '最大字符数', type: 'number | null', default: 'null' },
-        { name: 'minlength', description: '最小字符数', type: 'number | null', default: 'null' },
-        { name: 'type', description: '输入框类型', type: 'string', default: "'text'" },
-        { name: 'status', description: '输入框状态', type: "'error' | 'warning' | ''", default: "''" },
-        { name: 'bordered', description: '是否有边框', type: 'boolean', default: 'true' },
-        { name: 'showCount', description: '是否显示字数统计', type: 'boolean', default: 'false' },
-        { name: 'autofocus', description: '是否自动获取焦点', type: 'boolean', default: 'false' },
-        { name: 'id', description: '输入框ID', type: 'string', default: "''" },
-        { name: 'pattern', description: '输入框校验规则', type: '((value: string) => boolean) | RegExp | null', default: 'null' },
-        { name: 'autocomplete', description: '浏览器自动完成', type: 'string', default: "'off'" }
+        { name: 'inputPlaceholder', description: '输入框提示文本', type: 'string', default: "''" },
+        { name: 'inputDisabled', description: '是否禁用', type: 'boolean', default: 'false' },
+        { name: 'inputReadonly', description: '是否只读', type: 'boolean', default: 'false' },
+        { name: 'inputSize', description: '输入框大小', type: "'large' | 'default' | 'small'", default: "'default'" },
+        { name: 'inputPrefix', description: '输入框前缀文本', type: 'string', default: "''" },
+        { name: 'inputSuffix', description: '输入框后缀文本', type: 'string', default: "''" },
+        { name: 'inputPrefixIcon', description: '输入框前缀图标', type: 'string', default: "''" },
+        { name: 'inputSuffixIcon', description: '输入框后缀图标', type: 'string', default: "''" },
+        { name: 'inputAllowClear', description: '是否允许清除', type: 'boolean', default: 'true' },
+        { name: 'inputMaxlength', description: '最大字符数', type: 'number | null', default: 'null' },
+        { name: 'inputMinlength', description: '最小字符数', type: 'number | null', default: 'null' },
+        { name: 'inputType', description: '输入框类型', type: 'string', default: "'text'" },
+        { name: 'inputStatus', description: '输入框状态', type: "'error' | 'warning' | ''", default: "''" },
+        { name: 'inputBordered', description: '是否有边框', type: 'boolean', default: 'true' },
+        { name: 'inputShowCount', description: '是否显示字数统计', type: 'boolean', default: 'false' },
+        { name: 'inputAutofocus', description: '是否自动获取焦点', type: 'boolean', default: 'false' },
+        { name: 'inputId', description: '输入框ID', type: 'string', default: "''" },
+        { name: 'inputPattern', description: '输入框校验规则', type: '((value: string) => boolean) | RegExp | null', default: 'null' },
+        { name: 'inputAutocomplete', description: '浏览器自动完成', type: 'string', default: "'off'" }
       ]
     },
     {
@@ -105,7 +105,7 @@ import { FormsModule } from '@angular/forms';
   imports: [InputComponent, FormsModule],
   template: \`
     <lib-input 
-      placeholder="请输入内容" 
+      inputPlaceholder="请输入内容" 
       [(ngModel)]="value">
     </lib-input>
     <p>当前值: {{ value }}</p>
@@ -128,17 +128,17 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <lib-input 
-        placeholder="大尺寸" 
-        size="large"
+        inputPlaceholder="大尺寸" 
+        inputSize="large"
         [(ngModel)]="largeValue">
       </lib-input>
       <lib-input 
-        placeholder="默认尺寸" 
+        inputPlaceholder="默认尺寸" 
         [(ngModel)]="defaultValue">
       </lib-input>
       <lib-input 
-        placeholder="小尺寸" 
-        size="small"
+        inputPlaceholder="小尺寸" 
+        inputSize="small"
         [(ngModel)]="smallValue">
       </lib-input>
     </div>
@@ -163,23 +163,23 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <lib-input 
-        placeholder="前缀" 
-        prefix="￥"
+        inputPlaceholder="前缀" 
+        inputPrefix="￥"
         [(ngModel)]="prefixValue">
       </lib-input>
       <lib-input 
-        placeholder="后缀" 
-        suffix="RMB"
+        inputPlaceholder="后缀" 
+        inputSuffix="RMB"
         [(ngModel)]="suffixValue">
       </lib-input>
       <lib-input 
-        placeholder="前缀图标" 
-        prefixIcon="icon-user"
+        inputPlaceholder="前缀图标" 
+        inputPrefixIcon="icon-user"
         [(ngModel)]="prefixIconValue">
       </lib-input>
       <lib-input 
-        placeholder="后缀图标" 
-        suffixIcon="icon-search"
+        inputPlaceholder="后缀图标" 
+        inputSuffixIcon="icon-search"
         [(ngModel)]="suffixIconValue">
       </lib-input>
     </div>
@@ -204,8 +204,8 @@ import { FormsModule } from '@angular/forms';
   imports: [InputComponent, FormsModule],
   template: \`
     <lib-input 
-      placeholder="输入后显示清除按钮" 
-      [allowClear]="true"
+      inputPlaceholder="输入后显示清除按钮" 
+      [inputAllowClear]="true"
       [(ngModel)]="value">
     </lib-input>
   \`,
@@ -227,13 +227,13 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <lib-input 
-        placeholder="禁用状态" 
-        [disabled]="true"
+        inputPlaceholder="禁用状态" 
+        [inputDisabled]="true"
         [(ngModel)]="disabledValue">
       </lib-input>
       <lib-input 
-        placeholder="只读状态" 
-        [readonly]="true"
+        inputPlaceholder="只读状态" 
+        [inputReadonly]="true"
         [(ngModel)]="readonlyValue">
       </lib-input>
     </div>
@@ -257,13 +257,13 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <lib-input 
-        placeholder="错误状态" 
-        status="error"
+        inputPlaceholder="错误状态" 
+        inputStatus="error"
         [(ngModel)]="errorValue">
       </lib-input>
       <lib-input 
-        placeholder="警告状态" 
-        status="warning"
+        inputPlaceholder="警告状态" 
+        inputStatus="warning"
         [(ngModel)]="warningValue">
       </lib-input>
     </div>
@@ -286,9 +286,9 @@ import { FormsModule } from '@angular/forms';
   imports: [InputComponent, FormsModule],
   template: \`
     <lib-input 
-      placeholder="最多输入10个字符" 
-      [maxlength]="10"
-      [showCount]="true"
+      inputPlaceholder="最多输入10个字符" 
+      [inputMaxlength]="10"
+      [inputShowCount]="true"
       [(ngModel)]="value">
     </lib-input>
   \`,
@@ -310,8 +310,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <div style="background-color: #f5f5f5; padding: 16px; border-radius: 4px;">
       <lib-input 
-        placeholder="无边框输入框" 
-        [bordered]="false"
+        inputPlaceholder="无边框输入框" 
+        [inputBordered]="false"
         [(ngModel)]="value">
       </lib-input>
     </div>

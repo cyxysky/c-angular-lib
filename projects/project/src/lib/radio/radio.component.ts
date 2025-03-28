@@ -23,10 +23,15 @@ export interface RadioOption {
   ]
 })
 export class RadioComponent implements ControlValueAccessor {
-  @Input() options: RadioOption[] = [];
-  @Input() direction: 'horizontal' | 'vertical' = 'horizontal';
-  @Input() color: string = ''; // 默认颜色
-  @Input() labelTemplate: TemplateRef<any> | null = null;
+  /** 选项 */
+  @Input({ alias: 'radioOptions' }) options: RadioOption[] = [];
+  /** 方向 */
+  @Input({ alias: 'radioDirection' }) direction: 'horizontal' | 'vertical' = 'horizontal';
+  /** 颜色 */
+  @Input({ alias: 'radioColor' }) color: string = '';
+  /** 标签模板 */
+  @Input({ alias: 'radioLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
+  /** 值变化事件 */
   @Output() valueChange = new EventEmitter<any>();
 
   value: any;

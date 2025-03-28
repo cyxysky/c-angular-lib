@@ -61,11 +61,12 @@ export class DocCheckboxComponent {
     {
       title: '属性',
       items: [
-        { name: 'options', description: '选项列表', type: 'CheckboxOption[]', default: '[]' },
+        { name: 'checkboxOptions', description: '选项列表', type: 'CheckboxOption[]', default: '[]' },
         { name: 'disabled', description: '是否禁用整个组件', type: 'boolean', default: 'false' },
-        { name: 'direction', description: '排列方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+        { name: 'checkboxDirection', description: '排列方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
         { name: 'checkboxColor', description: '复选框选中状态的颜色', type: 'string', default: '#1890ff' },
-        { name: 'labelTemplate', description: '自定义标签模板', type: 'TemplateRef<any>', default: '-' }
+        { name: 'checkboxLabelTemplate', description: '自定义标签模板', type: 'TemplateRef<any>', default: '-' },
+        { name: 'checkboxIndeterminate', description: '是否为半选状态', type: 'boolean', default: 'false' }
       ]
     },
     {
@@ -99,7 +100,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options">
+      [checkboxOptions]="options">
     </lib-checkbox>
     <p>当前值: {{ values | json }}</p>
   \`,
@@ -126,8 +127,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options"
-      direction="vertical">
+      [checkboxOptions]="options"
+      checkboxDirection="vertical">
     </lib-checkbox>
     <p>当前值: {{ values | json }}</p>
   \`,
@@ -154,7 +155,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options"
+      [checkboxOptions]="options"
       checkboxColor="#ff4d4f">
     </lib-checkbox>
     <p>当前值: {{ values | json }}</p>
@@ -182,7 +183,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options">
+      [checkboxOptions]="options">
     </lib-checkbox>
     <p>当前值: {{ values | json }}</p>
   \`,
@@ -210,7 +211,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options">
+      [checkboxOptions]="options"
+      checkboxIndeterminate="true">
     </lib-checkbox>
     <p>当前值: {{ values | json }}</p>
   \`,
@@ -238,8 +240,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-checkbox 
       [(ngModel)]="values" 
-      [options]="options"
-      [labelTemplate]="customLabel">
+      [checkboxOptions]="options"
+      [checkboxLabelTemplate]="customLabel">
     </lib-checkbox>
     <ng-template #customLabel let-option>
       <span class="custom-label">{{option.label}} - 自定义 (值: {{option.value}})</span>

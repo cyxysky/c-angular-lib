@@ -45,7 +45,7 @@ import { SwitchComponent } from 'project';
   standalone: true,
   imports: [FormsModule, SwitchComponent],
   template: \`
-    <lib-switch [(checked)]="checked"></lib-switch>
+    <lib-switch [(ngModel)]="checked"></lib-switch>
     <p>当前状态: {{ checked ? '开' : '关' }}</p>
   \`,
 })
@@ -62,7 +62,7 @@ import { SwitchComponent } from 'project';
   standalone: true,
   imports: [SwitchComponent],
   template: \`
-    <lib-switch [disabled]="true" [checked]="checked"></lib-switch>
+    <lib-switch [switchDisabled]="true" [ngModel]="checked"></lib-switch>
   \`,
 })
 export class SwitchComponent {
@@ -78,7 +78,7 @@ import { SwitchComponent } from 'project';
   standalone: true,
   imports: [SwitchComponent],
   template: \`
-    <lib-switch [loading]="true" [checked]="checked"></lib-switch>
+    <lib-switch [switchLoading]="true" [ngModel]="checked"></lib-switch>
   \`,
 })
 export class SwitchComponent {
@@ -97,13 +97,13 @@ import { SwitchComponent } from 'project';
   template: \`
     <lib-switch 
         [(ngModel)]="textSwitchChecked"
-        [checkedChildren]="'开'"
-        [unCheckedChildren]="'关'">
+        [switchCheckedChildren]="'开'"
+        [switchUnCheckedChildren]="'关'">
       </lib-switch>
       <lib-switch 
         [(ngModel)]="textSwitchChecked"
-        [checkedChildren]="checkedChildren"
-        [unCheckedChildren]="unCheckedChildren">
+        [switchCheckedChildren]="checkedChildren"
+        [switchUnCheckedChildren]="unCheckedChildren">
       </lib-switch>
       <ng-template #checkedChildren>
         使用template 开
@@ -138,8 +138,8 @@ import { SwitchComponent } from 'project';
   imports: [FormsModule, SwitchComponent],
   template: \`
     <lib-switch 
-      [(checked)]="checked"
-      [size]="'small'">
+      [(ngModel)]="checked"
+      [switchSize]="'small'">
     </lib-switch>
   \`,
 })
@@ -165,37 +165,31 @@ export class SwitchComponent {
       title: '属性',
       items: [
         {
-          name: 'checked',
-          description: '指定当前是否选中',
-          type: 'boolean',
-          default: 'false'
-        },
-        {
-          name: 'disabled',
+          name: 'switchDisabled',
           description: '是否禁用',
           type: 'boolean',
           default: 'false'
         },
         {
-          name: 'loading',
+          name: 'switchLoading',
           description: '是否加载中',
           type: 'boolean',
           default: 'false'
         },
         {
-          name: 'checkedChildren',
+          name: 'switchCheckedChildren',
           description: '选中时的内容',
           type: 'string | TemplateRef<any>',
           default: '-'
         },
         {
-          name: 'unCheckedChildren',
+          name: 'switchUnCheckedChildren',
           description: '非选中时的内容',
           type: 'string | TemplateRef<any>',
           default: '-'
         },
         {
-          name: 'size',
+          name: 'switchSize',
           description: '开关大小',
           type: "'default' | 'small'",
           default: "'default'"
@@ -206,7 +200,7 @@ export class SwitchComponent {
       title: '事件',
       items: [
         {
-          name: 'checkedChange',
+          name: 'ngModelChange',
           description: '开关状态改变时的回调函数',
           type: 'EventEmitter<boolean>',
           params: 'checked: boolean'

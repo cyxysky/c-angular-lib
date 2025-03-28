@@ -19,7 +19,7 @@
       [sourceCode]="basicSource">
       <div demo>
         <lib-segmented
-          [options]="basicOptions"
+          [segmentedOptions]="basicOptions"
           [(ngModel)]="basicValue">
         </lib-segmented>
         <p class="example-value">当前值: {{ basicValue }}</p>
@@ -35,14 +35,14 @@
       [sourceCode]="iconSource">
       <div demo>
         <lib-segmented
-          [options]="iconOptions"
+          [segmentedOptions]="iconOptions"
           [(ngModel)]="iconValue">
         </lib-segmented>
         <p class="example-value">当前值: {{ iconValue }}</p>
         <p>支持自定义渲染</p>
         <lib-segmented
-          [options]="iconOptions"
-          [template]="iconTemplate"
+          [segmentedOptions]="iconOptions"
+          [segmentedTemplate]="iconTemplate"
           [(ngModel)]="iconValue">
         </lib-segmented>
         <ng-template #iconTemplate let-option>
@@ -60,9 +60,9 @@
       [sourceCode]="disabledSource">
       <div demo>
         <lib-segmented
-          [options]="disabledOptions"
+          [segmentedOptions]="disabledOptions"
           [(ngModel)]="disabledValue"
-          [disabled]="componentDisabled">
+          [segmentedDisabled]="componentDisabled">
         </lib-segmented>
         <div style="margin-top: 16px;">
           <lib-button (click)="toggleDisabled()">
@@ -82,15 +82,15 @@
       [sourceCode]="sizeSource">
       <div demo>
         <lib-segmented
-          [options]="sizeOptions"
+          [segmentedOptions]="sizeOptions"
           [(ngModel)]="currentSize"
           (valueChange)="onSizeChange($event)">
         </lib-segmented>
         <div style="margin-top: 16px;">
           <lib-segmented
-            [options]="basicOptions"
+            [segmentedOptions]="basicOptions"
             [(ngModel)]="basicValue"
-            [size]="currentSize">
+            [segmentedSize]="currentSize">
           </lib-segmented>
         </div>
         <p class="example-value">当前尺寸: {{ currentSize }}</p>
@@ -111,13 +111,13 @@
               <div>
                 默认占满宽度
               </div>
-              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+              <lib-segmented [segmentedOptions]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
             </div>
             <div style="display: grid; gap: 16px;">
               <div>
                 设置最大宽度 <lib-number-input [(ngModel)]="maxWidth"></lib-number-input> , 超出宽度出现移动按钮
               </div>
-              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="maxWidth()"></lib-segmented>
+              <lib-segmented [segmentedOptions]="basicOptions" [(ngModel)]="basicValue" [segmentedMaxWidth]="maxWidth()"></lib-segmented>
             </div>
           </div>
 

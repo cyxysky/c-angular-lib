@@ -1,68 +1,68 @@
-@import '../../style/style.less';
+@import '../../style/radio.less';
 
 .radio-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: @radio-display-flex;
+    flex-wrap: @radio-flex-wrap;
+    gap: @radio-group-gap;
 
     &.radio-group-vertical {
-        flex-direction: column;
+        flex-direction: @radio-flex-direction-column;
     }
 
     .radio-wrapper {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        margin-right: 16px;
+        display: @radio-display-flex;
+        align-items: @radio-align-items;
+        cursor: @radio-cursor-pointer;
+        margin-right: @radio-margin-right;
 
         &.radio-disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
+            cursor: @radio-disabled-cursor;
+            opacity: @radio-disabled-opacity;
         }
 
         .radio {
-            position: relative;
-            display: inline-block;
-            margin-right: 8px;
-            white-space: nowrap;
-            outline: none;
+            position: @radio-position-relative;
+            display: @radio-display-inline-block;
+            margin-right: @radio-inner-margin-right;
+            white-space: @radio-white-space;
+            outline: @radio-outline;
 
             input {
-                position: absolute;
+                position: @radio-position-absolute;
                 top: 0;
                 right: 0;
                 bottom: 0;
                 left: 0;
-                z-index: 1;
-                cursor: pointer;
-                opacity: 0;
+                z-index: @radio-z-index;
+                cursor: @radio-cursor-pointer;
+                opacity: @radio-input-opacity;
             }
 
             .radio-inner {
-                position: relative;
-                display: block;
-                width: 16px;
-                height: 16px;
-                background-color: #fff;
-                border: 1px solid @radio-border-color;
+                position: @radio-position-relative;
+                display: @radio-display-block;
+                width: @radio-size;
+                height: @radio-size;
+                background-color: @radio-background-color;
+                border: @radio-border-width solid @radio-border-color;
                 color: @radio-color;
-                border-radius: 50%;
-                transition: all 0.3s;
+                border-radius: @radio-border-radius;
+                transition: @radio-transition;
 
                 &::after {
-                    position: absolute;
+                    position: @radio-position-absolute;
                     top: 50%;
                     left: 50%;
-                    display: block;
-                    width: 8px;
-                    height: 8px;
-                    margin-top: -4px;
-                    margin-left: -4px;
+                    display: @radio-display-block;
+                    width: @radio-inner-size;
+                    height: @radio-inner-size;
+                    margin-top: @radio-inner-margin;
+                    margin-left: @radio-inner-margin;
                     background-color: currentColor;
-                    border-radius: 50%;
-                    transform: scale(0);
-                    opacity: 0;
-                    transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+                    border-radius: @radio-border-radius;
+                    transform: @radio-inner-transform-hidden;
+                    opacity: @radio-inner-opacity-hidden;
+                    transition: @radio-inner-transition;
                     content: '';
                 }
             }
@@ -71,14 +71,14 @@
                 border-color: inherit;
 
                 &::after {
-                    transform: scale(1);
-                    opacity: 1;
+                    transform: @radio-inner-transform-visible;
+                    opacity: @radio-inner-opacity-visible;
                 }
             }
         }
 
         .radio-label {
-            padding: 0 8px;
+            padding: @radio-label-padding;
         }
     }
 }

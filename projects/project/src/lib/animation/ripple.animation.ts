@@ -2,7 +2,7 @@ import { animation, style, animate, keyframes } from '@angular/animations';
 
 export const rippleAnimation = animation([
   animate(
-    '600ms ease-out',
+    '800ms ease-out',
     keyframes([
       style({
         transform: 'scale(0)',

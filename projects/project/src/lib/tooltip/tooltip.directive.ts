@@ -1,6 +1,6 @@
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ComponentRef, Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { OverlayService } from '../service/overlay.service';
 import { TooltipComponent } from './tooltip.component';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from '../overlay/overlay-basic.directive';
@@ -16,29 +16,38 @@ import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from
 })
 export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirective {
   /** 提示内容 */
-  @Input('libTooltip') tooltipContent: string | TemplateRef<any> = '';
+  @Input('tooltip') tooltipContent: string | TemplateRef<any> = '';
   /** 提示位置 */
-  @Input('libTooltipPlacement') placement: OverlayBasicPosition = 'top';
+  @Input('tooltipPlacement') placement: OverlayBasicPosition = 'top';
   /** 提示触发方式 */
-  @Input('libTooltipTrigger') trigger: OverlayBasicTrigger = 'hover';
+  @Input('tooltipTrigger') trigger: OverlayBasicTrigger = 'hover';
   /** 提示是否显示 */
-  @Input('libTooltipVisible') visible: boolean = false;
+  @Input('tooltipVisible') visible: boolean = false;
   /** 是否严格由编程控制显示 */
-  @Input('libTooltipStrictVisiable') strictVisiable: boolean = false;
+  @Input('tooltipStrictVisiable') strictVisiable: boolean = false;
   /** 提示鼠标进入延迟 */
-  @Input('libTooltipMouseEnterDelay') mouseEnterDelay: number = 50;
+  @Input('tooltipMouseEnterDelay') mouseEnterDelay: number = 50;
   /** 提示鼠标离开延迟 */
-  @Input('libTooltipMouseLeaveDelay') mouseLeaveDelay: number = 0;
+  @Input('tooltipMouseLeaveDelay') mouseLeaveDelay: number = 200;
   /** 提示CSS类 */
-  @Input('libTooltipClass') tooltipClass: string = '';
+  @Input('tooltipClass') tooltipClass: string = '';
   /** 提示颜色 */
-  @Input('libTooltipColor') tooltipColor: string = '#000';
+  @Input('tooltipColor') tooltipColor: string = '#000';
 
+  /** 提示 */
   private overlayRef: OverlayRef | null = null;
+  /** 进入计时器 */
   private enterTimer: any;
+  /** 离开计时器 */
   private leaveTimer: any;
+  /** 组件 */
   private portal: ComponentPortal<TooltipComponent> | null = null;
+  /** 提示组件 */
   private tooltipComponent: TooltipComponent | null = null;
+  /** 提示组件引用 */
+  private tooltipComponentRef: ComponentRef<TooltipComponent> | null = null;
+  /** 组件悬停 */
+  private componentHover: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -79,6 +88,24 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
 
   @HostListener('mouseenter')
   onMouseEnter(): void {
+    this.hoverOpen();
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
+    this.hoverClose();
+  }
+
+  @HostListener('click')
+  onClick(): void {
+    // 严格由编程控制显示
+    if (this.strictVisiable) return;
+    if (this.trigger === 'click') {
+      this.visible ? this.hide() : this.show();
+    }
+  }
+
+  hoverOpen() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
     if (this.trigger === 'hover') {
@@ -89,22 +116,15 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     }
   }
 
-  @HostListener('mouseleave')
-  onMouseLeave(): void {
+  hoverClose() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
     if (this.trigger === 'hover') {
       clearTimeout(this.enterTimer);
-      this.hide();
-    }
-  }
-
-  @HostListener('click')
-  onClick(): void {
-    // 严格由编程控制显示
-    if (this.strictVisiable) return;
-    if (this.trigger === 'click') {
-      this.visible ? this.hide() : this.show();
+      this.leaveTimer = setTimeout(() => {
+        this.hide();
+        clearTimeout(this.leaveTimer);
+      }, this.mouseLeaveDelay);
     }
   }
 
@@ -129,10 +149,19 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     const componentRef = this.overlayRef.attach(this.portal);
 
     // 设置tooltip内容和位置
-    componentRef.instance.content = this.tooltipContent;
-    componentRef.instance.placement = this.placement;
-    componentRef.instance.color = this.tooltipColor;
+
+    componentRef.setInput('content', this.tooltipContent);
+    componentRef.setInput('placement', this.placement);
+    componentRef.setInput('color', this.tooltipColor);
+    componentRef.location.nativeElement.addEventListener('mouseenter', () => {
+      this.componentHover = true;
+    });
+    componentRef.location.nativeElement.addEventListener('mouseleave', () => {
+      this.componentHover = false;
+      this.hoverClose();
+    });
     this.tooltipComponent = componentRef.instance;
+    this.tooltipComponentRef = componentRef;
 
     // 设置CSS类以添加动画效果
     setTimeout(() => {
@@ -143,7 +172,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   }
 
   public hide(): void {
-    if (!this.visible) return;
+    if (!this.visible || this.componentHover) return;
     this.visible = false;
     this.closeTooltip();
   }
@@ -163,6 +192,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   private closeTooltip(): void {
     if (this.overlayRef) {
       this.visible = false;
+      this.tooltipComponentRef ? this.tooltipComponentRef.destroy() : null;
       this.overlayRef.dispose();
       this.overlayRef = null;
     }

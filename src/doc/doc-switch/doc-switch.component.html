@@ -19,7 +19,7 @@
   <!-- 禁用状态 -->
   <app-doc-box title="禁用状态" [sourceCode]="disabledSwitchSource">
     <div demo>
-      <lib-switch [disabled]="true" [ngModel]="disabledSwitchChecked"></lib-switch>
+      <lib-switch [switchDisabled]="true" [ngModel]="disabledSwitchChecked"></lib-switch>
     </div>
     <div description>
       禁用状态下的开关，不响应用户点击事件。
@@ -29,7 +29,7 @@
   <!-- 加载中状态 -->
   <app-doc-box title="加载中状态" [sourceCode]="loadingSwitchSource">
     <div demo>
-      <lib-switch [loading]="true" [ngModel]="loadingSwitchChecked"></lib-switch>
+      <lib-switch [switchLoading]="true" [ngModel]="loadingSwitchChecked"></lib-switch>
     </div>
     <div description>
       加载中状态的开关，通常用于异步操作时防止用户重复点击。
@@ -41,13 +41,13 @@
     <div demo>
       <lib-switch 
         [(ngModel)]="textSwitchChecked"
-        [checkedChildren]="'开'"
-        [unCheckedChildren]="'关'">
+        [switchCheckedChildren]="'开'"
+        [switchUnCheckedChildren]="'关'">
       </lib-switch>
       <lib-switch 
         [(ngModel)]="textSwitchChecked"
-        [checkedChildren]="checkedChildren"
-        [unCheckedChildren]="unCheckedChildren">
+        [switchCheckedChildren]="checkedChildren"
+        [switchUnCheckedChildren]="unCheckedChildren">
       </lib-switch>
       <ng-template #checkedChildren>
         使用template 开
@@ -83,7 +83,7 @@
           <p style="margin-bottom: 8px;">小尺寸</p>
           <lib-switch 
             [ngModel]="smallSwitchChecked" 
-            [size]="'small'"
+            [switchSize]="'small'"
             (ngModelChange)="smallSwitchChecked = $event">
           </lib-switch>
         </div>

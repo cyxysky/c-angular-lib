@@ -11,7 +11,7 @@
   <!-- 基础用法 -->
   <app-doc-box title="基础用法" [sourceCode]="basicTagSource">
     <div demo>
-      <lib-tag [content]="basicTagContent"></lib-tag>
+      <lib-tag [tagContent]="basicTagContent"></lib-tag>
     </div>
     <div description>
       基础标签的用法，展示文本内容。
@@ -23,8 +23,8 @@
     <div demo>
       <lib-tag 
         *ngFor="let tag of closableTags; let i = index"
-        [content]="tag"
-        [closable]="true"
+        [tagContent]="tag"
+        [tagClosable]="true"
         (close)="handleClose(i)"
         style="margin-right: 8px;">
       </lib-tag>
@@ -39,8 +39,8 @@
     <div demo>
       <lib-tag 
         *ngFor="let tag of checkableTags"
-        [content]="tag.content"
-        [checkable]="true"
+        [tagContent]="tag.content"
+        [tagCheckable]="true"
         [(checked)]="tag.checked"
         style="margin-right: 8px;">
       </lib-tag>
@@ -57,8 +57,8 @@
       <div style="margin-bottom: 16px;">
         <lib-tag 
           *ngFor="let color of presetColors"
-          [content]="color"
-          [color]="color"
+          [tagContent]="color"
+          [tagColor]="color"
           style="margin-right: 8px; margin-bottom: 8px;">
         </lib-tag>
       </div>
@@ -67,8 +67,8 @@
       <div>
         <lib-tag 
           *ngFor="let color of customColors"
-          [content]="color"
-          [color]="color"
+          [tagContent]="color"
+          [tagColor]="color"
           style="margin-right: 8px; margin-bottom: 8px;">
         </lib-tag>
       </div>
@@ -83,15 +83,15 @@
   <app-doc-box title="禁用状态" [sourceCode]="disabledTagSource">
     <div demo>
       <lib-tag 
-        [content]="'禁用标签'"
-        [disabled]="true"
-        [closable]="true">
+        [tagContent]="'禁用标签'"
+        [tagDisabled]="true"
+        [tagClosable]="true">
       </lib-tag>
 
       <lib-tag 
-        [content]="'禁用可选择标签'"
-        [disabled]="true"
-        [checkable]="true"
+        [tagContent]="'禁用可选择标签'"
+        [tagDisabled]="true"
+        [tagCheckable]="true"
         [checked]="true"
         style="margin-left: 8px;">
       </lib-tag>

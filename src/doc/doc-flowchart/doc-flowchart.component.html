@@ -35,7 +35,7 @@
                 <p class="doc-description">
                     通过配置state可以设置流程的当前状态，支持active、hold、close三种状态。
                 </p>
-                <lib-segmented [options]="states" [(ngModel)]="state" style="margin: 10px 0;"></lib-segmented>
+                <lib-segmented [segmentedOptions]="states" [(ngModel)]="state" style="margin: 10px 0;"></lib-segmented>
                 <lib-multi-dimensional-flowchart
                     [state]="state"
                     [data]="complexData" 

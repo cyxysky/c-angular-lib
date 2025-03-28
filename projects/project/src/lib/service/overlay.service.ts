@@ -1,6 +1,7 @@
-import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin, ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ElementRef, Injectable, TemplateRef, ViewContainerRef } from '@angular/core';
+import { OverlayBasicPositionConfigs } from '../overlay/overlay-basic.directive';
 
 @Injectable({
   providedIn: 'root'
@@ -12,16 +13,21 @@ export class OverlayService {
   ) { }
 
   /**
-   * 创建一个overlay
+   * 创建一个overlay并监听位置变化
    * @param configs 配置
-   * @param _overlayOrigin 原点
+   * @param elementRef 元素引用
    * @param position 位置
-   * @param overlayTemplate 模板
-   * @param viewContainerRef 视图容器
    * @param closeModal 关闭回调
+   * @param positionCallback 位置变化回调
    * @returns overlayRef
    */
-  createOverlay(configs: OverlayConfig, elementRef: ElementRef | Element | any, position: ConnectedPosition[], closeModal: (overlayRef: OverlayRef) => void): OverlayRef {
+  createOverlay(
+    configs: OverlayConfig, 
+    elementRef: ElementRef | Element | any, 
+    position: ConnectedPosition[], 
+    closeModal: (overlayRef: OverlayRef) => void,
+    positionCallback?: (position: ConnectedPosition, isBackupUsed: boolean) => void
+  ): OverlayRef {
     let config = new OverlayConfig();
     // 定位策略
     let positionStrategy = this.overlay.position().
@@ -42,11 +48,30 @@ export class OverlayService {
     }
     // 创建overlay
     let overlayRef = this.overlay.create(config);
+    
+    // 监听位置变化
+    if (positionCallback) {
+      const strategy = overlayRef.getConfig().positionStrategy as FlexibleConnectedPositionStrategy;
+      strategy.positionChanges.subscribe((positionChange: ConnectedOverlayPositionChange) => {
+        // 判断使用的是主位置还是备用位置
+        const currentPositionIndex = positionChange.connectionPair ? 
+          position.findIndex(p => 
+            p.originX === positionChange.connectionPair.originX &&
+            p.originY === positionChange.connectionPair.originY &&
+            p.overlayX === positionChange.connectionPair.overlayX &&
+            p.overlayY === positionChange.connectionPair.overlayY
+          ) : -1;
+          
+        const isBackupPosition = currentPositionIndex > 0; // 索引0是主位置，其他是备用位置
+        positionCallback(positionChange.connectionPair, isBackupPosition);
+      });
+    }
+    
     // 点击背景，关闭浮层
     overlayRef.outsidePointerEvents().subscribe(() => {
       closeModal(overlayRef);
     });
-    // 附加模板
+    
     return overlayRef;
   }
 
@@ -57,127 +82,46 @@ export class OverlayService {
   public getPositions(placement: string): ConnectedPosition[] {
     const positions: ConnectedPosition[] = [];
 
-    switch (placement) {
-      case 'top':
-        positions.push({
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'center',
-          overlayY: 'bottom',
-          offsetY: -0
-        });
-        break;
+    // 定义所有可能的主要位置配置
 
-      case 'bottom':
-        positions.push({
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'center',
-          overlayY: 'top',
-          offsetY: 0
-        });
-        break;
 
-      case 'left':
-        positions.push({
-          originX: 'start',
-          originY: 'center',
-          overlayX: 'end',
-          overlayY: 'center',
-          offsetX: -0
-        });
-        break;
-
-      case 'right':
-        positions.push({
-          originX: 'end',
-          originY: 'center',
-          overlayX: 'start',
-          overlayY: 'center',
-          offsetX: 0
-        });
-        break;
-
-      case 'left-top':
-        positions.push({
-          originX: 'start',
-          originY: 'top',
-          overlayX: 'end',
-          overlayY: 'top',
-          offsetX: -0
-        });
-        break;
-
-      case 'left-bottom':
-        positions.push({
-          originX: 'start',
-          originY: 'bottom',
-          overlayX: 'end',
-          overlayY: 'bottom',
-          offsetX: -0
-        });
-        break;
-
-      case 'right-top':
-        positions.push({
-          originX: 'end',
-          originY: 'top',
-          overlayX: 'start',
-          overlayY: 'top',
-          offsetX: 0
-        });
-        break;
-
-      case 'right-bottom':
-        positions.push({
-          originX: 'end',
-          originY: 'bottom',
-          overlayX: 'start',
-          overlayY: 'bottom',
-          offsetX: 0
-        });
-        break;
-
-      case 'top-left':
-        positions.push({
-          originX: 'start',
-          originY: 'top',
-          overlayX: 'start',
-          overlayY: 'bottom',
-          offsetY: -0
-        });
-        break;
-
-      case 'top-right':
-        positions.push({
-          originX: 'end',
-          originY: 'top',
-          overlayX: 'end',
-          overlayY: 'bottom',
-          offsetY: -0
-        });
-        break;
-
-      case 'bottom-left':
-        positions.push({
-          originX: 'start',
-          originY: 'bottom',
-          overlayX: 'start',
-          overlayY: 'top',
-          offsetY: 0
-        });
-        break;
-
-      case 'bottom-right':
-        positions.push({
-          originX: 'end',
-          originY: 'bottom',
-          overlayX: 'end',
-          overlayY: 'top',
-          offsetY: 0
-        });
-        break;
+    // 添加主位置
+    if (OverlayBasicPositionConfigs[placement]) {
+      positions.push(OverlayBasicPositionConfigs[placement]);
     }
+
+    // 确定备用位置策略
+    const mainDirections = ['top', 'bottom', 'left', 'right'];
+    let backupDirections = [];
+    
+    // 获取当前placement的主方向
+    const currentMainDirection = mainDirections.find(dir => placement.includes(dir)) || '';
+    
+    // 备用位置包含除当前主方向外的其他主方向
+    backupDirections = mainDirections.filter(dir => !placement.includes(dir));
+    
+    // 添加备用位置
+    backupDirections.forEach(dir => {
+      if (OverlayBasicPositionConfigs[dir]) {
+        positions.push(OverlayBasicPositionConfigs[dir]);
+      }
+    });
+    
+    // 对于复合方向（如 'top-left'），还需添加相关的复合备用位置
+    if (placement.includes('-')) {
+      const parts = placement.split('-');
+      // 如果有第二部分（如 'top-left' 中的 'left'）
+      if (parts[1]) {
+        // 添加与第二部分相关的复合备用位置
+        backupDirections.forEach(dir => {
+          const backupCompound = `${dir}-${parts[1]}`;
+          if (OverlayBasicPositionConfigs[backupCompound]) {
+            positions.push(OverlayBasicPositionConfigs[backupCompound]);
+          }
+        });
+      }
+    }
+
     return positions;
   }
 }

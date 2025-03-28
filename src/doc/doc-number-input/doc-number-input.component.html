@@ -20,8 +20,8 @@
       <div demo >
         <div style="display: flex; gap: 10px;">
             <lib-number-input [(ngModel)]="basicValue"></lib-number-input>
-            <lib-number-input [(ngModel)]="basicValue" [status]="'warning'" [color]="'#faad14'"></lib-number-input>
-            <lib-number-input [(ngModel)]="basicValue" [status]="'error'" [color]="'#ff4d4f'"></lib-number-input>
+            <lib-number-input [(ngModel)]="basicValue" [numberInputStatus]="'warning'" [numberInputColor]="'#faad14'"></lib-number-input>
+            <lib-number-input [(ngModel)]="basicValue" [numberInputStatus]="'error'" [numberInputColor]="'#ff4d4f'"></lib-number-input>
         </div>
         <p class="example-value">当前值: {{ basicValue }}</p>
       </div>
@@ -36,8 +36,8 @@
       [sourceCode]="prefixSuffixSource">
       <div demo>
         <lib-number-input
-          [prefix]="'¥'"
-          [suffix]="'元'"
+          [numberInputPrefix]="'¥'"
+          [numberInputSuffix]="'元'"
           [(ngModel)]="prefixSuffixValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ prefixSuffixValue }}</p>
@@ -62,7 +62,7 @@
       [sourceCode]="precisionSource">
       <div demo>
         <lib-number-input
-          [precision]="2"
+          [numberInputPrecision]="2"
           [(ngModel)]="precisionValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ precisionValue }}</p>
@@ -78,7 +78,7 @@
       [sourceCode]="disabledSource">
       <div demo>
         <lib-number-input
-          [disabled]="true"
+          [numberInputDisabled]="true"
           [(ngModel)]="disabledValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ disabledValue }}</p>
@@ -94,7 +94,7 @@
       [sourceCode]="readonlySource">
       <div demo>
         <lib-number-input
-          [readonly]="true"
+          [numberInputReadonly]="true"
           [(ngModel)]="readonlyValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ readonlyValue }}</p>
@@ -110,8 +110,8 @@
       [sourceCode]="stepSource">
       <div demo>
         <lib-number-input
-          [step]="0.1"
-          [precision]="2"
+          [numberInputStep]="0.1"
+          [numberInputPrecision]="2"
           [(ngModel)]="stepValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ stepValue }}</p>
@@ -127,8 +127,8 @@
       [sourceCode]="boundedSource">
       <div demo>
         <lib-number-input
-          [min]="1"
-          [max]="10"
+          [numberInputMin]="1"
+          [numberInputMax]="10"
           [(ngModel)]="boundedValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ boundedValue }}</p>
@@ -144,7 +144,7 @@
       [sourceCode]="formattedSource">
       <div demo>
         <lib-number-input
-          [formatter]="currencyFormatter"
+          [numberInputFormatter]="currencyFormatter"
           [(ngModel)]="formattedValue">
         </lib-number-input>
         <p class="example-value">当前值: {{ formattedValue }}</p>

@@ -1,29 +1,29 @@
-@import '../../style/style.less';
+@import '../../style/segmented.less';
 
 :host {
-  display: inline-block;
-  width: 100%;
+  display: @segmented-display;
+  width: @segmented-width;
 }
 
 .segmented {
-  box-sizing: border-box;
-  position: relative;
+  box-sizing: @segmented-box-sizing;
+  position: @segmented-position-relative;
   display: inline-flex;
-  align-items: center;
-  background-color: #f0f0f0;
-  border-radius: 6px;
-  padding: 2px;
-  max-width: 100%;
-  gap: 4px;
+  align-items: @segmented-item-align-items;
+  background-color: @segmented-background-color;
+  border-radius: @segmented-border-radius;
+  padding: @segmented-padding;
+  max-width: @segmented-max-width;
+  gap: @segmented-gap;
   
   &-container {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0;
-    margin: 0;
+    position: @segmented-position-relative;
+    flex: @segmented-container-flex;
+    min-width: @segmented-container-min-width;
+    overflow-x: @segmented-container-overflow-x;
+    overflow-y: @segmented-container-overflow-y;
+    padding: @segmented-container-padding;
+    margin: @segmented-container-margin;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
     
@@ -33,214 +33,214 @@
   }
   
   &-group {
-    position: relative;
-    display: flex;
-    flex-wrap: nowrap;
-    width: fit-content;
-    min-width: 100%;
-    padding: 0;
-    margin: 0;
+    position: @segmented-position-relative;
+    display: @segmented-group-display;
+    flex-wrap: @segmented-group-flex-wrap;
+    width: @segmented-group-width-fit;
+    min-width: @segmented-group-min-width;
+    padding: @segmented-group-padding;
+    margin: @segmented-group-margin;
   }
   
   &-item {
-    position: relative;
-    color: rgba(0, 0, 0, 0.65);
-    height: 28px;
-    padding: 0 12px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: color 0.3s;
-    flex: 0 0 auto;
-    z-index: 2;
+    position: @segmented-item-position;
+    color: @segmented-item-color;
+    height: @segmented-item-height;
+    padding: @segmented-item-padding;
+    margin: @segmented-item-margin;
+    display: @segmented-item-display;
+    align-items: @segmented-item-align-items;
+    justify-content: @segmented-item-justify-content;
+    cursor: @segmented-item-cursor;
+    transition: @segmented-item-transition;
+    flex: @segmented-item-flex;
+    z-index: @segmented-item-z-index;
     
     &-label {
-      display: flex;
-      align-items: center;
-      white-space: nowrap;
-      padding: 0;
-      margin: 0;
+      display: @segmented-label-display;
+      align-items: @segmented-label-align-items;
+      white-space: @segmented-label-white-space;
+      padding: @segmented-label-padding;
+      margin: @segmented-label-margin;
     }
     
     &-icon {
-      margin-right: 6px;
+      margin-right: @segmented-item-icon-margin-right;
     }
     
     &-selected {
-      color: rgba(0, 0, 0, 0.85);
+      color: @segmented-item-color-selected;
     }
     
     &-disabled {
-      color: rgba(0, 0, 0, 0.25);
-      cursor: not-allowed;
+      color: @segmented-item-color-disabled;
+      cursor: @segmented-item-cursor-disabled;
     }
   }
   
   &-thumb {
-    position: absolute;
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
-                width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    height: 28px;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    margin: 0;
-    padding: 0;
-    width: 0;
+    position: @segmented-thumb-position;
+    background-color: @segmented-thumb-background-color;
+    border-radius: @segmented-thumb-border-radius;
+    box-shadow: @segmented-thumb-box-shadow;
+    transition: @segmented-thumb-transition-transform,
+                @segmented-thumb-transition-width;
+    height: @segmented-thumb-height;
+    top: @segmented-thumb-top;
+    left: @segmented-thumb-left;
+    z-index: @segmented-thumb-z-index;
+    margin: @segmented-thumb-margin;
+    padding: @segmented-thumb-padding;
+    width: @segmented-thumb-width;
   }
   
   &-nav {
-    flex: 0 0 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    z-index: 3;
-    transition: all 0.3s;
-    color: rgba(0, 0, 0, 0.45);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: @segmented-nav-flex;
+    height: @segmented-nav-height;
+    display: @segmented-nav-display;
+    align-items: @segmented-nav-align-items;
+    justify-content: @segmented-nav-justify-content;
+    background-color: @segmented-nav-background-color;
+    border-radius: @segmented-nav-border-radius;
+    cursor: @segmented-nav-cursor;
+    z-index: @segmented-nav-z-index;
+    transition: @segmented-nav-transition;
+    color: @segmented-nav-color;
+    box-shadow: @segmented-nav-box-shadow;
     
     &:hover {
-      background-color: #fafafa;
-      color: rgba(0, 0, 0, 0.85);
+      background-color: @segmented-nav-background-hover;
+      color: @segmented-nav-color-hover;
     }
     
     &-disabled {
-      cursor: not-allowed;
-      color: rgba(0, 0, 0, 0.25);
-      box-shadow: none;
+      cursor: @segmented-nav-cursor-disabled;
+      color: @segmented-nav-color-disabled;
+      box-shadow: @segmented-nav-box-shadow-disabled;
       
       &:hover {
-        background-color: #fff;
-        color: rgba(0, 0, 0, 0.25);
+        background-color: @segmented-nav-background-color;
+        color: @segmented-nav-color-disabled;
       }
     }
     
     &-icon {
-      width: 0;
-      height: 0;
-      border-style: solid;
-      padding: 0;
-      margin: 0;
+      width: @segmented-nav-icon-width;
+      height: @segmented-nav-icon-height;
+      border-style: @segmented-nav-icon-border-style;
+      padding: @segmented-nav-icon-padding;
+      margin: @segmented-nav-icon-margin;
     }
   }
   
   &-prev {
     .segmented-nav-icon {
-      border-width: 4px 6px 4px 0;
-      border-color: transparent currentColor transparent transparent;
+      border-width: @segmented-nav-prev-border-width;
+      border-color: @segmented-nav-prev-border-color;
     }
   }
   
   &-next {
     .segmented-nav-icon {
-      border-width: 4px 0 4px 6px;
-      border-color: transparent transparent transparent currentColor;
+      border-width: @segmented-nav-next-border-width;
+      border-color: @segmented-nav-next-border-color;
     }
   }
   
   &-block {
-    display: flex;
-    width: 100%;
+    display: @segmented-block-display;
+    width: @segmented-block-width;
     
     .segmented-group {
-      justify-content: space-between;
+      justify-content: @segmented-block-group-justify-content;
     }
     
     .segmented-item {
-      flex: 1 1 0%;
+      flex: @segmented-block-item-flex;
     }
   }
   
   &-lg {
-    padding: 3px;
+    padding: @segmented-lg-padding;
     
     .segmented-item {
-      height: 40px;
-      font-size: 16px;
+      height: @segmented-lg-item-height;
+      font-size: @segmented-lg-item-font-size;
     }
     
     .segmented-nav {
-      height: 40px;
-      flex-basis: 32px;
+      height: @segmented-lg-nav-height;
+      flex-basis: @segmented-lg-nav-flex-basis;
       
       &-icon {
-        border-width: 5px 7px 5px 0;
+        border-width: @segmented-lg-nav-icon-border-width-prev;
       }
     }
     
     .segmented-next .segmented-nav-icon {
-      border-width: 5px 0 5px 7px;
+      border-width: @segmented-lg-nav-icon-border-width-next;
     }
     
     .segmented-thumb {
-      height: 40px;
+      height: @segmented-lg-thumb-height;
     }
   }
   
   &-sm {
-    padding: 1px;
+    padding: @segmented-sm-padding;
     
     .segmented-item {
-      height: 24px;
-      font-size: 12px;
+      height: @segmented-sm-item-height;
+      font-size: @segmented-sm-item-font-size;
     }
     
     .segmented-nav {
-      height: 24px;
-      flex-basis: 24px;
+      height: @segmented-sm-nav-height;
+      flex-basis: @segmented-sm-nav-flex-basis;
       
       &-icon {
-        border-width: 3px 5px 3px 0;
+        border-width: @segmented-sm-nav-icon-border-width-prev;
       }
     }
     
     .segmented-next .segmented-nav-icon {
-      border-width: 3px 0 3px 5px;
+      border-width: @segmented-sm-nav-icon-border-width-next;
     }
     
     .segmented-thumb {
-      height: 24px;
+      height: @segmented-sm-thumb-height;
     }
   }
   
   &-disabled {
-    cursor: not-allowed;
+    cursor: @segmented-item-cursor-disabled;
     
     .segmented-item {
-      color: rgba(0, 0, 0, 0.25);
-      cursor: not-allowed;
+      color: @segmented-item-color-disabled;
+      cursor: @segmented-item-cursor-disabled;
     }
     
     .segmented-thumb {
-      background-color: rgba(0, 0, 0, 0.04);
-      box-shadow: none;
+      background-color: @segmented-thumb-background-color-disabled;
+      box-shadow: @segmented-thumb-box-shadow-disabled;
     }
     
     .segmented-nav {
-      cursor: not-allowed;
-      color: rgba(0, 0, 0, 0.25);
+      cursor: @segmented-nav-cursor-disabled;
+      color: @segmented-nav-color-disabled;
       
       &:hover {
-        color: rgba(0, 0, 0, 0.25);
-        background-color: rgba(0, 0, 0, 0.04);
+        color: @segmented-nav-color-disabled;
+        background-color: @segmented-nav-background-disabled-hover;
       }
     }
   }
 }
 
 .segmented-item:not(.segmented-item-disabled):hover {
-  color: @primary;
+  color: @segmented-hover-color;
 }
 
 .segmented-item:not(.segmented-item-disabled):active {
-  color: @primary;
+  color: @segmented-active-color;
 }

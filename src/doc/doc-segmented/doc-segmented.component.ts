@@ -75,10 +75,13 @@ export class DocSegmentedComponent {
     {
       title: '属性',
       items: [
-        { name: 'options', description: '选项列表', type: 'SegmentedOption[]', default: '[]' },
-        { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
-        { name: 'block', description: '是否为块级元素', type: 'boolean', default: 'false' },
-        { name: 'size', description: '尺寸大小', type: "'large' | 'default' | 'small'", default: "'default'" }
+        { name: 'segmentedOptions', description: '选项列表', type: 'SegmentedOption[]', default: '[]' },
+        { name: 'segmentedDisabled', description: '是否禁用', type: 'boolean', default: 'false' },
+        { name: 'segmentedBlock', description: '是否为块级元素', type: 'boolean', default: 'false' },
+        { name: 'segmentedSize', description: '尺寸大小', type: "'large' | 'default' | 'small'", default: "'default'" },
+        { name: 'segmentedMaxWidth', description: '最大宽度', type: 'number', default: 'undefined' },
+        { name: 'segmentedAdaptParentWidth', description: '是否适应父容器宽度', type: 'boolean', default: 'true' },
+        { name: 'segmentedTemplate', description: '自定义选项模板', type: 'TemplateRef<any>', default: 'null' }
       ]
     },
     {
@@ -110,7 +113,7 @@ import { SegmentedComponent } from 'your-lib';
   imports: [SegmentedComponent],
   template: \`
     <lib-segmented
-      [options]="options"
+      [segmentedOptions]="options"
       [(ngModel)]="value">
     </lib-segmented>
     <p>当前值: {{ value }}</p>
@@ -136,13 +139,13 @@ import { SegmentedComponent } from 'your-lib';
   imports: [SegmentedComponent],
   template: \`
     <lib-segmented
-      [options]="options"
+      [segmentedOptions]="options"
       [(ngModel)]="value">
     </lib-segmented>
     <p>当前值: {{ value }}</p>
     <lib-segmented
-      [options]="iconOptions"
-      [template]="iconTemplate"
+      [segmentedOptions]="iconOptions"
+      [segmentedTemplate]="iconTemplate"
       [(ngModel)]="iconValue">
     </lib-segmented>
     <ng-template #iconTemplate let-option>
@@ -170,9 +173,9 @@ import { SegmentedComponent } from 'your-lib';
   imports: [SegmentedComponent],
   template: \`
     <lib-segmented
-      [options]="options"
+      [segmentedOptions]="options"
       [(ngModel)]="value"
-      [disabled]="componentDisabled">
+      [segmentedDisabled]="componentDisabled">
     </lib-segmented>
     <button (click)="componentDisabled = !componentDisabled">
       {{ componentDisabled ? '启用' : '禁用' }}
@@ -201,14 +204,14 @@ import { SegmentedComponent } from 'your-lib';
   imports: [SegmentedComponent],
   template: \`
     <lib-segmented
-      [options]="sizeOptions"
+      [segmentedOptions]="sizeOptions"
       [(ngModel)]="currentSize">
     </lib-segmented>
     <div style="margin-top: 16px;">
       <lib-segmented
-        [options]="options"
+        [segmentedOptions]="options"
         [(ngModel)]="value"
-        [size]="currentSize">
+        [segmentedSize]="currentSize">
       </lib-segmented>
     </div>
     <p>当前尺寸: {{ currentSize }}</p>
@@ -245,7 +248,7 @@ import { SegmentedComponent } from 'your-lib';
               <div>
                 默认占满宽度
               </div>
-              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
+              <lib-segmented [segmentedOptions]="basicOptions" [(ngModel)]="basicValue"></lib-segmented>
             </div>
             <div>
               <div>
@@ -254,7 +257,7 @@ import { SegmentedComponent } from 'your-lib';
               <div>
                 <lib-number-input [(ngModel)]="maxWidth"></lib-number-input>
               </div>
-              <lib-segmented [options]="basicOptions" [(ngModel)]="basicValue" [maxWidth]="maxWidth"></lib-segmented>
+              <lib-segmented [segmentedOptions]="basicOptions" [(ngModel)]="basicValue" [segmentedMaxWidth]="maxWidth"></lib-segmented>
             </div>
           </div>
         </div>

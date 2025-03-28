@@ -19,7 +19,7 @@
       [sourceCode]="basicSource">
       <div demo>
         <lib-input 
-          placeholder="请输入内容" 
+          inputPlaceholder="请输入内容" 
           [(ngModel)]="basicValue">
         </lib-input>
         <p class="example-value">当前值: {{ basicValue }}</p>
@@ -36,17 +36,17 @@
       <div demo>
         <div class="size-demo">
           <lib-input 
-            placeholder="大尺寸" 
-            size="large"
+            inputPlaceholder="大尺寸" 
+            inputSize="large"
             [(ngModel)]="largeValue">
           </lib-input>
           <lib-input 
-            placeholder="默认尺寸" 
+            inputPlaceholder="默认尺寸" 
             [(ngModel)]="defaultValue">
           </lib-input>
           <lib-input 
-            placeholder="小尺寸" 
-            size="small"
+            inputPlaceholder="小尺寸" 
+            inputSize="small"
             [(ngModel)]="smallValue">
           </lib-input>
         </div>
@@ -63,23 +63,23 @@
       <div demo>
         <div class="affix-demo">
           <lib-input 
-            placeholder="前缀" 
-            prefix="￥"
+            inputPlaceholder="前缀" 
+            inputPrefix="￥"
             [(ngModel)]="prefixValue">
           </lib-input>
           <lib-input 
-            placeholder="后缀" 
-            suffix="RMB"
+            inputPlaceholder="后缀" 
+            inputSuffix="RMB"
             [(ngModel)]="suffixValue">
           </lib-input>
           <lib-input 
-            placeholder="前缀图标" 
-            prefixIcon="bi-truck-flatbed"
+            inputPlaceholder="前缀图标" 
+            inputPrefixIcon="bi-truck-flatbed"
             [(ngModel)]="prefixIconValue">
           </lib-input>
           <lib-input 
-            placeholder="后缀图标" 
-            suffixIcon="bi-tiktok"
+            inputPlaceholder="后缀图标" 
+            inputSuffixIcon="bi-tiktok"
             [(ngModel)]="suffixIconValue">
           </lib-input>
         </div>
@@ -95,8 +95,8 @@
       [sourceCode]="clearSource">
       <div demo>
         <lib-input 
-          placeholder="输入后显示清除按钮" 
-          [allowClear]="true"
+          inputPlaceholder="输入后显示清除按钮" 
+          [inputAllowClear]="true"
           [(ngModel)]="clearValue">
         </lib-input>
       </div>
@@ -112,13 +112,13 @@
       <div demo>
         <div class="disabled-demo">
           <lib-input 
-            placeholder="禁用状态" 
-            [disabled]="true"
+            inputPlaceholder="禁用状态" 
+            [inputDisabled]="true"
             [(ngModel)]="disabledValue">
           </lib-input>
           <lib-input 
-            placeholder="只读状态" 
-            [readonly]="true"
+            inputPlaceholder="只读状态" 
+            [inputReadonly]="true"
             [(ngModel)]="readonlyValue">
           </lib-input>
         </div>
@@ -135,13 +135,13 @@
       <div demo>
         <div class="status-demo">
           <lib-input 
-            placeholder="错误状态" 
-            status="error"
+            inputPlaceholder="错误状态" 
+            inputStatus="error"
             [(ngModel)]="errorValue">
           </lib-input>
           <lib-input 
-            placeholder="警告状态" 
-            status="warning"
+            inputPlaceholder="警告状态" 
+            inputStatus="warning"
             [(ngModel)]="warningValue">
           </lib-input>
         </div>
@@ -157,9 +157,9 @@
       [sourceCode]="countSource">
       <div demo>
         <lib-input 
-          placeholder="最多输入10个字符" 
-          [maxlength]="10"
-          [showCount]="true"
+          inputPlaceholder="最多输入10个字符" 
+          [inputMaxlength]="10"
+          [inputShowCount]="true"
           [(ngModel)]="countValue">
         </lib-input>
       </div>
@@ -175,8 +175,8 @@
       <div demo>
         <div class="borderless-demo">
           <lib-input 
-            placeholder="无边框输入框" 
-            [bordered]="false"
+            inputPlaceholder="无边框输入框" 
+            [inputBordered]="false"
             [(ngModel)]="borderlessValue">
           </lib-input>
         </div>

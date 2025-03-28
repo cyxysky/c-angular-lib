@@ -1,35 +1,35 @@
-@import url('../../style/style.less');
+@import '../../style/button.less';
 
 .ripple {
     position: absolute;
-    background: rgba(255, 255, 255, 0.6);
+    background: @button-ripple-bg;
     border-radius: 50%;
     pointer-events: none;
     transform: scale(0);
 }
 
 .botton {
-    line-height: 1.5715;
+    line-height: @button-line-height;
     position: relative;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
-    font-size: 0.875rem;
-    letter-spacing: 0.06em;
+    font-weight: @button-font-weight;
+    font-size: @button-font-size-base;
+    letter-spacing: @button-letter-spacing;
     white-space: nowrap;
-    box-shadow: 0 2px #00000004;
+    box-shadow: @button-box-shadow;
     cursor: pointer;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    transition: @button-transition;
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
-    height: 32px;
-    padding: 4px 15px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    width: 100%;
+    height: @button-height-base;
+    padding: @button-padding-base;
+    border: @button-border-width @button-border-style @button-border-color-base;
+    border-radius: @button-border-radius-base;
+    width: @button-width;
 }
 
 .primary {
@@ -87,51 +87,51 @@
 }
 
 .ghost {
-    background-color: transparent;
-    color: @dark;
-    box-shadow: none;
+    background-color: @button-ghost-bg;
+    color: @button-ghost-color;
+    box-shadow: @button-ghost-box-shadow;
 }
 
 .large {
-    padding: 6.4px 15px;
-    font-size: 16px;
-    height: 40px;
+    padding: @button-padding-large;
+    font-size: @button-font-size-large;
+    height: @button-height-large;
 }
 
 .disabled {
-    color: #00000040;
-    border-color: #d9d9d9;
-    background: #f5f5f5;
+    color: @button-disabled-color;
+    border-color: @button-disabled-border-color;
+    background: @button-disabled-bg;
 }
 
 .small {
-    padding: 0 7px;
-    font-size: 12px;
-    height: 24px;
+    padding: @button-padding-small;
+    font-size: @button-font-size-small;
+    height: @button-height-small;
 }
 
 .circle {
-    border-radius: 40px;
+    border-radius: @button-border-radius-circle;
 }
 
 .round {
-    border-radius: 90px;
+    border-radius: @button-border-radius-round;
 }
 
 .dashed {
-    border-style: dashed;
+    border-style: @button-border-style-dashed;
 }
 
 .link {
-    border: none;
-    background: none;
-    color: @link;
-    box-shadow: none;
+    border: @button-link-border;
+    background: @button-link-bg;
+    color: @button-link-color;
+    box-shadow: @button-link-box-shadow;
 }
 
 .text {
-    border: none;
-    background: none;
-    color: black;
-    box-shadow: none;
+    border: @button-text-border;
+    background: @button-text-bg;
+    color: @button-text-color;
+    box-shadow: @button-text-box-shadow;
 }

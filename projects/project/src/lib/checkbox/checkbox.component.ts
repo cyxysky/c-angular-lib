@@ -27,15 +27,15 @@ export type CheckboxDirection = 'horizontal' | 'vertical';
 })
 export class CheckboxComponent implements ControlValueAccessor, OnInit {
   /** 选项 */
-  @Input() options: CheckboxOption[] = [];
+  @Input({ alias: 'checkboxOptions' }) options: CheckboxOption[] = [];
   /** 方向 */
-  @Input() direction: CheckboxDirection = 'horizontal';
+  @Input({ alias: 'checkboxDirection' }) direction: CheckboxDirection = 'horizontal';
   /** 复选框颜色 */
-  @Input() checkboxColor: string = '#1890ff';
-  /** 是否禁用 */
-  @Input() indeterminate: boolean = false;
+  @Input({ alias: 'checkboxColor' }) checkboxColor: string = '#1890ff';
+  /** 是否半选 */
+  @Input({ alias: 'checkboxIndeterminate' }) indeterminate: boolean = false;
   /** 标签模板 */
-  @Input() labelTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'checkboxLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
 
   value: any[] = [];
   isChecked: { [key: string]: boolean } = {};

@@ -62,15 +62,16 @@ export class DocSliderComponent {
     {
       title: '属性',
       items: [
-        { name: 'min', description: '最小值', type: 'number', default: '0' },
-        { name: 'max', description: '最大值', type: 'number', default: '100' },
-        { name: 'step', description: '步长', type: 'number', default: '1' },
-        { name: 'trackColor', description: '滑动条的轨道颜色', type: 'string', default: '#1890ff' },
-        { name: 'isRange', description: '是否为范围滑块', type: 'boolean', default: 'false' },
-        { name: 'marks', description: '刻度标记', type: 'Record<number, string>', default: 'null' },
-        { name: 'snapToMarks', description: '是否只能滑动到刻度上', type: 'boolean', default: 'false' },
-        { name: 'tipFormatter', description: '提示格式化函数', type: '(value: number) => string', default: 'null' },
-        { name: 'labelTemplate', description: '刻度标签模板', type: 'TemplateRef<any>', default: 'null' }
+        { name: 'sliderMin', description: '最小值', type: 'number', default: '0' },
+        { name: 'sliderMax', description: '最大值', type: 'number', default: '100' },
+        { name: 'sliderStep', description: '步长', type: 'number', default: '1' },
+        { name: 'sliderTrackColor', description: '滑动条的轨道颜色', type: 'string', default: '#1890ff' },
+        { name: 'sliderHandleColor', description: '滑块的颜色', type: 'string', default: "''"},
+        { name: 'sliderIsRange', description: '是否为范围滑块', type: 'boolean', default: 'false' },
+        { name: 'sliderMarks', description: '刻度标记', type: 'Record<number, string>', default: 'null' },
+        { name: 'sliderSnapToMarks', description: '是否只能滑动到刻度上', type: 'boolean', default: 'false' },
+        { name: 'sliderTipFormatter', description: '提示格式化函数', type: '(value: number) => string', default: 'null' },
+        { name: 'sliderLabelTemplate', description: '刻度标签模板', type: 'TemplateRef<any>', default: 'null' }
       ]
     },
     {
@@ -116,7 +117,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="value" 
-      [trackColor]="'#ff4d4f'">
+      [sliderTrackColor]="'#ff4d4f'">
     </lib-slider>
     <p>当前值: {{ value }}</p>
   \`,
@@ -138,9 +139,9 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="value"
-      [step]="10"
-      [min]="0"
-      [max]="100">
+      [sliderStep]="10"
+      [sliderMin]="0"
+      [sliderMax]="100">
     </lib-slider>
     <p>当前值: {{ value }}</p>
   \`,
@@ -162,7 +163,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="value"
-      [isRange]="true">
+      [sliderIsRange]="true">
     </lib-slider>
     <p>当前范围: [{{ value[0] }}, {{ value[1] }}]</p>
   \`,
@@ -184,13 +185,13 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="marksValue"
-      [marks]="sliderMarks">
+      [sliderMarks]="sliderMarks">
     </lib-slider>
     <p class="example-value">当前值: {{ marksValue }}</p>
     <lib-slider 
       [(ngModel)]="marksValue"
-      [marks]="sliderMarks"
-      [labelTemplate]="customMarkLabel">
+      [sliderMarks]="sliderMarks"
+      [sliderLabelTemplate]="customMarkLabel">
     </lib-slider>
     <ng-template #customMarkLabel let-mark>
       <div style="color: #1890ff;">{{ mark.label }}</div>
@@ -221,8 +222,8 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="value"
-      [marks]="sliderMarks"
-      [snapToMarks]="true">
+      [sliderMarks]="sliderMarks"
+      [sliderSnapToMarks]="true">
     </lib-slider>
     <p>当前值: {{ value }}</p>
   \`,
@@ -251,7 +252,7 @@ import { FormsModule } from '@angular/forms';
   template: \`
     <lib-slider 
       [(ngModel)]="value"
-      [tipFormatter]="formatTooltip">
+      [sliderTipFormatter]="formatTooltip">
     </lib-slider>
     <p>当前值: {{ value }}</p>
   \`,

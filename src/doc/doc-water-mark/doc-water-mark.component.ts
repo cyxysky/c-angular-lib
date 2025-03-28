@@ -44,29 +44,29 @@ export class DocWaterMarkComponent {
     {
       title: '水印组件属性',
       items: [
-        { name: 'text', description: '水印文本内容', type: 'string', default: '\'水印文字\'' },
-        { name: 'fontColor', description: '水印文字颜色', type: 'string', default: '\'rgba(0, 0, 0, 0.15)\'' },
-        { name: 'fontSize', description: '水印文字大小', type: 'number', default: '16' },
-        { name: 'fontFamily', description: '水印文字字体', type: 'string', default: '\'Microsoft YaHei, PingFang SC, Arial, sans-serif\'' },
-        { name: 'fontWeight', description: '水印文字粗细', type: 'string', default: '\'200\'' },
-        { name: 'gap', description: '水印之间的间距', type: 'number', default: '60' },
-        { name: 'zIndex', description: '水印层级', type: 'number', default: '9999' },
-        { name: 'rotate', description: '水印旋转角度', type: 'number', default: '-22' },
-        { name: 'width', description: '单个水印宽度', type: 'number', default: '350' },
-        { name: 'height', description: '单个水印高度', type: 'number', default: '180' },
-        { name: 'offsetLeft', description: '水印横向偏移', type: 'number', default: '0' },
-        { name: 'offsetTop', description: '水印纵向偏移', type: 'number', default: '0' },
-        { name: 'imageBase64', description: '图片水印的Base64字符串或URL', type: 'string | null', default: 'null' }
+        { name: 'waterMarkText', description: '水印文本内容', type: 'string', default: '\'水印文字\'' },
+        { name: 'waterMarkFontColor', description: '水印文字颜色', type: 'string', default: '\'rgba(0, 0, 0, 0.15)\'' },
+        { name: 'waterMarkFontSize', description: '水印文字大小', type: 'number', default: '16' },
+        { name: 'waterMarkFontFamily', description: '水印文字字体', type: 'string', default: '\'Microsoft YaHei, PingFang SC, Arial, sans-serif\'' },
+        { name: 'waterMarkFontWeight', description: '水印文字粗细', type: 'string', default: '\'200\'' },
+        { name: 'waterMarkGap', description: '水印之间的间距', type: 'number', default: '60' },
+        { name: 'waterMarkZIndex', description: '水印层级', type: 'number', default: '9999' },
+        { name: 'waterMarkRotate', description: '水印旋转角度', type: 'number', default: '-22' },
+        { name: 'waterMarkWidth', description: '单个水印宽度', type: 'number', default: '350' },
+        { name: 'waterMarkHeight', description: '单个水印高度', type: 'number', default: '180' },
+        { name: 'waterMarkOffsetLeft', description: '水印横向偏移', type: 'number', default: '0' },
+        { name: 'waterMarkOffsetTop', description: '水印纵向偏移', type: 'number', default: '0' },
+        { name: 'waterMarkImageBase64', description: '图片水印的Base64字符串或URL', type: 'string | null', default: 'null' }
       ]
     },
     {
       title: '水印指令属性',
       items: [
         { name: 'libWaterMarkDirective', description: '水印指令选择器', type: 'directive', default: '-' },
-        { name: '[text]', description: '水印文本内容', type: 'string', default: '\'水印文字\'' },
-        { name: '[fontColor]', description: '水印文字颜色', type: 'string', default: '\'rgba(0, 0, 0, 0.15)\'' },
-        { name: '[fontSize]', description: '水印文字大小', type: 'number', default: '16' },
-        { name: '[imageBase64]', description: '图片水印的Base64字符串或URL', type: 'string | null', default: 'null' }
+        { name: '[waterMarkText]', description: '水印文本内容', type: 'string', default: '\'水印文字\'' },
+        { name: '[waterMarkFontColor]', description: '水印文字颜色', type: 'string', default: '\'rgba(0, 0, 0, 0.15)\'' },
+        { name: '[waterMarkFontSize]', description: '水印文字大小', type: 'number', default: '16' },
+        { name: '[waterMarkImageBase64]', description: '图片水印的Base64字符串或URL', type: 'string | null', default: 'null' }
       ]
     }
   ];
@@ -82,7 +82,7 @@ import { WaterMarkComponent } from '@project/water-mark';
   standalone: true,
   imports: [WaterMarkComponent],
   template: \`
-    <lib-water-mark [text]="'公司内部文件'">
+    <lib-water-mark [waterMarkText]="'公司内部文件'">
       <div style="height: 300px;width: 100%;padding: 20px;">
         <h3>水印组件基本使用</h3>
         <p>水印将显示在这个区域内部</p>
@@ -105,10 +105,10 @@ import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, N
   imports: [FormsModule, WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, NumberInputComponent],
   template: \`
     <lib-water-mark 
-      [text]="customText" 
-      [fontColor]="customColor"
-      [fontSize]="fontSize"
-      [rotate]="rotation">
+      [waterMarkText]="customText" 
+      [waterMarkFontColor]="customColor"
+      [waterMarkFontSize]="fontSize"
+      [waterMarkRotate]="rotation">
       <div style="height: 300px;width: 100%;padding: 20px;">
         <h3>自定义水印样式</h3>
         <p>可以调整下方参数查看效果</p>
@@ -126,11 +126,11 @@ import { WaterMarkComponent, InputComponent, SelectComponent, OptionComponent, N
         </div>
         <div class="control-row">
           <label>字体大小：</label>
-          <lib-number-input [(ngModel)]="fontSize" [min]="8" [max]="32"></lib-number-input>
+          <lib-number-input [(ngModel)]="fontSize" [numberInputMin]="8" [numberInputMax]="32"></lib-number-input>
         </div>
         <div class="control-row">
           <label>旋转角度：</label>
-          <lib-number-input [(ngModel)]="rotation" [min]="-90" [max]="90"></lib-number-input>
+          <lib-number-input [(ngModel)]="rotation" [numberInputMin]="-90" [numberInputMax]="90"></lib-number-input>
         </div>
       </div>
     </lib-water-mark>
@@ -167,8 +167,8 @@ import { WaterMarkComponent } from '@project/water-mark';
   imports: [WaterMarkComponent],
   template: \`
     <lib-water-mark 
-      [text]="'公司内部文件'" 
-      [imageBase64]="logoUrl">
+      [waterMarkText]="'公司内部文件'" 
+      [waterMarkImageBase64]="logoUrl">
       <div style="height: 300px;width: 100%;padding: 20px;">
         <h3>图片水印</h3>
         <p>结合图片和文字实现品牌水印</p>
@@ -194,7 +194,7 @@ import { WaterMarkDirectiveDirective } from '@project/water-mark';
   template: \`
     <div style="height: 300px;width: 100%;padding: 20px;" 
          libWaterMarkDirective 
-         [text]="'水印指令应用'">
+         [waterMarkText]="'水印指令应用'">
       <h3>水印指令</h3>
       <p>可以直接在任意元素上应用水印指令</p>
     </div>
@@ -214,7 +214,7 @@ import { WaterMarkComponent, ButtonComponent } from '@project/water-mark';
   standalone: true,
   imports: [CommonModule, WaterMarkComponent, ButtonComponent],
   template: \`
-    <lib-water-mark [text]="'防篡改水印'" [fontColor]="'rgba(233, 66, 66, 0.2)'">
+    <lib-water-mark [waterMarkText]="'防篡改水印'" [waterMarkFontColor]="'rgba(233, 66, 66, 0.2)'">
       <div style="height: 300px;width: 100%;padding: 20px;">
         <h3>防篡改功能</h3>
         <p>尝试使用开发者工具删除或修改水印元素，水印将自动恢复</p>
