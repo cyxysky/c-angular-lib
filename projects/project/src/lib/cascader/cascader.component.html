@@ -33,7 +33,6 @@
                 (ngModelChange)="onSearch($event)"
                 (compositionstart)="onCompositionChange($event)"
                 (compositionend)="onCompositionChange($event)" 
-                (keydown)="handleKeydown($event)" 
                 [disabled]="disabled"/>
             <span class="search-text" #searchText>{{ searchValue }}</span>
         </div>
@@ -90,7 +89,7 @@
                 <div *ngFor="let option of filteredOptions; index as i" 
                       class="search-option"
                       [class.disabled]="option.disabled"
-                      [class.selected]="isOptionSelected(option)"
+                      [class.selected]="option.checked"
                       [class.keyboard-active]="keyboardNavIndex === i"
                       (click)="onSearchOptionClick(option)">
                     <div class="option-path">
@@ -103,9 +102,9 @@
                     </div>
                     <div *ngIf="isMultiple" class="checkbox">
                         <input type="checkbox" 
-                                [checked]="isOptionSelected(option)" 
-                                [disabled]="option.disabled || option.disableCheckbox" 
-                                (click)="$event.stopPropagation()">
+                               [checked]="option.checked" 
+                               [disabled]="option.disabled || option.disableCheckbox" 
+                               (click)="$event.stopPropagation()">
                     </div>
                 </div>
             </div>
@@ -119,8 +118,8 @@
                         class="cascader-menu-item" 
                         [class.cascader-menu-item-active]="isOptionActivated(option, i)"
                         [class.cascader-menu-item-disabled]="option.disabled"
-                        [class.cascader-menu-item-selected]="isOptionTempSelected(option, i)"
-                        [class.cascader-menu-item-indeterminate]="isOptionIndeterminate(option)"
+                        [class.cascader-menu-item-selected]="isOptionTempSelected(option, i) || (isMultiple && option.checked)"
+                        [class.cascader-menu-item-indeterminate]="isMultiple && option.halfChecked"
                         [class.cascader-menu-item-loading]="option.loading"
                         (click)="onOptionClick(option, i, $event)"
                         (mouseenter)="onOptionMouseEnter(option, i)">
@@ -128,10 +127,10 @@
                             <!-- 复选框 -->
                             <ng-container *ngIf="isMultiple && checkable">
                                 <span class="cascader-checkbox" 
-                                      [class.cascader-checkbox-checked]="isOptionSelected(option)"
-                                      [class.cascader-checkbox-indeterminate]="isOptionIndeterminate(option)">
+                                      [class.cascader-checkbox-checked]="option.checked"
+                                      [class.cascader-checkbox-indeterminate]="option.halfChecked">
                                     <input type="checkbox" 
-                                           [checked]="isOptionSelected(option)" 
+                                           [checked]="option.checked" 
                                            [disabled]="option.disabled || option.disableCheckbox"
                                            (click)="onCheckboxClick(option, i, $event)">
                                     <span class="checkbox-inner"></span>
@@ -155,7 +154,7 @@
                                 </svg>
                             </span>
                             
-                            <!-- 修复：增加清晰的指示器，显示是否有子项 -->
+                            <!-- 子项指示器 -->
                             <span *ngIf="hasChildren(option)" class="cascader-menu-item-expand-icon">
                                 <i class="bi bi-chevron-right"></i>
                             </span>
