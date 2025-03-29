@@ -6,6 +6,8 @@
                     <li nz-menu-group>
                         <ul>
                             <li nz-menu-item nzSelected (click)="nowComponent.set('button')">按钮</li>
+                            <li nz-menu-item (click)="nowComponent.set('select')">选择器</li>
+                            <li nz-menu-item (click)="nowComponent.set('cascader')">级联选择器</li>
                             <li nz-menu-item (click)="nowComponent.set('input')">输入</li>
                             <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
                             <li nz-menu-item (click)="nowComponent.set('switch')">开关</li>
@@ -100,6 +102,12 @@
         }
         @case ('popconfirm') {
         <app-doc-popconfirm></app-doc-popconfirm>
+        }
+        @case ('select') {
+        <app-doc-select></app-doc-select>
+        }
+        @case ('cascader') {
+        <app-doc-cascader></app-doc-cascader>
         }
         }
     </div>

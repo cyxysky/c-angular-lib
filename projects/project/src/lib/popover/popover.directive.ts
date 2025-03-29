@@ -58,7 +58,6 @@ export class PopoverDirective implements OverlayBasicDirective {
     }
   }
 
-
   ngOnInit(): void {
     // 初始化时如果visible为true，则显示tooltip
     if (this.visible) {

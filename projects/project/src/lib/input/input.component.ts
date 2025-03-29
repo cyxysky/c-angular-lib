@@ -22,6 +22,7 @@ export type InputStatus = 'error' | 'warning' | '';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
+  //#region 输入属性 (Inputs)
   /** 输入框大小 */
   size = input<InputSize>('default', { alias: 'inputSize' });
   /** 输入框前缀 */
@@ -62,15 +63,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   pattern = input<((value: string) => boolean) | RegExp | null>(null, { alias: 'inputPattern' });
   /** 输入框自动完成 */
   autocomplete = input<string>('off', { alias: 'inputAutocomplete' });
-  
-  /** 内部状态 */
-  hasFocus = signal<boolean>(false);
-  paddingLeft = signal<number>(11);
-  paddingRight = signal<number>(11);
-  
-  /** 错误信息 */
-  error = '';
+  //#endregion
 
+  //#region 输出属性 (Outputs)
   /** 输入框获得焦点事件 */
   @Output() focus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
   /** 输入框失去焦点事件 */
@@ -85,10 +80,22 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Output() click: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
   /** 值变更事件 */
   @Output() valueChange: EventEmitter<any> = new EventEmitter<any>();
+  //#endregion
 
+  //#region 内部状态变量
+  /** 焦点状态 */
+  hasFocus = signal<boolean>(false);
+  /** 左内边距 */
+  paddingLeft = signal<number>(11);
+  /** 右内边距 */
+  paddingRight = signal<number>(11);
+  /** 错误信息 */
+  error = '';
   /** 内部数据 */
   _data: any = '';
+  //#endregion
 
+  //#region 生命周期钩子
   ngOnInit(): void {
     // 初始化时计算左右内边距
     this.calculatePadding();
@@ -100,51 +107,59 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
       this.calculatePadding();
     }
   }
+  //#endregion
 
-  /** 事件处理方法 */
+  //#region 事件处理方法
+  /**
+   * 获得焦点事件处理
+   */
   onFocus(event: FocusEvent): void {
     this.hasFocus.set(true);
     this.focus.emit(event);
     this.onTouched();
   }
 
+  /**
+   * 失去焦点事件处理
+   */
   onBlur(event: FocusEvent): void {
     this.hasFocus.set(false);
     this.blur.emit(event);
   }
 
+  /**
+   * 键盘按下事件处理
+   */
   onKeyDown(event: KeyboardEvent): void {
     this.keydown.emit(event);
   }
 
+  /**
+   * 键盘弹起事件处理
+   */
   onKeyUp(event: KeyboardEvent): void {
     this.keyup.emit(event);
   }
 
+  /**
+   * 键盘按下事件处理
+   */
   onKeyPress(event: KeyboardEvent): void {
     this.keypress.emit(event);
   }
 
+  /**
+   * 鼠标点击事件处理
+   */
   onClick(event: MouseEvent): void {
     this.click.emit(event);
   }
+  //#endregion
 
-  /** 计算内边距 */
-  calculatePadding(): void {
-    // 默认左右内边距
-    let left = 12;
-    let right = 12;
-
-    // 根据后缀和清除图标调整右内边距
-    if (this.suffix() || this.suffixIcon()) {
-      right = 12;
-    }
-
-    this.paddingLeft.set(left);
-    this.paddingRight.set(right);
-  }
-
-  /** 值变更处理 */
+  //#region 数据处理方法
+  /**
+   * 值变更处理
+   */
   changeValue(value: any): void {
     // 验证输入值
     if (this.pattern()) {
@@ -167,20 +182,45 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
     this.valueChange.emit(value);
   }
 
-  /** 清除输入内容 */
+  /**
+   * 清除输入内容
+   */
   clear(event: MouseEvent): void {
     event.stopPropagation();
     this.setAndSubmitData('');
   }
 
-  /** 设置并提交数据 */
+  /**
+   * 设置并提交数据
+   */
   setAndSubmitData(value: any): void {
     this._data = value;
     this.onChange(this._data);
     this.valueChange.emit(this._data);
   }
+  //#endregion
 
-  /** 计算字符统计 */
+  //#region 工具方法
+  /**
+   * 计算内边距
+   */
+  calculatePadding(): void {
+    // 默认左右内边距
+    let left = 12;
+    let right = 12;
+
+    // 根据后缀和清除图标调整右内边距
+    if (this.suffix() || this.suffixIcon()) {
+      right = 12;
+    }
+
+    this.paddingLeft.set(left);
+    this.paddingRight.set(right);
+  }
+
+  /**
+   * 计算字符统计
+   */
   getCharCount(): string {
     const count = this._data?.length || 0;
     if (this.maxlength()) {
@@ -189,7 +229,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
     return `${count}`;
   }
 
-  /** 获取元素类名 */
+  /**
+   * 获取元素类名
+   */
   getInputClass(): string {
     const classNames = ['lib-input'];
     if (this.size() === 'small') classNames.push('lib-input-sm');
@@ -203,24 +245,40 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
     
     return classNames.join(' ');
   }
+  //#endregion
 
-  /** ngModel注册事件 */
+  //#region ControlValueAccessor 实现
+  /** 值变更处理函数 */
   public onChange: any = (value: any) => { };
+  /** 触摸处理函数 */
   public onTouched: any = () => { };
   
+  /**
+   * 写入值
+   */
   writeValue(obj: any): void {
     this._data = obj ?? '';
   }
   
+  /**
+   * 注册变更处理函数
+   */
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
   
+  /**
+   * 注册触摸处理函数
+   */
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
   
+  /**
+   * 设置禁用状态
+   */
   setDisabledState?(isDisabled: boolean): void {
     // 使用输入信号不需要在这里设置
   }
+  //#endregion
 }

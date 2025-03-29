@@ -81,32 +81,19 @@ export class OverlayService {
 
   public getPositions(placement: string): ConnectedPosition[] {
     const positions: ConnectedPosition[] = [];
-
-    // 定义所有可能的主要位置配置
-
-
     // 添加主位置
     if (OverlayBasicPositionConfigs[placement]) {
       positions.push(OverlayBasicPositionConfigs[placement]);
     }
-
     // 确定备用位置策略
     const mainDirections = ['top', 'bottom', 'left', 'right'];
     let backupDirections = [];
-    
-    // 获取当前placement的主方向
-    const currentMainDirection = mainDirections.find(dir => placement.includes(dir)) || '';
-    
-    // 备用位置包含除当前主方向外的其他主方向
     backupDirections = mainDirections.filter(dir => !placement.includes(dir));
-    
-    // 添加备用位置
     backupDirections.forEach(dir => {
       if (OverlayBasicPositionConfigs[dir]) {
         positions.push(OverlayBasicPositionConfigs[dir]);
       }
     });
-    
     // 对于复合方向（如 'top-left'），还需添加相关的复合备用位置
     if (placement.includes('-')) {
       const parts = placement.split('-');
@@ -121,7 +108,18 @@ export class OverlayService {
         });
       }
     }
-
     return positions;
+  }
+
+  /**
+   * 异步更新浮层位置
+   * @param overlayRef 浮层引用
+   * @param time 延迟时间
+   */
+  public asyncUpdateOverlayPosition(overlayRef: OverlayRef | null, time: number = 10  ) {
+    let timer = setTimeout(() => {
+      overlayRef && overlayRef.updatePosition();
+      clearTimeout(timer);
+    }, time);
   }
 }

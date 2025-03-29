@@ -17,6 +17,7 @@ import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/f
   ]
 })
 export class NumberInputComponent implements ControlValueAccessor {
+  //#region 输入属性 (Inputs)
   /** 最小值 */
   min = input<number | null>(null, { alias: 'numberInputMin' });
   /** 最大值 */
@@ -45,16 +46,23 @@ export class NumberInputComponent implements ControlValueAccessor {
   status = input<'normal' | 'error' | 'warning'>('normal', { alias: 'numberInputStatus' });
   /** 格式化函数 */
   formatter = input<(value: number) => any>(value => value, { alias: 'numberInputFormatter' });
-  
-  // 内部状态
+  //#endregion
+
+  //#region 内部状态变量
+  /** 当前值 */
   valueSignal = signal<number | null>(null);
+  /** 是否获得焦点 */
   focused = signal<boolean>(false);
+  /** 输入框值 */
   inputValue = signal<number | null>(null);
 
+  /** 状态CSS类 */
   statusClass = computed(() => {
-    return this.status() === 'error' ? 'lib-number-input-error' : this.status() === 'warning' ? 'lib-number-input-warning' : '';
-  })
-  // 计算属性
+    return this.status() === 'error' ? 'lib-number-input-error' : 
+           this.status() === 'warning' ? 'lib-number-input-warning' : '';
+  });
+
+  /** 显示值（经过格式化处理） */
   displayValue = computed(() => {
     const value = this.valueSignal();
     if (value === null) return '';
@@ -65,37 +73,12 @@ export class NumberInputComponent implements ControlValueAccessor {
     }
     return formattedValue;
   });
+  //#endregion
 
-  // ControlValueAccessor 接口实现
-  private onChange: (value: number | null) => void = () => {};
-  private onTouched: () => void = () => {};
-
-  writeValue(value: number | null): void {
-    // 确保新值符合精度要求
-    if (value !== null) {
-      const precision = this.precision();
-      if (precision >= 0) {
-        value = parseFloat(value.toFixed(precision));
-      }
-    }
-    
-    this.valueSignal.set(value);
-    this.updateInputValue();
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    // 由于使用信号API，我们不能直接修改input信号
-  }
-
-  // 组件方法
+  //#region 业务方法
+  /**
+   * 增加值
+   */
   increase(): void {
     if (this.disabled() || this.readonly()) return;
     
@@ -114,6 +97,9 @@ export class NumberInputComponent implements ControlValueAccessor {
     this.setValue(newValue);
   }
 
+  /**
+   * 减少值
+   */
   decrease(): void {
     if (this.disabled() || this.readonly()) return;
     
@@ -132,6 +118,9 @@ export class NumberInputComponent implements ControlValueAccessor {
     this.setValue(newValue);
   }
   
+  /**
+   * 设置值
+   */
   setValue(value: number | null): void {
     if (value !== null) {
       // 限制在min和max范围内
@@ -157,8 +146,11 @@ export class NumberInputComponent implements ControlValueAccessor {
     }
   }
 
+  /**
+   * 模型值变更处理
+   */
   onModelChange(value: number): void {
-        // 处理空值
+    // 处理空值
     if (value === null) {
       this.setValue(null);
       return;
@@ -185,6 +177,9 @@ export class NumberInputComponent implements ControlValueAccessor {
     }
   }
 
+  /**
+   * 失去焦点事件处理
+   */
   onBlur(): void {
     this.focused.set(false);
     this.onTouched();
@@ -196,11 +191,18 @@ export class NumberInputComponent implements ControlValueAccessor {
     }
   }
 
+  /**
+   * 获得焦点事件处理
+   */
   onFocus(): void {
     this.focused.set(true);
   }
+  //#endregion
 
-  // 辅助方法
+  //#region 工具方法
+  /**
+   * 更新输入框值
+   */
   private updateInputValue(): void {
     const value = this.valueSignal();
     if (value === null) {
@@ -215,4 +217,47 @@ export class NumberInputComponent implements ControlValueAccessor {
       }
     }
   }
+  //#endregion
+
+  //#region ControlValueAccessor 实现
+  private onChange: (value: number | null) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  /**
+   * 写入值
+   */
+  writeValue(value: number | null): void {
+    // 确保新值符合精度要求
+    if (value !== null) {
+      const precision = this.precision();
+      if (precision >= 0) {
+        value = parseFloat(value.toFixed(precision));
+      }
+    }
+    
+    this.valueSignal.set(value);
+    this.updateInputValue();
+  }
+
+  /**
+   * 注册变更处理函数
+   */
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  /**
+   * 注册触摸处理函数
+   */
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  /**
+   * 设置禁用状态
+   */
+  setDisabledState(isDisabled: boolean): void {
+    // 由于使用信号API，我们不能直接修改input信号
+  }
+  //#endregion
 }

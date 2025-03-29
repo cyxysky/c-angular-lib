@@ -1,0 +1,174 @@
+<div class="cascader-box" 
+    [class.cascader-sm]="size === 'small'" 
+    [class.cascader-lg]="size === 'large'"
+    [class.cascader-borderless]="borderless" 
+    [class.cascader-error]="status === 'error'"
+    [class.cascader-warning]="status === 'warning'" 
+    [class.cascader-disabled]="disabled"
+    [class.cascader-open]="isDropdownOpen"
+    (click)="toggleDropdown($event)" 
+    [style.min-width]="minWidth" 
+    cdkOverlayOrigin
+    (mouseenter)="expandTrigger === 'hover' && openDropdown()"
+    (mouseleave)="expandTrigger === 'hover' && closeDropdown()">
+    <div class="cascader-content">
+        <div class="placeholder" *ngIf="(!value || (isArray(value) && value.length === 0)) && !searchValue">
+            {{ placeholder }}
+        </div>
+        <div class="cascader-labels" *ngIf="!isMultiple && displayLabels.length > 0 && !searchValue">
+            <span class="label-text">{{ displayLabels.join(' / ') }}</span>
+        </div>
+        <ng-container *ngIf="isMultiple && displayTags.length > 0 && !searchValue">
+            <div class="cascader-tag" *ngFor="let tag of displayTags">
+                <div class="cascader-tag-text">{{ tag.label }}</div>
+                <div class="cascader-tag-close-icon" (click)="removeItem($event, tag.value)">
+                    <i class="bi bi-x"></i>
+                </div>
+            </div>
+        </ng-container>
+        
+        <!-- 搜索框 -->
+        <div #searchBox class="search-box" *ngIf="showSearch">
+            <input class="search-input" #searchInput [(ngModel)]="searchValue" 
+                (ngModelChange)="onSearch($event)"
+                (compositionstart)="onCompositionChange($event)"
+                (compositionend)="onCompositionChange($event)" 
+                (keydown)="handleKeydown($event)" 
+                [disabled]="disabled"/>
+            <span class="search-text" #searchText>{{ searchValue }}</span>
+        </div>
+    </div>
+    
+    <!-- 后缀图标 -->
+    <div class="suffix-box">
+        <!-- 加载图标 -->
+        <div *ngIf="loading" class="loading-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                class="loading-svg">
+                <path
+                    d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-14.75A6.75 6.75 0 1 1 1.5 8c0 3.693 3.007 6.75 6.75 6.75S15 11.693 15 8A6.75 6.75 0 0 0 8.25 1.25z"
+                    fill-opacity="0" />
+                <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
+            </svg>
+        </div>
+        <!-- 搜索图标 -->
+        <i class="bi bi-search" *ngIf="!loading && showSearch && isDropdownOpen"></i>
+        <!-- 下拉图标 -->
+        <i class="bi bi-caret-down-fill cascader-icon" *ngIf="!loading && !showSearch" 
+           [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
+        <!-- 清除图标 -->
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && ((isMultiple && displayTags.length) || (!isMultiple && displayLabels.length) || searchValue)" 
+           (click)="clear($event)"></i>
+    </div>
+</div>
+
+<ng-template #dropdownTemplate>
+    <div class="cascader-dropdown" 
+         [class.open]="isDropdownOpen" 
+         [class.closed]="!isDropdownOpen"
+         [style.min-width]="menuWidth + 'px'">
+        <!-- 搜索结果列表 -->
+        <div *ngIf="showSearch && searchValue" class="search-result-list">
+            <div *ngIf="loading" class="search-loading">
+                <div class="loading-text">搜索中...</div>
+            </div>
+            <div *ngIf="!loading && filteredOptions.length === 0" class="empty-options">
+                <div class="empty-container">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="empty-text">暂无匹配数据</div>
+                </div>
+            </div>
+            <div *ngIf="!loading && filteredOptions.length > 0" class="search-options">
+                <div *ngFor="let option of filteredOptions; index as i" 
+                      class="search-option"
+                      [class.disabled]="option.disabled"
+                      [class.selected]="isOptionSelected(option)"
+                      [class.keyboard-active]="keyboardNavIndex === i"
+                      (click)="onSearchOptionClick(option)">
+                    <div class="option-path">
+                        <ng-container *ngIf="optionLabelTemplate">
+                            <ng-container *ngTemplateOutlet="optionLabelTemplate; context: {$implicit: option, index: i, path: option.path}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="!optionLabelTemplate">
+                            {{ getOptionPath(option) }}
+                        </ng-container>
+                    </div>
+                    <div *ngIf="isMultiple" class="checkbox">
+                        <input type="checkbox" 
+                                [checked]="isOptionSelected(option)" 
+                                [disabled]="option.disabled || option.disableCheckbox" 
+                                (click)="$event.stopPropagation()">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 级联菜单 -->
+        <div *ngIf="!searchValue" class="cascader-menus">
+            <ul *ngFor="let column of columns; index as i" class="cascader-menu">
+                <ng-container *ngIf="column && column.length > 0; else emptyMenu">
+                    <li *ngFor="let option of column; index as j" 
+                        class="cascader-menu-item" 
+                        [class.cascader-menu-item-active]="isOptionActivated(option, i)"
+                        [class.cascader-menu-item-disabled]="option.disabled"
+                        [class.cascader-menu-item-selected]="isOptionTempSelected(option, i)"
+                        [class.cascader-menu-item-indeterminate]="isOptionIndeterminate(option)"
+                        [class.cascader-menu-item-loading]="option.loading"
+                        (click)="onOptionClick(option, i, $event)"
+                        (mouseenter)="onOptionMouseEnter(option, i)">
+                        <div class="cascader-menu-item-content">
+                            <!-- 复选框 -->
+                            <ng-container *ngIf="isMultiple && checkable">
+                                <span class="cascader-checkbox" 
+                                      [class.cascader-checkbox-checked]="isOptionSelected(option)"
+                                      [class.cascader-checkbox-indeterminate]="isOptionIndeterminate(option)">
+                                    <input type="checkbox" 
+                                           [checked]="isOptionSelected(option)" 
+                                           [disabled]="option.disabled || option.disableCheckbox"
+                                           (click)="onCheckboxClick(option, i, $event)">
+                                    <span class="checkbox-inner"></span>
+                                </span>
+                            </ng-container>
+                            
+                            <!-- 标签 -->
+                            <span class="cascader-menu-item-label">
+                                <ng-container *ngIf="optionTemplate">
+                                    <ng-container *ngTemplateOutlet="optionTemplate; context: {$implicit: option, index: j, level: i}"></ng-container>
+                                </ng-container>
+                                <ng-container *ngIf="!optionTemplate">
+                                    {{ option[labelProperty] }}
+                                </ng-container>
+                            </span>
+                            
+                            <!-- 加载图标 -->
+                            <span *ngIf="option.loading" class="cascader-menu-item-loading-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" class="loading-svg">
+                                    <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
+                                </svg>
+                            </span>
+                            
+                            <!-- 修复：增加清晰的指示器，显示是否有子项 -->
+                            <span *ngIf="hasChildren(option)" class="cascader-menu-item-expand-icon">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+                        </div>
+                    </li>
+                </ng-container>
+                
+                <ng-template #emptyMenu>
+                    <li class="cascader-menu-item-empty">
+                        <span>暂无数据</span>
+                    </li>
+                </ng-template>
+            </ul>
+        </div>
+    </div>
+</ng-template>

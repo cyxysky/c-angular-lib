@@ -1,0 +1,327 @@
+<div class="doc-container">
+    <h1 class="doc-title">级联选择器 Cascader</h1>
+    
+    <p class="doc-description">
+      级联选择框，用于从有层级关系的一组选项中进行选择。
+    </p>
+    
+    <h2 class="doc-section-title">何时使用</h2>
+    <p class="doc-description">
+      当需要从一组相关联的数据集合进行选择时，例如省市区、公司部门、分类目录等具有层级结构的数据。
+    </p>
+    
+    <h2 class="doc-section-title">代码演示</h2>
+    
+    <div class="doc-grid">
+      <!-- 基本用法 -->
+      <app-doc-box
+        title="基本用法"
+        [sourceCode]="basicSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="selectedValue"
+            [options]="options"
+            placeholder="请选择">
+          </lib-cascader>
+          <div *ngIf="selectedValue && selectedValue.length" class="example-value">
+            当前选择: {{ getDisplayText(selectedValue) }}
+          </div>
+        </div>
+        <div description>
+          最简单的用法，通过点击展开下级菜单，逐级进行选择。
+        </div>
+      </app-doc-box>
+      
+      <!-- 不同大小 -->
+      <app-doc-box
+        title="三种大小"
+        [sourceCode]="sizeSource">
+        <div demo>
+          <div class="size-container">
+            <lib-cascader
+              size="large"
+              [(ngModel)]="selectedSizes.large"
+              [options]="options"
+              placeholder="大号级联选择">
+            </lib-cascader>
+            
+            <lib-cascader
+              [(ngModel)]="selectedSizes.default"
+              [options]="options"
+              placeholder="默认大小">
+            </lib-cascader>
+            
+            <lib-cascader
+              size="small"
+              [(ngModel)]="selectedSizes.small"
+              [options]="options"
+              placeholder="小号级联选择">
+            </lib-cascader>
+          </div>
+        </div>
+        <div description>
+          提供大、中、小三种尺寸的级联选择框。
+        </div>
+      </app-doc-box>
+      
+      <!-- 移入展开 -->
+      <app-doc-box
+        title="移入展开"
+        [sourceCode]="hoverExpandSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="hoverValue"
+            [options]="options"
+            expandTrigger="hover"
+            placeholder="鼠标移入展开菜单">
+          </lib-cascader>
+          <div *ngIf="hoverValue && hoverValue.length" class="example-value">
+            当前选择: {{ getDisplayText(hoverValue) }}
+          </div>
+        </div>
+        <div description>
+          通过鼠标移入触发展开下级菜单，简化选择操作流程。
+        </div>
+      </app-doc-box>
+      
+      <!-- 选择即改变 -->
+      <app-doc-box
+        title="选择即改变"
+        [sourceCode]="changeOnSelectSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="changeOnSelectValue"
+            [options]="options"
+            [changeOnSelect]="true"
+            placeholder="选择即改变">
+          </lib-cascader>
+          <div *ngIf="changeOnSelectValue && changeOnSelectValue.length" class="example-value">
+            当前选择: {{ getDisplayText(changeOnSelectValue) }}
+          </div>
+        </div>
+        <div description>
+          选择即改变模式允许用户选择任意一级选项，不必完成整个选择流程。
+        </div>
+      </app-doc-box>
+      
+      <!-- 多选模式 -->
+      <app-doc-box
+        title="多选模式"
+        [sourceCode]="multipleSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="multipleSelected"
+            [options]="options"
+            [isMultiple]="true"
+            placeholder="请选择多个选项">
+          </lib-cascader>
+          <div *ngIf="multipleSelected && multipleSelected.length > 0" class="example-value">
+            当前选择: {{ multipleSelected.join(', ') }}
+          </div>
+        </div>
+        <div description>
+          多选模式下，用户可以选择多个选项。选中的选项会以标签的形式展示，可以单击标签删除。
+        </div>
+      </app-doc-box>
+      
+      <!-- 禁用选项 -->
+      <app-doc-box
+        title="禁用选项"
+        [sourceCode]="disabledOptionSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="disabledOptionValue"
+            [options]="disabledOptions"
+            placeholder="包含禁用选项">
+          </lib-cascader>
+          <div *ngIf="disabledOptionValue && disabledOptionValue.length" class="example-value">
+            当前选择: {{ getDisplayText(disabledOptionValue) }}
+          </div>
+        </div>
+        <div description>
+          通过指定 options 里的 disabled 字段可以禁用特定选项，禁用的选项不可被选择。
+        </div>
+      </app-doc-box>
+      
+      <!-- 搜索功能 -->
+      <app-doc-box
+        title="搜索功能"
+        [sourceCode]="searchSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="searchSelected"
+            [options]="largeOptions"
+            [showSearch]="true"
+            placeholder="支持搜索的级联选择框">
+          </lib-cascader>
+          <div *ngIf="searchSelected && searchSelected.length" class="example-value">
+            当前选择: {{ getDisplayText(searchSelected) }}
+          </div>
+        </div>
+        <div description>
+          支持搜索的级联选择器，可以通过输入关键字快速筛选和定位选项。
+        </div>
+      </app-doc-box>
+      
+      <!-- 自定义字段名 -->
+      <app-doc-box
+        title="自定义字段名"
+        [sourceCode]="customFieldSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="customFieldValue"
+            [options]="customFieldOptions"
+            [fieldNames]="customFields"
+            placeholder="自定义字段名">
+          </lib-cascader>
+          <div *ngIf="customFieldValue && customFieldValue.length" class="example-value">
+            当前选择: {{ getDisplayText(customFieldValue) }}
+          </div>
+        </div>
+        <div description>
+          可以自定义字段名，适配不同格式的数据源。
+        </div>
+      </app-doc-box>
+      
+      <!-- 自定义选择函数 -->
+      <app-doc-box
+        title="自定义选择函数"
+        [sourceCode]="optionSelectFnSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="optionSelectFnValue"
+            [options]="options"
+            [optionSelectFn]="customSelectFunction"
+            placeholder="自定义选择函数">
+          </lib-cascader>
+          <div *ngIf="optionSelectFnValue && optionSelectFnValue.length" class="example-value">
+            当前选择: {{ getDisplayText(optionSelectFnValue) }}
+          </div>
+          <div class="tip">示例中只允许选择城市，不允许选择省份</div>
+        </div>
+        <div description>
+          通过自定义的选择函数来判断选项是否可以选择，可以实现更灵活的业务逻辑控制。
+        </div>
+      </app-doc-box>
+      
+      <!-- 多选时禁用复选框 -->
+      <app-doc-box
+        title="禁用复选框"
+        [sourceCode]="disableCheckboxSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="disableCheckboxValue"
+            [options]="disableCheckboxOptions"
+            [isMultiple]="true"
+            placeholder="部分选项禁用复选框">
+          </lib-cascader>
+          <div *ngIf="disableCheckboxValue && disableCheckboxValue.length > 0" class="example-value">
+            当前选择: {{ disableCheckboxValue.join(', ') }}
+          </div>
+        </div>
+        <div description>
+          在多选模式下，可以为特定选项禁用复选框，通过指定 disableCheckbox 属性。
+        </div>
+      </app-doc-box>
+      
+      <!-- 自定义选项模板 -->
+      <app-doc-box
+        title="自定义选项模板"
+        [sourceCode]="customTemplateSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="customTemplateValue"
+            [options]="customOptions"
+            [optionTemplate]="customOptionTpl"
+            placeholder="自定义选项显示内容">
+          </lib-cascader>
+          
+          <ng-template #customOptionTpl let-option>
+            <div class="custom-option">
+              <i class="bi" [ngClass]="option.icon"></i>
+              <span>{{option.label}}</span>
+              <span class="option-desc" *ngIf="option.description">{{option.description}}</span>
+            </div>
+          </ng-template>
+          
+          <div *ngIf="customTemplateValue && customTemplateValue.length" class="example-value">
+            当前选择: {{ getDisplayText(customTemplateValue) }}
+          </div>
+        </div>
+        <div description>
+          通过自定义模板可以灵活定制选项的显示内容，可以添加图标、描述等丰富的信息。
+        </div>
+      </app-doc-box>
+      
+      <!-- 自定义状态 -->
+      <app-doc-box
+        title="自定义状态"
+        [sourceCode]="statusSource">
+        <div demo>
+          <div class="status-container">
+            <lib-cascader
+              [(ngModel)]="statusValues.default"
+              [options]="options"
+              placeholder="默认状态">
+            </lib-cascader>
+            
+            <lib-cascader
+              [(ngModel)]="statusValues.error"
+              [status]="'error'"
+              [options]="options"
+              placeholder="错误状态">
+            </lib-cascader>
+            
+            <lib-cascader
+              [(ngModel)]="statusValues.warning"
+              [status]="'warning'"
+              [options]="options"
+              placeholder="警告状态">
+            </lib-cascader>
+          </div>
+        </div>
+        <div description>
+          为级联选择器添加状态，可选择 error 或 warning，用于表单验证。
+        </div>
+      </app-doc-box>
+      
+      <!-- 无边框 -->
+      <app-doc-box
+        title="无边框"
+        [sourceCode]="borderlessSource">
+        <div demo>
+          <div class="borderless-container">
+            <lib-cascader
+              [borderless]="true"
+              [(ngModel)]="borderlessValue"
+              [options]="options"
+              placeholder="无边框级联选择框">
+            </lib-cascader>
+          </div>
+        </div>
+        <div description>
+          无边框样式的级联选择器，常用于嵌入在其他容器中时使用。
+        </div>
+      </app-doc-box>
+      
+      <!-- 禁用级联选择器 -->
+      <app-doc-box
+        title="禁用选择器"
+        [sourceCode]="disabledSource">
+        <div demo>
+          <lib-cascader
+            [(ngModel)]="disabledValue"
+            [options]="options"
+            [disabled]="true"
+            placeholder="禁用状态的级联选择框">
+          </lib-cascader>
+        </div>
+        <div description>
+          禁用状态的级联选择框不可点击，常用于权限控制或特定条件下禁止用户操作的场景。
+        </div>
+      </app-doc-box>
+    </div>
+    
+    <h2 class="doc-section-title">API</h2>
+    <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+  </div>

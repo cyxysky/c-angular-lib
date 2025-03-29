@@ -33,6 +33,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
 import { RadioComponent } from './radio/radio.component';
 import { SliderComponent } from './slider/slider.component';
 import { PopoverComponent } from './popover/popover.component';
+import { CascaderComponent } from './cascader/cascader.component';
 // 组件
 export * from './customer-form/customer-form.component';
 export * from './dynamic-table/dynamic-table.component';
@@ -58,6 +59,7 @@ export * from './checkbox/checkbox.component';
 export * from './radio/radio.component';  
 export * from './slider/slider.component';
 export * from './popover/popover.component';
+export * from './cascader/cascader.component';
 // 指令
 export * from './directive/widget.directive';
 export * from './water-mark/water-mark-directive.directive';
@@ -98,6 +100,7 @@ export * from './popconfirm/popconfirm.directive';
     PopoverDirective,
     PopoverComponent,
     PopconfirmDirective,
+    CascaderComponent,
   ],
   exports: [
     CustomerFormComponent,
@@ -129,6 +132,7 @@ export * from './popconfirm/popconfirm.directive';
     PopoverDirective,
     PopoverComponent,
     PopconfirmDirective,
+    CascaderComponent,
   ]
 })
 export class ProjectModule { }

@@ -1,1 +1,167 @@
-<p>select works!</p>
+<div class="select-box" 
+    [class.select-sm]="size === 'small'" 
+    [class.select-lg]="size === 'large'"
+    [class.select-borderless]="borderless" 
+    [class.select-error]="status === 'error'"
+    [class.select-warning]="status === 'warning'" 
+    [class.select-disabled]="disabled"
+    (click)="openModal()" 
+    [style.min-width]="minWidth" 
+    cdkOverlayOrigin>
+    <div class="select-content">
+        <div class="placeHolder" *ngIf="(!_data || (_data && _data.length === 0)) && !searchOnCompositionValue">
+            {{ placeHolder }}
+        </div>
+        <div class="singal-data" *ngIf="selectMode === 'single' && searchOnCompositionValue === ''"
+            [ngClass]="{'singal-data-gray': modalState === 'open'}">
+            <!-- 使用自定义模板 -->
+            <ng-container *ngIf="optionLabelTemplate && _data">
+                <ng-container *ngFor="let option of optionList">
+                    <ng-container *ngIf="option[optionValue] === _data">
+                        <ng-container *ngTemplateOutlet="optionLabelTemplate; context: getTemplateContext(option)"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+            <!-- 默认显示 -->
+            <ng-container *ngIf="!optionLabelTemplate || !_data">
+                {{ getLabel(_data) }}
+            </ng-container>
+        </div>
+        <ng-container *ngIf="selectMode === 'multiple'">
+            <div class="select-tag" *ngFor="let tag of _data;index as i">
+                <div class="select-tag-text">
+                    <!-- 使用自定义模板 -->
+                    <ng-container *ngIf="optionLabelTemplate">
+                        <ng-container *ngFor="let option of optionList">
+                            <ng-container *ngIf="option[optionValue] === tag">
+                                <ng-container *ngTemplateOutlet="optionLabelTemplate; context: getTemplateContext(option)"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <!-- 默认显示 -->
+                    <ng-container *ngIf="!optionLabelTemplate">
+                        {{ getLabel(tag) }}
+                    </ng-container>
+                </div>
+                <!-- 删除内容 -->
+                <div class="select-tag-close-icon" (click)="removeUser($event, tag)">
+                    <i class="bi bi-x"></i>
+                </div>
+            </div>
+        </ng-container>
+        <!-- 搜索框 -->
+        <div #searchBox class="search-box" *ngIf="search">
+            <input class="search-input" #searchInput [(ngModel)]="searchValue" (ngModelChange)="onSearch($event)"
+                (compositionupdate)="compositionchange($event)" (paste)="handlePaste($event)"
+                (keydown)="handleKeydown($event)" class="search-input" />
+            <span class="search-text" #searchText> {{ searchOnCompositionValue }}</span>
+        </div>
+    </div>
+    <!-- 后缀 -->
+    <div class="suffix-box">
+        <!-- 加载图标 -->
+        <div *ngIf="loading" class="loading-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                class="loading-svg">
+                <path
+                    d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-14.75A6.75 6.75 0 1 1 1.5 8c0 3.693 3.007 6.75 6.75 6.75S15 11.693 15 8A6.75 6.75 0 0 0 8.25 1.25z"
+                    fill-opacity="0" />
+                <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
+            </svg>
+        </div>
+        <!-- 搜索图标 -->
+        <i class="bi bi-search" *ngIf="!loading && search && modalState === 'open'"></i>
+        <!-- 下拉图标 -->
+        <i class="bi bi-caret-down-fill select-icon" *ngIf="!loading && !search" [ngClass]="{'select-icon-clear': allowClear}" [style.transform]="modalState === 'open' ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
+        <!-- 清除图标 -->
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading" (click)="clear($event)"></i>
+    </div>
+</div>
+
+
+<ng-template #overlay>
+    <div class="overlay-select-option-box" [class.open]="modalState === 'open'" [class.closed]="modalState === 'closed'">
+        <div [style.max-height]="optionPanelMaxHeight" class="option-list-container" id="option-list-container">
+            <!-- 搜索状态提示 -->
+            <div *ngIf="remoteLoading" class="remote-loading">
+                <div class="loading-text">搜索中...</div>
+            </div>
+            <!-- 没有选项时显示空状态 -->
+            <div *ngIf="filteredOptions.length === 0 && !remoteLoading" class="empty-options">
+                <div class="empty-container">
+                    <div >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="empty-text">暂无匹配数据</div>
+                </div>
+            </div>
+            <!-- 虚拟滚动选项列表 -->
+            <div *ngIf="filteredOptions.length > 0 && !remoteLoading" class="virtual-scroll-container">
+                <cdk-virtual-scroll-viewport 
+                    [ngStyle]="{'contain': 'unset', 'max-height': optionPanelMaxHeight + 'px'}"
+                    [minBufferPx]="optionPanelMaxHeight" 
+                    [maxBufferPx]="optionPanelMaxHeight * 2" 
+                    [itemSize]="itemSize" 
+                    class="virtual-scroll-viewport">
+                    <!-- 无分组数据 -->
+                    <ng-container *ngIf="getObjectKeys(optionsGroups).length === 0">
+                        <div 
+                            *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn"
+                            (click)="selectUser(option[optionValue], isOptionDisabled(option))"
+                            class="option" 
+                            [class.disabled]="isOptionDisabled(option) || (reachedMaxCount && !_data.includes(option[optionValue]))"
+                            [class.hidden]="hideSelected && _data.includes(option[optionValue])"
+                            [class.select-option]="_data.includes(option[optionValue])">
+                            <div class="option-text">
+                                <!-- 使用自定义模板 -->
+                                <ng-container *ngIf="optionTemplate">
+                                    <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(option)"></ng-container>
+                                </ng-container>
+                                <!-- 默认显示 -->
+                                <ng-container *ngIf="!optionTemplate">
+                                    {{ option[optionKey] }}
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!-- 有分组数据 -->
+                    <ng-container *ngIf="getObjectKeys(optionsGroups).length > 0">
+                        <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn" class="option-group">
+                            <!-- 分组标题 -->
+                            <div *ngIf="item.type === 'group'" class="group-title">{{ item.label }}</div>
+                            <!-- 分组选项 -->
+                            <div 
+                                *ngIf="item.type === 'option'"
+                                (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
+                                class="option" 
+                                [class.cursor]="(isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))) ? 'not-allowed' : 'pointer'"
+                                [class.disabled]="isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))"
+                                [class.select-option]="_data.includes(item.option[optionValue])">
+                                <div class="option-text">
+                                    <!-- 使用自定义模板 -->
+                                    <ng-container *ngIf="optionTemplate">
+                                        <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(item.option)"></ng-container>
+                                    </ng-container>
+                                    <!-- 默认显示 -->
+                                    <ng-container *ngIf="!optionTemplate">
+                                        {{ item.option[optionKey] }}
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </cdk-virtual-scroll-viewport>
+            </div>
+        </div>
+        <!-- 底部操作栏 -->
+        <ng-container *ngIf="bottomBar">
+            <ng-container *ngTemplateOutlet="bottomBar"></ng-container>
+        </ng-container>
+    </div>
+</ng-template>

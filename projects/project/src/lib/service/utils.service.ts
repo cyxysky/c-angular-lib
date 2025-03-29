@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { TemplateRef } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
@@ -7,4 +7,98 @@ export class UtilsService {
 
   constructor() { }
 
+  /**
+   * 使用防抖函数包装异步函数
+   * @param fn 需要防抖的函数
+   * @param delay 延迟时间（毫秒）
+   * @returns 包装后的防抖函数
+   */
+  debounce<T>(fn: (...args: any[]) => Promise<T>, delay: number = 300): (...args: any[]) => void {
+    let timeout: any = null;
+    let requestId: number = 0;
+    
+    return function(...args: any[]): void {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      
+      const currentRequestId = ++requestId;
+      
+      timeout = setTimeout(() => {
+        fn(...args)
+          .then((result: T) => {
+            if (currentRequestId === requestId) {
+              return result;
+            }
+            return result;
+          })
+          .catch((error) => {
+            if (currentRequestId === requestId) {
+              throw error;
+            }
+            return undefined as any;
+          });
+      }, delay);
+    };
+  }
+  
+  /**
+   * 创建记忆化函数，用于缓存相同输入的计算结果
+   * @param fn 需要记忆化的函数
+   * @returns 记忆化后的函数
+   */
+  memoize<T>(fn: (...args: any[]) => T): (...args: any[]) => T {
+    const cache = new Map();
+    
+    return function(...args: any[]): T {
+      const key = JSON.stringify(args);
+      if (cache.has(key)) {
+        return cache.get(key);
+      }
+      
+      const result = fn(...args);
+      cache.set(key, result);
+      return result;
+    };
+  }
+  
+  /**
+   * 获取对象的所有键
+   * @param obj 任意对象
+   * @returns 对象的键数组
+   */
+  getObjectKeys(obj: any): string[] {
+    return Object.keys(obj);
+  }
+  
+  /**
+   * 通用的追踪函数，用于 ngFor 的 trackBy
+   * @param index 索引
+   * @param item 项目
+   * @returns 追踪标识符
+   */
+  trackByFn(index: number, item: any): any {
+    return index;
+  }
+  
+  /**
+   * 延迟执行函数
+   * @param callback 回调函数
+   * @param delay 延迟时间（毫秒）
+   * @returns 定时器标识符
+   */
+  delayExecution(callback: () => void, delay: number = 10): any {
+    return setTimeout(() => {
+      callback();
+    }, delay);
+  }
+
+  /**
+   * 判断是否为 TemplateRef 类型
+   * @param value 需要判断的值
+   * @returns 是否为 TemplateRef 类型
+   */
+  isTemplateRef(value: any): boolean {
+    return value instanceof TemplateRef;
+  }
 }

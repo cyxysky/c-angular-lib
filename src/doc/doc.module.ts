@@ -14,6 +14,8 @@ import { DocRadioComponent } from './doc-radio/doc-radio.component';
 import { DocSliderComponent } from './doc-slider/doc-slider.component';
 import { DocPopoverComponent } from './doc-popover/doc-popover.component';
 import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.component';
+import { DocSelectComponent } from './doc-select/doc-select.component';
+import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -31,7 +33,9 @@ import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.componen
     DocRadioComponent,
     DocSliderComponent,
     DocPopoverComponent,
-    DocPopconfirmComponent
+    DocPopconfirmComponent,
+    DocSelectComponent,
+    DocCascaderComponent
   ],
   exports: [
     DocButtonComponent,
@@ -47,7 +51,9 @@ import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.componen
     DocRadioComponent,
     DocSliderComponent,
     DocPopoverComponent,
-    DocPopconfirmComponent
+    DocPopconfirmComponent,
+    DocSelectComponent,
+    DocCascaderComponent
   ]
 })
 export class DocModule { }
