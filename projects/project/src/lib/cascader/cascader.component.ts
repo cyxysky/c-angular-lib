@@ -609,14 +609,20 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         if (this.hasChildren(option)) {
           this.selectAllChildren(option, path);
         }
+        
+        // 递归检查父级，如果所有子级都被选中，则选中父级并删除子级
+        this.consolidateSelection();
       } else {
-        // 取消选中
+        // 取消选中当前选项
         this.selectedPathsMap.delete(pathKey);
         
         // 取消选中所有子选项
         if (this.hasChildren(option)) {
           this.deselectAllChildren(option);
         }
+        
+        // 取消选中父级
+        this.updateParentSelectionState(option);
       }
       
       // 更新半选状态
@@ -629,6 +635,227 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.emitValueChange();
     } catch (err) {
       console.error('多选切换错误:', err);
+    }
+  }
+
+  // 合并选择-关键函数
+  private consolidateSelection(): void {
+    // 按层级收集节点
+    const levelMap = new Map<number, Set<string>>();
+    
+    // 收集所有已选节点信息
+    for (const path of this.selectedPathsMap.values()) {
+      for (let i = 0; i < path.length; i++) {
+        const option = path[i];
+        const optionValue = String(this.getOptionValue(option));
+        
+        if (!levelMap.has(i)) {
+          levelMap.set(i, new Set<string>());
+        }
+        levelMap.get(i)!.add(optionValue);
+      }
+    }
+    
+    // 从最低层级开始往上检查
+    const maxLevel = Math.max(...Array.from(levelMap.keys()));
+    
+    for (let level = maxLevel; level >= 1; level--) {
+      const nodesAtLevel = levelMap.get(level) || new Set();
+      
+      for (const nodeValue of nodesAtLevel) {
+        // 查找此节点所在的路径
+        let nodePath: CascaderOption[] | null = null;
+        for (const path of this.selectedPathsMap.values()) {
+          if (path.length > level && String(this.getOptionValue(path[level])) === nodeValue) {
+            nodePath = path;
+            break;
+          }
+        }
+        
+        if (!nodePath) continue;
+        
+        // 获取父节点及其所有子节点
+        const parentOption = nodePath[level - 1];
+        if (!parentOption) continue;
+        
+        const parentChildren = this.getChildren(parentOption).filter(c => !c.disabled && !c.disableCheckbox);
+        if (parentChildren.length === 0) continue;
+        
+        // 检查父节点的所有子节点是否都被选中
+        const allChildrenSelected = parentChildren.every(child => {
+          const childValue = String(this.getOptionValue(child));
+          return levelMap.get(level)?.has(childValue);
+        });
+        
+        // 如果所有子节点都被选中，则选中父节点并删除所有子节点的路径
+        if (allChildrenSelected) {
+          // 获取父节点路径
+          const parentPath = nodePath.slice(0, level);
+          const parentPathKey = this.getPathKey(parentPath);
+          
+          // 添加父节点路径
+          this.selectedPathsMap.set(parentPathKey, parentPath);
+          
+          // 删除所有子节点路径
+          for (const [key, path] of Array.from(this.selectedPathsMap.entries())) {
+            if (path.length > level && this.isPathParentOf(parentPath, path)) {
+              this.selectedPathsMap.delete(key);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 更新父级选择状态
+  private updateParentSelectionState(option: CascaderOption): void {
+    let currentOption = option;
+    let parent = this.optionParentMap.get(currentOption);
+    
+    while (parent) {
+      const parentPath = this.buildOptionPath(parent);
+      const parentPathKey = this.getPathKey(parentPath);
+      
+      // 检查父节点的所有其他子节点是否有选中的
+      const children = this.getChildren(parent).filter(c => !c.disabled && !c.disableCheckbox);
+      
+      let anyChildSelected = false;
+      for (const child of children) {
+        if (this.isOptionSelected(child)) {
+          anyChildSelected = true;
+          break;
+        }
+      }
+      
+      // 如果没有任何子节点选中，也取消选中父节点
+      if (!anyChildSelected) {
+        this.selectedPathsMap.delete(parentPathKey);
+      }
+      
+      // 继续检查上一级父节点
+      currentOption = parent;
+      parent = this.optionParentMap.get(currentOption);
+    }
+  }
+
+  // 更新多选值和显示标签
+  private updateMultipleValues(): void {
+    if (this.selectedPathsMap.size === 0) {
+      this.value = [];
+      this.displayTags = [];
+      return;
+    }
+    
+    // 直接使用已经归并过的路径
+    this.value = Array.from(this.selectedPathsMap.values()).map(
+      path => path.map(opt => this.getOptionValue(opt))
+    );
+    
+    this.updateDisplayTags();
+  }
+
+  // 更新显示标签
+  private updateDisplayTags(): void {
+    if (!this.isMultiple || this.selectedPathsMap.size === 0) {
+      this.displayTags = [];
+      return;
+    }
+    
+    const tags: { label: string, value: any, option: CascaderOption }[] = [];
+    
+    // 直接从选中路径映射生成标签
+    for (const path of this.selectedPathsMap.values()) {
+      if (!path.length) continue;
+      
+      const lastOption = path[path.length - 1];
+      const pathLabels = path.map(opt => String(opt[this.labelProperty])).join(' / ');
+      
+      tags.push({
+        label: pathLabels,
+        value: this.getOptionValue(lastOption),
+        option: lastOption
+      });
+    }
+    
+    this.displayTags = tags;
+  }
+
+  // 更新半选状态
+  private updateIndeterminateStatus(): void {
+    this.indeterminateSet.clear();
+    
+    if (!this.isMultiple) return;
+    
+    // 记录每个节点的选中状态
+    const processOption = (option: CascaderOption, path: CascaderOption[] = []): [number, number] => {
+      if (option.disabled || option.disableCheckbox) return [0, 0];
+      
+      // 对于叶子节点
+      if (!this.hasChildren(option)) {
+        const isSelected = this.isOptionInSelectedPaths(option);
+        return [isSelected ? 1 : 0, 1];
+      }
+      
+      // 对于有子节点的节点
+      const children = this.getChildren(option).filter(c => !c.disabled && !c.disableCheckbox);
+      if (!children.length) return [0, 0];
+      
+      let selectedCount = 0;
+      let totalCount = 0;
+      
+      // 递归处理所有子节点
+      for (const child of children) {
+        const [selected, total] = processOption(child, [...path, child]);
+        selectedCount += selected;
+        totalCount += total;
+      }
+      
+      // 如果有子节点被选中但不是全部，则标记为半选状态
+      if (selectedCount > 0 && selectedCount < totalCount) {
+        const optionValue = String(this.getOptionValue(option));
+        this.indeterminateSet.add(optionValue);
+      }
+      
+      return [selectedCount, totalCount];
+    };
+    
+    // 从根节点开始处理
+    for (const option of this.options) {
+      processOption(option);
+    }
+  }
+
+  // 辅助方法：检查选项是否在选中路径中
+  private isOptionInSelectedPaths(option: CascaderOption): boolean {
+    const optionValue = this.getOptionValue(option);
+    
+    // 查找是否有包含此选项的路径
+    for (const path of this.selectedPathsMap.values()) {
+      if (path.some(opt => this.getOptionValue(opt) === optionValue)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  // 辅助方法：检查选项是否被选中
+  isOptionSelected(option: CascaderOption): boolean {
+    if (!option) return false;
+    
+    const optionValue = this.getOptionValue(option);
+    
+    if (this.isMultiple) {
+      // 检查是否有以此选项结尾的路径
+      for (const path of this.selectedPathsMap.values()) {
+        if (path.length > 0 && this.getOptionValue(path[path.length - 1]) === optionValue) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      // 单选模式
+      return this.selectedOptions.some(opt => this.getOptionValue(opt) === optionValue);
     }
   }
 
@@ -947,25 +1174,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     return !this.hasChildren(option);
   }
 
-  isOptionSelected(option: CascaderOption): boolean {
-    if (!option) return false;
-    
-    const optionValue = this.getOptionValue(option);
-    
-    if (this.isMultiple) {
-      // 多选模式 - 检查选项是否在任何选中路径中
-      for (const path of this.selectedPathsMap.values()) {
-        if (path.some(opt => this.getOptionValue(opt) === optionValue)) {
-          return true;
-        }
-      }
-      return false;
-    } else {
-      // 单选模式 - 检查是否在正式选中路径中
-      return this.selectedOptions.some(opt => this.getOptionValue(opt) === optionValue);
-    }
-  }
-
   isOptionIndeterminate(option: CascaderOption): boolean {
     if (!this.isMultiple) return false;
     
@@ -1165,156 +1373,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     }
   }
 
-  private updateIndeterminateStatus(): void {
-    this.indeterminateSet.clear();
-    
-    if (!this.isMultiple) return;
-    
-    // 记录每个节点的选中状态
-    const nodeStatus: Map<string, {selected: number, total: number}> = new Map();
-    
-    // 根据当前选中路径更新节点状态
-    for (const path of this.selectedPathsMap.values()) {
-      // 对路径中的每个节点进行处理
-      for (let i = 0; i < path.length; i++) {
-        const node = path[i];
-        const nodeValue = String(this.getOptionValue(node));
-        
-        // 叶子节点或路径中的最后一个节点
-        if (i === path.length - 1 || this.isLeaf(node)) {
-          nodeStatus.set(nodeValue, {selected: 1, total: 1});
-        } 
-        // 中间节点，需要汇总子节点状态
-        else {
-          if (!nodeStatus.has(nodeValue)) {
-            nodeStatus.set(nodeValue, {selected: 0, total: 0});
-          }
-        }
-      }
-    }
-    
-    // 计算所有节点的状态
-    const calculateNodeStatus = (options: CascaderOption[]): void => {
-      if (!options || !options.length) return;
-      
-      for (const option of options) {
-        if (option.disabled) continue;
-        
-        const value = String(this.getOptionValue(option));
-        
-        // 如果有子节点，计算子节点状态
-        if (this.hasChildren(option)) {
-          calculateNodeStatus(this.getChildren(option));
-          
-          // 汇总子节点状态
-          let selectedCount = 0;
-          let totalCount = 0;
-          
-          for (const child of this.getChildren(option)) {
-            if (child.disabled) continue;
-            
-            const childValue = String(this.getOptionValue(child));
-            const status = nodeStatus.get(childValue);
-            
-            if (status) {
-              selectedCount += status.selected;
-              totalCount += status.total;
-            } else {
-              totalCount += 1; // 未选中的子节点
-            }
-          }
-          
-          // 更新当前节点状态
-          nodeStatus.set(value, {selected: selectedCount, total: totalCount});
-          
-          // 部分选中时设置半选状态
-          if (selectedCount > 0 && selectedCount < totalCount) {
-            this.indeterminateSet.add(value);
-          }
-        }
-      }
-    };
-    
-    // 从根节点开始计算
-    calculateNodeStatus(this.options);
-  }
 
-  private updateMultipleValues(): void {
-    // 转换选中路径为值数组
-    this.value = Array.from(this.selectedPathsMap.values()).map(
-      path => path.map(opt => this.getOptionValue(opt))
-    );
-    
-    // 更新显示标签
-    this.updateDisplayTags();
-  }
-
-  private updateDisplayTags(): void {
-    if (!this.isMultiple || this.selectedPathsMap.size === 0) {
-      this.displayTags = [];
-      return;
-    }
-    
-    const tags: { label: string, value: any, option: CascaderOption }[] = [];
-    
-    // 使用Map存储路径信息，键为路径字符串
-    const pathMap = new Map<string, {
-      path: CascaderOption[], 
-      isParentOfOtherSelected: boolean
-    }>();
-    
-    // 第一步：收集所有路径信息
-    for (const path of this.selectedPathsMap.values()) {
-      if (!path.length) continue;
-      
-      const pathKey = this.getPathKey(path);
-      pathMap.set(pathKey, {
-        path,
-        isParentOfOtherSelected: false
-      });
-    }
-    
-    // 第二步：标记哪些路径是其他选中路径的父路径
-    for (const [pathKey, info] of pathMap.entries()) {
-      // 检查此路径是否是其他路径的父路径
-      for (const [otherKey, otherInfo] of pathMap.entries()) {
-        if (pathKey === otherKey) continue;
-        
-        // 判断当前路径是否是其他路径的父路径
-        const isParent = this.isPathParentOf(info.path, otherInfo.path);
-        if (isParent) {
-          info.isParentOfOtherSelected = true;
-          break;
-        }
-      }
-    }
-    
-    // 第三步：只显示父级标签（不是其他选中路径父级的路径）
-    for (const info of pathMap.values()) {
-      if (!info.isParentOfOtherSelected) {
-        const path = info.path;
-        const lastOption = path[path.length - 1];
-        const optionValue = this.getOptionValue(lastOption);
-        
-        // 对于叶子节点或者不是其他选中项的父节点的选项，显示完整路径
-        const pathLabels = path.map(opt => {
-          try {
-            return opt[this.labelProperty] !== undefined ? String(opt[this.labelProperty]) : '未知';
-          } catch (e) {
-            return '未知';
-          }
-        }).join(' / ');
-        
-        tags.push({
-          label: pathLabels,
-          value: optionValue,
-          option: lastOption
-        });
-      }
-    }
-    
-    this.displayTags = tags;
-  }
 
   // 判断一个路径是否是另一个路径的父路径
   private isPathParentOf(parentPath: CascaderOption[], childPath: CascaderOption[]): boolean {
