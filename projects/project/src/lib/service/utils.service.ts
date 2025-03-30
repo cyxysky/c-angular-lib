@@ -11,34 +11,31 @@ export class UtilsService {
    * 使用防抖函数包装异步函数
    * @param fn 需要防抖的函数
    * @param delay 延迟时间（毫秒）
-   * @returns 包装后的防抖函数
+   * @returns 包装后的防抖函数，返回 Promise
    */
-  debounce<T>(fn: (...args: any[]) => Promise<T>, delay: number = 300): (...args: any[]) => void {
+  debounce<T>(fn: (...args: any[]) => Promise<T>, delay: number = 300): (...args: any[]) => Promise<T> {
     let timeout: any = null;
     let requestId: number = 0;
-    
-    return function(...args: any[]): void {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      
-      const currentRequestId = ++requestId;
-      
-      timeout = setTimeout(() => {
-        fn(...args)
-          .then((result: T) => {
-            if (currentRequestId === requestId) {
-              return result;
-            }
-            return result;
-          })
-          .catch((error) => {
-            if (currentRequestId === requestId) {
-              throw error;
-            }
-            return undefined as any;
-          });
-      }, delay);
+    return function(...args: any[]): Promise<T> {
+      return new Promise((resolve, reject) => {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+        const currentRequestId = ++requestId;
+        timeout = setTimeout(() => {
+          fn(...args)
+            .then((result: T) => {
+              if (currentRequestId === requestId) {
+                resolve(result);
+              }
+            })
+            .catch((error) => {
+              if (currentRequestId === requestId) {
+                reject(error);
+              }
+            });
+        }, delay);
+      });
     };
   }
   

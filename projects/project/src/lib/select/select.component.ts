@@ -69,7 +69,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 远程搜索方法 */
   @Input({ alias: 'selectSearchFn' }) searchFn: ((value: string) => Promise<any[]>) | null = null;
   /** 最小宽度 */
-  @Input({ alias: 'selectMinWidth' }) minWidth: string = '120px';
+  @Input({ alias: 'selectMinWidth' }) minWidth: string = '400px';
   /** 选项自定义模板 */
   @Input() optionTemplate: TemplateRef<any> | null = null;
   /** 选择内容自定义模板 */
@@ -553,15 +553,11 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public openModal(): void {
     if (this.overlayRef || this.disabled) return;
-    
     this.focusSearchInput();
     this.resetOptionList();
     this.processGroupedOptions();
-    
     this.renderer.addClass(this._overlayOrigin.elementRef.nativeElement, 'active');
-    
     this.createAndSetupOverlay(this._overlayOrigin.elementRef.nativeElement);
-    
     this.modalState = 'open';
     this.cdr.detectChanges();
   }
@@ -576,7 +572,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       backdropClass: 'transparent-backdrop',
       width: selectElement.clientWidth
     };
-
     // 位置配置
     const positions: ConnectedPosition[] = [
       { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },

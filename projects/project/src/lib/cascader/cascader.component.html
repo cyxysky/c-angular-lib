@@ -6,19 +6,18 @@
     [class.cascader-warning]="status === 'warning'" 
     [class.cascader-disabled]="disabled"
     [class.cascader-open]="isDropdownOpen"
-    (click)="toggleDropdown($event)" 
+    (click)="openDropdown()" 
     [style.min-width]="minWidth" 
     cdkOverlayOrigin
-    (mouseenter)="expandTrigger === 'hover' && openDropdown()"
-    (mouseleave)="expandTrigger === 'hover' && closeDropdown()">
+    (mouseenter)="actionTrigger === 'hover' && openDropdown()">
     <div class="cascader-content">
-        <div class="placeholder" *ngIf="(!value || (isArray(value) && value.length === 0)) && !searchValue">
+        <div class="placeholder" *ngIf="(!value || (isArray(value) && value.length === 0)) && !searchOnCompositionValue">
             {{ placeholder }}
         </div>
-        <div class="cascader-labels" *ngIf="!isMultiple && displayLabels.length > 0 && !searchValue">
-            <span class="label-text">{{ displayLabels.join(' / ') }}</span>
+        <div class="cascader-labels" *ngIf="!isMultiple && displayLabels.length > 0 && !searchOnCompositionValue">
+            <span class="label-text" [ngClass]="{'dropdown-open-text': isDropdownOpen}">{{ displayLabels.join(' / ') }}</span>
         </div>
-        <ng-container *ngIf="isMultiple && displayTags.length > 0 && !searchValue">
+        <ng-container *ngIf="isMultiple && displayTags.length > 0">
             <div class="cascader-tag" *ngFor="let tag of displayTags">
                 <div class="cascader-tag-text">{{ tag.label }}</div>
                 <div class="cascader-tag-close-icon" (click)="removeItem($event, tag.value)">
@@ -26,15 +25,16 @@
                 </div>
             </div>
         </ng-container>
-        
         <!-- 搜索框 -->
         <div #searchBox class="search-box" *ngIf="showSearch">
-            <input class="search-input" #searchInput [(ngModel)]="searchValue" 
+            <input 
+                class="search-input" 
+                #searchInput 
+                [(ngModel)]="searchValue" 
                 (ngModelChange)="onSearch($event)"
-                (compositionstart)="onCompositionChange($event)"
-                (compositionend)="onCompositionChange($event)" 
+                (compositionupdate)="onCompositionChange($event)"
                 [disabled]="disabled"/>
-            <span class="search-text" #searchText>{{ searchValue }}</span>
+            <span class="search-text" #searchText>{{ searchOnCompositionValue }}</span>
         </div>
     </div>
     
@@ -53,11 +53,9 @@
         <!-- 搜索图标 -->
         <i class="bi bi-search" *ngIf="!loading && showSearch && isDropdownOpen"></i>
         <!-- 下拉图标 -->
-        <i class="bi bi-caret-down-fill cascader-icon" *ngIf="!loading && !showSearch" 
-           [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
+        <i class="bi bi-caret-down-fill cascader-icon" *ngIf="!loading && !showSearch" [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
         <!-- 清除图标 -->
-        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && ((isMultiple && displayTags.length) || (!isMultiple && displayLabels.length) || searchValue)" 
-           (click)="clear($event)"></i>
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading" (click)="clear($event)"></i>
     </div>
 </div>
 
@@ -86,40 +84,38 @@
                 </div>
             </div>
             <div *ngIf="!loading && filteredOptions.length > 0" class="search-options">
-                <div *ngFor="let option of filteredOptions; index as i" 
-                      class="search-option"
-                      [class.disabled]="option.disabled"
-                      [class.selected]="option.checked"
-                      [class.keyboard-active]="keyboardNavIndex === i"
-                      (click)="onSearchOptionClick(option)">
-                    <div class="option-path">
-                        <ng-container *ngIf="optionLabelTemplate">
-                            <ng-container *ngTemplateOutlet="optionLabelTemplate; context: {$implicit: option, index: i, path: option.path}"></ng-container>
-                        </ng-container>
-                        <ng-container *ngIf="!optionLabelTemplate">
-                            {{ getOptionPath(option) }}
-                        </ng-container>
+                <ng-container *ngFor="let option of filteredOptions; index as i" >
+                    <div 
+                        *ngIf="!isMultiple ? isLeaf(option) : true"
+                        class="search-option"
+                        [class.disabled]="option.disabled"
+                        [class.selected]="option.checked"
+                        [class.keyboard-active]="keyboardNavIndex === i"
+                        (click)="onSearchOptionClick(option)">
+                        <div class="option-path">
+                            <ng-container *ngIf="optionLabelTemplate">
+                                <ng-container *ngTemplateOutlet="optionLabelTemplate; context: {$implicit: option, index: i, path: option.path}"></ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="!optionLabelTemplate">
+                                {{ getOptionPath(option) }}
+                            </ng-container>
+                        </div>
                     </div>
-                    <div *ngIf="isMultiple" class="checkbox">
-                        <input type="checkbox" 
-                               [checked]="option.checked" 
-                               [disabled]="option.disabled || option.disableCheckbox" 
-                               (click)="$event.stopPropagation()">
-                    </div>
-                </div>
+                </ng-container>
             </div>
         </div>
         
         <!-- 级联菜单 -->
         <div *ngIf="!searchValue" class="cascader-menus">
+            <!-- 级别菜单 -->
             <ul *ngFor="let column of columns; index as i" class="cascader-menu">
                 <ng-container *ngIf="column && column.length > 0; else emptyMenu">
+                    <!-- 当前级别菜单的选项 -->
                     <li *ngFor="let option of column; index as j" 
                         class="cascader-menu-item" 
                         [class.cascader-menu-item-active]="isOptionActivated(option, i)"
                         [class.cascader-menu-item-disabled]="option.disabled"
-                        [class.cascader-menu-item-selected]="isOptionTempSelected(option, i) || (isMultiple && option.checked)"
-                        [class.cascader-menu-item-indeterminate]="isMultiple && option.halfChecked"
+                        [class.cascader-menu-item-selected]="isOptionTempSelected(option, i)"
                         [class.cascader-menu-item-loading]="option.loading"
                         (click)="onOptionClick(option, i, $event)"
                         (mouseenter)="onOptionMouseEnter(option, i)">

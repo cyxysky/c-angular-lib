@@ -51,9 +51,15 @@
         </ng-container>
         <!-- 搜索框 -->
         <div #searchBox class="search-box" *ngIf="search">
-            <input class="search-input" #searchInput [(ngModel)]="searchValue" (ngModelChange)="onSearch($event)"
-                (compositionupdate)="compositionchange($event)" (paste)="handlePaste($event)"
-                (keydown)="handleKeydown($event)" class="search-input" />
+            <input 
+                class="search-input" 
+                #searchInput 
+                [(ngModel)]="searchValue" 
+                (ngModelChange)="onSearch($event)"
+                (compositionupdate)="compositionchange($event)" 
+                (paste)="handlePaste($event)"
+                (keydown)="handleKeydown($event)"
+                class="search-input" />
             <span class="search-text" #searchText> {{ searchOnCompositionValue }}</span>
         </div>
     </div>
