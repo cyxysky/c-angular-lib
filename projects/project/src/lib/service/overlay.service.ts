@@ -25,7 +25,7 @@ export class OverlayService {
     configs: OverlayConfig, 
     elementRef: ElementRef | Element | any, 
     position: ConnectedPosition[], 
-    closeModal: (overlayRef: OverlayRef) => void,
+    closeModal: (overlayRef: OverlayRef, event: Event) => void,
     positionCallback?: (position: ConnectedPosition, isBackupUsed: boolean) => void
   ): OverlayRef {
     let config = new OverlayConfig();
@@ -68,8 +68,8 @@ export class OverlayService {
     }
     
     // 点击背景，关闭浮层
-    overlayRef.outsidePointerEvents().subscribe(() => {
-      closeModal(overlayRef);
+    overlayRef.outsidePointerEvents().subscribe((event) => {
+      closeModal(overlayRef, event);
     });
     
     return overlayRef;

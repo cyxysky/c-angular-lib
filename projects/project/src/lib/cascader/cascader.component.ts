@@ -36,7 +36,11 @@ export type CascaderSize = 'large' | 'default' | 'small';
       multi: true
     }
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(mouseenter)': 'enterDropdown()',
+    '(mouseleave)': 'leaveDropdown()'
+  }
 })
 export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccessor {
   // 视图引用
@@ -137,10 +141,14 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   private indeterminateSet = new Set<string>();
   /** 是否可勾选 */
   public checkable: boolean = true;
+  /** 鼠标悬停关闭定时器 */
+  public hoverCloseTimer: any = null;
   // 添加临时选中数组
   tempSelectedOptions: CascaderOption[] = [];
   // 搜索输入框值
   public searchOnCompositionValue = '';
+  /** 目前浮层是否打开 */
+  public isNowDropdownOpen: boolean = false;
   // getter/setter
   /** 标签属性 */
   get labelProperty(): string {
@@ -247,6 +255,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   openDropdown(): void {
     if (this.disabled || this.isDropdownOpen) return;
+    this.isNowDropdownOpen = true;
     document.addEventListener('keydown', this.enhancedKeyboardHandler);
     this.visibleChange.emit(true);
     // 重置临时选中路径为当前实际选中路径
@@ -274,11 +283,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         offsetY: -4
       }
     ];
-    // 计算固定宽度
-    const dropdownWidth = Math.max(
-      origin.offsetWidth,
-      this.columns.length * this.menuWidth
-    );
     let positionStrategy = this.overlay.position().
       flexibleConnectedTo(origin).
       withPositions(positions).
@@ -287,17 +291,19 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       withLockedPosition(false);
     // 创建浮层（添加错误处理）
     this.overlayRef = this.overlayService.createOverlay({
-      hasBackdrop: true,
+      hasBackdrop: false,
       backdropClass: 'transparent-backdrop',
-      width: dropdownWidth,
-      minWidth: origin.offsetWidth,
       maxHeight: '80vh',         // 限制最大高度
       disposeOnNavigation: true,  // 导航时自动销毁,
       positionStrategy: positionStrategy
     }, origin, positions,
-      () => {
+      (ref, event) => {
         // 点击背景关闭
         if (this.isDropdownOpen) {
+          const target = event.target as HTMLElement;
+          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
+            return;
+          }
           this.closeDropdown();
         }
       },
@@ -308,9 +314,33 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       // 聚焦搜索框
       this.focusSearch();
     }
+    this.isDropdownOpen = true;
     // 设置键盘导航索引
     this.keyboardNavIndex = -1;
-    this.isDropdownOpen = true;
+
+  }
+
+  /**
+   * 进入下拉菜单
+   */
+  public enterDropdown = () => {
+    if (this.actionTrigger === 'hover') {
+      if (!this.isDropdownOpen) {
+        this.openDropdown();
+      }
+      clearTimeout(this.hoverCloseTimer);
+    }
+  }
+
+  /**
+   * 离开下拉菜单
+   */
+  public leaveDropdown = () => {
+    if (this.actionTrigger === 'hover') {
+      this.hoverCloseTimer = setTimeout(() => {
+        this.closeDropdown();
+      }, 100);
+    }
   }
 
   /**
@@ -319,6 +349,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   closeDropdown(): void {
     if (!this.isDropdownOpen) return;
     this.isDropdownOpen = false;
+    this.isNowDropdownOpen = false;
     this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
@@ -855,7 +886,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       let timer = setTimeout(() => {
         this.closeDropdown();
         clearTimeout(timer);
-      }, 200);
+      }, 100);
     }
     // 清空搜索状态
     // this.resetSearch();

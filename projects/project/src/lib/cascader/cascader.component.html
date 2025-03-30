@@ -8,14 +8,13 @@
     [class.cascader-open]="isDropdownOpen"
     (click)="openDropdown()" 
     [style.min-width]="minWidth" 
-    cdkOverlayOrigin
-    (mouseenter)="actionTrigger === 'hover' && openDropdown()">
+    cdkOverlayOrigin>
     <div class="cascader-content">
         <div class="placeholder" *ngIf="(!value || (isArray(value) && value.length === 0)) && !searchOnCompositionValue">
             {{ placeholder }}
         </div>
         <div class="cascader-labels" *ngIf="!isMultiple && displayLabels.length > 0 && !searchOnCompositionValue">
-            <span class="label-text" [ngClass]="{'dropdown-open-text': isDropdownOpen}">{{ displayLabels.join(' / ') }}</span>
+            <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ displayLabels.join(' / ') }}</span>
         </div>
         <ng-container *ngIf="isMultiple && displayTags.length > 0">
             <div class="cascader-tag" *ngFor="let tag of displayTags">
@@ -55,15 +54,17 @@
         <!-- 下拉图标 -->
         <i class="bi bi-caret-down-fill cascader-icon" *ngIf="!loading && !showSearch" [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
         <!-- 清除图标 -->
-        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading" (click)="clear($event)"></i>
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isDropdownOpen" (click)="clear($event)"></i>
     </div>
 </div>
 
 <ng-template #dropdownTemplate>
-    <div class="cascader-dropdown" 
-         [class.open]="isDropdownOpen" 
-         [class.closed]="!isDropdownOpen"
-         [style.min-width]="menuWidth + 'px'">
+    <div class="cascader-dropdown"
+        (mouseenter)="enterDropdown()"
+        (mouseleave)="leaveDropdown()"
+        [class.open]="isDropdownOpen" 
+        [class.closed]="!isDropdownOpen"
+        [style.min-width]="menuWidth + 'px'">
         <!-- 搜索结果列表 -->
         <div *ngIf="showSearch && searchValue" class="search-result-list">
             <div *ngIf="loading" class="search-loading">

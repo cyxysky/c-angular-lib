@@ -80,7 +80,7 @@
         <!-- 下拉图标 -->
         <i class="bi bi-caret-down-fill select-icon" *ngIf="!loading && !search" [ngClass]="{'select-icon-clear': allowClear}" [style.transform]="modalState === 'open' ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
         <!-- 清除图标 -->
-        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading" (click)="clear($event)"></i>
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && modalState !== 'open'" (click)="clear($event)"></i>
     </div>
 </div>
 

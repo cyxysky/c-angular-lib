@@ -195,14 +195,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   private processGroupedOptions(): void {
     this.optionsGroups = {};
     const options = this.filteredOptions.length > 0 ? this.filteredOptions : this.optionList;
-    
+
     options.forEach(option => {
       if (option.group) {
         this.optionsGroups[option.group] = this.optionsGroups[option.group] || [];
         this.optionsGroups[option.group].push(option);
       }
     });
-    
+
     this.flattenGroupedOptions();
   }
 
@@ -262,10 +262,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public getFilteredOptionsWithHideSelected(): any[] {
     const hasGroups = this.getObjectKeys(this.optionsGroups).length > 0;
     const items = hasGroups ? this.flattenedGroupOptions : this.filteredOptions;
-    
+
     if (!this.hideSelected) return items;
-    
-    return hasGroups 
+
+    return hasGroups
       ? items.filter(item => item.type !== 'option' || !this._data.includes(item.option[this.optionValue]))
       : items.filter(item => !this._data.includes(item[this.optionValue]));
   }
@@ -275,19 +275,19 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public handleSelectionChange(value: any, action: 'add' | 'remove'): void {
     let data;
-    
+
     if (this.selectMode === 'single') {
       data = action === 'add' ? value : '';
     } else {
       data = [...this._data];
-      
+
       if (action === 'add' && !data.includes(value) && data.length < this.maxMultipleCount) {
         data.push(value);
       } else if (action === 'remove') {
         data = _.without(data, value);
       }
     }
-    
+
     this.updateData(data);
     this.reachedMaxCount = this.selectMode === 'multiple' && data.length >= this.maxMultipleCount;
   }
@@ -297,15 +297,15 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public selectUser(value: any, disabled: boolean = false): void {
     if (disabled) return;
-    
+
     this.resetSearchInputWidth();
-    
+
     if (this.selectMode === 'single') {
       this.handleSelectionChange(value, 'add');
       this.closeModal(this.overlayRef);
       return;
     }
-    
+
     // 多选
     this.focusSearchInput();
     const action = this._data.includes(value) ? 'remove' : 'add';
@@ -316,6 +316,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 移除用户
    */
   public removeUser(event: Event, userId: any): void {
+    event.stopImmediatePropagation();
     event.stopPropagation();
     this.handleSelectionChange(userId, 'remove');
   }
@@ -358,7 +359,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public onSearch(value: any): void {
     this.searchOnCompositionValue = value;
     this.searchInputWidthChange();
-    
+
     // 执行搜索
     if (!this.searchFn) {
       this.executeLocalSearch(value);
@@ -371,13 +372,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 执行本地搜索
    */
   private executeLocalSearch(value: string): void {
-    this.filteredOptions = !value || value.trim() === '' 
+    this.filteredOptions = !value || value.trim() === ''
       ? [...this.optionList]
       : this.optionList.filter(option => {
-          const optionText = String(option[this.optionKey] || '');
-          return optionText.toLowerCase().includes(value.toLowerCase());
-        });
-    
+        const optionText = String(option[this.optionKey] || '');
+        return optionText.toLowerCase().includes(value.toLowerCase());
+      });
+
     // 更新分组数据
     this.processGroupedOptions();
     this.cdr.detectChanges();
@@ -472,14 +473,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public createCustomTag(value: string): void {
     if (!this.tagMode || !value || value.trim() === '') return;
-    
+
     const tags = value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
     if (tags.length === 0) return;
-    
+
     if (this.selectMode === 'multiple') {
       const newData = [...this._data];
       let tagsAdded = false;
-      
+
       tags.forEach(tag => {
         if (!newData.includes(tag) && newData.length < this.maxMultipleCount) {
           newData.push(tag);
@@ -488,7 +489,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
           tagsAdded = true;
         }
       });
-      
+
       if (tagsAdded) {
         this.updateData(newData);
         this.reachedMaxCount = (newData.length >= this.maxMultipleCount);
@@ -498,7 +499,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.customTags.push(tags[0]);
       this.optionMap.set(tags[0], tags[0]);
     }
-    
+
     this.resetSearchInputWidth();
   }
   //#endregion
@@ -524,19 +525,19 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public handleKeydown(event: KeyboardEvent): void {
     // 退格键删除最后一个选项
-    if (event.key === 'Backspace' && 
-        this.searchValue === '' && 
-        this.modalState === 'open' && 
-        this.selectMode === 'multiple' && 
-        Array.isArray(this._data) && 
-        this._data.length > 0) {
-      
+    if (event.key === 'Backspace' &&
+      this.searchValue === '' &&
+      this.modalState === 'open' &&
+      this.selectMode === 'multiple' &&
+      Array.isArray(this._data) &&
+      this._data.length > 0) {
+
       event.preventDefault();
       const lastItem = this._data[this._data.length - 1];
       this.handleSelectionChange(lastItem, 'remove');
       return;
     }
-    
+
     // 回车创建标签
     if (event.key === 'Enter' && this.tagMode) {
       event.preventDefault();
@@ -561,14 +562,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.modalState = 'open';
     this.cdr.detectChanges();
   }
-  
+
   /**
    * 创建并设置浮层
    */
   private createAndSetupOverlay(selectElement: any): void {
     // 配置
     const config = {
-      hasBackdrop: true,
+      hasBackdrop: false,
       backdropClass: 'transparent-backdrop',
       width: selectElement.clientWidth
     };
@@ -577,15 +578,21 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
       { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' }
     ];
-    
+
     // 创建浮层
     this.overlayRef = this.overlayService.createOverlay(
       config,
       selectElement,
       positions,
-      (ref) => this.closeModal(ref)
+      (ref, event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
+          return;
+        }
+        this.closeModal(ref)
+      }
     );
-    
+
     // 附加模板
     this.overlayService.attachTemplate(
       this.overlayRef,
@@ -598,14 +605,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 关闭弹窗
    * @param overlayRef 浮层引用
    */
-  closeModal(overlayRef: OverlayRef | null): void {
+  async closeModal(overlayRef: OverlayRef | null): Promise<void> {
     this.modalState = 'closed';
     this.resetSearchInputWidth();
     this.resetSearchState();
     // 移除激活样式
     this.renderer.removeClass(this._overlayOrigin.elementRef.nativeElement, 'active');
     this.cdr.detectChanges();
-    
+
     // 使用setTimeout确保CSS过渡动画有时间完成
     const timer = setTimeout(() => {
       if (overlayRef) {
