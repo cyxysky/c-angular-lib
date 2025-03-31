@@ -33,9 +33,9 @@
 
 <!-- 树节点模板 -->
 <ng-template #renderTreeNodesTemplate let-nodes let-level="level" let-parentNode="parentNode">
-  <ul class="lib-tree-node-list" 
-    [style.max-height]="(parentNode === undefined || parentNode.expanded) ? '100%' : '0'"
-    >
+  <ul class="lib-tree-node-list"
+    [@expandCollapse]="(parentNode === undefined || parentNode.expanded) ? 'expanded' : 'collapsed'"
+    (@expandCollapse.done)="parentNode && onAnimationDone($event, parentNode)">
     <li *ngFor="let node of nodes; let isLast = last; let index = index" class="lib-tree-node" [class.lib-tree-node-last]="isLast">
       <div 
         class="lib-tree-node-content"
@@ -69,7 +69,10 @@
       </div>
 
       <!-- 子节点递归 -->
-      <div class="lib-tree-children" *ngIf="node.children && node.children.length && expandedKeys.has(node.key)">
+      <div class="lib-tree-children" 
+           [@expandCollapse]="node.expanded ? 'expanded' : 'collapsed'"
+           (@expandCollapse.done)="onAnimationDone($event, node)"
+           *ngIf="node.children && node.children.length && expandedKeys.has(node.key)">
         <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
       </div>
     </li>
@@ -101,7 +104,10 @@
     </div>
 
     <!-- 子节点 -->
-    <div class="lib-tree-children" *ngIf="node.children?.length && expandedKeys.has(node.key)">
+    <div class="lib-tree-children" 
+         [@expandCollapse]="node.expanded ? 'expanded' : 'collapsed'"
+         (@expandCollapse.done)="onAnimationDone($event, node)"
+         *ngIf="node.children?.length && expandedKeys.has(node.key)">
       <ng-container *ngFor="let childNode of node.children; let isLastChild = last">
         <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: childNode, isLast: isLastChild, level: level + 1 }"></ng-container>
       </ng-container>
@@ -116,20 +122,19 @@
     *ngIf="node.children && node.children.length || (asyncData && !node.isLeaf)"
     class="lib-tree-switcher"
     [class.lib-tree-flat-line]="showLine && level !== 0"
-    [class.lib-tree-switcher-expanded]="expandedKeys.has(node.key)"
+    [class.lib-tree-switcher-expanded]="node.expanded"
     [class.lib-tree-switcher-disabled]="node.disabled"
     (click)="$event.stopPropagation(); onNodeExpand(node)"
   >
     <ng-container *ngTemplateOutlet="expandedIcon || defaultExpandedIconTpl; context: { $implicit: node }"></ng-container>
     <ng-template #defaultExpandedIconTpl>
-      <i class="tree-switcher-icon"></i>
+      <i class="tree-switcher-icon" [@rotate]="node.expanded ? 'end' : 'start'"></i>
     </ng-template>
   </span>
   <!-- 没有子节点的 -->
   <span 
     *ngIf="!node.children || (!node.children.length && !asyncData) || node.isLeaf" class="lib-tree-switcher" 
     [class.lib-tree-flat-line-longer]="showLine">
-
   </span>
 </ng-template>
 
@@ -139,7 +144,7 @@
     [style.width.px]="indent"
     [class.lib-tree-vertical-line]="showLine && hasFlatLine(node, j)"
     class="lib-tree-indent" 
-    *ngFor="let i of getIndentArray(level); index as j">
+    *ngFor="let i of getIndentArray(level); index as j;let last = last">
   </span>
 </ng-template>
 

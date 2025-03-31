@@ -2,6 +2,9 @@ import { Component, Input, Output, EventEmitter, TemplateRef, ContentChild, forw
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
+import { trigger, state, style, transition, animate, AnimationEvent } from '@angular/animations';
+import { expandCollapse } from '../animation/expandCollapse.animation';
+import { rotate } from '../animation/rotate.animation';
 
 export interface TreeNodeOptions {
   key: string;
@@ -31,7 +34,11 @@ export interface TreeNodeOptions {
   ],
   templateUrl: './tree.component.html',
   styleUrl: './tree.component.less',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    expandCollapse,
+    rotate(90)
+  ]
 })
 export class TreeComponent implements OnInit, OnChanges {
   @Input() treeData: TreeNodeOptions[] = [];
@@ -72,6 +79,9 @@ export class TreeComponent implements OnInit, OnChanges {
   checkedKeys: Set<string> = new Set();
   indeterminateKeys: Set<string> = new Set();
   searchResults: TreeNodeOptions[] = [];
+  
+  // 用于跟踪正在动画中的节点
+  animatingNodes: Map<string, boolean> = new Map();
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -200,20 +210,37 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   onNodeExpand(node: TreeNodeOptions): void {
+    if (this.animatingNodes.get(node.key)) {
+      return; // 如果正在动画中，不响应点击
+    }
+    
     if (this.asyncData && (!node.children || node.children.length === 0) && !node.isLeaf) {
       this.loadData.emit(node);
       return;
     }
 
+    this.animatingNodes.set(node.key, true);
+    
     if (this.expandedKeys.has(node.key)) {
-      this.expandedKeys.delete(node.key);
+      // 收起时不立即从expandedKeys中移除，等动画结束后再移除
       node.expanded = false;
     } else {
       this.expandedKeys.add(node.key);
       node.expanded = true;
     }
+    
     this.cdr.detectChanges();
     this.expandChange.emit({ expanded: node.expanded, node });
+  }
+
+  // 处理动画结束事件
+  onAnimationDone(event: AnimationEvent, node: TreeNodeOptions): void {
+    if (event.toState === 'collapsed' && !node.expanded) {
+      // 动画结束且是收起状态，从expandedKeys中移除
+      this.expandedKeys.delete(node.key);
+    }
+    this.animatingNodes.delete(node.key);
+    this.cdr.detectChanges();
   }
 
   onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
