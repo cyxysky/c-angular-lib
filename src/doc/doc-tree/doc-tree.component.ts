@@ -48,7 +48,9 @@ export class DocTreeComponent {
               title: '子节点1-2-2',
               disableCheckbox: true,
               children: [
-                { key: '0-1-1-0', title: '子节点1-2-2-1' }
+                { key: '0-1-1-0', title: '子节点1-2-2-1' },
+                { key: '0-1-1-1', title: '子节点1-2-2-2' },
+                { key: '0-1-1-2', title: '子节点1-2-2-3' },
               ]
             }
           ]
@@ -114,24 +116,24 @@ export class DocTreeComponent {
     {
       key: '0',
       title: '文档',
-      icon: 'folder-icon',
+      icon: 'bi-folder',
       children: [
         {
           key: '0-0',
           title: '图片',
-          icon: 'image-icon',
+          icon: 'bi-image',
           children: [
-            { key: '0-0-0', title: 'logo.png', icon: 'image-file-icon' },
-            { key: '0-0-1', title: 'banner.jpg', icon: 'image-file-icon' }
+            { key: '0-0-0', title: 'logo.png', icon: 'bi-file-earmark-image' },
+            { key: '0-0-1', title: 'banner.jpg', icon: 'bi-file-earmark-image' }
           ]
         },
         {
           key: '0-1',
           title: '文本',
-          icon: 'text-icon',
+          icon: 'bi-file-earmark',
           children: [
-            { key: '0-1-0', title: 'README.md', icon: 'markdown-icon' },
-            { key: '0-1-1', title: 'note.txt', icon: 'text-file-icon' }
+            { key: '0-1-0', title: 'README.md', icon: 'bi-file-earmark-text' },
+            { key: '0-1-1', title: 'note.txt', icon: 'bi-file-earmark-text' }
           ]
         }
       ]
@@ -139,10 +141,10 @@ export class DocTreeComponent {
     {
       key: '1',
       title: '代码',
-      icon: 'code-icon',
+      icon: 'bi-code-slash',
       children: [
-        { key: '1-0', title: 'index.ts', icon: 'typescript-icon' },
-        { key: '1-1', title: 'styles.css', icon: 'css-icon' }
+        { key: '1-0', title: 'index.ts', icon: 'bi-file-earmark-code' },
+        { key: '1-1', title: 'styles.css', icon: 'bi-file-earmark-code' }
       ]
     }
   ];

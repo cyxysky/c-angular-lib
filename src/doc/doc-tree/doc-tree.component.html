@@ -21,6 +21,7 @@
         <lib-tree
           [treeData]="basicTreeData"
           [checkable]="true"
+          [showIcon]="true"
           [defaultExpandAll]="false"
           [defaultSelectedKeys]="['1-1']"
           [defaultCheckedKeys]="['0']"
@@ -92,14 +93,19 @@
     
     <!-- 自定义图标 -->
     <app-doc-box
-      title="自定义图标"
+      title="自定义图标和展开图标"
       [sourceCode]="iconSource">
       <div demo>
         <lib-tree 
-          [treeData]="iconTreeData" 
+          [treeData]="iconTreeData"
+          [expandedIcon]="expandIconTemplate"
           [showIcon]="true"
           [defaultExpandAll]="true"
         >
+          <ng-template #expandIconTemplate let-node>
+            <i class="bi-folder2-open" *ngIf="node.expanded"></i>
+            <i class="bi-folder" *ngIf="!node.expanded"></i>
+          </ng-template>
           <ng-template #iconTemplate let-node>
             <i class="tree-icon" [ngClass]="node.icon"></i>
           </ng-template>

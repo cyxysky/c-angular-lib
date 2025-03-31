@@ -32,9 +32,11 @@
 </div>
 
 <!-- 树节点模板 -->
-<ng-template #renderTreeNodesTemplate let-nodes let-level="level">
-  <ul class="lib-tree-node-list">
-    <li *ngFor="let node of nodes; let isLast = last; let index = index" class="lib-tree-node" [class.lib-tree-node-hidden]="!isNodeVisible(node)" [class.lib-tree-node-last]="isLast">
+<ng-template #renderTreeNodesTemplate let-nodes let-level="level" let-parentNode="parentNode">
+  <ul class="lib-tree-node-list" 
+    [style.max-height]="(parentNode === undefined || parentNode.expanded) ? '100%' : '0'"
+    >
+    <li *ngFor="let node of nodes; let isLast = last; let index = index" class="lib-tree-node" [class.lib-tree-node-last]="isLast">
       <div 
         class="lib-tree-node-content"
         [class.lib-tree-node-content-selected]="node.selected"
@@ -52,18 +54,14 @@
           *ngIf="showIcon" 
           class="lib-tree-icon"
         >
-          <ng-container *ngIf="iconTemplate; else defaultIconTpl">
-            <ng-container *ngTemplateOutlet="iconTemplate; context: { $implicit: node, origin: node }"></ng-container>
-          </ng-container>
+          <ng-container *ngTemplateOutlet="iconTemplate || defaultIconTpl; context: { $implicit: node, origin: node }"></ng-container>
           <ng-template #defaultIconTpl>
             <i class="tree-icon" [ngClass]="node.icon || (node.isLeaf ? 'file-icon' : (expandedKeys.has(node.key) ? 'folder-open-icon' : 'folder-icon'))"></i>
           </ng-template>
         </span>
         <!-- 节点内容 -->
         <div class="lib-tree-title" [class.lib-tree-title-disabled]="node.disabled" [class.lib-tree-title-selected]="node.selected" (click)="onNodeSelect(node, $event)">
-          <ng-container *ngIf="treeTemplate; else defaultNodeTpl">
-            <ng-container *ngTemplateOutlet="treeTemplate; context: { $implicit: node, origin: node, node: node }"></ng-container>
-          </ng-container>
+          <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, origin: node, node: node }"></ng-container>
           <ng-template #defaultNodeTpl>
             {{ node.title }}
           </ng-template>
@@ -72,7 +70,7 @@
 
       <!-- 子节点递归 -->
       <div class="lib-tree-children" *ngIf="node.children && node.children.length && expandedKeys.has(node.key)">
-        <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1 }"></ng-container>
+        <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
       </div>
     </li>
   </ul>
@@ -122,7 +120,10 @@
     [class.lib-tree-switcher-disabled]="node.disabled"
     (click)="$event.stopPropagation(); onNodeExpand(node)"
   >
-    <i class="tree-switcher-icon"></i>
+    <ng-container *ngTemplateOutlet="expandedIcon || defaultExpandedIconTpl; context: { $implicit: node }"></ng-container>
+    <ng-template #defaultExpandedIconTpl>
+      <i class="tree-switcher-icon"></i>
+    </ng-template>
   </span>
   <!-- 没有子节点的 -->
   <span 
@@ -134,12 +135,12 @@
 
 <!-- 缩进 -->
 <ng-template #indentTemplate let-node let-isLast="isLast" let-level="level" let-index="index" let-parentLength="parentLength">
-    <span 
+  <span 
     [style.width.px]="indent"
-    [class.lib-tree-vertical-line]="showLine && hasFlatLine(node, level, j)"
+    [class.lib-tree-vertical-line]="showLine && hasFlatLine(node, j)"
     class="lib-tree-indent" 
-    *ngFor="let i of getIndentArray(level);index as j">
-    </span>
+    *ngFor="let i of getIndentArray(level); index as j">
+  </span>
 </ng-template>
 
 <!-- 复选框 -->

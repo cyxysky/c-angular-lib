@@ -40,13 +40,17 @@ export class TreeComponent implements OnInit, OnChanges {
   @Input() checkable = false;
   @Input() multiple = false;
   @Input() draggable = false;
-  @Input() virtualHeight: number = 300;
   @Input() defaultExpandAll = false;
   @Input() searchValue = '';
   @Input() asyncData = false;
   @Input() indent = 24;
   @Input() optionHeight = 24;
   @Input() isVirtualScroll = false;
+  @Input() expandedIcon: TemplateRef<{ $implicit: TreeNodeOptions, origin: any }> | null = null;
+  @Input() virtualHeight: number = 300;
+  @Input() virtualItemSize: number = 24;
+  @Input() virtualMinBuffer: number = 10;
+  @Input() virtualMaxBuffer: number = 10;
   @Input() defaultSelectedKeys: string[] = [];
   @Input() defaultCheckedKeys: string[] = [];
   @Input() defaultExpandedKeys: string[] = [];
@@ -79,6 +83,10 @@ export class TreeComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initTreeState();
     this.flattenTree();
+  }
+
+  ngAfterViewInit(): void {
+    this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -169,6 +177,8 @@ export class TreeComponent implements OnInit, OnChanges {
       }
       if (node.children && node.children.length) {
         this.flattenTreeNodes(node.children, node);
+      } else {
+        node.isLeaf = true;
       }
     });
   }
@@ -435,7 +445,54 @@ export class TreeComponent implements OnInit, OnChanges {
     );
   }
 
-  public hasFlatLine(node: TreeNodeOptions, index: number, parentLength: number): boolean {
-    return parentLength + 2 >= index;
+  /**
+   * 判断是否显示虚线
+   * @param node 节点
+   * @param index 当前缩进的索引
+   * @returns 
+   */
+  public hasFlatLine(node: TreeNodeOptions, index: number): boolean {
+    const parents = this.getParentNodes(node);
+    // 如果没有父节点，或者index大于父节点数量，则显示连接线
+    if (!parents.length || index >= parents.length) {
+      return true;
+    }
+    // 从当前层级往上遍历每一层
+    for (let i = parents.length - 1; i >= 0; i--) {
+      const parent = parents[i];
+      // 如果当前检查的缩进层级对应的父节点
+      if (parents.length - 1 - i === index) {
+        // 检查该父节点是否为其父节点的最后一个子节点
+        const parentOfParent = i > 0 ? parents[i - 1] : null;
+        if (parentOfParent && parentOfParent.children) {
+          // 如果是最后一个子节点，则不显示连接线
+          if (parentOfParent.children[parentOfParent.children.length - 1].key === parent.key) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  // 获取节点的所有父节点
+  private getParentNodes(node: TreeNodeOptions): TreeNodeOptions[] {
+    const parents: TreeNodeOptions[] = [];
+    const findParents = (nodes: TreeNodeOptions[], targetKey: string): boolean => {
+      for (const current of nodes) {
+        if (current.key === targetKey) {
+          return true;
+        }
+        if (current.children) {
+          if (findParents(current.children, targetKey)) {
+            parents.unshift(current);
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    findParents(this.treeData, node.key);
+    return parents;
   }
 }
