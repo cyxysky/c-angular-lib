@@ -16,6 +16,7 @@ import { DocPopoverComponent } from './doc-popover/doc-popover.component';
 import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.component';
 import { DocSelectComponent } from './doc-select/doc-select.component';
 import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
+import { DocTreeComponent } from './doc-tree/doc-tree.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -35,7 +36,8 @@ import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
     DocPopoverComponent,
     DocPopconfirmComponent,
     DocSelectComponent,
-    DocCascaderComponent
+    DocCascaderComponent,
+    DocTreeComponent
   ],
   exports: [
     DocButtonComponent,
@@ -53,7 +55,8 @@ import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
     DocPopoverComponent,
     DocPopconfirmComponent,
     DocSelectComponent,
-    DocCascaderComponent
+    DocCascaderComponent,
+    DocTreeComponent
   ]
 })
 export class DocModule { }

@@ -1,11 +1,441 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ContentChild, forwardRef, ElementRef, ViewChild, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
+
+export interface TreeNodeOptions {
+  key: string;
+  title: string;
+  icon?: string;
+  isLeaf?: boolean;
+  expanded?: boolean;
+  selected?: boolean;
+  checked?: boolean;
+  indeterminate?: boolean;
+  selectable?: boolean;
+  disabled?: boolean;
+  disableCheckbox?: boolean;
+  children?: TreeNodeOptions[];
+  [key: string]: any;
+}
 
 @Component({
   selector: 'lib-tree',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    CdkVirtualScrollViewport,
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualForOf
+  ],
   templateUrl: './tree.component.html',
-  styleUrl: './tree.component.less'
+  styleUrl: './tree.component.less',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeComponent {
+export class TreeComponent implements OnInit, OnChanges {
+  @Input() treeData: TreeNodeOptions[] = [];
+  @Input() showIcon = false;
+  @Input() showLine = false;
+  @Input() checkable = false;
+  @Input() multiple = false;
+  @Input() draggable = false;
+  @Input() virtualHeight: number = 300;
+  @Input() defaultExpandAll = false;
+  @Input() searchValue = '';
+  @Input() asyncData = false;
+  @Input() indent = 24;
+  @Input() optionHeight = 24;
+  @Input() isVirtualScroll = false;
+  @Input() defaultSelectedKeys: string[] = [];
+  @Input() defaultCheckedKeys: string[] = [];
+  @Input() defaultExpandedKeys: string[] = [];
 
+  @Output() checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
+  @Output() expandChange = new EventEmitter<{ expanded: boolean, node: TreeNodeOptions }>();
+  @Output() selectedChange = new EventEmitter<{ selected: boolean, node: TreeNodeOptions }>();
+  @Output() searchChange = new EventEmitter<string>();
+  @Output() loadData = new EventEmitter<TreeNodeOptions>();
+
+  @ContentChild('treeTemplate') treeTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any, node: TreeNodeOptions }>;
+  @ContentChild('iconTemplate') iconTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any }>;
+
+  @ViewChild('treeContainer') treeContainer!: ElementRef;
+
+  flattenNodes: Map<string, TreeNodeOptions> = new Map();
+  expandedKeys: Set<string> = new Set();
+  selectedKeys: Set<string> = new Set();
+  checkedKeys: Set<string> = new Set();
+  indeterminateKeys: Set<string> = new Set();
+  searchResults: TreeNodeOptions[] = [];
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  // 生成缩进数组
+  getIndentArray(level: number): number[] {
+    return Array(level).fill(0).map((_, i) => i);
+  }
+
+  ngOnInit(): void {
+    this.initTreeState();
+    this.flattenTree();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['treeData']) {
+      this.flattenTree();
+    }
+    if (changes['searchValue']) {
+      this.handleSearch();
+    }
+    if (changes['defaultExpandAll']) {
+      if (this.defaultExpandAll) {
+        this.handleExpandAll();
+      }
+    }
+    if (changes['defaultExpandedKeys']) {
+      this.initDefaultExpandedKeys();
+    }
+    if (changes['defaultSelectedKeys']) {
+      this.initDefaultSelectedKeys();
+    }
+    if (changes['defaultCheckedKeys']) {
+      this.initDefaultCheckedKeys();
+    }
+  }
+
+  initDefaultExpandedKeys(): void {
+    this.defaultExpandedKeys.forEach(key => {
+      const node = this.flattenNodes.get(key);
+      if (node) {
+        this.expandedKeys.add(key);
+        node.expanded = true;
+      }
+    });
+  }
+
+  initDefaultSelectedKeys(): void {
+    this.defaultSelectedKeys.forEach(key => {
+      const node = this.flattenNodes.get(key);
+      if (node && !node.disabled && node.selectable !== false) {
+        this.selectedKeys.add(key);
+        node.selected = true;
+      }
+    });
+  }
+
+  initDefaultCheckedKeys(): void {
+    this.defaultCheckedKeys.forEach(key => {
+      const node = this.flattenNodes.get(key);
+      if (node && !node.disabled && !node.disableCheckbox) {
+        this.checkedKeys.add(key);
+        node.checked = true;
+        this.updateParentCheckState(node);
+      }
+    });
+  }
+
+  private initTreeState(): void {
+    if (this.defaultExpandAll) {
+      this.handleExpandAll();
+    } else if (this.defaultExpandedKeys.length) {
+      this.initDefaultExpandedKeys();
+    }
+    this.initDefaultSelectedKeys();
+    this.initDefaultCheckedKeys();
+    this.cdr.detectChanges();
+  }
+
+  private flattenTree(): void {
+    this.flattenNodes = new Map();
+    this.flattenTreeNodes(this.treeData);
+    this.cdr.detectChanges();
+  }
+
+  private flattenTreeNodes(nodes: TreeNodeOptions[] = [], parent?: TreeNodeOptions): void {
+    nodes.forEach(node => {
+      this.flattenNodes.set(node.key, node);
+      if (node.expanded) {
+        this.expandedKeys.add(node.key);
+      }
+      if (node.selected) {
+        this.selectedKeys.add(node.key);
+      }
+      if (node.checked) {
+        this.checkedKeys.add(node.key);
+      }
+      if (node.indeterminate) {
+        this.indeterminateKeys.add(node.key);
+      }
+      if (node.children && node.children.length) {
+        this.flattenTreeNodes(node.children, node);
+      }
+    });
+  }
+
+  handleExpandAll(): void {
+    this.expandedKeys = new Set();
+    this.traverseNodesForExpandAll(this.treeData);
+    this.cdr.detectChanges();
+  }
+
+  private traverseNodesForExpandAll(nodes: TreeNodeOptions[]): void {
+    nodes.forEach(node => {
+      if (!node.isLeaf && node.children && node.children.length) {
+        this.expandedKeys.add(node.key);
+        node.expanded = true;
+        this.traverseNodesForExpandAll(node.children);
+      }
+    });
+  }
+
+  onNodeExpand(node: TreeNodeOptions): void {
+    if (this.asyncData && (!node.children || node.children.length === 0) && !node.isLeaf) {
+      this.loadData.emit(node);
+      return;
+    }
+
+    if (this.expandedKeys.has(node.key)) {
+      this.expandedKeys.delete(node.key);
+      node.expanded = false;
+    } else {
+      this.expandedKeys.add(node.key);
+      node.expanded = true;
+    }
+    this.cdr.detectChanges();
+    this.expandChange.emit({ expanded: node.expanded, node });
+  }
+
+  onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
+    if (node.disabled || node.selectable === false) {
+      return;
+    }
+
+    if (!this.multiple) {
+      this.treeData.forEach(n => this.clearNodeSelected(n));
+    }
+    if (this.selectedKeys.has(node.key)) {
+      this.selectedKeys.delete(node.key)
+      node.selected = false;
+    } else {
+      !this.multiple && this.selectedKeys.clear();
+      this.selectedKeys.add(node.key);
+      node.selected = true;
+    }
+    this.cdr.detectChanges();
+    this.selectedChange.emit({ selected: node.selected, node });
+  }
+
+  private clearNodeSelected(node: TreeNodeOptions): void {
+    if (node.selected) {
+      node.selected = false;
+    }
+    if (node.children && node.children.length) {
+      node.children.forEach(child => this.clearNodeSelected(child));
+    }
+  }
+
+  onNodeCheck(node: TreeNodeOptions, checked: boolean): void {
+    if (node.disabled || node.disableCheckbox) {
+      return;
+    }
+
+    node.checked = checked;
+    node.indeterminate = false;
+
+    if (checked) {
+      this.checkedKeys.add(node.key);
+      this.indeterminateKeys.delete(node.key);
+    } else {
+      this.checkedKeys.delete(node.key);
+      this.indeterminateKeys.delete(node.key);
+    }
+
+    this.updateChildrenCheckState(node, checked);
+    this.updateParentCheckState(node);
+    this.cdr.detectChanges();
+    this.checkBoxChange.emit({ checked, node });
+  }
+
+  private updateChildrenCheckState(node: TreeNodeOptions, checked: boolean): void {
+    if (node.children) {
+      node.children.forEach(child => {
+        if (!child.disabled && !child.disableCheckbox) {
+          child.checked = checked;
+          child.indeterminate = false;
+
+          if (checked) {
+            this.checkedKeys.add(child.key);
+            this.indeterminateKeys.delete(child.key);
+          } else {
+            this.checkedKeys.delete(child.key);
+            this.indeterminateKeys.delete(child.key);
+          }
+
+          this.updateChildrenCheckState(child, checked);
+        }
+      });
+    }
+  }
+
+  private updateParentCheckState(node: TreeNodeOptions): void {
+    const findParent = (nodes: TreeNodeOptions[], targetKey: string): TreeNodeOptions | null => {
+      for (const current of nodes) {
+        if (current.children) {
+          const isParent = current.children.some(child => child.key === targetKey);
+          if (isParent) {
+            return current;
+          }
+          const found = findParent(current.children, targetKey);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
+    };
+
+    const parent = findParent(this.treeData, node.key);
+    if (parent && parent.children) {
+      const totalEnabledChildren = parent.children.filter(
+        child => !child.disabled && !child.disableCheckbox
+      ).length;
+
+      const checkedChildren = parent.children.filter(
+        child => child.checked && !child.disabled && !child.disableCheckbox
+      ).length;
+
+      const indeterminateChildren = parent.children.filter(
+        child => child.indeterminate && !child.disabled && !child.disableCheckbox
+      ).length;
+
+      if (checkedChildren === 0 && indeterminateChildren === 0) {
+        if (!parent.disabled && !parent.disableCheckbox) {
+          parent.checked = false;
+          parent.indeterminate = false;
+          this.checkedKeys.delete(parent.key);
+          this.indeterminateKeys.delete(parent.key);
+        }
+      } else if (checkedChildren === totalEnabledChildren) {
+        if (!parent.disabled && !parent.disableCheckbox) {
+          parent.checked = true;
+          parent.indeterminate = false;
+          this.checkedKeys.add(parent.key);
+          this.indeterminateKeys.delete(parent.key);
+        }
+      } else {
+        if (!parent.disabled && !parent.disableCheckbox) {
+          parent.checked = false;
+          parent.indeterminate = true;
+          this.checkedKeys.delete(parent.key);
+          this.indeterminateKeys.add(parent.key);
+        }
+      }
+
+      this.updateParentCheckState(parent);
+    }
+  }
+
+  handleSearch(): void {
+    if (!this.searchValue) {
+      this.searchResults = [];
+      return;
+    }
+
+    this.searchResults = this.searchTreeNodes(this.treeData, this.searchValue.toLowerCase());
+    if (this.searchResults.length > 0) {
+      this.expandSearchResults();
+    }
+    this.cdr.detectChanges();
+  }
+
+  private searchTreeNodes(nodes: TreeNodeOptions[], searchValue: string): TreeNodeOptions[] {
+    const results: TreeNodeOptions[] = [];
+
+    nodes.forEach(node => {
+      const nodeTitleLower = node.title.toLowerCase();
+
+      if (nodeTitleLower.includes(searchValue)) {
+        results.push(node);
+      }
+
+      if (node.children && node.children.length) {
+        const childResults = this.searchTreeNodes(node.children, searchValue);
+        if (childResults.length > 0) {
+          results.push(...childResults);
+        }
+      }
+    });
+    return results;
+  }
+
+  private expandSearchResults(): void {
+    this.searchResults.forEach(node => {
+      this.expandNodeParents(node);
+    });
+    this.cdr.detectChanges();
+  }
+
+  private expandNodeParents(node: TreeNodeOptions): void {
+    const findNodePath = (nodes: TreeNodeOptions[], targetKey: string, path: TreeNodeOptions[] = []): TreeNodeOptions[] => {
+      for (const current of nodes) {
+        const currentPath = [...path, current];
+        if (current.key === targetKey) {
+          return currentPath;
+        }
+        if (current.children) {
+          const found = findNodePath(current.children, targetKey, currentPath);
+          if (found.length) {
+            return found;
+          }
+        }
+      }
+      return [];
+    };
+
+    const nodePath = findNodePath(this.treeData, node.key);
+    nodePath.forEach(pathNode => {
+      if (!pathNode.isLeaf && pathNode.children && pathNode.children.length) {
+        this.expandedKeys.add(pathNode.key);
+        pathNode.expanded = true;
+      }
+    });
+  }
+
+  onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchValue = value;
+    this.searchChange.emit(value);
+    this.handleSearch();
+    this.cdr.detectChanges();
+  }
+
+  showEmptyState(): boolean {
+    return this.searchValue !== undefined && 
+           this.searchValue !== '' && 
+           this.searchResults.length === 0;
+  }
+
+  isNodeVisible(node: TreeNodeOptions): boolean {
+    if (!this.searchValue) {
+      return true;
+    }
+    const nodeInResults = this.searchResults.some(result => result.key === node.key);
+    const hasChildInResults = this.hasChildMatchSearch(node);
+    return nodeInResults || hasChildInResults;
+  }
+
+  private hasChildMatchSearch(node: TreeNodeOptions): boolean {
+    if (!node.children || !node.children.length) {
+      return false;
+    }
+    return node.children.some(child =>
+      this.searchResults.some(result => result.key === child.key) ||
+      this.hasChildMatchSearch(child)
+    );
+  }
+
+  public hasFlatLine(node: TreeNodeOptions, index: number, parentLength: number): boolean {
+    return parentLength + 2 >= index;
+  }
 }

@@ -1,0 +1,148 @@
+@import './style.less';
+// 级联选择器基础颜色变量
+@cascader-active-color: rgba(23, 184, 199, 0.6);
+@cascader-bg-color: #fff;
+@cascader-text-color: rgba(0, 0, 0, 0.85);
+@cascader-placeholder-color: rgba(0, 0, 0, 0.45);
+@cascader-hover-bg-color: rgba(23, 184, 199, 0.06);
+@cascader-disabled-bg-color: #f5f5f5;
+@cascader-disabled-color: rgba(0, 0, 0, 0.25);
+@cascader-disabled-border-color: #d9d9d9;
+
+// 级联选择器标签样式
+@cascader-tag-bg-color: rgb(30 137 200 / 6%);
+@cascader-tag-text-color: rgb(25 128 163 / 67%);
+@cascader-tag-border-color: rgba(23, 184, 199, 0.12);
+@cascader-tag-border: 1px solid @cascader-tag-border-color;
+@cascader-tag-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+@cascader-hover-tag-bg-color: rgba(0, 207, 226, 0.08);
+@cascader-tag-close-hover-bg: rgba(0, 0, 0, 0.08);
+
+// 级联选择器尺寸变量
+@cascader-height-base: 36px;
+@cascader-font-size-base: 14px;
+@cascader-min-width: 120px;
+@cascader-line-height: 1.5;
+@cascader-gap: 4px;
+
+// 级联选择器内容间距
+@cascader-content-padding-base: 4px 8px;
+@cascader-content-padding-lg: 6px 8px;
+@cascader-content-padding-sm: 2px 6px;
+@cascader-content-min-height-base: 34px;
+@cascader-content-min-height-lg: 42px;
+@cascader-content-min-height-sm: 26px;
+@cascader-content-max-width: calc(100% - 24px);
+
+// 级联选择器大尺寸变量
+@cascader-height-lg: 44px;
+@cascader-font-size-lg: 16px;
+@cascader-placeholder-padding-left-lg: 10px;
+
+// 级联选择器小尺寸变量
+@cascader-height-sm: 28px;
+@cascader-font-size-sm: 12px;
+@cascader-placeholder-padding-left-sm: 6px;
+
+// 级联选择器标签尺寸变量
+@cascader-tag-height-base: 24px;
+@cascader-tag-font-size-base: 13px;
+@cascader-tag-height-lg: 30px;
+@cascader-tag-font-size-lg: 14px;
+@cascader-tag-height-sm: 20px;
+@cascader-tag-font-size-sm: 12px;
+@cascader-tag-margin: 1px;
+@cascader-tag-padding: 0 4px 0 8px;
+@cascader-tag-padding-sm: 0 2px 0 6px;
+@cascader-tag-border-radius: 4px;
+@cascader-tag-text-max-width: calc(100% - 16px);
+
+// 级联选择器图标尺寸变量
+@cascader-icon-size-base: 16px;
+@cascader-icon-size-lg: 18px;
+@cascader-icon-size-sm: 14px;
+@cascader-icon-color: rgba(0, 0, 0, 0.6);
+@cascader-icon-hover-color: rgba(0, 0, 0, 0.65);
+@cascader-icon-transition: all 0.3s ease-in-out;
+
+// 级联选择器后缀区域尺寸
+@cascader-suffix-min-width-base: 30px;
+@cascader-suffix-min-width-sm: 24px;
+
+// 级联选择器边框和阴影
+@cascader-border-color: #e7eaed;
+@cascader-border-radius: 4px;
+@cascader-border-width: 1px;
+@cascader-border-style: solid;
+@cascader-border: @cascader-border-width @cascader-border-style @cascader-border-color;
+@cascader-focus-border-color: rgba(0, 207, 226, 0.6);
+@cascader-focus-border: @cascader-border-width @cascader-border-style @cascader-focus-border-color;
+@cascader-hover-border-color: rgba(0, 207, 226, 0.4);
+@cascader-hover-border: @cascader-border-width @cascader-border-style @cascader-hover-border-color;
+@cascader-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+@cascader-focus-box-shadow: 0 0 0 2px rgba(0, 207, 226, 0.12);
+
+// 级联选择器错误和警告状态
+@cascader-error-color: #ff4d4f;
+@cascader-warning-color: #faad14;
+@cascader-error-border: @cascader-border-width @cascader-border-style @cascader-error-color;
+@cascader-warning-border: @cascader-border-width @cascader-border-style @cascader-warning-color;
+@cascader-error-box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+@cascader-warning-box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+
+// 级联选择器下拉菜单样式
+@cascader-dropdown-box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
+@cascader-dropdown-border-radius: 4px;
+@cascader-dropdown-z-index: 1000;
+@cascader-dropdown-transition: all 0.2s;
+
+// 级联选择器搜索结果列表样式
+@cascader-search-result-max-height: 256px;
+@cascader-search-result-padding: 4px 0;
+@cascader-search-loading-padding: 8px 0;
+@cascader-empty-options-padding: 16px;
+@cascader-search-option-padding: 5px 12px;
+@cascader-search-option-margin-left: 8px;
+
+// 级联选择器菜单样式
+@cascader-menu-min-width: 120px;
+@cascader-menu-width: 160px;
+@cascader-menu-height: 180px;
+@cascader-menu-padding: 4px 0;
+@cascader-menu-border-right: 1px solid #f0f0f0;
+@cascader-menu-item-padding: 5px 12px;
+@cascader-menu-item-line-height: 22px;
+@cascader-menu-item-transition: all 0.3s;
+@cascader-menu-item-hover-bg: #f5f5f5;
+@cascader-menu-item-active-bg: #e6f4ff;
+@cascader-menu-item-active-font-weight: 600;
+@cascader-menu-item-selected-color: #1890ff;
+@cascader-menu-item-expand-icon-margin: 8px;
+@cascader-menu-item-checkbox-margin: 8px;
+@cascader-menu-item-empty-color: @cascader-placeholder-color;
+
+// 级联选择器复选框样式
+@cascader-checkbox-size: 16px;
+@cascader-checkbox-margin: 8px;
+@cascader-checkbox-bg: #fff;
+@cascader-checkbox-border: 1px solid #d9d9d9;
+@cascader-checkbox-border-radius: 2px;
+@cascader-checkbox-transition: all 0.3s;
+@cascader-checkbox-checked-bg: #1890ff;
+@cascader-checkbox-checked-border: #1890ff;
+@cascader-checkbox-indeterminate-width: 8px;
+@cascader-checkbox-indeterminate-height: 8px;
+@cascader-checkbox-inner-transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;
+@cascader-checkbox-check-width: 5.71428571px;
+@cascader-checkbox-check-height: 9.14285714px;
+
+// 级联选择器动画
+@cascader-transition-duration: 0.2s;
+@cascader-transition: all @cascader-transition-duration ease;
+@cascader-rotate-duration: 1.2s;
+@cascader-tag-animation: @cascader-transition-duration linear 0s alternate show;
+
+// 搜索框样式
+@cascader-search-margin-left-base: 8px;
+@cascader-search-input-height-base: 24px;
+@cascader-placeholder-padding-left: 8px;

@@ -26,7 +26,7 @@
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
                             <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
-
+                            <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
                         </ul>
                     </li>
                 </ul>
@@ -108,6 +108,9 @@
         }
         @case ('cascader') {
         <app-doc-cascader></app-doc-cascader>
+        }
+        @case ('tree') {
+        <app-doc-tree></app-doc-tree>
         }
         }
     </div>

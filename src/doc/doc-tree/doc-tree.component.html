@@ -1,1 +1,132 @@
-<p>doc-tree works!</p>
+<div class="doc-container">
+  <h1 class="doc-title">树 Tree</h1>
+  
+  <p class="doc-description">
+    多层次的结构列表，展示具有层级关系的数据。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    文件夹、组织架构、生物分类、国家地区等等，世间万物的大多数结构都是树形结构。使用树控件可以完整展现其中的层级关系，并具有展开收起选择等交互功能。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-tree
+          [treeData]="basicTreeData"
+          [checkable]="true"
+          [defaultExpandAll]="false"
+          [defaultSelectedKeys]="['1-1']"
+          [defaultCheckedKeys]="['0']"
+          [defaultExpandedKeys]="['']"
+          (selectedChange)="onNodeSelected($event)"
+          (checkBoxChange)="onNodeChecked($event)"
+          (expandChange)="onNodeExpanded($event)"
+        ></lib-tree>
+      </div>
+      <div description>
+        最简单的用法，展示可勾选、可选中、默认展开等功能。
+      </div>
+    </app-doc-box>
+    
+    <!-- 带连接线的树 -->
+    <app-doc-box
+      title="带连接线的树"
+      [sourceCode]="lineSource">
+      <div demo>
+        <lib-tree 
+          [treeData]="basicTreeData" 
+          [showLine]="true"
+          [defaultExpandAll]="true"
+        ></lib-tree>
+      </div>
+      <div description>
+        带连接线的树形结构，用于展示层级明显的树形结构。
+      </div>
+    </app-doc-box>
+    
+    <!-- 使用TreeTemplate自定义目录结构 -->
+    <app-doc-box
+      title="自定义节点内容"
+      [sourceCode]="customSource">
+      <div demo>
+        <lib-tree 
+          [treeData]="customTreeData" 
+          [defaultExpandAll]="true"
+        >
+          <ng-template #treeTemplate let-node let-origin="origin">
+            <div class="custom-node">
+              <span>{{ node.title }}</span>
+              <span *ngIf="origin.type" class="node-type">{{ origin.type }}</span>
+              <span *ngIf="origin.description" class="node-desc">{{ origin.description }}</span>
+            </div>
+          </ng-template>
+        </lib-tree>
+      </div>
+      <div description>
+        使用 TreeTemplate 实现自定义目录结构，通过 let-origin="origin" 获得原始数据，let-node 获取当前节点状态。
+      </div>
+    </app-doc-box>
+    
+    <!-- 虚拟滚动 -->
+    <app-doc-box
+      title="虚拟滚动"
+      [sourceCode]="virtualSource">
+      <div demo>
+        <lib-tree 
+          [treeData]="largeTreeData" 
+          [isVirtualScroll]="true"
+          [virtualHeight]="300"
+        ></lib-tree>
+      </div>
+      <div description>
+        设定 virtualHeight 开启虚拟滚动，适用于大数据量场景。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义图标 -->
+    <app-doc-box
+      title="自定义图标"
+      [sourceCode]="iconSource">
+      <div demo>
+        <lib-tree 
+          [treeData]="iconTreeData" 
+          [showIcon]="true"
+          [defaultExpandAll]="true"
+        >
+          <ng-template #iconTemplate let-node>
+            <i class="tree-icon" [ngClass]="node.icon"></i>
+          </ng-template>
+        </lib-tree>
+      </div>
+      <div description>
+        可以针对不同的节点定制图标。
+      </div>
+    </app-doc-box>
+    
+    <!-- 可搜索的树 -->
+    <app-doc-box
+      title="可搜索的树"
+      [sourceCode]="searchSource">
+      <div demo>
+        <lib-tree 
+          [treeData]="basicTreeData" 
+          [searchValue]="searchValue"
+          (searchChange)="searchValue = $event"
+        ></lib-tree>
+      </div>
+      <div description>
+        树节点可以被搜索，搜索结果会自动展开父节点。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

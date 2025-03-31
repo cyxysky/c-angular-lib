@@ -1,4 +1,4 @@
-@import '../../style/select.less';
+@import '../../style/cascader.less';
 
 :host {
   display: block;
@@ -6,86 +6,86 @@
 }
 
 .cascader-box {
-  background-color: @select-bg-color;
-  border: @select-border;
-  border-radius: @select-border-radius;
-  transition: @select-transition;
-  min-height: @select-height-base;
-  font-size: @select-font-size-base;
+  background-color: @cascader-bg-color;
+  border: @cascader-border;
+  border-radius: @cascader-border-radius;
+  transition: @cascader-transition;
+  min-height: @cascader-height-base;
+  font-size: @cascader-font-size-base;
   cursor: pointer;
-  line-height: @select-line-height;
+  line-height: @cascader-line-height;
   display: flex;
   align-items: center;
   overflow: hidden;
-  min-width: @select-min-width;
-  box-shadow: @select-box-shadow;
+  min-width: @cascader-min-width;
+  box-shadow: @cascader-box-shadow;
 
   &:hover {
-    border: @select-hover-border;
+    border: @cascader-hover-border;
   }
 
   &:focus,
   &:active,
   &.active {
-    border: @select-focus-border;
-    box-shadow: @select-focus-box-shadow;
+    border: @cascader-focus-border;
+    box-shadow: @cascader-focus-box-shadow;
     outline: none;
   }
 
   // 大中小尺寸
   &.cascader-lg {
-    min-height: @select-height-lg;
-    font-size: @select-font-size-lg;
+    min-height: @cascader-height-lg;
+    font-size: @cascader-font-size-lg;
 
     .cascader-content {
-      padding: @select-content-padding-lg;
-      min-height: @select-content-min-height-lg;
+      padding: @cascader-content-padding-lg;
+      min-height: @cascader-content-min-height-lg;
     }
 
     .cascader-tag {
-      height: @select-tag-height-lg;
-      font-size: @select-tag-font-size-lg;
+      height: @cascader-tag-height-lg;
+      font-size: @cascader-tag-font-size-lg;
 
       .cascader-tag-close-icon {
-        width: @select-icon-size-lg;
-        height: @select-icon-size-lg;
+        width: @cascader-icon-size-lg;
+        height: @cascader-icon-size-lg;
       }
     }
 
     .placeholder,
     .cascader-labels {
-      font-size: @select-font-size-lg;
-      padding-left: @select-placeholder-padding-left-lg;
+      font-size: @cascader-font-size-lg;
+      padding-left: @cascader-placeholder-padding-left-lg;
     }
 
   }
 
   &.cascader-sm {
-    min-height: @select-height-sm;
-    font-size: @select-font-size-sm;
+    min-height: @cascader-height-sm;
+    font-size: @cascader-font-size-sm;
 
     .cascader-content {
-      padding: @select-content-padding-sm;
-      min-height: @select-content-min-height-sm;
+      padding: @cascader-content-padding-sm;
+      min-height: @cascader-content-min-height-sm;
 
       .cascader-tag {
-        height: @select-tag-height-sm;
-        line-height: @select-tag-height-sm;
-        font-size: @select-tag-font-size-sm;
-        padding: @select-tag-padding-sm;
-        margin: @select-tag-margin;
+        height: @cascader-tag-height-sm;
+        line-height: @cascader-tag-height-sm;
+        font-size: @cascader-tag-font-size-sm;
+        padding: @cascader-tag-padding-sm;
+        margin: @cascader-tag-margin;
 
         .cascader-tag-close-icon {
-          width: @select-icon-size-sm;
-          height: @select-icon-size-sm;
+          width: @cascader-icon-size-sm;
+          height: @cascader-icon-size-sm;
         }
       }
     }
 
     .placeholder,
     .cascader-labels {
-      font-size: @select-font-size-sm;
-      padding-left: @select-placeholder-padding-left-sm;
+      font-size: @cascader-font-size-sm;
+      padding-left: @cascader-placeholder-padding-left-sm;
     }
   }
 
@@ -97,32 +97,32 @@
 
   // 状态样式
   &.cascader-error {
-    border: @select-error-border;
+    border: @cascader-error-border;
 
     &:focus,
     &:active,
     &.active {
-      border: @select-error-border;
-      box-shadow: @select-error-box-shadow;
+      border: @cascader-error-border;
+      box-shadow: @cascader-error-box-shadow;
     }
   }
 
   &.cascader-warning {
-    border: @select-warning-border;
+    border: @cascader-warning-border;
 
     &:focus,
     &:active,
     &.active {
-      border: @select-warning-border;
-      box-shadow: @select-warning-box-shadow;
+      border: @cascader-warning-border;
+      box-shadow: @cascader-warning-box-shadow;
     }
   }
 
   &.cascader-disabled {
     cursor: not-allowed;
-    background-color: #f5f5f5;
-    color: rgba(0, 0, 0, 0.25);
-    border-color: #d9d9d9;
+    background-color: @cascader-disabled-bg-color;
+    color: @cascader-disabled-color;
+    border-color: @cascader-disabled-border-color;
 
     .cascader-content,
     .suffix-box {
@@ -134,25 +134,25 @@
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
-    padding: @select-content-padding-base;
-    min-height: @select-content-min-height-base;
+    padding: @cascader-content-padding-base;
+    min-height: @cascader-content-min-height-base;
     position: relative;
-    gap: @select-gap;
+    gap: @cascader-gap;
     align-items: center;
-    max-width: calc(100% - 24px);
+    max-width: @cascader-content-max-width;
     overflow: hidden;
 
     .placeholder {
       display: flex;
       align-items: center;
-      padding-left: @select-placeholder-padding-left;
-      color: @select-placeholder-color;
+      padding-left: @cascader-placeholder-padding-left;
+      color: @cascader-placeholder-color;
       position: absolute;
     }
 
     .cascader-labels {
-      padding-left: @select-placeholder-padding-left;
-      color: @select-text-color;
+      padding-left: @cascader-placeholder-padding-left;
+      color: @cascader-text-color;
       max-width: 100%;
       overflow: hidden;
       white-space: nowrap;
@@ -168,30 +168,30 @@
         text-overflow: ellipsis;
       }
       .dropdown-open-text {
-        color: rgba(0, 0, 0, 0.45) !important;
+        color: @cascader-placeholder-color !important;
       }
     }
 
     .cascader-tag {
       display: inline-flex;
       align-items: center;
-      height: @select-tag-height-base;
+      height: @cascader-tag-height-base;
       max-width: 100%;
-      background-color: @select-tag-bg-color;
-      color: @select-tag-text-color;
-      border-radius: @select-tag-border-radius;
+      background-color: @cascader-tag-bg-color;
+      color: @cascader-tag-text-color;
+      border-radius: @cascader-tag-border-radius;
       cursor: default;
-      font-size: @select-tag-font-size-base;
-      padding: @select-tag-padding;
-      transition: @select-transition;
-      animation: @select-tag-animation;
-      border: @select-tag-border;
-      box-shadow: @select-tag-box-shadow;
+      font-size: @cascader-tag-font-size-base;
+      padding: @cascader-tag-padding;
+      transition: @cascader-transition;
+      animation: @cascader-tag-animation;
+      border: @cascader-tag-border;
+      box-shadow: @cascader-tag-box-shadow;
       white-space: nowrap;
       overflow: hidden;
 
       .cascader-tag-text {
-        max-width: calc(100% - 16px);
+        max-width: @cascader-tag-text-max-width;
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -202,23 +202,23 @@
         justify-content: center;
         cursor: pointer;
         pointer-events: all;
-        width: @select-icon-size-base;
-        height: @select-icon-size-base;
-        border-radius: @select-tag-border-radius;
-        transition: @select-transition;
+        width: @cascader-icon-size-base;
+        height: @cascader-icon-size-base;
+        border-radius: @cascader-tag-border-radius;
+        transition: @cascader-transition;
 
         &:hover {
-          background-color: @select-tag-close-hover-bg;
+          background-color: @cascader-tag-close-hover-bg;
         }
       }
 
       &:hover {
-        background-color: @select-hover-tag-bg-color;
+        background-color: @cascader-hover-tag-bg-color;
       }
     }
 
     .search-box {
-      margin-left: @select-search-margin-left-base;
+      margin-left: @cascader-search-margin-left-base;
       max-width: 100%;
       position: relative;
 
@@ -236,7 +236,7 @@
         border: none;
         outline: none;
         appearance: none;
-        height: @select-search-input-height-base;
+        height: @cascader-search-input-height-base;
         min-width: 20px;
         width: 100%;
       }
@@ -249,24 +249,24 @@
     justify-content: center;
     flex-grow: 0;
     flex-shrink: 0;
-    min-width: @select-suffix-min-width-base;
-    max-width: @select-suffix-min-width-base;
+    min-width: @cascader-suffix-min-width-base;
+    max-width: @cascader-suffix-min-width-base;
     height: 100%;
     margin-left: auto;
 
     .clear-icon {
       display: none;
-      color: @select-placeholder-color;
-      transition: @select-transition;
+      color: @cascader-placeholder-color;
+      transition: @cascader-transition;
 
       &:hover {
-        color: @select-icon-hover-color;
+        color: @cascader-icon-hover-color;
       }
     }
 
     .cascader-icon {
-      transition: @select-icon-transition;
-      color: @select-icon-color;
+      transition: @cascader-icon-transition;
+      color: @cascader-icon-color;
     }
 
     .loading-icon {
@@ -275,8 +275,8 @@
       justify-content: center;
 
       .loading-svg {
-        animation: rotate @select-rotate-duration linear infinite;
-        color: @select-active-color;
+        animation: rotate @cascader-rotate-duration linear infinite;
+        color: @cascader-active-color;
       }
     }
   }
@@ -296,13 +296,13 @@
 
 // 下拉菜单
 .cascader-dropdown {
-  background-color: @select-bg-color;
-  box-shadow: @select-dropdown-box-shadow;
-  border-radius: @select-dropdown-border-radius;
+  background-color: @cascader-bg-color;
+  box-shadow: @cascader-dropdown-box-shadow;
+  border-radius: @cascader-dropdown-border-radius;
   overflow: hidden;
   transform-origin: 0 0;
-  transition: all 0.2s;
-  z-index: 1000;
+  transition: @cascader-dropdown-transition;
+  z-index: @cascader-dropdown-z-index;
 
   &.closed {
     opacity: 0;
@@ -317,17 +317,17 @@
   // 搜索结果列表
   .search-result-list {
     width: 100%;
-    max-height: 256px;
+    max-height: @cascader-search-result-max-height;
     overflow-y: auto;
-    padding: 4px 0;
+    padding: @cascader-search-result-padding;
 
     .search-loading {
       display: flex;
       justify-content: center;
-      padding: 8px 0;
+      padding: @cascader-search-loading-padding;
 
       .loading-text {
-        color: @select-group-title-color;
+        color: @cascader-placeholder-color;
       }
     }
 
@@ -335,7 +335,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: @cascader-empty-options-padding;
 
       .empty-container {
         display: flex;
@@ -344,31 +344,31 @@
 
         .empty-text {
           margin-top: 8px;
-          color: @select-group-title-color;
+          color: @cascader-placeholder-color;
         }
       }
     }
 
     .search-options {
       .search-option {
-        padding: 5px 12px;
+        padding: @cascader-search-option-padding;
         cursor: pointer;
         display: flex;
         justify-content: space-between;
         align-items: center;
 
         &:hover {
-          background-color: @select-hover-bg-color;
+          background-color: @cascader-hover-bg-color;
         }
 
         &.selected {
           font-weight: 500;
-          background-color: @select-tag-bg-color;
-          color: @select-tag-text-color;
+          background-color: @cascader-tag-bg-color;
+          color: @cascader-tag-text-color;
         }
 
         &.disabled {
-          color: @select-disabled-color;
+          color: @cascader-disabled-color;
           cursor: not-allowed;
           background-color: transparent;
 
@@ -384,7 +384,7 @@
         }
 
         .checkbox {
-          margin-left: 8px;
+          margin-left: @cascader-search-option-margin-left;
         }
       }
     }
@@ -397,12 +397,12 @@
     .cascader-menu {
       list-style: none;
       margin: 0;
-      padding: 4px 0;
-      min-width: 120px;
-      width: 160px;
-      height: 180px;
+      padding: @cascader-menu-padding;
+      min-width: @cascader-menu-min-width;
+      width: @cascader-menu-width;
+      height: @cascader-menu-height;
       overflow-y: auto;
-      border-right: 1px solid #f0f0f0;
+      border-right: @cascader-menu-border-right;
       box-sizing: border-box;
 
       &:last-child {
@@ -410,21 +410,21 @@
       }
 
       .cascader-menu-item {
-        padding: 5px 12px;
-        line-height: 22px;
+        padding: @cascader-menu-item-padding;
+        line-height: @cascader-menu-item-line-height;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: @cascader-menu-item-transition;
         display: flex;
         align-items: center;
         width: 100%;
         box-sizing: border-box;
 
         &:hover {
-          background-color: @select-hover-bg-color;
+          background-color: @cascader-hover-bg-color;
         }
 
         &-disabled {
-          color: @select-disabled-color;
+          color: @cascader-disabled-color;
           cursor: not-allowed;
 
           &:hover {
@@ -433,22 +433,22 @@
         }
 
         &-active {
-          background-color: @select-hover-bg-color;
+          background-color: @cascader-hover-bg-color;
           font-weight: 500;
         }
 
         &-selected {
-          color: @select-tag-text-color;
-          background-color: @select-tag-bg-color;
+          color: @cascader-tag-text-color;
+          background-color: @cascader-tag-bg-color;
           font-weight: 500;
         }
 
         &-indeterminate {
-          background-color: fadeout(@select-tag-bg-color, 70%);
+          background-color: fadeout(@cascader-tag-bg-color, 70%);
 
           .cascader-checkbox.indeterminate .checkbox-indicator {
-            background-color: @select-active-color;
-            border-color: @select-active-color;
+            background-color: @cascader-active-color;
+            border-color: @cascader-active-color;
           }
         }
 
@@ -464,20 +464,20 @@
           }
 
           .cascader-menu-item-expand-icon {
-            margin-left: 8px;
+            margin-left: @cascader-menu-item-expand-icon-margin;
             flex-shrink: 0;
           }
 
           .cascader-checkbox {
-            margin-right: 8px;
+            margin-right: @cascader-menu-item-checkbox-margin;
             flex-shrink: 0;
           }
         }
       }
 
       .cascader-menu-item-empty {
-        padding: 5px 12px;
-        color: @select-placeholder-color;
+        padding: @cascader-menu-item-padding;
+        color: @cascader-menu-item-empty-color;
         text-align: center;
       }
     }
@@ -500,13 +500,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
-  width: 16px;
-  height: 16px;
-  background-color: #fff;
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
-  transition: all 0.3s;
+  margin-right: @cascader-checkbox-margin;
+  width: @cascader-checkbox-size;
+  height: @cascader-checkbox-size;
+  background-color: @cascader-checkbox-bg;
+  border: @cascader-checkbox-border;
+  border-radius: @cascader-checkbox-border-radius;
+  transition: @cascader-checkbox-transition;
 
   input[type="checkbox"] {
     position: absolute;
@@ -529,39 +529,39 @@
   }
 
   &.cascader-checkbox-checked {
-    background-color: #1890ff;
-    border-color: #1890ff;
+    background-color: @cascader-checkbox-checked-bg;
+    border-color: @cascader-checkbox-checked-border;
 
     .checkbox-inner:after {
       position: absolute;
       top: 45%;
-      left: 25%;
+      left: 22%;
       display: table;
-      width: 5.71428571px;
-      height: 9.14285714px;
+      width: @cascader-checkbox-check-width;
+      height: @cascader-checkbox-check-height;
       border: 2px solid #fff;
       border-top: 0;
       border-left: 0;
       transform: rotate(45deg) scale(1) translate(-50%, -50%);
       opacity: 1;
-      transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;
+      transition: @cascader-checkbox-inner-transition;
       content: ' ';
     }
   }
 
   &.cascader-checkbox-indeterminate {
-    background-color: #fff;
-    border-color: #d9d9d9;
+    background-color: @cascader-checkbox-bg;
+    border-color: @cascader-checkbox-border;
 
     .checkbox-inner:after {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 8px;
-      height: 8px;
+      width: @cascader-checkbox-indeterminate-width;
+      height: @cascader-checkbox-indeterminate-height;
       border: none;
-      border-radius: 2px;
-      background-color: #1890ff;
+      border-radius: @cascader-checkbox-border-radius;
+      background-color: @cascader-checkbox-checked-bg;
       transform: translate(-50%, -50%);
       content: ' ';
       opacity: 1;
@@ -571,33 +571,33 @@
 
 /* 确保选中项样式正确 */
 .cascader-menu-item {
-  padding: 5px 12px;
-  line-height: 22px;
+  padding: @cascader-menu-item-padding;
+  line-height: @cascader-menu-item-line-height;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: @cascader-menu-item-transition;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: @cascader-menu-item-hover-bg;
   }
 
   &.cascader-menu-item-active {
-    font-weight: 600;
-    background-color: #e6f4ff;
+    font-weight: @cascader-menu-item-active-font-weight;
+    background-color: @cascader-menu-item-active-bg;
   }
 
   &.cascader-menu-item-selected {
-    color: #1890ff;
-    font-weight: 600;
-    background-color: #e6f4ff;
+    color: @cascader-menu-item-selected-color;
+    font-weight: @cascader-menu-item-active-font-weight;
+    background-color: @cascader-menu-item-active-bg;
   }
 
   &.cascader-menu-item-disabled {
-    color: rgba(0, 0, 0, 0.25);
+    color: @cascader-disabled-color;
     cursor: not-allowed;
   }
 
   &.cascader-menu-item-indeterminate {
-    background-color: #fff;
+    background-color: @cascader-bg-color;
   }
 
   .cascader-menu-item-content {

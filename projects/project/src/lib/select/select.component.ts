@@ -1,12 +1,11 @@
 import { CdkOverlayOrigin, Overlay, OverlayRef, OverlayConfig, ConnectedPosition } from '@angular/cdk/overlay';
-import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import _ from 'lodash';
 import { CommonModule, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayService } from '../service/overlay.service';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { UtilsService } from '../service/utils.service';
 
 @Component({
