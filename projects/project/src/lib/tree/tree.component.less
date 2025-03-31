@@ -67,6 +67,7 @@
 
     &-children {
       position: relative;
+      overflow: hidden; /* 确保溢出部分被隐藏 */
     }
   }
 
@@ -289,4 +290,9 @@
         height: 1px;
         background-color: #d9d9d9;
     }
+}
+
+.lib-tree-children {
+  position: relative;
+  will-change: height, opacity;
 }

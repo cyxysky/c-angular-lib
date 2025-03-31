@@ -83,6 +83,12 @@ export class TreeComponent implements OnInit, OnChanges {
   // 用于跟踪正在动画中的节点
   animatingNodes: Map<string, boolean> = new Map();
 
+  // 新增：存储应该显示的节点（不管是否展开）
+  visibleNodes: Set<string> = new Set();
+
+  // 这个集合跟踪哪些节点应该在DOM中（展开的或正在执行收起动画的）
+  nodeRenderMap: Set<string> = new Set();
+
   constructor(private cdr: ChangeDetectorRef) {}
 
   // 生成缩进数组
@@ -93,6 +99,8 @@ export class TreeComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initTreeState();
     this.flattenTree();
+    // 初始化：将所有展开的节点添加到渲染集合
+    this.expandedKeys.forEach(key => this.nodeRenderMap.add(key));
   }
 
   ngAfterViewInit(): void {
@@ -210,21 +218,19 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   onNodeExpand(node: TreeNodeOptions): void {
-    if (this.animatingNodes.get(node.key)) {
-      return; // 如果正在动画中，不响应点击
-    }
-    
     if (this.asyncData && (!node.children || node.children.length === 0) && !node.isLeaf) {
       this.loadData.emit(node);
       return;
     }
-
-    this.animatingNodes.set(node.key, true);
     
-    if (this.expandedKeys.has(node.key)) {
-      // 收起时不立即从expandedKeys中移除，等动画结束后再移除
+    if (node.expanded) {
+      // 收起：先更新状态，保持DOM渲染直到动画结束
       node.expanded = false;
+      this.expandedKeys.delete(node.key);
+      // nodeRenderMap保持不变，等动画结束后再移除
     } else {
+      // 展开：先添加到渲染集合，再立即更新状态
+      this.nodeRenderMap.add(node.key);
       this.expandedKeys.add(node.key);
       node.expanded = true;
     }
@@ -233,14 +239,20 @@ export class TreeComponent implements OnInit, OnChanges {
     this.expandChange.emit({ expanded: node.expanded, node });
   }
 
-  // 处理动画结束事件
-  onAnimationDone(event: AnimationEvent, node: TreeNodeOptions): void {
-    if (event.toState === 'collapsed' && !node.expanded) {
-      // 动画结束且是收起状态，从expandedKeys中移除
-      this.expandedKeys.delete(node.key);
+  // 处理动画事件
+  onAnimationStart(event: AnimationEvent, node: TreeNodeOptions): void {
+    if (event.fromState === 'void' && event.toState === '*') {
+      // 展开动画开始
+      this.visibleNodes.add(node.key);
     }
-    this.animatingNodes.delete(node.key);
-    this.cdr.detectChanges();
+  }
+
+  onAnimationDone(event: AnimationEvent, node: TreeNodeOptions): void {
+    // 仅当收起动画完成时，从渲染集合中移除
+    if (event.toState === 'collapsed' && !node.expanded) {
+      this.nodeRenderMap.delete(node.key);
+      this.cdr.detectChanges();
+    }
   }
 
   onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
@@ -454,22 +466,7 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   isNodeVisible(node: TreeNodeOptions): boolean {
-    if (!this.searchValue) {
-      return true;
-    }
-    const nodeInResults = this.searchResults.some(result => result.key === node.key);
-    const hasChildInResults = this.hasChildMatchSearch(node);
-    return nodeInResults || hasChildInResults;
-  }
-
-  private hasChildMatchSearch(node: TreeNodeOptions): boolean {
-    if (!node.children || !node.children.length) {
-      return false;
-    }
-    return node.children.some(child =>
-      this.searchResults.some(result => result.key === child.key) ||
-      this.hasChildMatchSearch(child)
-    );
+    return this.visibleNodes.has(node.key) || this.expandedKeys.has(node.key);
   }
 
   /**
@@ -521,5 +518,16 @@ export class TreeComponent implements OnInit, OnChanges {
     };
     findParents(this.treeData, node.key);
     return parents;
+  }
+
+  // 添加判断是否应该渲染子节点的方法
+  shouldRenderChildren(node: TreeNodeOptions): any {
+    // 如果节点在动画中或者已展开，则渲染子节点
+    return this.animatingNodes.get(node.key) === true || node.expanded;
+  }
+
+  // 获取节点的动画状态 
+  getNodeState(node: TreeNodeOptions): string {
+    return node.expanded ? 'expanded' : 'collapsed';
   }
 }

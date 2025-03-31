@@ -33,9 +33,7 @@
 
 <!-- 树节点模板 -->
 <ng-template #renderTreeNodesTemplate let-nodes let-level="level" let-parentNode="parentNode">
-  <ul class="lib-tree-node-list"
-    [@expandCollapse]="(parentNode === undefined || parentNode.expanded) ? 'expanded' : 'collapsed'"
-    (@expandCollapse.done)="parentNode && onAnimationDone($event, parentNode)">
+  <ul class="lib-tree-node-list">
     <li *ngFor="let node of nodes; let isLast = last; let index = index" class="lib-tree-node" [class.lib-tree-node-last]="isLast">
       <div 
         class="lib-tree-node-content"
@@ -68,11 +66,11 @@
         </div>
       </div>
 
-      <!-- 子节点递归 -->
+      <!-- 子节点递归 - 树节点模板中 -->
       <div class="lib-tree-children" 
+           *ngIf="node.children && node.children.length && nodeRenderMap.has(node.key)"
            [@expandCollapse]="node.expanded ? 'expanded' : 'collapsed'"
-           (@expandCollapse.done)="onAnimationDone($event, node)"
-           *ngIf="node.children && node.children.length && expandedKeys.has(node.key)">
+           (@expandCollapse.done)="onAnimationDone($event, node)">
         <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
       </div>
     </li>
@@ -103,11 +101,11 @@
     </div>
     </div>
 
-    <!-- 子节点 -->
+    <!-- 子节点 - 单个节点模板中 -->
     <div class="lib-tree-children" 
+         *ngIf="node.children?.length && nodeRenderMap.has(node.key)"
          [@expandCollapse]="node.expanded ? 'expanded' : 'collapsed'"
-         (@expandCollapse.done)="onAnimationDone($event, node)"
-         *ngIf="node.children?.length && expandedKeys.has(node.key)">
+         (@expandCollapse.done)="onAnimationDone($event, node)">
       <ng-container *ngFor="let childNode of node.children; let isLastChild = last">
         <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: childNode, isLast: isLastChild, level: level + 1 }"></ng-container>
       </ng-container>
