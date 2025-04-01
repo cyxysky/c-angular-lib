@@ -116,6 +116,31 @@
         可以使用模板自定义复选框标签的显示方式。
       </div>
     </app-doc-box>
+
+    <!-- 单选模式 -->
+    <app-doc-box
+      title="单选模式"
+      [sourceCode]="singleSource">
+      <div demo>
+        <lib-checkbox 
+          [(ngModel)]="singleValue" 
+          [checkboxSingle]="true"
+          checkboxSingleLabel="同意用户协议">
+        </lib-checkbox>
+        <lib-checkbox 
+          [(ngModel)]="singleValue" 
+          [checkboxSingle]="true"
+          [checkboxSingleLabel]="customSingleLabel">
+        </lib-checkbox>
+        <ng-template #customSingleLabel>
+          <span>自定义-同意用户协议</span>
+        </ng-template>
+        <p class="example-value">当前值: {{ singleValue }}</p>
+      </div>
+      <div description>
+        通过设置 checkboxSingle="true" 可以使用单选模式，常用于同意协议等场景。
+      </div>
+    </app-doc-box>
   </div>
   
   <h2 class="doc-section-title">API</h2>

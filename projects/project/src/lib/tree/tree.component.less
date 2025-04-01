@@ -1,29 +1,33 @@
-@tree-prefix: lib-tree;
+@import '../../style/tree.less';
 
 .@{tree-prefix} {
   &-container {
     width: 100%;
     max-height: 100%;
     overflow: hidden;
-    font-size: 14px;
-    line-height: 1.5;
-    color: rgba(0, 0, 0, 0.85);
+    font-size: @tree-font-size;
+    line-height: @tree-line-height;
+    color: @tree-text-color;
+  }
+
+  &-hidden {
+    display: none;
   }
 
   &-search {
-    padding: 8px;
-    margin-bottom: 8px;
+    padding: @tree-search-padding;
+    margin-bottom: @tree-search-margin-bottom;
 
     &-input {
       width: 100%;
-      padding: 4px 8px;
-      border: 1px solid #d9d9d9;
-      border-radius: 2px;
-      transition: all 0.3s;
+      padding: @tree-search-input-padding;
+      border: @tree-default-border;
+      border-radius: @tree-border-radius;
+      transition: @tree-transition;
 
       &:focus {
-        border-color: #40a9ff;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        border-color: @tree-primary-color;
+        box-shadow: @tree-focus-box-shadow;
         outline: none;
       }
     }
@@ -31,7 +35,7 @@
 
   &-node {
     &-container {
-      padding: 0 4px;
+      padding: @tree-node-padding;
     }
 
     &-hidden {
@@ -49,14 +53,14 @@
       position: relative;
       display: flex;
       align-items: center;
-      padding: 0 4px;
-      height: 24px;
-      border-radius: 2px;
+      padding: @tree-node-padding;
+      height: @tree-node-height;
+      border-radius: @tree-border-radius;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: @tree-transition;
 
       &-disabled {
-        color: rgba(0, 0, 0, 0.25);
+        color: @tree-text-disabled-color;
         cursor: not-allowed;
 
         &:hover {
@@ -73,8 +77,7 @@
 
   &-indent {
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    height: @tree-node-height;
     position: relative;
   }
 
@@ -82,12 +85,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin-right: 2px;
+    width: @tree-switcher-size;
+    height: @tree-node-height;
+    margin-right: @tree-switcher-margin-right;
     cursor: pointer;
     z-index: 1;
-    transition: all 0.3s;
+    transition: @tree-transition;
 
     &-expanded {
       .tree-switcher-icon {
@@ -100,26 +103,26 @@
     }
 
     &-disabled {
-      color: rgba(0, 0, 0, 0.25);
+      color: @tree-text-disabled-color;
       cursor: not-allowed;
     }
 
     .tree-switcher-icon {
       position: relative;
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: @tree-switcher-icon-width;
+      height: @tree-switcher-icon-height;
       
       &::before {
         content: '';
         position: absolute;
         top: 0;
-        left: 3px;
+        left: @tree-arrow-left-position;
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: 5px 0 5px 6px;
-        border-color: transparent transparent transparent currentColor;
+        border-width: @tree-arrow-border;
+        border-color: @tree-arrow-transparent-color;
       }
     }
   }
@@ -129,33 +132,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-    background-color: #fff;
-    transition: all 0.3s;
+    width: @tree-checkbox-size;
+    height: @tree-checkbox-size;
+    margin-right: @tree-checkbox-margin-right;
+    border: @tree-default-border;
+    border-radius: @tree-border-radius;
+    background-color: @tree-background-color;
+    transition: @tree-transition;
     cursor: pointer;
 
     &-checked {
-      background-color: #1890ff;
-      border-color: #1890ff;
+      background-color: @tree-primary-color;
+      border-color: @tree-primary-color;
 
       .@{tree-prefix}-checkbox-inner {
         position: relative;
         display: inline-block;
-        width: 8px;
-        height: 8px;
+        width: @tree-checkbox-inner-size;
+        height: @tree-checkbox-inner-size;
 
         &::after {
           content: '';
           position: absolute;
-          left: 1px;
-          top: -2px;
-          width: 6px;
-          height: 10px;
-          border: 2px solid #fff;
+          left: @tree-checkbox-inner-left;
+          top: @tree-checkbox-inner-top;
+          width: @tree-checkbox-tick-width;
+          height: @tree-checkbox-tick-height;
+          border: @tree-checkbox-tick-border;
           border-left: 0;
           border-top: 0;
           transform: rotate(45deg);
@@ -164,8 +167,8 @@
     }
 
     &-indeterminate {
-      background-color: #fff;
-      border-color: #1890ff;
+      background-color: @tree-background-color;
+      border-color: @tree-primary-color;
 
       .@{tree-prefix}-checkbox-inner {
         position: relative;
@@ -174,44 +177,44 @@
         &::after {
           content: '';
           position: absolute;
-          left: -4px;
-          top: -4px;
-          width: 8px;
-          height: 8px;
-          border-radius: 2px;
-          background-color: #1890ff;
+          left: @tree-checkbox-indeterminate-left;
+          top: @tree-checkbox-indeterminate-top;
+          width: @tree-checkbox-inner-size;
+          height: @tree-checkbox-inner-size;
+          border-radius: @tree-border-radius;
+          background-color: @tree-primary-color;
         }
       }
     }
 
     &-disabled {
-      background-color: #f5f5f5;
-      border-color: #d9d9d9;
+      background-color: @tree-disabled-background;
+      border-color: @tree-border-color;
       cursor: not-allowed;
 
       .@{tree-prefix}-checkbox-inner {
         &::after {
-          border-color: rgba(0, 0, 0, 0.25);
+          border-color: @tree-text-disabled-color;
         }
       }
     }
   }
 
   &-icon {
-    margin-right: 4px;
-    font-size: 14px;
+    margin-right: @tree-icon-margin-right;
+    font-size: @tree-icon-size;
     
     .tree-icon {
       &.file-icon::before {
-        content: '\1F4C4'; // 文件图标
+        content: @tree-file-icon; // 文件图标
       }
       
       &.folder-icon::before {
-        content: '\1F4C1'; // 文件夹图标
+        content: @tree-folder-icon; // 文件夹图标
       }
       
       &.folder-open-icon::before {
-        content: '\1F4C2'; // 打开文件夹图标
+        content: @tree-folder-open-icon; // 打开文件夹图标
       }
     }
   }
@@ -224,15 +227,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 2px 0px;
-    transition: all 0.3s;
+    padding: @tree-title-padding;
+    transition: @tree-transition;
     &:not(.lib-tree-title-disabled):hover {
-        background-color: #f5f5f5;
+        background-color: @tree-hover-color;
     }
 
     &-selected {
-        background-color: #e6f7ff !important;
+        background-color: @tree-selected-color !important;
     }
+  }
+
+  &-empty-state {
+    text-align: center;
+    padding: @tree-empty-padding;
+    font-weight: @tree-empty-font-weight;
   }
 }
 .lib-tree-vertical-line{
@@ -242,9 +251,9 @@
       position: absolute;
       top: -50%;
       left: 50%;
-      width: 1px;
+      width: @tree-line-width;
       height: 150%;
-      background-color: #d9d9d9;
+      background-color: @tree-border-color;
   }
 }
 
@@ -255,13 +264,11 @@
       position: absolute;
       top: -50%;
       left: 50%;
-      width: 1px;
+      width: @tree-line-width;
       height: 100%;
-      background-color: #d9d9d9;
+      background-color: @tree-border-color;
   }
 }
-
-
 
 .lib-tree-flat-line{
     position: relative;
@@ -272,27 +279,39 @@
         top: 50%;
         left: -50%;
         width: 100%;
-        height: 1px;
-        background-color: #d9d9d9;
-
-    }
-}
-
-.lib-tree-flat-line-longer{
-    position: relative;
-    &::before{
-        content: '';
-        z-index: 0;
-        position: absolute;
-        top: 50%;
-        left: -50%;
-        width: 100%;
-        height: 1px;
-        background-color: #d9d9d9;
+        height: @tree-line-width;
+        background-color: @tree-border-color;
     }
 }
 
 .lib-tree-children {
   position: relative;
   will-change: height, opacity;
+}
+
+
+.loading-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: @tree-switcher-size;
+  height: @tree-node-height;
+  margin-right: @tree-switcher-margin-right;
+
+  .loading-svg {
+    animation: @tree-rotate-animation;
+    color: @tree-loading-color;
+    width: @tree-loading-icon-width;
+    height: @tree-loading-icon-height;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

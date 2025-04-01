@@ -9,14 +9,18 @@
     (click)="openDropdown()" 
     [style.min-width]="minWidth" 
     cdkOverlayOrigin>
+    <!-- 内容 -->
     <div class="cascader-content">
-        <div class="placeholder" *ngIf="(!value || (isArray(value) && value.length === 0)) && !searchOnCompositionValue">
+        <!-- 占位符 -->
+        <div class="placeholder" *ngIf="showPlaceHolder()">
             {{ placeholder }}
         </div>
-        <div class="cascader-labels" *ngIf="!isMultiple && displayLabels.length > 0 && !searchOnCompositionValue">
+        <!-- 单选数据 -->
+        <div class="cascader-labels" *ngIf="showSingalData()">
             <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ displayLabels.join(' / ') }}</span>
         </div>
-        <ng-container *ngIf="isMultiple && displayTags.length > 0">
+        <!-- 多选数据 -->
+        <ng-container *ngIf="showMultData()">
             <div class="cascader-tag" *ngFor="let tag of displayTags">
                 <div class="cascader-tag-text">{{ tag.label }}</div>
                 <div class="cascader-tag-close-icon" (click)="removeItem($event, tag.value)">
@@ -36,16 +40,17 @@
             <span class="search-text" #searchText>{{ searchOnCompositionValue }}</span>
         </div>
     </div>
-    
+    <!-- 后缀 -->
+    <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
+</div>
+
+<!-- 后缀模板 -->
+<ng-template #suffixTemplate>
     <!-- 后缀图标 -->
     <div class="suffix-box">
         <!-- 加载图标 -->
         <div *ngIf="loading" class="loading-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
-                class="loading-svg">
-                <path
-                    d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-14.75A6.75 6.75 0 1 1 1.5 8c0 3.693 3.007 6.75 6.75 6.75S15 11.693 15 8A6.75 6.75 0 0 0 8.25 1.25z"
-                    fill-opacity="0" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="loading-svg" color="rgba(23, 184, 199, 0.6)" fill="currentColor">
                 <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
             </svg>
         </div>
@@ -56,8 +61,9 @@
         <!-- 清除图标 -->
         <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isDropdownOpen" (click)="clear($event)"></i>
     </div>
-</div>
+</ng-template>
 
+<!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
     <div class="cascader-dropdown"
         (mouseenter)="enterDropdown()"

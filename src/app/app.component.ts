@@ -21,7 +21,7 @@ export class AppComponent {
   mySignal = signal({
     ok: 'false'
   });
-  nowComponent = signal('tree');
+  nowComponent = signal('checkbox');
   checked = signal(false);
   onCheckedChange(checked: boolean) {
     this.checked.set(checked);

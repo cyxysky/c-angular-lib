@@ -51,47 +51,47 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   // 输入属性
   /** 选项数据 */
-  @Input() options: CascaderOption[] = [];
+  @Input({ alias: 'options' }) options: CascaderOption[] = [];
   /** 展开方式 */
-  @Input() expandTrigger: CascaderExpandTrigger = 'click';
+  @Input({ alias: 'expandTrigger' }) expandTrigger: CascaderExpandTrigger = 'click';
   /** 触发方式 */
-  @Input() actionTrigger: CascaderTriggerType = 'click';
+  @Input({ alias: 'actionTrigger' }) actionTrigger: CascaderTriggerType = 'click';
   /** 是否显示搜索框 */
-  @Input({ transform: booleanAttribute }) showSearch: boolean = true;
+  @Input({ alias: 'showSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 是否禁用 */
-  @Input({ transform: booleanAttribute }) disabled: boolean = false;
+  @Input({ alias: 'disabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 占位文本 */
-  @Input() placeholder: string = '请选择';
+  @Input({ alias: 'placeholder' }) placeholder: string = '请选择';
   /** 是否允许清空 */
-  @Input({ transform: booleanAttribute }) allowClear: boolean = true;
+  @Input({ alias: 'allowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 改变后立即关闭菜单 */
-  @Input({ transform: booleanAttribute }) changeOnSelect: boolean = false;
+  @Input({ alias: 'changeOnSelect', transform: booleanAttribute }) changeOnSelect: boolean = false;
   /** 是否多选 */
-  @Input({ transform: booleanAttribute }) isMultiple: boolean = false;
+  @Input({ alias: 'isMultiple', transform: booleanAttribute }) isMultiple: boolean = false;
   /** 尺寸 */
-  @Input() size: CascaderSize = 'default';
+  @Input({ alias: 'size' }) size: CascaderSize = 'default';
   /** 自定义节点属性 */
-  @Input() fieldNames: { label: string; value: string; children: string; } = { label: 'label', value: 'value', children: 'children' };
+  @Input({ alias: 'fieldNames' }) fieldNames: { label: string; value: string; children: string; } = { label: 'label', value: 'value', children: 'children' };
   /** 是否无边框 */
-  @Input({ transform: booleanAttribute }) borderless: boolean = false;
+  @Input({ alias: 'borderless', transform: booleanAttribute }) borderless: boolean = false;
   /** 状态 */
-  @Input() status: 'error' | 'warning' | null = null;
+  @Input({ alias: 'status' }) status: 'error' | 'warning' | null = null;
   /** 下拉菜单的宽度 */
-  @Input() menuWidth: number = 160;
+  @Input({ alias: 'menuWidth' }) menuWidth: number = 160;
   /** 最小宽度 */
-  @Input() minWidth: string = '200px';
+  @Input({ alias: 'minWidth' }) minWidth: string = '200px';
   /** 自定义选项模板 */
-  @Input() optionTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'optionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
   /** 自定义选项标签模板 */
-  @Input() optionLabelTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'optionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
   /** 是否加载中 */
-  @Input({ transform: booleanAttribute }) loading: boolean = false;
+  @Input({ alias: 'loading', transform: booleanAttribute }) loading: boolean = false;
   /** 自定义显示渲染函数 */
-  @Input() displayRender?: (labels: string[], selectedOptions?: CascaderOption[]) => string;
+  @Input({ alias: 'displayRender' }) displayRender?: (labels: string[], selectedOptions?: CascaderOption[]) => string;
   /** 选项过滤函数 */
-  @Input() optionFilterFn?: (inputValue: string, option: CascaderOption, path: CascaderOption[]) => boolean;
+  @Input({ alias: 'optionFilterFn' }) optionFilterFn?: (inputValue: string, option: CascaderOption, path: CascaderOption[]) => boolean;
   /** 选项选择函数，返回 true/false 表示是否可选 */
-  @Input() optionSelectFn?: (option: CascaderOption) => boolean;
+  @Input({ alias: 'optionSelectFn' }) optionSelectFn?: (option: CascaderOption) => boolean;
 
   // 输出事件
   /** 值变化事件 */
@@ -209,8 +209,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.closeDropdown();
   }
 
-
-
   // 初始化方法
   private initOptionMaps(options: CascaderOption[], parent?: CascaderOption, path: CascaderOption[] = []): void {
     if (!options?.length) return;
@@ -243,7 +241,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         // 设置默认状态
         if (option.checked === undefined) option.checked = false;
         if (option.halfChecked === undefined) option.halfChecked = false;
-
         // 递归初始化子选项
         if (this.hasChildren(option)) {
           initStates(this.getChildren(option));
@@ -1338,6 +1335,30 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public blurSearch(): void {
     this.searchInput && this.searchInput.nativeElement.blur();
+  }
+
+  /**
+   * 是否显示占位符
+   * @returns 是否显示占位符
+   */
+  public showPlaceHolder(): boolean {
+    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchOnCompositionValue
+  }
+
+  /**
+   * 是否显示单选数据
+   * @returns 是否显示单选数据
+   */
+  public showSingalData(): boolean {
+    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchOnCompositionValue
+  }
+
+  /**
+   * 是否显示多选数据
+   * @returns 是否显示多选数据
+   */
+  public showMultData(): boolean {
+    return this.isMultiple && this.displayTags.length > 0
   }
 
   /**

@@ -56,6 +56,9 @@ export class DocCheckboxComponent {
   // 自定义模板示例
   templateValues: any[] = [1, 3];
 
+  // 添加单选模式示例的数据
+  singleValue: boolean = true;
+
   // API 文档
   apiSections: ApiData[] = [
     {
@@ -66,7 +69,9 @@ export class DocCheckboxComponent {
         { name: 'checkboxDirection', description: '排列方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
         { name: 'checkboxColor', description: '复选框选中状态的颜色', type: 'string', default: '#1890ff' },
         { name: 'checkboxLabelTemplate', description: '自定义标签模板', type: 'TemplateRef<any>', default: '-' },
-        { name: 'checkboxIndeterminate', description: '是否为半选状态', type: 'boolean', default: 'false' }
+        { name: 'checkboxIndeterminate', description: '是否为半选状态', type: 'boolean', default: 'false' },
+        { name: 'checkboxSingle', description: '是否为单选模式', type: 'boolean', default: 'false' },
+        { name: 'checkboxSingleLabel', description: '单选模式下的标签文本或模板', type: 'string | TemplateRef<any>', default: '""' }
       ]
     },
     {
@@ -257,6 +262,29 @@ export class CheckboxComponent {
     { label: '选项2', value: 2 },
     { label: '选项3', value: 3 }
   ];
+}`;
+
+  // 添加单选模式示例代码
+  singleSource = `
+import { Component } from '@angular/core';
+import { CheckboxComponent } from 'your-lib';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-example',
+  standalone: true,
+  imports: [CheckboxComponent, FormsModule],
+  template: \`
+    <lib-checkbox 
+      [(ngModel)]="value" 
+      [checkboxSingle]="true"
+      checkboxSingleLabel="同意用户协议">
+    </lib-checkbox>
+    <p>当前值: {{ value }}</p>
+  \`
+})
+export class ExampleComponent {
+  value: boolean = false;
 }`;
 
   toggleDisabled(): void {

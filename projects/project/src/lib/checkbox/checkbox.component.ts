@@ -1,6 +1,7 @@
-import { Component, Input, forwardRef, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { UtilsService } from '../service/utils.service';
 
 export interface CheckboxOption {
   label: string;
@@ -23,7 +24,8 @@ export type CheckboxDirection = 'horizontal' | 'vertical';
       useExisting: forwardRef(() => CheckboxComponent),
       multi: true
     }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckboxComponent implements ControlValueAccessor, OnInit {
   //#region 输入属性 (Inputs)
@@ -37,20 +39,34 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
   @Input({ alias: 'checkboxIndeterminate' }) indeterminate: boolean = false;
   /** 标签模板 */
   @Input({ alias: 'checkboxLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
+  /** 是否禁用 */
+  @Input({ alias: 'checkboxDisabled' }) disabled: boolean = false;
+  /** 是否单独显示 */
+  @Input({ alias: 'checkboxSingle' }) single: boolean = false;
+  /** 单选标签 */
+  @Input({ alias: 'checkboxSingleLabel' }) singleLabelContent: TemplateRef<any> | string | any= '';
   //#endregion
 
   //#region 内部状态变量
   /** 选中的值数组 */
   value: any[] = [];
+  /** 单选值 */
+  singleValue: boolean = false;
   /** 选项选中状态映射 */
   isChecked: { [key: string]: boolean } = {};
-  /** 是否禁用 */
-  disabled: boolean = false;
   //#endregion
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+  ) { }
 
   //#region 生命周期钩子
   ngOnInit(): void {
     this.updateCheckedStatus();
+  }
+
+  ngOnChanges(changes: any): void {
+    this.cdr.detectChanges();
   }
   //#endregion
 
@@ -66,13 +82,19 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
         this.isChecked[key] = this.value.some(
           val => this.getOptionKey(val) === key
         );
-        
         if (option.indeterminate && !this.isChecked[key]) {
           this.value = [...this.value, option.value];
           this.isChecked[key] = true;
         }
       });
     }
+    this.cdr.detectChanges();
+  }
+
+  checkSingle(): void {
+    this.singleValue = !this.singleValue;
+    this.onChange(this.singleValue);
+    this.cdr.detectChanges();
   }
 
   /**
@@ -80,10 +102,8 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
    */
   toggleOption(option: CheckboxOption): void {
     if (this.disabled || option.disabled) return;
-    
     const optionValue = option.value;
     const optionValueKey = this.getOptionKey(optionValue);
-    
     if (option.indeterminate) {
       option.indeterminate = false;
       if (!this.isChecked[optionValueKey]) {
@@ -99,8 +119,8 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
         this.value = [...this.value, optionValue];
       }
     }
-    
     this.updateCheckedStatus();
+    this.cdr.detectChanges();
     this.onChange(this.value);
     this.onTouched();
   }
@@ -121,6 +141,7 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
       this.value = [];
     }
     this.updateCheckedStatus();
+    this.cdr.detectChanges();
     this.onChange(this.value);
     this.onTouched();
   }
@@ -139,7 +160,6 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
    */
   getIndeterminateState(): boolean {
     if (this.indeterminate) return true;
-    
     const checkedCount = Object.values(this.isChecked).filter(v => v).length;
     return checkedCount > 0 && checkedCount < this.options.length;
   }
@@ -148,8 +168,16 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
    * 是否全选
    */
   isAllChecked(): boolean {
-    return this.options.length > 0 && 
-           this.options.every(opt => this.isChecked[this.getOptionKey(opt.value)]);
+    return this.options.length > 0 &&
+      this.options.every(opt => this.isChecked[this.getOptionKey(opt.value)]);
+  }
+
+  /**
+   * 是否为模板
+   */
+  isTemplate(value: any): boolean {
+    if (!value) return false;
+    return value instanceof TemplateRef;
   }
 
   /**
@@ -160,12 +188,12 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
     if (option.id !== undefined) {
       return this.isChecked[this.getOptionKey(option.value)];
     }
-    
+
     // 否则尝试使用值本身作为键（如果是简单类型）
     if (typeof option.value === 'string' || typeof option.value === 'number') {
       return this.isChecked[this.getOptionKey(option.value)];
     }
-    
+
     // 最后才使用JSON序列化（可以添加缓存机制以提高性能）
     return this.isChecked[this.getOptionKey(option.value)];
   }
@@ -173,15 +201,19 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
 
   //#region ControlValueAccessor 实现
   /** 值变更回调函数 */
-  onChange: any = () => {};
+  onChange: any = () => { };
   /** 触摸回调函数 */
-  onTouched: any = () => {};
+  onTouched: any = () => { };
 
   /**
    * 写入值
    */
-  writeValue(value: any[]): void {
-    this.value = value || [];
+  writeValue(value: any): void {
+    if (this.single) {
+      this.singleValue = value;
+    } else {
+      this.value = value || [];
+    }
     this.updateCheckedStatus();
   }
 

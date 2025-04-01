@@ -98,4 +98,44 @@ export class UtilsService {
   isTemplateRef(value: any): boolean {
     return value instanceof TemplateRef;
   }
+
+  /**
+   * 通用遍历函数，用于对所有节点执行操作
+   * @param nodes 节点
+   * @param callback 回调函数
+   */
+  public traverseAllNodes(nodes: any[], callback: (node: any) => void): void {
+    nodes && nodes.length && nodes.forEach(node => {
+      callback(node);
+      if (node.children && node.children.length) {
+        this.traverseAllNodes(node.children, callback);
+      }
+    });
+  }
+
+  /**
+   * 获取节点的所有父节点
+   * @param node 节点
+   * @param AllNodes 所有节点
+   * @returns 父节点
+   */
+  private getParentNodes(node: any, AllNodes: any[]): any[] {
+    const parents: any[] = [];
+    const findParents = (nodes: any[], targetKey: string): boolean => {
+      for (const current of nodes) {
+        if (current.key === targetKey) {
+          return true;
+        }
+        if (current.children) {
+          if (findParents(current.children, targetKey)) {
+            parents.unshift(current);
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    findParents(AllNodes, node.key);
+    return parents;
+  }
 }

@@ -1,6 +1,7 @@
 <div class="input-container" [class]="getInputClass()">
 
   <span class="input-prefix" *ngIf="prefix() || prefixIcon()">
+    <ng-content select="[prefix]"></ng-content>
     <i *ngIf="prefixIcon()" class="input-prefix-icon" [class]="prefixIcon()"></i>
     <span *ngIf="prefix()">{{ prefix() }}</span>
   </span>
@@ -31,6 +32,7 @@
   <span class="input-suffix" *ngIf="suffix() || suffixIcon() || (allowClear() && _data) || (showCount() && maxlength())">
     <!-- 后缀 -->
     <span *ngIf="suffix()">{{ suffix() }}</span>
+    <ng-content select="[suffix]"></ng-content>
     <!-- 图标 -->
     <i *ngIf="suffixIcon()" class="input-suffix-icon" [class]="suffixIcon()"></i>
     <!-- 字数统计 -->

@@ -1,25 +1,57 @@
 <div class="checkbox-group" [class.checkbox-vertical]="direction === 'vertical'" [class.checkbox-horizontal]="direction === 'horizontal'">  
   <div class="checkbox-options">
-    <label class="checkbox-wrapper" *ngFor="let option of options" [class.checkbox-disabled]="disabled || option.disabled">
-      <span class="checkbox-input">
-        <input 
-          type="checkbox" 
-          [checked]="isChecked[getOptionKey(option.value)]" 
-          [indeterminate]="option.indeterminate"
-          [disabled]="disabled || option.disabled"
-          (change)="toggleOption(option)"
-        />
-        <span class="checkbox-inner" 
-          [class.indeterminate]="option.indeterminate"
-          [class.checked]="isChecked[getOptionKey(option.value)]"
-          [style.borderColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"
-          [style.backgroundColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"></span>
-      </span>
-      <ng-container *ngTemplateOutlet="labelTemplate || defaultLabel; context: { $implicit: option }"></ng-container>
+    <ng-container *ngIf="!single">
+      <label class="checkbox-wrapper" *ngFor="let option of options" [class.checkbox-disabled]="disabled || option.disabled">
+        <ng-container *ngTemplateOutlet="checkboxOption; context: { $implicit: option }"></ng-container>
+      </label>
+    </ng-container>
+    <label class="checkbox-wrapper" *ngIf="single" [class.checkbox-disabled]="disabled">
+      <ng-container *ngTemplateOutlet="singleLabel"></ng-container>
     </label>
   </div>
 </div>
 
+<!-- 单选模式 -->
+<ng-template #singleLabel let-option>
+  <span class="checkbox-input">
+    <input 
+      type="checkbox" 
+      [checked]="singleValue" 
+      [indeterminate]="indeterminate"
+      [disabled]="disabled"
+      (change)="checkSingle()"
+    />
+    <span class="checkbox-inner" 
+      [class.indeterminate]="indeterminate"
+      [class.checked]="singleValue"
+      [style.borderColor]="singleValue ? checkboxColor : ''"
+      [style.backgroundColor]="singleValue ? checkboxColor : ''"></span>
+  </span>
+  <ng-container *ngIf="isTemplate(singleLabelContent)" [ngTemplateOutlet]="singleLabelContent"></ng-container>
+  <ng-container *ngIf="!isTemplate(singleLabelContent)" [ngTemplateOutlet]="defaultLabel"></ng-container>
+</ng-template>
+
+<!-- 多选模式 -->
+<ng-template #checkboxOption let-option>
+  <span class="checkbox-input">
+    <input 
+      type="checkbox" 
+      [checked]="isChecked[getOptionKey(option.value)]" 
+      [indeterminate]="option.indeterminate"
+      [disabled]="disabled || option.disabled"
+      (change)="toggleOption(option)"
+    />
+    <span class="checkbox-inner" 
+      [class.indeterminate]="option.indeterminate"
+      [class.checked]="isChecked[getOptionKey(option.value)]"
+      [style.borderColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"
+      [style.backgroundColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"></span>
+  </span>
+  <ng-container *ngTemplateOutlet="labelTemplate || defaultLabel; context: { $implicit: option }"></ng-container>
+</ng-template>
+
+<!-- 默认标签 -->
 <ng-template #defaultLabel let-option>
-    <span class="checkbox-label">{{ option.label }}</span>
+  <span class="checkbox-label" *ngIf="!single">{{ option.label }}</span>
+  <span class="checkbox-label" *ngIf="single">{{ singleLabelContent }}</span>
 </ng-template>

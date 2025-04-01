@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
-import { TreeComponent, TreeNodeOptions } from '../../../projects/project/src/lib/tree/tree.component';
-import { ProjectModule } from "../../../projects/project/src/lib/project.module";
+import { ProjectModule, TreeComponent, TreeNodeOptions } from '@project';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-doc-tree',
@@ -14,43 +14,46 @@ import { ProjectModule } from "../../../projects/project/src/lib/project.module"
     FormsModule,
     DocBoxComponent,
     DocApiTableComponent,
-    TreeComponent,
     ProjectModule
   ],
   templateUrl: './doc-tree.component.html',
   styleUrl: './doc-tree.component.less'
 })
 export class DocTreeComponent {
+  @ViewChild('tree') treeComponent!: TreeComponent;
   // 搜索值
   searchValue = '';
   
+  // 多选模式标志
+  isMultiple = false;
+
   // 基本树数据
   basicTreeData: TreeNodeOptions[] = [
     {
       key: '0',
-      title: '父节点1',
+      title: '父节点1, key: 0',
       children: [
         {
           key: '0-0',
-          title: '子节点1-1',
+          title: '子节点1-1, key: 0-0',
           children: [
-            { key: '0-0-0', title: '子节点1-1-1' },
-            { key: '0-0-1', title: '子节点1-1-2', disabled: true }
+            { key: '0-0-0', title: '子节点1-1-1, key: 0-0-0' },
+            { key: '0-0-1', title: '子节点1-1-2, key: 0-0-1', disabled: true }
           ]
         },
         {
           key: '0-1',
-          title: '子节点1-2',
+          title: '子节点1-2, key: 0-1',
           children: [
-            { key: '0-1-0', title: '子节点1-2-1' },
+            { key: '0-1-0', title: '子节点1-2-1, key: 0-1-0' },
             { 
               key: '0-1-1', 
-              title: '子节点1-2-2',
+              title: '子节点1-2-2, key: 0-1-1',
               disableCheckbox: true,
               children: [
-                { key: '0-1-1-0', title: '子节点1-2-2-1' },
-                { key: '0-1-1-1', title: '子节点1-2-2-2' },
-                { key: '0-1-1-2', title: '子节点1-2-2-3' },
+                { key: '0-1-1-0', title: '子节点1-2-2-1, key: 0-1-1-0' },
+                { key: '0-1-1-1', title: '子节点1-2-2-2, key: 0-1-1-1' },
+                { key: '0-1-1-2', title: '子节点1-2-2-3, key: 0-1-1-2' },
               ]
             }
           ]
@@ -59,19 +62,25 @@ export class DocTreeComponent {
     },
     {
       key: '1',
-      title: '父节点2',
+      title: '父节点2, key: 1',
       children: [
         {
           key: '1-0',
-          title: '子节点2-1',
+          title: '子节点2-1, key: 1-0',
           children: [
-            { key: '1-0-0', title: '子节点2-1-1' }
+            { key: '1-0-0', title: '子节点2-1-1, key: 1-0-0' }
           ]
         },
-        { key: '1-1', title: '子节点2-2' }
+        { key: '1-1', title: '子节点2-2, key: 1-1' }
       ]
     }
   ];
+  
+  basicTreeData1 = _.cloneDeep(this.basicTreeData);
+  basicTreeData2 = _.cloneDeep(this.basicTreeData);
+  
+  // 多选模式的树数据
+  multipleTreeData = _.cloneDeep(this.basicTreeData);
   
   // 自定义树数据
   customTreeData: TreeNodeOptions[] = [
@@ -149,6 +158,20 @@ export class DocTreeComponent {
     }
   ];
   
+  // 异步加载数据
+  asyncTreeData: TreeNodeOptions[] = [
+    {
+      key: '0',
+      title: '异步节点1',
+      children: [],
+    },
+    {
+      key: '1',
+      title: '异步节点2',
+      children: [],
+    }
+  ];
+  
   // 用于虚拟滚动的大数据集
   largeTreeData: TreeNodeOptions[] = [];
   
@@ -165,14 +188,12 @@ export class DocTreeComponent {
         title: `父节点 ${i}`,
         children: []
       };
-      
       for (let j = 0; j < 10; j++) {
         const childNode: TreeNodeOptions = {
           key: `${i}-${j}`,
           title: `子节点 ${i}-${j}`,
           children: []
         };
-        
         for (let k = 0; k < 5; k++) {
           childNode.children!.push({
             key: `${i}-${j}-${k}`,
@@ -180,10 +201,8 @@ export class DocTreeComponent {
             isLeaf: true
           });
         }
-        
         parentNode.children!.push(childNode);
       }
-      
       this.largeTreeData.push(parentNode);
     }
   }
@@ -200,6 +219,57 @@ export class DocTreeComponent {
   onNodeExpanded(event: { expanded: boolean, node: TreeNodeOptions }): void {
     console.log('展开/折叠节点:', event);
   }
+  
+  // 搜索变更事件处理
+  onSearchChange(value: string): void {
+    this.searchValue = value;
+    console.log('搜索:', value);
+  }
+  
+  // 异步加载数据处理
+  onLoadData(node: TreeNodeOptions): void {
+    // 模拟异步加载
+    setTimeout(() => {
+      if (node.key === '0') {
+        node.changeChildren && node.changeChildren([
+          { key: '0-0', title: '异步加载的子节点1', isLeaf: true },
+          { key: '0-1', title: '异步加载的子节点2', isLeaf: false, children: [] }
+        ]);
+      } else if (node.key === '1') {
+        node.changeChildren && node.changeChildren([
+          { key: '1-0', title: '异步加载的子节点3', isLeaf: true },
+          { key: '1-1', title: '异步加载的子节点4', isLeaf: true }
+        ]);
+      } else {
+        node.changeChildren && node.changeChildren([
+          { key: '0-1-0', title: '异步加载的孙节点1', isLeaf: true },
+          { key: '0-1-1', title: '异步加载的孙节点2', isLeaf: true }
+        ]);
+      }
+    }, 1000);
+  }
+
+  // 获取树的各种状态
+  getTreeState(): void {
+    console.log('展开的节点:', this.treeComponent.getExpandedKeys());
+    console.log('选中的节点:', this.treeComponent.getSelectedKeys());
+    console.log('勾选的节点:', this.treeComponent.getCheckedKeys()); 
+    console.log('搜索结果:', this.treeComponent.getSearchResults());
+    console.log('扁平化的节点:', this.treeComponent.getFlattenNodes());
+  }
+
+  ExpendNodeKey: string = '';
+  // 展开指定节点
+  expandNodes(): void {
+    this.treeComponent.expendNodeByKeys(this.ExpendNodeKey.split(','), true);
+  }
+
+  // 重置展开状态
+  resetExpanded(): void {
+    this.treeComponent.resetExpandedState();
+  }
+
+
 
   // API 文档
   apiSections: ApiData[] = [
@@ -207,15 +277,25 @@ export class DocTreeComponent {
       title: '属性',
       items: [
         { name: 'treeData', description: '树形数据', type: 'TreeNodeOptions[]', default: '[]' },
-        { name: 'showIcon', description: '是否显示图标', type: 'boolean', default: 'false' },
-        { name: 'showLine', description: '是否显示连接线', type: 'boolean', default: 'false' },
-        { name: 'checkable', description: '是否可勾选', type: 'boolean', default: 'false' },
-        { name: 'multiple', description: '是否支持多选', type: 'boolean', default: 'false' },
-        { name: 'draggable', description: '是否可拖拽', type: 'boolean', default: 'false' },
-        { name: 'virtualHeight', description: '虚拟滚动高度', type: 'string', default: "''(禁用虚拟滚动)" },
-        { name: 'defaultExpandAll', description: '默认展开所有节点', type: 'boolean', default: 'false' },
-        { name: 'searchValue', description: '搜索值', type: 'string', default: "''"},
-        { name: 'asyncData', description: '是否异步加载数据', type: 'boolean', default: 'false' }
+        { name: 'treeShowIcon', description: '是否显示图标', type: 'boolean', default: 'false' },
+        { name: 'treeShowLine', description: '是否显示连接线', type: 'boolean', default: 'false' },
+        { name: 'treeCheckable', description: '是否可勾选', type: 'boolean', default: 'false' },
+        { name: 'treeMultiple', description: '是否支持多选', type: 'boolean', default: 'false' },
+        { name: 'treeDraggable', description: '是否可拖拽', type: 'boolean', default: 'false' },
+        { name: 'treeDefaultExpandAll', description: '默认展开所有节点', type: 'boolean', default: 'false' },
+        { name: 'treeSearchValue', description: '搜索值', type: 'string', default: "''" },
+        { name: 'treeAsyncData', description: '是否异步加载数据', type: 'boolean', default: 'false' },
+        { name: 'treeIndent', description: '缩进值', type: 'number', default: '24' },
+        { name: 'treeOptionHeight', description: '选项高度', type: 'number', default: '24' },
+        { name: 'treeIsVirtualScroll', description: '是否启用虚拟滚动', type: 'boolean', default: 'false' },
+        { name: 'treeExpandedIcon', description: '自定义展开图标模板', type: 'TemplateRef', default: 'null' },
+        { name: 'treeVirtualHeight', description: '虚拟滚动容器高度', type: 'number', default: '300' },
+        { name: 'treeVirtualItemSize', description: '虚拟滚动项高度', type: 'number', default: '24' },
+        { name: 'treeVirtualMinBuffer', description: '虚拟滚动最小缓冲区', type: 'number', default: '600' },
+        { name: 'treeVirtualMaxBuffer', description: '虚拟滚动最大缓冲区', type: 'number', default: '300' },
+        { name: 'treeDefaultSelectedKeys', description: '默认选中的节点键值', type: 'string[]', default: '[]' },
+        { name: 'treeDefaultCheckedKeys', description: '默认勾选的节点键值', type: 'string[]', default: '[]' },
+        { name: 'treeDefaultExpandedKeys', description: '默认展开的节点键值', type: 'string[]', default: '[]' }
       ]
     },
     {
@@ -232,7 +312,8 @@ export class DocTreeComponent {
       title: '模板',
       items: [
         { name: 'treeTemplate', description: '自定义节点模板', type: 'TemplateRef<{$implicit: TreeNodeOptions, origin: any, node: TreeNodeOptions}>' },
-        { name: 'iconTemplate', description: '自定义图标模板', type: 'TemplateRef<{$implicit: TreeNodeOptions, origin: any}>' }
+        { name: 'iconTemplate', description: '自定义图标模板', type: 'TemplateRef<{$implicit: TreeNodeOptions, origin: any}>' },
+        { name: 'expandedIcon', description: '自定义展开图标模板', type: 'TemplateRef<{$implicit: TreeNodeOptions}>' }
       ]
     },
     {
@@ -245,10 +326,52 @@ export class DocTreeComponent {
         { name: 'expanded', description: '是否展开', type: 'boolean', default: 'false' },
         { name: 'selected', description: '是否选中', type: 'boolean', default: 'false' },
         { name: 'checked', description: '是否勾选', type: 'boolean', default: 'false' },
+        { name: 'indeterminate', description: '节点复选框的不确定状态', type: 'boolean', default: 'false' },
         { name: 'selectable', description: '是否可选中', type: 'boolean', default: 'true' },
         { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
         { name: 'disableCheckbox', description: '是否禁用复选框', type: 'boolean', default: 'false' },
-        { name: 'children', description: '子节点数据', type: 'TreeNodeOptions[]', default: '[]' }
+        { name: 'children', description: '子节点数据', type: 'TreeNodeOptions[]', default: '[]' },
+        { name: 'changeChildren', description: '修改子节点数据的方法，异步加载时必须使用该方法更新子节点，以确保视图自动更新', type: '(children: TreeNodeOptions[]) => void', default: '-' }
+      ]
+    },
+    {
+      title: '方法',
+      items: [
+        { 
+          name: 'getExpandedKeys', 
+          description: '获取展开的节点', 
+          type: '() => Set<string>' 
+        },
+        { 
+          name: 'getSelectedKeys', 
+          description: '获取选中的节点', 
+          type: '() => Set<string>' 
+        },
+        { 
+          name: 'getCheckedKeys', 
+          description: '获取勾选的节点', 
+          type: '() => Set<string>' 
+        },
+        { 
+          name: 'getSearchResults', 
+          description: '获取搜索结果', 
+          type: '() => TreeNodeOptions[]' 
+        },
+        { 
+          name: 'getFlattenNodes', 
+          description: '获取扁平化节点', 
+          type: '() => Map<string, TreeNodeOptions>' 
+        },
+        { 
+          name: 'expendNodeByKeys', 
+          description: '展开指定的节点', 
+          type: '(keys: string[], resetExpanded?: boolean, expandSelf?: boolean) => void' 
+        },
+        { 
+          name: 'resetExpandedState', 
+          description: '重置树的展开状态到初始状态', 
+          type: '() => void' 
+        }
       ]
     }
   ];
@@ -256,7 +379,7 @@ export class DocTreeComponent {
   // 演示代码
   // 基本用法
   basicSource = `
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TreeComponent, TreeNodeOptions } from 'your-lib';
 
 @Component({
@@ -264,17 +387,28 @@ import { TreeComponent, TreeNodeOptions } from 'your-lib';
   standalone: true,
   imports: [TreeComponent],
   template: \`
-    <lib-tree
+    <lib-tree #tree
       [treeData]="treeData"
-      [checkable]="true"
-      [defaultExpandAll]="true"
+      [treeCheckable]="true"
+      [treeShowIcon]="true"
+      [treeDefaultExpandAll]="false"
+      [treeDefaultSelectedKeys]="['1-1']"
+      [treeDefaultCheckedKeys]="['0']"
+      [treeDefaultExpandedKeys]="['0']"
       (selectedChange)="onNodeSelected($event)"
       (checkBoxChange)="onNodeChecked($event)"
       (expandChange)="onNodeExpanded($event)"
     ></lib-tree>
+    <div class="mt-3">
+      <button class="mr-2" (click)="getTreeState()">获取树状态</button>
+      <button class="mr-2" (click)="expandNodes()">展开指定节点</button>
+      <button (click)="resetExpanded()">重置展开状态</button>
+    </div>
   \`,
 })
 export class BasicTreeDemoComponent {
+  @ViewChild('tree') treeComponent!: TreeComponent;
+
   treeData: TreeNodeOptions[] = [
     {
       key: '0',
@@ -303,6 +437,26 @@ export class BasicTreeDemoComponent {
   onNodeExpanded(event: { expanded: boolean, node: TreeNodeOptions }): void {
     console.log('展开/折叠节点:', event);
   }
+
+  // 获取树的各种状态
+  getTreeState(): void {
+    console.log('展开的节点:', this.treeComponent.getExpandedKeys());
+    console.log('选中的节点:', this.treeComponent.getSelectedKeys());
+    console.log('勾选的节点:', this.treeComponent.getCheckedKeys());
+    console.log('半选状态的节点:', this.treeComponent.getIndeterminateKeys());
+    console.log('搜索结果:', this.treeComponent.getSearchResults());
+    console.log('扁平化的节点:', this.treeComponent.getFlattenNodes());
+  }
+
+  // 展开指定节点
+  expandNodes(): void {
+    this.treeComponent.expendNodeByKeys(['0', '0-0'], true);
+  }
+
+  // 重置展开状态
+  resetExpanded(): void {
+    this.treeComponent.resetExpandedState();
+  }
 }`;
 
   // 带连接线的树
@@ -317,8 +471,8 @@ import { TreeComponent, TreeNodeOptions } from 'your-lib';
   template: \`
     <lib-tree 
       [treeData]="treeData" 
-      [showLine]="true"
-      [defaultExpandAll]="true"
+      [treeShowLine]="true"
+      [treeDefaultExpandAll]="true"
     ></lib-tree>
   \`,
 })
@@ -353,7 +507,7 @@ import { TreeComponent, TreeNodeOptions } from 'your-lib';
   template: \`
     <lib-tree 
       [treeData]="treeData" 
-      [defaultExpandAll]="true"
+      [treeDefaultExpandAll]="true"
     >
       <ng-template #treeTemplate let-node let-origin="origin">
         <div class="custom-node">
@@ -415,7 +569,11 @@ import { TreeComponent, TreeNodeOptions } from 'your-lib';
   template: \`
     <lib-tree 
       [treeData]="treeData" 
-      [virtualHeight]="'300px'"
+      [treeIsVirtualScroll]="true"
+      [treeVirtualHeight]="300"
+      [treeVirtualItemSize]="24"
+      [treeVirtualMinBuffer]="600"
+      [treeVirtualMaxBuffer]="300"
     ></lib-tree>
   \`,
 })
@@ -470,9 +628,14 @@ import { TreeComponent, TreeNodeOptions } from 'your-lib';
   template: \`
     <lib-tree 
       [treeData]="treeData" 
-      [showIcon]="true"
-      [defaultExpandAll]="true"
+      [treeShowIcon]="true"
+      [treeDefaultExpandAll]="true"
+      [treeExpandedIcon]="expandIconTemplate"
     >
+      <ng-template #expandIconTemplate let-node>
+        <i class="bi-folder2-open" *ngIf="node.expanded"></i>
+        <i class="bi-folder" *ngIf="!node.expanded"></i>
+      </ng-template>
       <ng-template #iconTemplate let-node>
         <i class="tree-icon" [ngClass]="node.icon"></i>
       </ng-template>
@@ -484,14 +647,14 @@ export class IconTreeDemoComponent {
     {
       key: '0',
       title: '文档',
-      icon: 'folder-icon',
+      icon: 'bi-folder',
       children: [
         {
           key: '0-0',
           title: '图片',
-          icon: 'image-icon',
+          icon: 'bi-image',
           children: [
-            { key: '0-0-0', title: 'logo.png', icon: 'image-file-icon' }
+            { key: '0-0-0', title: 'logo.png', icon: 'bi-file-earmark-image' }
           ]
         }
       ]
@@ -510,10 +673,11 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [TreeComponent, FormsModule],
   template: \`
+    <lib-input [(ngModel)]="searchValue" (ngModelChange)="onSearchChange($event)"></lib-input>
     <lib-tree 
       [treeData]="treeData" 
-      [searchValue]="searchValue"
-      (searchChange)="searchValue = $event"
+      [treeSearchValue]="searchValue"
+      (searchChange)="onSearchChange($event)"
     ></lib-tree>
   \`,
 })
@@ -532,6 +696,102 @@ export class SearchTreeDemoComponent {
             { key: '0-0-0', title: '子节点1-1-1' }
           ]
         }
+      ]
+    }
+  ];
+  
+  onSearchChange(value: string): void {
+    this.searchValue = value;
+    console.log('搜索:', value);
+  }
+}`;
+
+  // 异步加载
+  asyncSource = `
+import { Component } from '@angular/core';
+import { TreeComponent, TreeNodeOptions } from 'your-lib';
+
+@Component({
+  selector: 'app-async-demo',
+  standalone: true,
+  imports: [TreeComponent],
+  template: \`
+    <lib-tree 
+      [treeData]="treeData" 
+      [treeAsyncData]="true"
+      (loadData)="onLoadData($event)"
+    ></lib-tree>
+  \`,
+})
+export class AsyncTreeDemoComponent {
+  treeData: TreeNodeOptions[] = [
+    {
+      key: '0',
+      title: '异步节点1',
+      children: []
+    },
+    {
+      key: '1',
+      title: '异步节点2',
+      children: []
+    }
+  ];
+  
+  onLoadData(node: TreeNodeOptions): void {
+    // 模拟异步加载
+    setTimeout(() => {
+      // 使用 changeChildren 方法更新子节点，确保视图自动更新
+      node.changeChildren && node.changeChildren([
+        { key: '0-0', title: '异步加载的子节点1', isLeaf: true },
+        { key: '0-1', title: '异步加载的子节点2', isLeaf: false, children: [] }
+      ]);
+    }, 1000);
+  }
+}`;
+
+  // 多选模式
+  multipleSource = `
+import { Component } from '@angular/core';
+import { TreeComponent, TreeNodeOptions } from 'your-lib';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-multiple-demo',
+  standalone: true,
+  imports: [TreeComponent, FormsModule],
+  template: \`
+    <lib-tree 
+      [treeData]="treeData" 
+      [treeMultiple]="isMultiple"
+      [treeDefaultExpandAll]="true"
+    ></lib-tree>
+    <div class="mt-2">
+      <lib-checkbox [(ngModel)]="isMultiple">启用多选模式</lib-checkbox>
+    </div>
+  \`,
+})
+export class MultipleTreeDemoComponent {
+  isMultiple = false;
+  
+  treeData: TreeNodeOptions[] = [
+    {
+      key: '0',
+      title: '父节点1',
+      children: [
+        {
+          key: '0-0',
+          title: '子节点1-1',
+          children: [
+            { key: '0-0-0', title: '子节点1-1-1' }
+          ]
+        }
+      ]
+    },
+    {
+      key: '1',
+      title: '父节点2',
+      children: [
+        { key: '1-0', title: '子节点2-1' }
       ]
     }
   ];
