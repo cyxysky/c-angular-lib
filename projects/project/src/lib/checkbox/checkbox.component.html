@@ -21,14 +21,23 @@
       [disabled]="disabled"
       (change)="checkSingle()"
     />
-    <span class="checkbox-inner" 
-      [class.indeterminate]="indeterminate"
-      [class.checked]="singleValue"
-      [style.borderColor]="singleValue ? checkboxColor : ''"
-      [style.backgroundColor]="singleValue ? checkboxColor : ''"></span>
+    <ng-container *ngTemplateOutlet="checkboxInner; context: { $implicit:  singleValue, indeterminate: indeterminate, disabled: disabled }"></ng-container>
   </span>
   <ng-container *ngIf="isTemplate(singleLabelContent)" [ngTemplateOutlet]="singleLabelContent"></ng-container>
   <ng-container *ngIf="!isTemplate(singleLabelContent)" [ngTemplateOutlet]="defaultLabel"></ng-container>
+</ng-template>
+
+<ng-template #checkboxInner let-checked let-indeterminate="indeterminate" let-disabled="disabled">
+  <span 
+    class="checkbox-box" 
+    [class.checked]="!indeterminate && checked"
+    [class.indeterminate]="indeterminate"
+    [class.disabled]="disabled"
+    [style.backgroundColor]="checked ? checkboxColor : ''"
+    [style.borderColor]="checked ? checkboxColor : ''"
+  >
+    <span class="checkbox-inner" [style.--before-color]="indeterminateColor ? indeterminateColor : '#1890ff'"></span>
+  </span>
 </ng-template>
 
 <!-- 多选模式 -->
@@ -41,11 +50,7 @@
       [disabled]="disabled || option.disabled"
       (change)="toggleOption(option)"
     />
-    <span class="checkbox-inner" 
-      [class.indeterminate]="option.indeterminate"
-      [class.checked]="isChecked[getOptionKey(option.value)]"
-      [style.borderColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"
-      [style.backgroundColor]="(isChecked[getOptionKey(option.value)] || option.indeterminate) ? checkboxColor : ''"></span>
+    <ng-container *ngTemplateOutlet="checkboxInner; context: { $implicit:  isChecked[getOptionKey(option.value)], indeterminate: option.indeterminate, disabled: disabled || option.disabled }"></ng-container>
   </span>
   <ng-container *ngTemplateOutlet="labelTemplate || defaultLabel; context: { $implicit: option }"></ng-container>
 </ng-template>

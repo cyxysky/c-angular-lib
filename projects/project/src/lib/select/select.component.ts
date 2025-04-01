@@ -568,7 +568,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   private createAndSetupOverlay(selectElement: any): void {
     // 配置
     const config = {
-      hasBackdrop: false,
+      hasBackdrop: true,
       backdropClass: 'transparent-backdrop',
       width: selectElement.clientWidth
     };

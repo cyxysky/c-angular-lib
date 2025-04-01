@@ -55,12 +55,13 @@
         <lib-checkbox 
           [(ngModel)]="colorValues" 
           [checkboxOptions]="basicOptions"
+          [checkboxIndeterminateColor]="'black'"
           checkboxColor="#ff4d4f">
         </lib-checkbox>
         <p class="example-value">当前值: {{ colorValues | json }}</p>
       </div>
       <div description>
-        可以自定义复选框的选中颜色。
+        可以通过checkboxColor自定义复选框的选中颜色。半选状态的颜色可以通过checkboxIndeterminateColor属性自定义。
       </div>
     </app-doc-box>
     

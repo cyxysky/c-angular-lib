@@ -156,22 +156,11 @@
 <ng-template #checkboxTemplate let-node>
   <lib-checkbox 
     *ngIf="checkable"
-    [(ngModel)]="node.checked"
+    [ngModel]="node.checked"
     [checkboxSingle]="true"
     [checkboxIndeterminate]="node.indeterminate" 
-    [checkboxDisabled]="node.disabled || node.disableCheckbox"
-    [checkboxSingleLabel]="node.checked"
+    [checkboxDisabled]="(node.disabled || node.disableCheckbox)"
+    [checkboxSingleLabel]="''"
     (ngModelChange)="onNodeCheck(node, !node.checked)">
-
   </lib-checkbox>
-    <span 
-        *ngIf="checkable" 
-        class="lib-tree-checkbox" 
-        [class.lib-tree-checkbox-checked]="node.checked"
-        [class.lib-tree-checkbox-indeterminate]="node.indeterminate"
-        [class.lib-tree-checkbox-disabled]="node.disabled || node.disableCheckbox"
-        (click)="$event.stopPropagation(); onNodeCheck(node, !node.checked)"
-      >
-        <span class="lib-tree-checkbox-inner"></span>
-      </span>
 </ng-template>

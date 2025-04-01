@@ -4,7 +4,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { OverlayService } from '../service/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { UtilsService } from '../service/utils.service';
-
+import { CheckboxComponent } from '../checkbox/checkbox.component';
 export interface CascaderOption {
   value: any;
   label: string;
@@ -26,7 +26,7 @@ export type CascaderSize = 'large' | 'default' | 'small';
 @Component({
   selector: 'lib-cascader',
   standalone: true,
-  imports: [CommonModule, FormsModule, CdkOverlayOrigin],
+  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent],
   templateUrl: './cascader.component.html',
   styleUrl: './cascader.component.less',
   providers: [
@@ -288,7 +288,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       withLockedPosition(false);
     // 创建浮层（添加错误处理）
     this.overlayRef = this.overlayService.createOverlay({
-      hasBackdrop: false,
+      hasBackdrop: true,
       backdropClass: 'transparent-backdrop',
       maxHeight: '80vh',         // 限制最大高度
       disposeOnNavigation: true,  // 导航时自动销毁,

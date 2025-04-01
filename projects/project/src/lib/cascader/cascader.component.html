@@ -129,15 +129,15 @@
                         <div class="cascader-menu-item-content">
                             <!-- 复选框 -->
                             <ng-container *ngIf="isMultiple && checkable">
-                                <span class="cascader-checkbox" 
-                                      [class.cascader-checkbox-checked]="option.checked"
-                                      [class.cascader-checkbox-indeterminate]="option.halfChecked">
-                                    <input type="checkbox" 
-                                           [checked]="option.checked" 
-                                           [disabled]="option.disabled || option.disableCheckbox"
-                                           (click)="onCheckboxClick(option, i, $event)">
-                                    <span class="checkbox-inner"></span>
-                                </span>
+                                <lib-checkbox 
+                                    *ngIf="checkable"
+                                    [ngModel]="option.checked"
+                                    [checkboxSingle]="true"
+                                    [checkboxIndeterminate]="option.halfChecked" 
+                                    [checkboxDisabled]="option.disabled || option.disableCheckbox"
+                                    [checkboxSingleLabel]="''"
+                                    (click)="onCheckboxClick(option, i, $event)">
+                                </lib-checkbox>
                             </ng-container>
                             
                             <!-- 标签 -->

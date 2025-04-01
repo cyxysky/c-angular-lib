@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { UtilsService } from '../service/utils.service';
@@ -34,17 +34,19 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
   /** 方向 */
   @Input({ alias: 'checkboxDirection' }) direction: CheckboxDirection = 'horizontal';
   /** 复选框颜色 */
-  @Input({ alias: 'checkboxColor' }) checkboxColor: string = '#1890ff';
+  @Input({ alias: 'checkboxColor' }) checkboxColor: string = '';
   /** 是否半选 */
-  @Input({ alias: 'checkboxIndeterminate' }) indeterminate: boolean = false;
+  @Input({ alias: 'checkboxIndeterminate', transform: booleanAttribute }) indeterminate: boolean = false;
+  /** 半选颜色 */
+  @Input({ alias: 'checkboxIndeterminateColor' }) indeterminateColor: string = '';
   /** 标签模板 */
   @Input({ alias: 'checkboxLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
   /** 是否禁用 */
-  @Input({ alias: 'checkboxDisabled' }) disabled: boolean = false;
+  @Input({ alias: 'checkboxDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 是否单独显示 */
-  @Input({ alias: 'checkboxSingle' }) single: boolean = false;
+  @Input({ alias: 'checkboxSingle', transform: booleanAttribute }) single: boolean = false;
   /** 单选标签 */
-  @Input({ alias: 'checkboxSingleLabel' }) singleLabelContent: TemplateRef<any> | string | any= '';
+  @Input({ alias: 'checkboxSingleLabel' }) singleLabelContent: TemplateRef<any> | string | any = '';
   //#endregion
 
   //#region 内部状态变量
@@ -235,7 +237,7 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
    * 设置禁用状态
    */
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // this.disabled = isDisabled;
   }
   //#endregion
 }
