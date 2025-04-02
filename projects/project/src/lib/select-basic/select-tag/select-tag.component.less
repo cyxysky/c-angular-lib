@@ -1,5 +1,3 @@
-@import '../../../style/select-tag.less';
-
 :host {
     display: inline-block;
 }
@@ -7,22 +5,22 @@
 .tag {
     display: inline-flex;
     align-items: center;
-    height: @tag-height-base;
+    height: 24px;
     max-width: 100%;
-    background-color: @tag-bg-color;
-    color: @tag-text-color;
-    border-radius: @tag-border-radius;
+    background-color: rgb(30 137 200 / 6%);
+    color: rgb(25 128 163 / 67%);
+    border-radius: 4px;
     cursor: default;
 
-    transition: @tag-transition;
-    animation: @tag-animation;
-    border: @tag-border;
-    box-shadow: @tag-box-shadow;
+    transition: all 0.2s ease;
+    animation: 0.2s linear 0s alternate show;
+    border: 1px solid rgba(23, 184, 199, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     white-space: nowrap;
     overflow: hidden;
 
     .text {
-        max-width: @tag-text-max-width;
+        max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
         padding-right: 4px;
@@ -34,42 +32,42 @@
         justify-content: center;
         cursor: pointer;
         pointer-events: all;
-        border-radius: @tag-border-radius;
-        transition: @tag-transition;
+        border-radius: 4px;
+        transition: all 0.2s ease;
 
         &:hover {
-            background-color: @tag-close-hover-bg;
+            background-color: rgba(0, 0, 0, 0.08);
         }
     }
 
     &:hover {
-        background-color: @tag-hover-bg-color;
+        background-color: rgba(0, 207, 226, 0.08);
     }
 }
 
 .default {
-    padding: @tag-padding;
-    height: @tag-height-base;
+    padding: 0 4px 0 8px;
+    height: 24px;
     .close-icon {
-        width: @tag-close-icon-size-base;
-        height: @tag-close-icon-size-base;
+        width: 16px;
+        height: 16px;
     }
 }
 
 .small {
-    padding: @tag-padding-sm;
-    height: @tag-height-sm;
+    padding: 0 2px 0 6px;
+    height: 20px;
     .close-icon {
-        width: @tag-close-icon-size-sm;
-        height: @tag-close-icon-size-sm;
+        width: 14px;
+        height: 14px;
     }
 }
 
 .large {
-    padding: @tag-padding-lg;
-    height: @tag-height-lg;
+    padding: 0 6px 0 10px;
+    height: 30px;
     .close-icon {
-        width: @tag-close-icon-size-lg;
-        height: @tag-close-icon-size-lg;
+        width: 18px;
+        height: 18px;
     }
 }
