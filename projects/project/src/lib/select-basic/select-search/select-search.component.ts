@@ -1,0 +1,77 @@
+import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+@Component({
+  selector: 'lib-select-search',
+  imports: [FormsModule],
+  templateUrl: './select-search.component.html',
+  styleUrl: './select-search.component.less'
+})
+export class SelectSearchComponent {
+  @ViewChild('searchInput', { static: false }) searchInput!: ElementRef;
+  @ViewChild('searchText', { static: false }) searchText!: ElementRef;
+
+  @Input({ alias: 'disabled' }) disabled: boolean = false;
+  @Output() search = new EventEmitter<string>();
+  @Output() inputWidthChange = new EventEmitter<number>();
+
+  constructor(private renderer: Renderer2) { }
+
+  public searchOnCompositionValue: string = '';
+  public searchValue: string = '';
+  /**
+   * 搜索
+   * @param value 搜索值
+   */
+  public onSearch(value: string): void {
+    this.searchValue = value;
+    this.searchOnCompositionValue = value;
+    this.searchInputWidthChange();
+    this.search.emit(value);
+  }
+
+  /**
+ * 处理组合变化
+ * @param event 事件
+ */
+  public onCompositionChange(event: CompositionEvent): void {
+    if (event && event.data) {
+      this.searchOnCompositionValue = this.searchValue + event.data;
+    }
+    this.searchInputWidthChange();
+  }
+
+  /**
+  * 搜索输入宽度变化
+  */
+  public searchInputWidthChange(): void {
+    const timer = setTimeout(() => {
+      let width = (this.searchOnCompositionValue === '' ? 4 : this.searchText.nativeElement.offsetWidth + 20);
+      this.renderer.setStyle(this.searchInput.nativeElement, 'width', `${width}px`);
+      this.inputWidthChange.emit(width);
+      clearTimeout(timer);
+    });
+  }
+
+  /**
+   * 聚焦
+   */
+  public focus(): void {
+    this.searchInput.nativeElement.focus();
+  }
+
+  /**
+   * 失焦
+   */
+  public blur(): void {
+    this.searchInput.nativeElement.blur();
+  }
+
+  /**
+   * 清除
+   */
+  public clear(): void {
+    this.searchValue = '';
+    this.searchOnCompositionValue = '';
+    this.searchInputWidthChange();
+  }
+}

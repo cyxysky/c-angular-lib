@@ -7,10 +7,11 @@ import { CommonModule, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayService } from '../service/overlay.service';
 import { UtilsService } from '../service/utils.service';
-
+import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
+import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 @Component({
   selector: 'lib-select',
-  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin],
+  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectTagComponent, SelectSearchComponent],
   templateUrl: './select.component.html',
   styleUrl: './select.component.less',
   providers: [
@@ -29,9 +30,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 浮层tamplet对象 */
   @ViewChild('overlay', { static: false }) overlayTemplate!: TemplateRef<any>;
   /** 搜索盒子 */
-  @ViewChild('searchInput', { static: false }) searchInput!: ElementRef;
-  /** 搜索值 */
-  @ViewChild('searchText', { static: false }) searchText!: ElementRef;
+  @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;
   //#endregion
 
   //#region 输入属性
@@ -274,7 +273,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public handleSelectionChange(value: any, action: 'add' | 'remove'): void {
     let data;
-
     if (this.selectMode === 'single') {
       data = action === 'add' ? value : '';
     } else {
@@ -286,7 +284,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
         data = _.without(data, value);
       }
     }
-
     this.updateData(data);
     this.reachedMaxCount = this.selectMode === 'multiple' && data.length >= this.maxMultipleCount;
   }
@@ -296,9 +293,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public selectUser(value: any, disabled: boolean = false): void {
     if (disabled) return;
-
-    this.resetSearchInputWidth();
-
     if (this.selectMode === 'single') {
       this.handleSelectionChange(value, 'add');
       this.closeModal(this.overlayRef);
@@ -337,7 +331,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public clear(event: Event): void {
     event.stopPropagation();
     this.updateData(this.selectMode === 'single' ? '' : []);
-    this.resetSearchInputWidth();
     this.reachedMaxCount = false;
   }
 
@@ -357,7 +350,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   public onSearch(value: any): void {
     this.searchOnCompositionValue = value;
-    this.searchInputWidthChange();
 
     // 执行搜索
     if (!this.searchFn) {
@@ -424,44 +416,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   //#endregion
 
   //#region 搜索输入框操作
-  /**
-   * 搜索输入宽度变化
-   */
-  public searchInputWidthChange(): void {
-    const timer = setTimeout(() => {
-      let width = (this.searchOnCompositionValue === '' ? 4 : this.searchText.nativeElement.offsetWidth + 20);
-      this.renderer.setStyle(this.searchInput.nativeElement, 'width', `${width}px`);
-      this.updateOverlayRefPosition();
-      clearTimeout(timer);
-    });
-  }
-
-  /**
-   * 搜索输入宽度变化
-   * @param event 搜索输入宽度变化
-   */
-  public compositionchange(event: any): void {
-    if (event && event.data) {
-      this.searchOnCompositionValue = this.searchValue + event.data;
-    }
-    this.searchInputWidthChange();
-  }
-
-  /**
-   * 重置搜索输入宽度
-   */
-  public resetSearchInputWidth(): void {
-    if (!this.searchInput) return;
-    this.renderer.setStyle(this.searchInput.nativeElement, 'width', '4px');
-    this.cdr.detectChanges();
-  }
 
   /**
    * 聚焦搜索输入
    */
   public focusSearchInput(): void {
     if (this.search && this.searchInput) {
-      this.searchInput.nativeElement.focus();
+      this.searchInput.focus();
     }
   }
   //#endregion
@@ -498,8 +459,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.customTags.push(tags[0]);
       this.optionMap.set(tags[0], tags[0]);
     }
-
-    this.resetSearchInputWidth();
   }
   //#endregion
 
@@ -542,7 +501,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       event.preventDefault();
       this.createCustomTag(this.searchValue);
       this.resetSearchState();
-      this.searchInputWidthChange();
     }
   }
   //#endregion
@@ -606,7 +564,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   async closeModal(overlayRef: OverlayRef | null): Promise<void> {
     this.modalState = 'closed';
-    this.resetSearchInputWidth();
     this.resetSearchState();
     // 移除激活样式
     this.renderer.removeClass(this._overlayOrigin.elementRef.nativeElement, 'active');

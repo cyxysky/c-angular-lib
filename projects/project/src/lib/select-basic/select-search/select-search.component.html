@@ -1,0 +1,10 @@
+<div #searchBox class="search-box">
+    <input 
+        class="search-input" 
+        #searchInput 
+        [(ngModel)]="searchValue" 
+        (ngModelChange)="onSearch($event)"
+        (compositionupdate)="onCompositionChange($event)"
+        [disabled]="disabled"/>
+    <span class="search-text" #searchText>{{ searchOnCompositionValue }}</span>
+</div>

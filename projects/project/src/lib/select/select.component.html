@@ -28,40 +28,27 @@
             </ng-container>
         </div>
         <ng-container *ngIf="selectMode === 'multiple'">
-            <div class="select-tag" *ngFor="let tag of _data;index as i">
-                <div class="select-tag-text">
-                    <!-- 使用自定义模板 -->
-                    <ng-container *ngIf="optionLabelTemplate">
-                        <ng-container *ngFor="let option of optionList">
-                            <ng-container *ngIf="option[optionValue] === tag">
-                                <ng-container *ngTemplateOutlet="optionLabelTemplate; context: getTemplateContext(option)"></ng-container>
-                            </ng-container>
+            <lib-select-tag *ngFor="let tag of _data;index as i" [size]="size" [closable]="true" (remove)="removeUser($event, tag)" style="padding-right: 4px;" [size]="size">
+                <ng-container *ngIf="optionLabelTemplate">
+                    <ng-container *ngFor="let option of optionList">
+                        <ng-container *ngIf="option[optionValue] === tag">
+                            <ng-container *ngTemplateOutlet="optionLabelTemplate; context: getTemplateContext(option)"></ng-container>
                         </ng-container>
                     </ng-container>
-                    <!-- 默认显示 -->
-                    <ng-container *ngIf="!optionLabelTemplate">
-                        {{ getLabel(tag) }}
-                    </ng-container>
-                </div>
-                <!-- 删除内容 -->
-                <div class="select-tag-close-icon" (click)="removeUser($event, tag)">
-                    <i class="bi bi-x"></i>
-                </div>
-            </div>
+                </ng-container>
+                <ng-container *ngIf="!optionLabelTemplate">
+                    {{ getLabel(tag) }}
+                 </ng-container>
+            </lib-select-tag>
         </ng-container>
         <!-- 搜索框 -->
-        <div #searchBox class="search-box" *ngIf="search">
-            <input 
-                class="search-input" 
-                #searchInput 
-                [(ngModel)]="searchValue" 
-                (ngModelChange)="onSearch($event)"
-                (compositionupdate)="compositionchange($event)" 
-                (paste)="handlePaste($event)"
-                (keydown)="handleKeydown($event)"
-                class="search-input" />
-            <span class="search-text" #searchText> {{ searchOnCompositionValue }}</span>
-        </div>
+        <lib-select-search
+            #searchInput
+            *ngIf="search"
+            [disabled]="disabled"
+            (inputWidthChange)="updateOverlayRefPosition()"
+            (search)="onSearch($event)">
+        </lib-select-search>
     </div>
     <!-- 后缀 -->
     <div class="suffix-box">

@@ -21,24 +21,18 @@
         </div>
         <!-- 多选数据 -->
         <ng-container *ngIf="showMultData()">
-            <div class="cascader-tag" *ngFor="let tag of displayTags">
-                <div class="cascader-tag-text">{{ tag.label }}</div>
-                <div class="cascader-tag-close-icon" (click)="removeItem($event, tag.value)">
-                    <i class="bi bi-x"></i>
-                </div>
-            </div>
+            <lib-select-tag *ngFor="let tag of displayTags" (remove)="removeItem($event, tag.value)" [size]="size" [closable]="true">
+                {{ tag.label }}
+            </lib-select-tag>
         </ng-container>
         <!-- 搜索框 -->
-        <div #searchBox class="search-box" *ngIf="showSearch">
-            <input 
-                class="search-input" 
-                #searchInput 
-                [(ngModel)]="searchValue" 
-                (ngModelChange)="onSearch($event)"
-                (compositionupdate)="onCompositionChange($event)"
-                [disabled]="disabled"/>
-            <span class="search-text" #searchText>{{ searchOnCompositionValue }}</span>
-        </div>
+        <lib-select-search
+            #searchInput
+            *ngIf="showSearch"
+            [disabled]="disabled"
+            (inputWidthChange)="updateDropdownPosition()"
+            (search)="onSearch($event)">
+        </lib-select-search>
     </div>
     <!-- 后缀 -->
     <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
