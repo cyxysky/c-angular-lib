@@ -1,0 +1,75 @@
+@import '../../../style/select-tag.less';
+
+:host {
+    display: inline-block;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    height: @tag-height-base;
+    max-width: 100%;
+    background-color: @tag-bg-color;
+    color: @tag-text-color;
+    border-radius: @tag-border-radius;
+    cursor: default;
+
+    transition: @tag-transition;
+    animation: @tag-animation;
+    border: @tag-border;
+    box-shadow: @tag-box-shadow;
+    white-space: nowrap;
+    overflow: hidden;
+
+    .text {
+        max-width: @tag-text-max-width;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 4px;
+    }
+
+    .close-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: all;
+        border-radius: @tag-border-radius;
+        transition: @tag-transition;
+
+        &:hover {
+            background-color: @tag-close-hover-bg;
+        }
+    }
+
+    &:hover {
+        background-color: @tag-hover-bg-color;
+    }
+}
+
+.default {
+    padding: @tag-padding;
+    height: @tag-height-base;
+    .close-icon {
+        width: @tag-close-icon-size-base;
+        height: @tag-close-icon-size-base;
+    }
+}
+
+.small {
+    padding: @tag-padding-sm;
+    height: @tag-height-sm;
+    .close-icon {
+        width: @tag-close-icon-size-sm;
+        height: @tag-close-icon-size-sm;
+    }
+}
+
+.large {
+    padding: @tag-padding-lg;
+    height: @tag-height-lg;
+    .close-icon {
+        width: @tag-close-icon-size-lg;
+        height: @tag-close-icon-size-lg;
+    }
+}

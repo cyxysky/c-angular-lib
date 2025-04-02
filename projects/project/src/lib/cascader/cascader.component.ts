@@ -5,6 +5,8 @@ import { OverlayService } from '../service/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { UtilsService } from '../service/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
+import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
+import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
 export interface CascaderOption {
   value: any;
   label: string;
@@ -26,7 +28,7 @@ export type CascaderSize = 'large' | 'default' | 'small';
 @Component({
   selector: 'lib-cascader',
   standalone: true,
-  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent],
+  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectSearchComponent, SelectTagComponent],
   templateUrl: './cascader.component.html',
   styleUrl: './cascader.component.less',
   providers: [
@@ -46,8 +48,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   // 视图引用
   @ViewChild(CdkOverlayOrigin, { static: false }) overlayOrigin!: CdkOverlayOrigin;
   @ViewChild('dropdownTemplate', { static: false }) dropdownTemplate!: TemplateRef<any>;
-  @ViewChild('searchInput', { static: false }) searchInput!: ElementRef;
-  @ViewChild('searchText', { static: false }) searchText!: ElementRef;
+  @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;
 
   // 输入属性
   /** 选项数据 */
@@ -145,8 +146,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public hoverCloseTimer: any = null;
   // 添加临时选中数组
   tempSelectedOptions: CascaderOption[] = [];
-  // 搜索输入框值
-  public searchOnCompositionValue = '';
   /** 目前浮层是否打开 */
   public isNowDropdownOpen: boolean = false;
   // getter/setter
@@ -429,7 +428,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 更新下拉菜单位置
    */
-  private updateDropdownPosition(): void {
+  public updateDropdownPosition(): void {
     if (!this.overlayRef) return;
     let timer = setTimeout(() => {
       if (this.overlayRef && this.isDropdownOpen) {
@@ -718,8 +717,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public onSearch(value: string): void {
     this.searchValue = value;
-    this.searchOnCompositionValue = value;
-    this.searchInputWidthChange();
     this.loading = true;
     this.debouncedSearch(value).then(() => {
       console.log('搜索完成', value);
@@ -731,7 +728,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public resetSearch(): void {
     this.searchValue = '';
-    this.searchOnCompositionValue = '';
+    this.searchInput && this.searchInput.clear();
     this.filteredOptions = [];
     this.cdr.detectChanges();
   }
@@ -899,7 +896,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   enhancedKeyboardHandler = (event: KeyboardEvent): void => {
     if (!this.isDropdownOpen) return;
     // 如果正在搜索，使用搜索模式的键盘处理
-    if (this.searchOnCompositionValue || this.searchValue) {
+    if (this.searchValue) {
       this.handleKeydown(event);
       return;
     }
@@ -968,28 +965,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     }
   }
 
-  /**
-   * 处理组合变化
-   * @param event 事件
-   */
-  public onCompositionChange(event: CompositionEvent): void {
-    if (event && event.data) {
-      this.searchOnCompositionValue = this.searchValue + event.data;
-    }
-    this.searchInputWidthChange();
-  }
-
-  /**
-  * 搜索输入宽度变化
-  */
-  public searchInputWidthChange(): void {
-    const timer = setTimeout(() => {
-      let width = (this.searchOnCompositionValue === '' ? 4 : this.searchText.nativeElement.offsetWidth + 20);
-      this.renderer.setStyle(this.searchInput.nativeElement, 'width', `${width}px`);
-      this.updateDropdownPosition();
-      clearTimeout(timer);
-    });
-  }
 
   /**
    * 获取选项值
@@ -1327,14 +1302,14 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 聚焦搜索
    */
   public focusSearch(): void {
-    this.searchInput && this.searchInput.nativeElement.focus();
+    this.searchInput && this.searchInput.focus();
   }
 
   /**
    * 失去焦点
    */
   public blurSearch(): void {
-    this.searchInput && this.searchInput.nativeElement.blur();
+    this.searchInput && this.searchInput.blur();
   }
 
   /**
@@ -1342,7 +1317,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @returns 是否显示占位符
    */
   public showPlaceHolder(): boolean {
-    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchOnCompositionValue
+    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchValue
   }
 
   /**
@@ -1350,7 +1325,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @returns 是否显示单选数据
    */
   public showSingalData(): boolean {
-    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchOnCompositionValue
+    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchValue
   }
 
   /**
