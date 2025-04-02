@@ -7,7 +7,7 @@
     [class.cascader-disabled]="disabled"
     [class.cascader-open]="isDropdownOpen"
     (click)="openDropdown()" 
-    [style.min-width]="minWidth" 
+    [style.min-width]="'200px'" 
     cdkOverlayOrigin>
     <!-- 内容 -->
     <div class="cascader-content">
@@ -31,6 +31,7 @@
             *ngIf="showSearch"
             [disabled]="disabled"
             (inputWidthChange)="updateDropdownPosition()"
+            (compositionChange)="onCompositionChange($event)"
             (search)="onSearch($event)">
         </lib-select-search>
     </div>

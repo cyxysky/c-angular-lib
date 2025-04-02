@@ -39,7 +39,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 数据为空占位符 */
   @Input({ alias: 'selectPlaceHolder' }) placeHolder: string = '请选择';
   /** 选择模式 */
-  @Input({ alias: 'selectMode' }) selectMode: 'single' | 'multiple' = 'multiple';
+  @Input({ alias: 'selectMode' }) selectMode: 'single' | 'multiple' = 'single';
   /** 是否允许清空 */
   @Input({ alias: 'selectAllowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 是否显示搜索框 */
@@ -66,8 +66,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   @Input({ alias: 'selectLoading', transform: booleanAttribute }) loading: boolean = false;
   /** 远程搜索方法 */
   @Input({ alias: 'selectSearchFn' }) searchFn: ((value: string) => Promise<any[]>) | null = null;
-  /** 最小宽度 */
-  @Input({ alias: 'selectWidth' }) width: string = '400px';
   /** 选项自定义模板 */
   @Input() optionTemplate: TemplateRef<any> | null = null;
   /** 选择内容自定义模板 */
@@ -520,6 +518,15 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.cdr.detectChanges();
   }
 
+
+  /**
+   * 处理输入法输入
+   * @param event 输入事件
+   */
+  onCompositionChange(event: string) {
+    this.searchOnCompositionValue = event;
+  }
+
   /**
    * 创建并设置浮层
    */
@@ -549,7 +556,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
         this.closeModal(ref)
       }
     );
-
     // 附加模板
     this.overlayService.attachTemplate(
       this.overlayRef,

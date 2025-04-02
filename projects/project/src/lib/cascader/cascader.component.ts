@@ -65,7 +65,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   @Input({ alias: 'placeholder' }) placeholder: string = '请选择';
   /** 是否允许清空 */
   @Input({ alias: 'allowClear', transform: booleanAttribute }) allowClear: boolean = true;
-  /** 改变后立即关闭菜单 */
+  /** 允许选择父级 */
   @Input({ alias: 'changeOnSelect', transform: booleanAttribute }) changeOnSelect: boolean = false;
   /** 是否多选 */
   @Input({ alias: 'isMultiple', transform: booleanAttribute }) isMultiple: boolean = false;
@@ -79,16 +79,12 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   @Input({ alias: 'status' }) status: 'error' | 'warning' | null = null;
   /** 下拉菜单的宽度 */
   @Input({ alias: 'menuWidth' }) menuWidth: number = 160;
-  /** 最小宽度 */
-  @Input({ alias: 'minWidth' }) minWidth: string = '200px';
   /** 自定义选项模板 */
   @Input({ alias: 'optionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
   /** 自定义选项标签模板 */
   @Input({ alias: 'optionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
   /** 是否加载中 */
   @Input({ alias: 'loading', transform: booleanAttribute }) loading: boolean = false;
-  /** 自定义显示渲染函数 */
-  @Input({ alias: 'displayRender' }) displayRender?: (labels: string[], selectedOptions?: CascaderOption[]) => string;
   /** 选项过滤函数 */
   @Input({ alias: 'optionFilterFn' }) optionFilterFn?: (inputValue: string, option: CascaderOption, path: CascaderOption[]) => boolean;
   /** 选项选择函数，返回 true/false 表示是否可选 */
@@ -119,6 +115,8 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   isDropdownOpen: boolean = false;
   /** 搜索关键字 */
   searchValue: string = '';
+  /** 中文输入法 */
+  compositionValue: string = '';
   /** 多选模式下显示的标签 */
   displayTags: { label: string, value: any, option: CascaderOption }[] = [];
   /** 搜索过滤后的选项 */
@@ -1078,6 +1076,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.selectedPathsMap.delete(key);
       }
     }
+    this.toggleMultipleSelection(option);
     // 更新状态
     this.updateIndeterminateStatus();
     this.updateMultipleValues();
@@ -1095,6 +1094,14 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     } else {
       this.setSingleValue(value, emitChange);
     }
+  }
+
+  /**
+   * 处理中文输入法
+   * @param event 事件
+   */
+  public onCompositionChange(event: string): void {
+    this.compositionValue = event;
   }
 
   /**
@@ -1317,7 +1324,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @returns 是否显示占位符
    */
   public showPlaceHolder(): boolean {
-    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchValue
+    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchValue && !this.compositionValue
   }
 
   /**
@@ -1325,7 +1332,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @returns 是否显示单选数据
    */
   public showSingalData(): boolean {
-    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchValue
+    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchValue && !this.compositionValue
   }
 
   /**

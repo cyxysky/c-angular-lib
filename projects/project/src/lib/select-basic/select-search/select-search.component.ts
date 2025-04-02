@@ -12,6 +12,7 @@ export class SelectSearchComponent {
 
   @Input({ alias: 'disabled' }) disabled: boolean = false;
   @Output() search = new EventEmitter<string>();
+  @Output() compositionChange = new EventEmitter<string>();
   @Output() inputWidthChange = new EventEmitter<number>();
   @Output() paste = new EventEmitter<any>();
   constructor(private renderer: Renderer2) { }
@@ -38,6 +39,7 @@ export class SelectSearchComponent {
       this.searchOnCompositionValue = this.searchValue + event.data;
     }
     this.searchInputWidthChange();
+    this.compositionChange.emit(event.data);
   }
 
   /**
