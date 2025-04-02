@@ -47,6 +47,7 @@
             *ngIf="search"
             [disabled]="disabled"
             (inputWidthChange)="updateOverlayRefPosition()"
+            (paste)="handlePaste($event)"
             (search)="onSearch($event)">
         </lib-select-search>
     </div>

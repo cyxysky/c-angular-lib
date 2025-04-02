@@ -5,6 +5,7 @@
         [(ngModel)]="searchValue" 
         (ngModelChange)="onSearch($event)"
         (compositionupdate)="onCompositionChange($event)"
+        (paste)="onPaste($event)"
         [disabled]="disabled"/>
     <span class="search-text" #searchText>{{ searchOnCompositionValue }}</span>
 </div>

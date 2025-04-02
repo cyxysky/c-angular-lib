@@ -13,7 +13,7 @@ export class SelectSearchComponent {
   @Input({ alias: 'disabled' }) disabled: boolean = false;
   @Output() search = new EventEmitter<string>();
   @Output() inputWidthChange = new EventEmitter<number>();
-
+  @Output() paste = new EventEmitter<any>();
   constructor(private renderer: Renderer2) { }
 
   public searchOnCompositionValue: string = '';
@@ -73,5 +73,9 @@ export class SelectSearchComponent {
     this.searchValue = '';
     this.searchOnCompositionValue = '';
     this.searchInputWidthChange();
+  }
+
+  onPaste(event: ClipboardEvent): void {
+    this.paste.emit(event);
   }
 }
