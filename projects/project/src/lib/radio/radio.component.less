@@ -1,4 +1,52 @@
-@import '../../style/radio.less';
+// 单选框颜色变量
+@radio-color: #1890ff;
+@radio-active-color: #40a9ff;
+@radio-border-color: #d9d9d9;
+@radio-background-color: #fff;
+
+// 单选框尺寸变量
+@radio-size: 16px;
+@radio-inner-size: 8px;
+@radio-inner-margin: -4px;
+@radio-border-width: 1px;
+@radio-border-radius: 50%;
+
+// 布局变量
+@radio-group-gap: 8px;
+@radio-margin-right: 16px;
+@radio-label-padding: 0 8px;
+@radio-inner-margin-right: 8px;
+
+// 禁用状态变量
+@radio-disabled-opacity: 0.5;
+@radio-disabled-cursor: not-allowed;
+
+// 过渡效果变量
+@radio-transition: all 0.3s;
+@radio-inner-transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+
+// 透明度变量
+@radio-input-opacity: 0;
+@radio-inner-opacity-hidden: 0;
+@radio-inner-opacity-visible: 1;
+
+// 变换变量
+@radio-inner-transform-hidden: scale(0);
+@radio-inner-transform-visible: scale(1);
+
+// 布局变量
+@radio-display-flex: flex;
+@radio-display-inline-block: inline-block;
+@radio-display-block: block;
+@radio-flex-direction-column: column;
+@radio-flex-wrap: wrap;
+@radio-align-items: center;
+@radio-position-relative: relative;
+@radio-position-absolute: absolute;
+@radio-white-space: nowrap;
+@radio-outline: none;
+@radio-cursor-pointer: pointer;
+@radio-z-index: 1;
 
 .radio-group {
     display: @radio-display-flex;

@@ -1,5 +1,77 @@
-@import '../../style/number-input.less';
+@disabled-color: rgba(0, 0, 0, 0.25);
+@border-radius-base: 2px;
+@border-base-color: #d9d9d9;
+@default: #1890ff;
+@default-contrast: #fff;
+@default-shade: #096dd9;
+@warning: #ffc409;
+@danger: #c5000f;
+@default-tint: #40a9ff;
+// 数字输入框基础变量
+@number-input-display: inline-flex;
+@number-input-position-relative: relative;
+@number-input-min-width: 144px;
+@number-input-width-full: 100%;
+@number-input-width-calc: calc(100% - 16px);
+@number-input-padding: 4px 11px;
+@number-input-background-transparent: transparent;
+@number-input-background-hover: rgba(0, 0, 0, 0.03);
 
+// 数字输入框边框变量
+@number-input-border-none: none;
+@number-input-border-width: 1px;
+@number-input-border-style: solid;
+@number-input-border-color: #d9d9d9;
+@number-input-border-radius: @border-radius-base;
+@number-input-outline: none;
+
+// 数字输入框阴影变量
+@number-input-default-color-box-shadow: rgba(24, 144, 255, 0.2);
+@number-input-warning-color-box-shadow: rgba(250, 173, 20, 0.2) !important;
+@number-input-error-color-box-shadow: rgba(255, 77, 79, 0.2) !important;
+@number-input-box-shadow-size: 0 0 0 2px;
+
+// 数字输入框状态颜色
+@number-input-color-disabled: @disabled-color;
+@number-input-disabled-bg: #f5f5f5;
+@number-input-color-default: @default;
+@number-input-color-warning: @warning !important;
+@number-input-color-error: @danger !important;
+@number-input-text-color: rgba(0, 0, 0, 0.65);
+@number-input-arrow-color: rgba(0, 0, 0, 0.45);
+
+// 数字输入框过渡变量
+@number-input-transition: all 0.3s;
+
+// 数字输入框前后缀变量
+@number-input-affix-margin: 4px;
+@number-input-suffix-margin-right: 16px;
+
+// 数字输入框控制器变量
+@number-input-handler-width: 22px;
+@number-input-handler-height-half: 50%;
+@number-input-handler-cursor: pointer;
+@number-input-handler-cursor-disabled: not-allowed;
+
+// 数字输入框箭头变量
+@number-input-arrow-width: 0;
+@number-input-arrow-height: 0;
+@number-input-arrow-border-size: 4px;
+@number-input-arrow-border-transparent: 4px solid transparent;
+@number-input-arrow-border-bottom: 4px solid rgba(0, 0, 0, 0.45);
+@number-input-arrow-border-top: 4px solid rgba(0, 0, 0, 0.45);
+@number-input-arrow-border-none: 0;
+@number-input-arrow-display: inline-block;
+
+// 数字输入框布局变量
+@number-input-display-flex: flex;
+@number-input-display-none: none;
+@number-input-flex-none: none;
+@number-input-flex-direction-column: column;
+@number-input-align-items: center;
+@number-input-justify-content: center;
+@number-input-overflow: hidden;
+@number-input-box-sizing: border-box;
 :host {
     display: @number-input-display;
 }
