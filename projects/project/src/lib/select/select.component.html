@@ -6,7 +6,7 @@
     [class.select-warning]="status === 'warning'" 
     [class.select-disabled]="disabled"
     (click)="openModal()" 
-    [style.min-width]="minWidth" 
+    [style.width]="width" 
     cdkOverlayOrigin>
     <div class="select-content">
         <div class="placeHolder" *ngIf="(!_data || (_data && _data.length === 0)) && !searchOnCompositionValue">

@@ -40,7 +40,7 @@
         }
         
         .select-tag {
-            height: @select-tag-height-lg;
+            height: @select-tag-height-lg !important;
             font-size: @select-tag-font-size-lg;
             
             .select-tag-close-icon {
@@ -64,7 +64,7 @@
             min-height: @select-content-min-height-sm;
 
             .select-tag {
-                height: @select-tag-height-sm;
+                height: @select-tag-height-sm !important;
                 line-height: @select-tag-height-sm;
                 font-size: @select-tag-font-size-sm;
                 padding: @select-tag-padding-sm;
@@ -139,9 +139,6 @@
             background-color: @select-tag-bg-color;
             color: @select-tag-text-color;
             border-radius: @select-tag-border-radius;
-            float: left;
-            cursor: auto;
-            font-size: @select-tag-font-size-base;
             padding: @select-tag-padding;
             margin: @select-tag-margin;
             transition: @select-transition;

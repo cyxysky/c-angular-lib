@@ -27,13 +27,7 @@
 @select-content-min-height-lg: 42px;
 @select-content-min-height-sm: 26px;
 
-// 标签相关样式
-@select-tag-margin: 1px;
-@select-tag-padding: 0 4px 0 8px;
-@select-tag-padding-sm: 0 2px 0 6px;
-@select-tag-text-padding-right: 4px;
-@select-tag-text-max-width: 200px;
-@select-tag-border-radius: 4px;
+
 
 // 大尺寸变量
 @select-height-lg: 44px;
@@ -45,13 +39,21 @@
 @select-font-size-sm: 12px;
 @select-placeholder-padding-left-sm: 6px;
 
-// 标签尺寸变量
-@select-tag-height-base: 24px;
+// 标签相关样式
+@select-tag-margin: 1px;
+@select-tag-padding: 0 4px 0 8px;
+@select-tag-padding-sm: 0 2px 0 6px;
+@select-tag-text-padding-right: 4px;
+@select-tag-text-max-width: 200px;
+@select-tag-border-radius: 4px;
 @select-tag-font-size-base: 13px;
-@select-tag-height-lg: 30px;
-@select-tag-font-size-lg: 14px;
 @select-tag-height-sm: 20px;
+@select-tag-height-base: 24px;
+@select-tag-height-lg: 28px;
+@select-tag-font-size-lg: 14px;
 @select-tag-font-size-sm: 12px;
+@select-tag-max-width: calc(100% - 16px);
+@select-tag-border: 1px solid @select-tag-border-color;
 
 // 图标尺寸变量
 @select-icon-size-base: 16px;
@@ -68,7 +70,6 @@
 // 宽度变量
 @select-width-full: 100%;
 @select-width-half: 50%;
-@select-tag-max-width: calc(100% - 16px);
 @select-option-max-width: calc(100% - @select-suffix-min-width-base);
 @select-search-max-width: calc(100%);
 @select-search-input-width: 4px;
@@ -95,7 +96,6 @@
 @select-hover-border: @select-border-width @select-border-style @select-hover-border-color;
 @select-error-border: @select-border-width @select-border-style @select-error-color;
 @select-warning-border: @select-border-width @select-border-style @select-warning-color;
-@select-tag-border: 1px solid @select-tag-border-color;
 
 @select-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
 @select-focus-box-shadow: 0 0 0 2px rgba(0, 207, 226, 0.12);

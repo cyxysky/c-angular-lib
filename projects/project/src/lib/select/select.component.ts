@@ -40,7 +40,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 数据为空占位符 */
   @Input({ alias: 'selectPlaceHolder' }) placeHolder: string = '请选择';
   /** 选择模式 */
-  @Input({ alias: 'selectMode' }) selectMode: 'single' | 'multiple' = 'single';
+  @Input({ alias: 'selectMode' }) selectMode: 'single' | 'multiple' = 'multiple';
   /** 是否允许清空 */
   @Input({ alias: 'selectAllowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 是否显示搜索框 */
@@ -68,7 +68,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 远程搜索方法 */
   @Input({ alias: 'selectSearchFn' }) searchFn: ((value: string) => Promise<any[]>) | null = null;
   /** 最小宽度 */
-  @Input({ alias: 'selectMinWidth' }) minWidth: string = '400px';
+  @Input({ alias: 'selectWidth' }) width: string = '400px';
   /** 选项自定义模板 */
   @Input() optionTemplate: TemplateRef<any> | null = null;
   /** 选择内容自定义模板 */
@@ -664,7 +664,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public onTouch = (): void => { };
   public onChange = (value: any): void => { }
   public writeValue(obj: any): void {
-    this._data = obj;
+    if (!obj) return;
+
+    this._data = this.selectMode === 'multiple' ? [...obj] : _.isArray(obj) ? obj[0] : obj;
     this.cdr.detectChanges();
   }
   public registerOnChange(fn: any): void {
