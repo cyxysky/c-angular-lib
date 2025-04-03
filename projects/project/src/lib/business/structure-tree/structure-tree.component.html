@@ -17,22 +17,23 @@
             <div class="tree-node-wrapper" *ngFor="let node of nodes; let i=index; let isLast=last">
                 <!-- 节点卡片 -->
 
-                <div class="connector-wrapper" *ngIf="getLengthToParentNode(parent?.children?.length, i).length === 0">
+                <div class="connector-wrapper" *ngIf="getLengthToParentNode(parent?.children?.length, i).number === 0">
                     <div class="vertical-connector"></div>
                 </div>
                 <div class="node-card">
-                    <ng-container *ngFor="let item of getLengthToParentNode(parent?.children?.length, i);index as k">
-                        <div 
-                            class="line-wrapper" 
-                            *ngIf="item === 1"
-                            [style.left]="(k + 1) * 78 + 'px'">
+                    <div *ngIf="getLengthToParentNode(parent?.children?.length, i).absNumber !== 0"
+                        class="line-wrap-box"
+                        [style.width]="getLengthToParentNode(parent?.children?.length, i).absNumber * 161 + 'px'"
+                        [style.left]="getLeft(parent?.children?.length, i)">
+                        <div
+                            [ngClass]="getPosition(parent?.children?.length, i) ? 'line-wrapper-bottom-right': 'line-wrapper-bottom'">
                         </div>
-                        <div 
-                            class="line-wrapper-half" 
-                            *ngIf="item === 0.5">
+                        <div
+                            [ngClass]="getPosition(parent?.children?.length, i) ? 'line-wrapper-top-right': 'line-wrapper-top'">
                         </div>
-                    </ng-container>
-                    <div *ngIf="parent && parent.children && parent.children.length" class="circle-point point-top"></div>
+                    </div>
+                    <div *ngIf="parent && parent.children && parent.children.length" class="circle-point point-top">
+                    </div>
                     <div class="node-content" (click)="onNodeClick(node)">
                         <div class="node-avatar">
                             <img *ngIf="node.avatar" [src]="node.avatar" alt="avatar" />

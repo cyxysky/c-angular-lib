@@ -63,16 +63,20 @@ export class StructureTreeComponent implements OnInit {
    * @returns 距离
    */
   getLengthToParentNode(parentNodeChildLength: number, nowNodeIndex: number) {
-    let number = Math.abs((parentNodeChildLength / 2 - 0.5) - nowNodeIndex);
-    let result = [];
-    while (number > 0) {
-      if (number === 0.5) {
-        result.push(0.5);
-      } else {
-        result.push(1);
-      }
-      number--;
-    }
-    return result;
+    if (!parentNodeChildLength) return {number: 0, absNumber: 0};
+    const cardHeight = 80;
+    const cardWidth = 157 / 2;
+    let number = (parentNodeChildLength / 2 - 0.5) - nowNodeIndex;
+    return {number, absNumber: Math.abs(number)};
+  }
+
+  getPosition(parentNodeChildLength: number, nowNodeIndex: number) {
+    if (!parentNodeChildLength) return false;
+    return (parentNodeChildLength / 2 - 0.5) - nowNodeIndex < 0;
+  }
+
+  getLeft(parentNodeChildLength: number, nowNodeIndex: number) {
+    if (!parentNodeChildLength) return 0;
+    return (parentNodeChildLength / 2 - 0.5) - nowNodeIndex < 0 ? (76 - 161 * Math.abs((parentNodeChildLength / 2 - 0.5) - nowNodeIndex) + 'px') : '76px';
   }
 }
