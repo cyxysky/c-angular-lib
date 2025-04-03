@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { OverlayBasicPosition } from '../overlay/overlay-basic.directive';
 import { CommonModule } from '@angular/common';
 import { ButtonType, ButtonColor } from '../button/button.component.interface';
@@ -12,7 +12,7 @@ import { ButtonComponent } from '../button/button.component';
     '[style]': 'getMargin()'
   }
 })
-export class PopoverComponent {
+export class PopoverComponent implements AfterViewInit {
   /** 标题 */
   @Input('title') title: string | TemplateRef<any> = '';
   /** 内容 */
@@ -43,11 +43,21 @@ export class PopoverComponent {
   @Output('onCancel') onCancel: EventEmitter<void> = new EventEmitter<void>();
   constructor(public cdr: ChangeDetectorRef) {}
 
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+  }
+
+  ngOnChanges(changes: any): void {
+  }
+
   isTemplateRef(value: any): value is TemplateRef<any> {
     return value instanceof TemplateRef;
   }
 
   getMargin(): string {
+    this.cdr.detectChanges();
     switch (this.placement) {
       case 'top':
       case 'bottom':
@@ -67,7 +77,7 @@ export class PopoverComponent {
       
       default:
         return 'margin: 0';
-    } 
+    }
   }
 
   onConfirmClick(): void {

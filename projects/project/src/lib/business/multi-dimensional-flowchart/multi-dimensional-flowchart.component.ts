@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { WidgetSource } from '../directive/widget.directive';
+import { WidgetSource } from '../../directive/widget.directive';
 
 export interface Stage {
   key: string;

@@ -389,7 +389,7 @@ export class DocCascaderComponent implements OnInit {
   
   // 自定义选择函数 - 只允许选择城市，不允许选择省份
   customSelectFunction = (option: any) => {
-    return option.children && option.children.length === 0;
+    return !option.label.includes('西湖');
   };
   
   // 获取显示文本

@@ -17,12 +17,18 @@
         </div>
         <!-- 单选数据 -->
         <div class="cascader-labels" *ngIf="showSingalData()">
-            <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ displayLabels.join(' / ') }}</span>
+            <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultSingalTagLabelTemplate; context: {$implicit: value, labels: displayLabels}"></ng-container>
+            <ng-template #defaultSingalTagLabelTemplate let-value let-labels="labels">
+                <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ labels.join(' / ') }}</span>
+            </ng-template>
         </div>
         <!-- 多选数据 -->
         <ng-container *ngIf="showMultData()">
             <lib-select-tag *ngFor="let tag of displayTags" (remove)="removeItem($event, tag.value)" [size]="size" [closable]="true">
-                {{ tag.label }}
+                <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultMultTagLabelTemplate; context: {$implicit: tag}"></ng-container>
+                <ng-template #defaultMultTagLabelTemplate let-tag>
+                    {{ tag.label }}
+                </ng-template>
             </lib-select-tag>
         </ng-container>
         <!-- 搜索框 -->
