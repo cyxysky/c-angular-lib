@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NodeNumberType, NodeOperateType, NodeType } from '../process-tree.component';
-import { WidgetSource } from '../../directive/widget.directive';
+import { WidgetSource } from '../../../directive/widget.directive';
 
 
 @Component({

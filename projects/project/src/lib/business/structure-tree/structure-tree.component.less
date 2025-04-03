@@ -1,0 +1,271 @@
+@line-color: hsla(185, 79%, 55%, 0.5);
+@line-width: 2px;
+@line-height: 80px;
+@line-opacity: 1;
+
+
+.structure-tree-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.structure-tree {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.structure-tree-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: #999;
+    font-size: 14px;
+}
+
+.tree-level {
+    display: flex;
+    gap: 4px;
+}
+
+.tree-node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.circle-point {
+    width: 8px;
+    height: 8px;
+    background: #01CFE2;
+    box-shadow: 0px 0px 16px 0px rgba(19, 28, 40, 0.1);
+    border: 2px solid #FFFFFF;
+    display: block;
+    padding: 2px;
+    border-radius: 50%;
+    position: absolute;
+    left: calc(50% - 4px);
+}
+
+.point-top {
+    top: -4px;
+}
+
+.point-bottom {
+    bottom: -4px;
+}
+
+/* 节点卡片样式 */
+.node-card {
+    width: 157px;
+    height: 55px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8eaec;
+    position: relative;
+    display: flex;
+
+    &.with-edit {
+        padding-right: 36px;
+    }
+
+    &:hover {
+        border-color: #40a9ff;
+        box-shadow: 0 2px 12px rgba(24, 144, 255, 0.1);
+    }
+}
+
+.line-wrapper{
+    top: -40px;
+    width: 157px;
+    height: 40px;
+    position: absolute;
+    border: 2px solid @line-color;
+    border-top-left-radius: 45px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.node-content {
+    display: flex;
+    padding: 12px 8px;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.node-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 8px;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .default-avatar {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #1890ff;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 500;
+    }
+}
+
+.node-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.node-title {
+    font-size: 12px;
+    color: #999;
+    line-height: 18px;
+}
+
+.node-value {
+    padding: 2px 8px;
+    height: 20px;
+    background-color: #f0f9ff;
+    border-radius: 10px;
+    color: #1890ff;
+    font-size: 12px;
+    line-height: 20px;
+    margin-left: 8px;
+}
+
+/* 树形连接线 */
+.tree-children {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-top: 80px;
+    width: 100%;
+}
+
+/* 连接器样式 */
+.connector-wrapper {
+    position: absolute;
+    height: 80px;
+    top: -80px;
+    width: 2px;
+}
+
+.vertical-connector {
+    width: @line-width;
+    height: @line-height;
+    background-color: @line-color;
+    opacity: @line-opacity;
+}
+
+.children-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* 连接线样式 */
+.connector-lines {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 单子节点连接线 - 弯曲效果 */
+.single-connector {
+    position: relative;
+    width: 2px;
+    height: 30px;
+    background-color: transparent;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        border-top-left-radius: 40px;
+        border-left: 2px solid #40a9ff;
+        border-top: 2px solid #40a9ff;
+        transform: translateX(-50%);
+    }
+}
+
+/* 多子节点连接线 */
+.multi-connector {
+    width: 100%;
+    position: relative;
+    height: 30px;
+}
+
+.horizontal-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88%;
+    height: 2px;
+    background-color: #40a9ff;
+}
+
+.child-connectors {
+    position: absolute;
+    top: 0;
+    left: 6%;
+    width: 88%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.child-line {
+    position: relative;
+    width: 2px;
+    height: 30px;
+    background-color: transparent;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        border-top-left-radius: 30px;
+        border-left: 2px solid #40a9ff;
+        border-top: 2px solid #40a9ff;
+        transform: translateX(-50%) rotate(180deg) scale(-1, 1);
+    }
+}

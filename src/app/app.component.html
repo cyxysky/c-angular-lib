@@ -1,7 +1,7 @@
 <div style="display: flex;flex-direction: row;height: 100%;">
     <div>
         <ul nz-menu nzMode="inline">
-            <li nz-submenu nzTitle="组件" nzOpen>
+            <li nz-submenu nzTitle="基础组件" nzOpen>
                 <ul>
                     <li nz-menu-group>
                         <ul>
@@ -20,13 +20,22 @@
                             <li nz-menu-item (click)="nowComponent.set('checkbox')">复选框</li>
                             <li nz-menu-item (click)="nowComponent.set('radio')">单选框</li>
                             <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
+                            <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li nz-submenu nzTitle="业务组件" nzOpen>
+                <ul>
+                    <li nz-menu-group>
+                        <ul>
                             <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
                             <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
                             <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
                             <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
                             <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
                             <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
-                            <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
+                            <li nz-menu-item (click)="nowComponent.set('structure-tree')">结构树</li>
                         </ul>
                     </li>
                 </ul>
@@ -111,6 +120,9 @@
         }
         @case ('tree') {
         <app-doc-tree></app-doc-tree>
+        }
+        @case ('structure-tree') {
+        <app-doc-structure-tree></app-doc-structure-tree>
         }
         }
     </div>

@@ -7,16 +7,31 @@ import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.d
 import { PopoverDirective } from './popover/popover.directive';
 import { PopconfirmDirective } from './popconfirm/popconfirm.directive';
 import { TooltipDirective } from './tooltip/tooltip.directive';
-
-// 组件
-import { CustomerFormComponent } from './customer-form/customer-form.component';
-import { CustomerFormModalComponent } from './customer-form/customer-form-modal/customer-form-modal.component';
-import { ProcessTreeComponent } from './process-tree/process-tree.component';
-import { ProcessTreeNodeComponent } from './process-tree/process-tree-node/process-tree-node.component';
+export * from './directive/widget.directive';
+export * from './water-mark/water-mark-directive.directive';
+export * from './tooltip/tooltip.directive';
+export * from './popover/popover.directive';
+export * from './popconfirm/popconfirm.directive';
+// 业务组件
 import { DynamicTableComponent } from './business/dynamic-table/dynamic-table.component';
 import { GeneratePngComponent } from './business/generate-png/generate-png.component';
 import { MultiDimensionalFlowchartComponent } from './business/multi-dimensional-flowchart/multi-dimensional-flowchart.component';
 import { UserSelectComponent } from './business/user-select/user-select.component';
+import { CustomerFormComponent } from './business/customer-form/customer-form.component';
+import { CustomerFormModalComponent } from './business/customer-form/customer-form-modal/customer-form-modal.component';
+import { ProcessTreeComponent } from './business/process-tree/process-tree.component';
+import { ProcessTreeNodeComponent } from './business/process-tree/process-tree-node/process-tree-node.component';
+import { StructureTreeComponent } from './business/structure-tree/structure-tree.component';
+export * from './business/customer-form/customer-form.component';
+export * from './business/dynamic-table/dynamic-table.component';
+export * from './business/generate-png/generate-png.component';
+export * from './business/process-tree/process-tree.component';
+export * from './business/customer-form/customer-form-modal/customer-form-modal.component';
+export * from './business/multi-dimensional-flowchart/multi-dimensional-flowchart.component';
+export * from './business/process-tree/process-tree-node/process-tree-node.component';
+export * from './business/user-select/user-select.component';
+export * from './business/structure-tree/structure-tree.component';
+// 组件
 import { InputComponent } from './input/input.component';
 import { SelectComponent } from './select/select.component';
 import { ButtonComponent } from './button/button.component';
@@ -34,15 +49,6 @@ import { RadioComponent } from './radio/radio.component';
 import { SliderComponent } from './slider/slider.component';
 import { PopoverComponent } from './popover/popover.component';
 import { CascaderComponent } from './cascader/cascader.component';
-// 组件
-export * from './customer-form/customer-form.component';
-export * from './business/dynamic-table/dynamic-table.component';
-export * from './business/generate-png/generate-png.component';
-export * from './process-tree/process-tree.component';
-export * from './customer-form/customer-form-modal/customer-form-modal.component';
-export * from './business/multi-dimensional-flowchart/multi-dimensional-flowchart.component';
-export * from './process-tree/process-tree-node/process-tree-node.component';
-export * from './business/user-select/user-select.component';
 export * from './input/input.component';
 export * from './select/select.component';
 export * from './button/button.component';
@@ -56,16 +62,11 @@ export * from './segmented/segmented.component';
 export * from './water-mark/water-mark.component';
 export * from './tooltip/tooltip.component';
 export * from './checkbox/checkbox.component';
-export * from './radio/radio.component';  
+export * from './radio/radio.component';
 export * from './slider/slider.component';
 export * from './popover/popover.component';
 export * from './cascader/cascader.component';
-// 指令
-export * from './directive/widget.directive';
-export * from './water-mark/water-mark-directive.directive';
-export * from './tooltip/tooltip.directive';
-export * from './popover/popover.directive';
-export * from './popconfirm/popconfirm.directive';
+
 
 @NgModule({
   declarations: [],
@@ -101,6 +102,7 @@ export * from './popconfirm/popconfirm.directive';
     PopoverComponent,
     PopconfirmDirective,
     CascaderComponent,
+    StructureTreeComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -133,6 +135,7 @@ export * from './popconfirm/popconfirm.directive';
     PopoverComponent,
     PopconfirmDirective,
     CascaderComponent,
+    StructureTreeComponent
   ]
 })
 export class ProjectModule { }
