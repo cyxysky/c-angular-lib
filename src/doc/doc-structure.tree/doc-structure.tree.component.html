@@ -1,1 +1,13 @@
-<lib-structure-tree [data]="structureData"></lib-structure-tree>
+<lib-structure-tree 
+    [data]="structureData"
+    [lineRadius]="'15px'"
+    [widthLevel]="[440, 440 ,60]"
+    [gapLevel]="[444, 444, 64]"
+    >
+</lib-structure-tree>
+<ng-template #nodeTemplate let-node let-level="level">
+    <div 
+        [style.width]="level > 2 ? '60px' : '440px'" 
+        [style.height]="level > 2 ? '200px' : '55px'">
+    </div>
+</ng-template>

@@ -13,29 +13,139 @@ export class DocStructureTreeComponent {
       name: '吴强',
       title: '总经理',
       value: 200,
+      showChildren: true,
       children: [
         {
           id: '2',
           name: '杨传安',
           title: '研发副总裁',
           value: 60,
-          editable: true,
+          showChildren: true,
           children: [
             {
               id: '3',
-              name: '柳牧',
+              name: '柳牧1',
               title: '研发总监',
+              showChildren: true,
               value: 24,
+              children: [
+
+                {
+                  id: '3-2',
+                  name: '柳牧2',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-3',
+                  name: '柳牧3',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-4',
+                  name: '柳牧4',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-5',
+                  name: '柳牧5',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-6',
+                  name: '柳牧6',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-4',
+                  name: '柳牧4',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-5',
+                  name: '柳牧5',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-6',
+                  name: '柳牧6',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-4',
+                  name: '柳牧4',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-5',
+                  name: '柳牧5',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-6',
+                  name: '柳牧6',
+                  title: '研发总监',
+                  value: 24,
+                }
+              ]
             },
             {
               id: '4',
-              name: '柳牧',
+              name: '柳牧7',
               title: '研发总监',
+              showChildren: true,
               value: 24,
+              children: [
+                {
+                  id: '3-1',
+                  name: '柳牧8',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-2',
+                  name: '柳牧9',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-3',
+                  name: '柳牧10',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-4',
+                  name: '柳牧11',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-5',
+                  name: '柳牧12',
+                  title: '研发总监',
+                  value: 24,
+                },
+                {
+                  id: '3-6',
+                  name: '柳牧13',
+                  title: '研发总监',
+                  value: 24,
+                }
+              ]
             },
             {
               id: '5',
-              name: '柳牧',
+              name: '柳牧14',
               title: '研发总监',
               value: 24,
             },
