@@ -140,7 +140,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   ) { }
 
   // 生命周期方法
-  ngOnInit(): void {    
+  ngOnInit(): void {
     // 初始化节点映射
     this.initNodeMap();
   }
@@ -158,7 +158,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (changes['treeData']) {
       // 当树数据变化时，重新初始化节点映射
       this.initNodeMap();
-      
+
       // 如果不是首次变更，还需要更新选中状态
       if (!changes['treeData'].firstChange) {
         setTimeout(() => {
@@ -182,7 +182,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   private initNodeMap(): void {
     // 创建一个空的Map作为初始值
     this.nodeMap = new Map<string, TreeNodeOptions>();
-    
+
     // 递归处理节点数据
     const processNodes = (nodes: TreeNodeOptions[], parentKey?: string) => {
       nodes.forEach(node => {
@@ -190,20 +190,20 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         if (parentKey) {
           node["parentKey"] = parentKey;
         }
-        
+
         // 添加到Map中
         this.nodeMap.set(node.key, node);
-        
+
         // 处理子节点
         if (node.children && node.children.length > 0) {
           processNodes(node.children, node.key);
         }
       });
     };
-    
+
     // 初始处理所有节点
     processNodes(this.treeData);
-    
+
     // 如果树组件已准备好，更新为树组件的扁平节点Map
     if (this.treeComponent) {
       const treeNodeMap = this.treeComponent.getFlattenNodes();
@@ -229,7 +229,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.openChange.emit(true);
     this.visibleChange.emit(true);
     this.cdr.detectChanges();
-    
+
     const origin = this.overlayOrigin.elementRef.nativeElement;
     this.renderer.addClass(origin, 'tree-select-open');
     const positions: ConnectedPosition[] = [
@@ -254,7 +254,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       withPush(true).
       withGrowAfterOpen(true).
       withLockedPosition(false);
-      
+
     this.overlayRef = this.overlayService.createOverlay({
       hasBackdrop: true,
       width: origin.getBoundingClientRect().width,
@@ -273,7 +273,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         }
       },
       undefined);
-      
+
     if (this.overlayRef) {
       this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
       this.focusSearch();
@@ -297,7 +297,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         getParentKeys(parentNode);
       }
     };
-    
+
     const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
     selectedKeys.forEach(key => {
       const node = this.nodeMap.get(key);
@@ -305,7 +305,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         getParentKeys(node);
       }
     });
-    
+
     if (keysToExpand.size > 0) {
       this.treeComponent.expendNodeByKeys(Array.from(keysToExpand), false, false);
       this.cdr.detectChanges();
@@ -365,7 +365,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         prevNode.selected = false;
       }
     }
-    
     node.selected = true;
     this.value = node.key;
     this.closeDropdown();
@@ -375,7 +374,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (this.treeCheckable) return;
     const valueArray = Array.isArray(this.value) ? this.value : [];
     const index = valueArray.indexOf(node.key);
-    
+
     if (index !== -1) {
       node.selected = false;
       valueArray.splice(index, 1);
@@ -383,16 +382,33 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       node.selected = true;
       valueArray.push(node.key);
     }
-    
     this.value = valueArray;
-    this.updateParentNodeKeys();
-    this.updateDisplayTags();
+    this.getMultipleTags(valueArray);
+  }
+
+  getMultipleTags(values: string[]) {
+    if (!values) {
+      this.displayTags = [];
+    }
+    let tags: any = [];
+    values.forEach(key => {
+      const node = this.nodeMap.get(key);
+      if (node) {
+        tags.push({
+          label: node!.title,
+          value: node!.key,
+          node: node!
+        })
+      }
+    })
+    this.displayTags = tags;
+    this.cdr.detectChanges();
   }
 
   onCheckBoxChange(event: { checked: boolean, node: TreeNodeOptions }): void {
     if (!this.multiple || !this.treeCheckable) return;
     this.checkBoxChange.emit(event);
-    
+
     const checkedKeys = Array.from(this.treeComponent.getCheckedKeys());
     // 只在复选框状态下自动归并子级到父级
     if (this.treeCheckable) {
@@ -401,15 +417,13 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     } else {
       this.value = checkedKeys;
     }
-    
-    this.updateParentNodeKeys();
     this.updateDisplayTags();
     this.updateData();
   }
 
   private filterChildNodesOfCheckedParents(checkedKeys: string[]): string[] {
     if (checkedKeys.length === 0) return [];
-    
+
     // 首先找出所有父节点
     const parentNodes: TreeNodeOptions[] = [];
     checkedKeys.forEach(key => {
@@ -418,7 +432,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         parentNodes.push(node);
       }
     });
-    
+
     // 获取所有父节点的子节点key集合
     const childrenOfSelectedParents = new Set<string>();
     parentNodes.forEach(parent => {
@@ -432,20 +446,9 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       };
       getAllChildrenKeys(parent);
     });
-    
+
     // 只返回不是被选中父节点的子节点的节点key
     return checkedKeys.filter(key => !childrenOfSelectedParents.has(key));
-  }
-
-  private updateParentNodeKeys(): void {
-    this.parentNodeKeys.clear();
-    const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
-    selectedKeys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node && node.children && node.children.length > 0) {
-        this.parentNodeKeys.add(key);
-      }
-    });
   }
 
   private updateDisplayTags(): void {
@@ -453,7 +456,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.displayTags = [];
       return;
     }
-    
+
     if (!this.treeComponent) {
       const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
       this.displayTags = selectedKeys
@@ -466,53 +469,53 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         }));
       return;
     }
-    
+
     // 建立父子关系映射
     const childrenMap: Map<string, Set<string>> = new Map();
     const parentMap: Map<string, string> = new Map();
-    
+
     this.nodeMap.forEach((node, key) => {
       if (node["parentKey"]) {
         parentMap.set(key, node["parentKey"]);
-        
+
         if (!childrenMap.has(node["parentKey"])) {
           childrenMap.set(node["parentKey"], new Set());
         }
         childrenMap.get(node["parentKey"])!.add(key);
       }
     });
-    
+
     // 计算哪些父节点的所有子节点都被选中
     const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
     const nodeKeysSet = new Set(selectedKeys);
     const fullySelectedParents = new Set<string>();
-    
+
     selectedKeys.forEach(key => {
       const node = this.nodeMap.get(key);
       if (node && this.parentNodeKeys.has(key)) {
         const childKeys = childrenMap.get(key) || new Set();
         let allChildrenSelected = true;
-        
+
         childKeys.forEach(childKey => {
           if (!nodeKeysSet.has(childKey)) {
             allChildrenSelected = false;
           }
         });
-        
+
         if (allChildrenSelected && childKeys.size > 0) {
           fullySelectedParents.add(key);
         }
       }
     });
-    
+
     // 过滤节点
     const filteredNodes: TreeNodeOptions[] = [];
     selectedKeys.forEach(key => {
       const node = this.nodeMap.get(key);
       if (!node) return;
-      
+
       let shouldDisplay = true;
-      
+
       if (node["parentKey"]) {
         let currentParentKey = node["parentKey"];
         while (currentParentKey) {
@@ -523,12 +526,12 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
           currentParentKey = parentMap.get(currentParentKey);
         }
       }
-      
+
       if (shouldDisplay) {
         filteredNodes.push(node);
       }
     });
-    
+
     this.displayTags = filteredNodes.map(node => ({
       label: node.title,
       value: node.key,
@@ -562,11 +565,11 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (event) {
       event.stopPropagation();
     }
-    
+
     this.value = this.multiple ? [] : '';
     this.displayTags = [];
     this.parentNodeKeys.clear();
-    
+
     if (this.treeComponent) {
       if (this.multiple && this.treeCheckable) {
         const checkedKeys = Array.from(this.treeComponent.getCheckedKeys());
@@ -587,26 +590,26 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         });
       }
     }
-    
+
     this.defaultExpandedKeys = [];
     this.updateData();
   }
 
   removeItem(event: Event, key: string): void {
     event.stopPropagation();
-    
+
     if (!Array.isArray(this.value)) return;
-    
+
     const index = this.value.indexOf(key);
     if (index !== -1) {
       if (this.parentNodeKeys.has(key)) {
         this.parentNodeKeys.delete(key);
       }
-      
+
       const valueArray = [...this.value];
       valueArray.splice(index, 1);
       this.value = valueArray;
-      
+
       if (this.treeComponent) {
         const treeNode = this.nodeMap.get(key);
         if (treeNode) {
@@ -618,7 +621,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
           }
         }
       }
-      
+
       this.updateDisplayTags();
       this.updateData();
     }
@@ -627,7 +630,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   updateData() {
     this.valueChange.emit(this.value);
-    
+
     // 将value转换为节点列表
     const selectedNodes: TreeNodeOptions[] = [];
     const keys = Array.isArray(this.value) ? this.value : [this.value];
@@ -637,7 +640,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         selectedNodes.push(node);
       }
     });
-    
+
     this.treeSelectChange.emit(selectedNodes);
     this.selectionChange.emit(selectedNodes);
     this.onChange(this.value);
@@ -677,19 +680,19 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.displayTags = [];
       return;
     }
-    
+
     if (!this.nodeMap || this.nodeMap.size === 0) {
       return;
     }
-    
+
     if (this.multiple && Array.isArray(this.value)) {
       this.parentNodeKeys.clear();
-      
+
       // 只在复选框状态下应用筛选逻辑
-      const filteredValues = this.treeCheckable 
-        ? this.filterChildNodesOfCheckedParents(this.value) 
+      const filteredValues = this.treeCheckable
+        ? this.filterChildNodesOfCheckedParents(this.value)
         : this.value;
-      
+
       filteredValues.forEach(key => {
         const node = this.nodeMap.get(key);
         if (node) {
@@ -709,18 +712,18 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
               node.selected = true;
             }
           }
-          
+
           if (node.children && node.children.length > 0) {
             this.parentNodeKeys.add(node.key);
           }
         }
       });
-      
+
       this.updateDisplayTags();
     } else if (!this.multiple) {
       const key = this.value as string;
       const node = this.nodeMap.get(key);
-      
+
       if (node) {
         node.selected = true;
         if (this.treeComponent) {
@@ -728,7 +731,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         }
       }
     }
-    
+
     this.cdr.detectChanges();
   }
 
@@ -737,8 +740,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   }
 
   // ControlValueAccessor 接口实现
-  onChange: (value: any) => void = () => {};
-  onTouched: () => void = () => {};
+  onChange: (value: any) => void = () => { };
+  onTouched: () => void = () => { };
 
   writeValue(value: string | string[]): void {
     if (value === null || value === undefined) {
@@ -748,7 +751,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.cdr.detectChanges();
       return;
     }
-    
+
     this.value = value;
     this.initSelectedState();
     this.cdr.detectChanges();
