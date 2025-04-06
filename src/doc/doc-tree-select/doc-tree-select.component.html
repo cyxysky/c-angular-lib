@@ -1,0 +1,145 @@
+<div class="doc-container">
+  <h1 class="doc-title">树选择 TreeSelect</h1>
+  
+  <p class="doc-description">
+    树型选择控件，可以对树形结构数据进行单选或多选操作。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当需要从一个有层级关系的大量数据中进行选择时，例如组织架构、文件夹、分类目录等。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-tree-select
+          name="basicTreeSelect"
+          [treeData]="basicTreeData"
+          [(ngModel)]="basicValue"
+          [placeholder]="'请选择'"
+          [multiple]="false">
+        </lib-tree-select>
+        <p class="example-value">当前值: {{ basicValue }}</p>
+      </div>
+      <div description>
+        最简单的用法，展示树形选择器的基本功能。单选模式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 多选模式 -->
+    <app-doc-box
+      title="多选模式"
+      [sourceCode]="multipleSource">
+      <div demo>
+        <lib-tree-select
+          name="multipleTreeSelect"
+          [treeData]="multipleTreeData"
+          [(ngModel)]="multipleValue"
+          [placeholder]="'请选择'"
+          [multiple]="true"
+          [treeCheckable]="true">
+        </lib-tree-select>
+        <p class="example-value">当前值: {{ multipleValue | json }}</p>
+      </div>
+      <div description>
+        多选模式允许用户同时选择多个树节点，支持复选框操作。
+      </div>
+    </app-doc-box>
+    
+    <!-- 不同尺寸 -->
+    <app-doc-box
+      title="不同尺寸"
+      [sourceCode]="sizeSource">
+      <div demo>
+        <div style="margin-bottom: 16px;">
+          <lib-segmented
+            [segmentedOptions]="sizeOptions"
+            [(ngModel)]="currentSize">
+          </lib-segmented>
+        </div>
+        <lib-tree-select
+          name="sizeTreeSelect"
+          [treeData]="basicTreeData"
+          [(ngModel)]="basicValue"
+          [placeholder]="'请选择'"
+          [size]="currentSize"
+          [multiple]="true">
+        </lib-tree-select>
+        <p class="example-value">当前尺寸: {{ currentSize }}</p>
+      </div>
+      <div description>
+        树选择器有大、中、小三种尺寸，默认为中。
+      </div>
+    </app-doc-box>
+    
+    <!-- 状态节点 -->
+    <app-doc-box
+      title="状态节点"
+      [sourceCode]="stateSource">
+      <div demo>
+        <lib-tree-select
+          name="stateTreeSelect"
+          [treeData]="stateTreeData"
+          [(ngModel)]="stateValue"
+          [placeholder]="'请选择带状态的节点'"
+          [multiple]="true"
+          [filterState]="filterState">
+        </lib-tree-select>
+        <p class="example-value">当前值: {{ stateValue | json }}</p>
+      </div>
+      <div description>
+        节点可以具有错误或警告状态，可以通过过滤器只查看特定状态的节点。
+      </div>
+    </app-doc-box>
+    
+    <!-- 可搜索 -->
+    <app-doc-box
+      title="可搜索"
+      [sourceCode]="searchSource">
+      <div demo>
+        <lib-tree-select
+          name="searchTreeSelect"
+          [treeData]="searchTreeData"
+          [(ngModel)]="searchValue"
+          [placeholder]="'搜索节点'"
+          [showSearch]="true"
+          [multiple]="true">
+        </lib-tree-select>
+        <p class="example-value">当前值: {{ searchValue | json }}</p>
+      </div>
+      <div description>
+        搜索功能使用户能够快速找到所需的节点，尤其在大型树结构中非常有用。
+      </div>
+    </app-doc-box>
+    
+    <!-- 虚拟滚动 -->
+    <app-doc-box
+      title="虚拟滚动"
+      [sourceCode]="virtualSource">
+      <div demo>
+        <lib-tree-select
+          name="virtualTreeSelect"
+          [treeData]="virtualTreeData"
+          [(ngModel)]="virtualValue"
+          [placeholder]="'大数据量虚拟滚动'"
+          [treeVirtualScroll]="true"
+          [dropdownHeight]="300"
+          [multiple]="true">
+        </lib-tree-select>
+        <p class="example-value">已选择 {{ virtualValue || 0 }} 个节点</p>
+      </div>
+      <div description>
+        对于大量数据，虚拟滚动可以提高性能，只渲染可视区域内的节点。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

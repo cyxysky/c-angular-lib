@@ -115,8 +115,7 @@ export class TreeComponent implements OnInit, OnChanges {
   flattenVirtualNodes: Array<any> = [];
   virtualFlattenNodesParentMap: Map<string, string> = new Map();
   flattenNodesParentMap: Map<string, string> = new Map();
-  // 用于跟踪正在动画中的节点
-  animatingNodes: Map<string, boolean> = new Map();
+  initData: boolean = false;
   constructor(
     private cdr: ChangeDetectorRef,
     private utilsService: UtilsService
@@ -133,11 +132,14 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.initData = true;
     if (changes['treeData']) {
       this.flattenTree();
     }
-    if (changes['searchValue']) {
-      this.handleSearch();
+    if (changes['searchValue'] && !changes['searchValue'].firstChange) {
+      setTimeout(() => {
+        this.handleSearch();
+      }, 0);
     }
     if (changes['defaultExpandAll']) {
       if (this.defaultExpandAll) {
@@ -154,6 +156,7 @@ export class TreeComponent implements OnInit, OnChanges {
       this.initDefaultCheckedKeys();
     }
     this.cdr.detectChanges();
+    this.initData = false;
   }
 
   /**
@@ -319,6 +322,10 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
     if (node.disabled || node.selectable === false) return;
+    if (this.checkable) {
+      this.onNodeCheck(node, !node.checked);
+      return;
+    }
     !this.multiple && this.utilsService.traverseAllNodes(this.treeData, (node: TreeNodeOptions) => {
       node.selected && (node.selected = false);
     });

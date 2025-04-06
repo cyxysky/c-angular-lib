@@ -21,6 +21,7 @@
                             <li nz-menu-item (click)="nowComponent.set('radio')">单选框</li>
                             <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
                             <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
+                            <li nz-menu-item (click)="nowComponent.set('tree-select')">树选择器</li>
                         </ul>
                     </li>
                 </ul>
@@ -123,6 +124,9 @@
         }
         @case ('structure-tree') {
         <app-doc-structure-tree></app-doc-structure-tree>
+        }
+        @case ('tree-select') {
+        <app-doc-tree-select></app-doc-tree-select>
         }
         }
     </div>

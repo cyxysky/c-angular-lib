@@ -1,1 +1,125 @@
-<p>tree-select works!</p>
+<div class="tree-select-box" 
+    [class.tree-select-sm]="size === 'small'" 
+    [class.tree-select-lg]="size === 'large'"
+    [class.tree-select-borderless]="borderless" 
+    [class.tree-select-error]="status === 'error'"
+    [class.tree-select-warning]="status === 'warning'" 
+    [class.tree-select-disabled]="disabled"
+    [class.tree-select-open]="isDropdownOpen"
+    (click)="openDropdown()" 
+    [style.min-width]="'200px'" 
+    cdkOverlayOrigin>
+    <!-- 内容 -->
+    <div class="tree-select-content">
+        <!-- 占位符 -->
+        <div class="placeholder" *ngIf="showPlaceHolder()">
+            {{ placeholder }}
+        </div>
+        <!-- 单选数据 -->
+        <div class="tree-select-label" *ngIf="showSingleData()">
+            <ng-container *ngTemplateOutlet="labelTemplate || defaultSingleLabelTemplate; context: {$implicit: getSingleNodeTitle(), node: getSingleNode()}"></ng-container>
+            <ng-template #defaultSingleLabelTemplate let-title>
+                <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ title }}</span>
+            </ng-template>
+        </div>
+        <!-- 多选数据 -->
+        <ng-container *ngIf="showMultipleData()">
+            <lib-select-tag *ngFor="let tag of displayTags" (remove)="removeItem($event, tag.value)" [size]="size" [closable]="true">
+                <ng-container *ngTemplateOutlet="labelTemplate || defaultMultipleLabelTemplate; context: {$implicit: tag.node, node: tag.node}"></ng-container>
+                <ng-template #defaultMultipleLabelTemplate let-node>
+                    {{ node.title }}
+                </ng-template>
+            </lib-select-tag>
+        </ng-container>
+        <!-- 搜索框 -->
+        <lib-select-search
+            #searchInput
+            *ngIf="showSearch"
+            [disabled]="disabled"
+            (inputWidthChange)="updateDropdownPosition()"
+            (compositionChange)="onCompositionChange($event)"
+            (search)="onSearch($event)">
+        </lib-select-search>
+    </div>
+    <!-- 后缀 -->
+    <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
+</div>
+
+<!-- 后缀模板 -->
+<ng-template #suffixTemplate>
+    <!-- 后缀图标 -->
+    <div class="suffix-box">
+        <!-- 加载图标 -->
+        <div *ngIf="loading" class="loading-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="loading-svg" color="rgba(23, 184, 199, 0.6)" fill="currentColor">
+                <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
+            </svg>
+        </div>
+        <!-- 搜索图标 -->
+        <i class="bi bi-search" *ngIf="!loading && showSearch && isDropdownOpen"></i>
+        <!-- 下拉图标 -->
+        <i class="bi bi-caret-down-fill tree-select-icon" *ngIf="!loading && !showSearch" [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
+        <!-- 清除图标 -->
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isDropdownOpen" (click)="clear($event)"></i>
+    </div>
+</ng-template>
+
+<!-- 下拉菜单 -->
+<ng-template #dropdownTemplate>
+    <div class="tree-select-dropdown"
+        [class.open]="isDropdownOpen" 
+        [class.closed]="!isDropdownOpen"
+        [style.min-width]="dropdownWidth">
+        
+        <!-- 搜索结果树 -->
+        <div class="tree-container" [style.height.px]="dropdownHeight">
+            <!-- 树组件 -->
+            <lib-tree
+                [treeData]="treeData"
+                [treeSearchValue]="searchValue"
+                [treeOptionHeight]="treeOptionHeight"
+                [treeIndent]="treeIndent"
+                [treeCheckable]="treeCheckable"
+                [treeMultiple]="multiple"
+                [treeShowLine]="treeShowLine"
+                [treeShowIcon]="treeShowIcon"
+                [treeAsyncData]="treeAsyncData"
+                [treeVirtualHeight]="dropdownHeight"
+                [treeIsVirtualScroll]="treeVirtualScroll"
+                [treeExpandedIcon]="expandedIcon"
+                [treeDefaultExpandedKeys]="defaultExpandedKeys"
+                (selectedChange)="onNodeSelect($event.node)"
+                (checkBoxChange)="onCheckBoxChange($event)"
+                (loadData)="onLoadData($event)">
+                <!-- 自定义节点模板 -->
+                <ng-template #treeTemplate let-node>
+                    <ng-container *ngTemplateOutlet="treeNodeTemplate || defaultNodeTemplate; context: {$implicit: node, node: node}"></ng-container>
+                    <ng-template #defaultNodeTemplate let-node>
+                        {{ node.title }}
+                    </ng-template>
+                </ng-template>
+            </lib-tree>
+            
+            <!-- 空状态 -->
+            <div *ngIf="searchValue && (!treeComponent || treeComponent.getSearchResults().length === 0) && !loading" class="empty-options">
+                <div class="empty-container">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="empty-text">暂无匹配数据</div>
+                </div>
+            </div>
+            
+            <!-- 加载状态 -->
+            <div *ngIf="loading" class="search-loading">
+                <div class="loading-text">搜索中...</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
