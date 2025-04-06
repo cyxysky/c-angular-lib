@@ -116,6 +116,7 @@ export class TreeComponent implements OnInit, OnChanges {
   virtualFlattenNodesParentMap: Map<string, string> = new Map();
   flattenNodesParentMap: Map<string, string> = new Map();
   initData: boolean = false;
+  searching: boolean = false;
   constructor(
     private cdr: ChangeDetectorRef,
     private utilsService: UtilsService
@@ -125,22 +126,29 @@ export class TreeComponent implements OnInit, OnChanges {
     return Array(level).fill(0).map((_, i) => i);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+  }
 
   ngAfterViewInit(): void {
     this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['searchValue'] && !changes['searchValue'].firstChange) {
+      setTimeout(() => {
+        this.initData = true;
+        this.searching = true;
+        this.handleSearch();
+        this.initData = false;
+        this.searching = false;
+        this.cdr.detectChanges();
+      }, 0);
+    }
     this.initData = true;
     if (changes['treeData']) {
       this.flattenTree();
     }
-    if (changes['searchValue'] && !changes['searchValue'].firstChange) {
-      setTimeout(() => {
-        this.handleSearch();
-      }, 0);
-    }
+
     if (changes['defaultExpandAll']) {
       if (this.defaultExpandAll) {
         this.handleExpandAll();
@@ -435,6 +443,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * 处理搜索
    */
   handleSearch(): void {
+    console.log('搜索', this.searchValue);
     // 简化搜索逻辑
     this.resetExpandedState();
     if (!this.searchValue) {

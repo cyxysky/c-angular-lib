@@ -565,62 +565,148 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   removeItem(event: Event, key: string): void {
     event.stopPropagation();
     if (!Array.isArray(this.value)) return;
-    const index = this.value.indexOf(key);
-    if (index !== -1) {
-      if (this.parentNodeKeys.has(key)) {
-        this.parentNodeKeys.delete(key);
-      }
-      
-      // 更新节点状态
-      const node = this.nodeMap.get(key);
-      if (node) {
-        if (this.treeCheckable) {
-          node.checked = false;
-          node.indeterminate = false;
-          
-          // 处理子节点
-          if (node.children && node.children.length > 0) {
-            this.updateChildNodesStatus(node, false);
-          }
-          
-          // 处理父节点状态
-          this.updateParentNodesStatus(node);
-        } else {
-          node.selected = false;
-        }
-      }
-      
-      // 获取需要移除的所有key（包括子节点）
-      const keysToRemove = this.getNodeWithChildrenKeys(key);
-      
-      // 从value中移除所有相关节点
-      const valueArray = [...this.value].filter(k => !keysToRemove.includes(k));
-      this.value = valueArray;
-      
-      // 更新defaultCheckedKeys和defaultSelectedKeys
-      if (this.treeCheckable) {
-        this.defaultCheckedKeys = this.defaultCheckedKeys.filter((k: string) => !keysToRemove.includes(k));
-      } else {
-        this.defaultSelectedKeys = this.defaultSelectedKeys.filter((k: string) => !keysToRemove.includes(k));
-      }
-      
-      // 更新展开节点
-      this.defaultExpandedKeys = this.defaultExpandedKeys.filter((k: string) => !keysToRemove.includes(k));
-      
-      this.updateDisplayTags();
-      this.updateData();
-    }
+    if (this.value.indexOf(key) === -1) return;
+    
+    // 更新节点状态和获取所有需要移除的key
+    const keysToRemove = this.updateNodeStatus(key, false);
+    
+    // 更新value和相关数据
+    this.updateSelectionState(keysToRemove);
+    this.updateDisplayTags();
+    this.updateData();
   }
   
   clear(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
+    if (event) event.stopPropagation();
+    
+    // 清空所有状态和数据
+    this.resetAllState();
+    this.updateData();
+  }
+  
+  /**
+   * 更新节点选中状态并获取相关的所有key
+   * @param key 节点key
+   * @param checked 是否选中
+   * @returns 所有需要更新状态的key
+   */
+  private updateNodeStatus(key: string, checked: boolean): string[] {
+    const node = this.nodeMap.get(key);
+    if (!node) return [key];
+    
+    // 更新节点本身状态
+    this.updateSingleNodeStatus(node, checked);
+    
+    const keysToUpdate = [key];
+    
+    // 处理子节点状态
+    if (this.treeCheckable && node.children?.length) {
+      node.children.forEach(child => {
+        if (!child.disabled && !child.disableCheckbox) {
+          keysToUpdate.push(...this.updateNodeStatus(child.key, checked));
+        }
+      });
     }
+    
+    // 处理父节点状态
+    if (this.treeCheckable) {
+      this.updateAncestorNodesStatus(node);
+    }
+    
+    return keysToUpdate;
+  }
+  
+  /**
+   * 更新单个节点状态
+   */
+  private updateSingleNodeStatus(node: TreeNodeOptions, checked: boolean): void {
+    if (this.treeCheckable) {
+      node.checked = checked;
+      node.indeterminate = false;
+      
+      if (this.parentNodeKeys.has(node.key) && !checked) {
+        this.parentNodeKeys.delete(node.key);
+      }
+    } else {
+      node.selected = checked;
+    }
+  }
+  
+  /**
+   * 更新所有祖先节点状态
+   */
+  private updateAncestorNodesStatus(node: TreeNodeOptions): void {
+    // 找到直接父节点
+    let parentKey = this.findParentKey(node.key);
+    if (!parentKey) return;
+    const parent = this.nodeMap.get(parentKey);
+    if (!parent || !parent.children || parent.disabled || parent.disableCheckbox) return;
+    // 计算父节点状态
+    this.calculateParentNodeStatus(parent);
+    // 递归处理上级节点
+    this.updateAncestorNodesStatus(parent);
+  }
+  
+  /**
+   * 计算父节点状态
+   */
+  private calculateParentNodeStatus(parent: TreeNodeOptions): void {
+    if (!parent.children) return;
+    const children = parent.children;
+    const checkedCount = children.filter(child => child.checked && !child.disabled && !child.disableCheckbox).length;
+    const indeterminateCount = children.filter(child => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
+    const enabledCount = children.filter(child => !child.disabled && !child.disableCheckbox).length;
+    if (checkedCount === 0 && indeterminateCount === 0) {
+      parent.checked = false;
+      parent.indeterminate = false;
+    } else if (checkedCount === enabledCount) {
+      parent.checked = true;
+      parent.indeterminate = false;
+    } else {
+      parent.checked = false;
+      parent.indeterminate = true;
+    }
+  }
+  
+  /**
+   * 查找节点的父节点key
+   */
+  private findParentKey(key: string): string | undefined {
+    for (let [nodeKey, node] of this.nodeMap.entries()) {
+      if (node.children?.some(child => child.key === key)) {
+        return nodeKey;
+      }
+    }
+    return undefined;
+  }
+  
+  /**
+   * 更新选中状态相关数据
+   */
+  private updateSelectionState(keysToRemove: string[]): void {
+    // 更新value
+    this.value = (this.value as string[]).filter(k => !keysToRemove.includes(k));
+    
+    // 更新defaultCheckedKeys和defaultSelectedKeys
+    if (this.treeCheckable) {
+      this.defaultCheckedKeys = this.defaultCheckedKeys.filter(k => !keysToRemove.includes(k));
+    } else {
+      this.defaultSelectedKeys = this.defaultSelectedKeys.filter(k => !keysToRemove.includes(k));
+    }
+    
+    // 更新展开节点状态
+    this.defaultExpandedKeys = this.defaultExpandedKeys.filter(k => !keysToRemove.includes(k));
+  }
+  
+  /**
+   * 重置所有状态
+   */
+  private resetAllState(): void {
     this.value = this.multiple ? [] : '';
     this.displayTags = [];
     this.parentNodeKeys.clear();
     
-    // 清空所有节点状态
+    // 重置所有节点状态
     this.nodeMap.forEach(node => {
       if (this.treeCheckable) {
         node.checked = false;
@@ -631,95 +717,9 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     });
     
     // 重置defaultCheckedKeys和defaultSelectedKeys
-    if (this.treeCheckable) {
-      this.defaultCheckedKeys = [];
-    } else {
-      this.defaultSelectedKeys = [];
-    }
-    
-    // 清空展开节点状态
+    this.defaultCheckedKeys = [];
+    this.defaultSelectedKeys = [];
     this.defaultExpandedKeys = [];
-    this.updateData();
-  }
-  
-  /**
-   * 获取节点及其所有子节点的key
-   * @param nodeKey 节点key
-   * @returns 包含该节点及其所有子节点的key数组
-   */
-  private getNodeWithChildrenKeys(nodeKey: string): string[] {
-    const keys: string[] = [nodeKey];
-    const node = this.nodeMap.get(nodeKey);
-    
-    if (node && node.children && node.children.length > 0) {
-      node.children.forEach(child => {
-        keys.push(...this.getNodeWithChildrenKeys(child.key));
-      });
-    }
-    
-    return keys;
-  }
-  
-  /**
-   * 更新子节点状态
-   * @param node 父节点
-   * @param checked 是否选中
-   */
-  private updateChildNodesStatus(node: TreeNodeOptions, checked: boolean): void {
-    if (node.children && node.children.length > 0) {
-      node.children.forEach(child => {
-        if (!child.disabled && !child.disableCheckbox) {
-          child.checked = checked;
-          child.indeterminate = false;
-          
-          // 递归处理子节点
-          if (child.children && child.children.length > 0) {
-            this.updateChildNodesStatus(child, checked);
-          }
-        }
-      });
-    }
-  }
-  
-  /**
-   * 更新父节点状态
-   * @param node 当前节点
-   */
-  private updateParentNodesStatus(node: TreeNodeOptions): void {
-    // 找到父节点key
-    let parentKey: string | undefined;
-    this.nodeMap.forEach((n, k) => {
-      if (n.children && n.children.some(child => child.key === node.key)) {
-        parentKey = k;
-      }
-    });
-    
-    if (!parentKey) return;
-    
-    const parent = this.nodeMap.get(parentKey);
-    if (!parent || !parent.children || parent.disabled || parent.disableCheckbox) return;
-    
-    const children = parent.children;
-    const checkedCount = children.filter(child => child.checked && !child.disabled && !child.disableCheckbox).length;
-    const indeterminateCount = children.filter(child => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
-    const enabledCount = children.filter(child => !child.disabled && !child.disableCheckbox).length;
-    
-    if (checkedCount === 0 && indeterminateCount === 0) {
-      // 没有选中和半选的子节点
-      parent.checked = false;
-      parent.indeterminate = false;
-    } else if (checkedCount === enabledCount) {
-      // 所有可用子节点都被选中
-      parent.checked = true;
-      parent.indeterminate = false;
-    } else {
-      // 部分子节点被选中或半选
-      parent.checked = false;
-      parent.indeterminate = true;
-    }
-    
-    // 递归处理父节点的父节点
-    this.updateParentNodesStatus(parent);
   }
 
   updateData() {
@@ -738,6 +738,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.treeSelectChange.emit(selectedNodes);
     this.selectionChange.emit(selectedNodes);
     this.onChange(this.value);
+    this.focusSearch();
     this.cdr.detectChanges();
   }
 
@@ -845,7 +846,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.cdr.detectChanges();
       return;
     }
-
     this.value = value;
     this.initSelectedState();
     this.cdr.detectChanges();

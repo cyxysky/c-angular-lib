@@ -716,9 +716,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public onSearch(value: string): void {
     this.searchValue = value;
     this.loading = true;
-    this.debouncedSearch(value).then(() => {
-      console.log('搜索完成', value);
-    });
+    this.debouncedSearch(value).then(() => {});
   }
 
   /**
