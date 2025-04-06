@@ -128,6 +128,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   private isInitialized: boolean = false;
   /** 树组件是否已准备好 */
   private isTreeReady: boolean = false;
+  public defaultCheckedKeys: string[] = [];
+  public defaultSelectedKeys: string[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -135,7 +137,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef,
     private overlayService: OverlayService,
-    private elementRef: ElementRef,
     public utilsService: UtilsService
   ) { }
 
@@ -561,72 +562,165 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.compositionValue = event;
   }
 
-  clear(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
-
-    this.value = this.multiple ? [] : '';
-    this.displayTags = [];
-    this.parentNodeKeys.clear();
-
-    if (this.treeComponent) {
-      if (this.multiple && this.treeCheckable) {
-        const checkedKeys = Array.from(this.treeComponent.getCheckedKeys());
-        checkedKeys.forEach(key => {
-          const node = this.nodeMap.get(key);
-          if (node) {
-            node.checked = false;
-            node.indeterminate = false;
-          }
-        });
-      } else {
-        const selectedKeys = Array.from(this.treeComponent.getSelectedKeys());
-        selectedKeys.forEach(key => {
-          const node = this.nodeMap.get(key);
-          if (node) {
-            node.selected = false;
-          }
-        });
-      }
-    }
-
-    this.defaultExpandedKeys = [];
-    this.updateData();
-  }
-
   removeItem(event: Event, key: string): void {
     event.stopPropagation();
-
     if (!Array.isArray(this.value)) return;
-
     const index = this.value.indexOf(key);
     if (index !== -1) {
       if (this.parentNodeKeys.has(key)) {
         this.parentNodeKeys.delete(key);
       }
-
-      const valueArray = [...this.value];
-      valueArray.splice(index, 1);
-      this.value = valueArray;
-
-      if (this.treeComponent) {
-        const treeNode = this.nodeMap.get(key);
-        if (treeNode) {
-          if (this.treeCheckable) {
-            treeNode.checked = false;
-            this.treeComponent.onNodeCheck(treeNode, false);
-          } else {
-            treeNode.selected = false;
+      
+      // 更新节点状态
+      const node = this.nodeMap.get(key);
+      if (node) {
+        if (this.treeCheckable) {
+          node.checked = false;
+          node.indeterminate = false;
+          
+          // 处理子节点
+          if (node.children && node.children.length > 0) {
+            this.updateChildNodesStatus(node, false);
           }
+          
+          // 处理父节点状态
+          this.updateParentNodesStatus(node);
+        } else {
+          node.selected = false;
         }
       }
-
+      
+      // 获取需要移除的所有key（包括子节点）
+      const keysToRemove = this.getNodeWithChildrenKeys(key);
+      
+      // 从value中移除所有相关节点
+      const valueArray = [...this.value].filter(k => !keysToRemove.includes(k));
+      this.value = valueArray;
+      
+      // 更新defaultCheckedKeys和defaultSelectedKeys
+      if (this.treeCheckable) {
+        this.defaultCheckedKeys = this.defaultCheckedKeys.filter((k: string) => !keysToRemove.includes(k));
+      } else {
+        this.defaultSelectedKeys = this.defaultSelectedKeys.filter((k: string) => !keysToRemove.includes(k));
+      }
+      
+      // 更新展开节点
+      this.defaultExpandedKeys = this.defaultExpandedKeys.filter((k: string) => !keysToRemove.includes(k));
+      
       this.updateDisplayTags();
       this.updateData();
     }
   }
-
+  
+  clear(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.value = this.multiple ? [] : '';
+    this.displayTags = [];
+    this.parentNodeKeys.clear();
+    
+    // 清空所有节点状态
+    this.nodeMap.forEach(node => {
+      if (this.treeCheckable) {
+        node.checked = false;
+        node.indeterminate = false;
+      } else {
+        node.selected = false;
+      }
+    });
+    
+    // 重置defaultCheckedKeys和defaultSelectedKeys
+    if (this.treeCheckable) {
+      this.defaultCheckedKeys = [];
+    } else {
+      this.defaultSelectedKeys = [];
+    }
+    
+    // 清空展开节点状态
+    this.defaultExpandedKeys = [];
+    this.updateData();
+  }
+  
+  /**
+   * 获取节点及其所有子节点的key
+   * @param nodeKey 节点key
+   * @returns 包含该节点及其所有子节点的key数组
+   */
+  private getNodeWithChildrenKeys(nodeKey: string): string[] {
+    const keys: string[] = [nodeKey];
+    const node = this.nodeMap.get(nodeKey);
+    
+    if (node && node.children && node.children.length > 0) {
+      node.children.forEach(child => {
+        keys.push(...this.getNodeWithChildrenKeys(child.key));
+      });
+    }
+    
+    return keys;
+  }
+  
+  /**
+   * 更新子节点状态
+   * @param node 父节点
+   * @param checked 是否选中
+   */
+  private updateChildNodesStatus(node: TreeNodeOptions, checked: boolean): void {
+    if (node.children && node.children.length > 0) {
+      node.children.forEach(child => {
+        if (!child.disabled && !child.disableCheckbox) {
+          child.checked = checked;
+          child.indeterminate = false;
+          
+          // 递归处理子节点
+          if (child.children && child.children.length > 0) {
+            this.updateChildNodesStatus(child, checked);
+          }
+        }
+      });
+    }
+  }
+  
+  /**
+   * 更新父节点状态
+   * @param node 当前节点
+   */
+  private updateParentNodesStatus(node: TreeNodeOptions): void {
+    // 找到父节点key
+    let parentKey: string | undefined;
+    this.nodeMap.forEach((n, k) => {
+      if (n.children && n.children.some(child => child.key === node.key)) {
+        parentKey = k;
+      }
+    });
+    
+    if (!parentKey) return;
+    
+    const parent = this.nodeMap.get(parentKey);
+    if (!parent || !parent.children || parent.disabled || parent.disableCheckbox) return;
+    
+    const children = parent.children;
+    const checkedCount = children.filter(child => child.checked && !child.disabled && !child.disableCheckbox).length;
+    const indeterminateCount = children.filter(child => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
+    const enabledCount = children.filter(child => !child.disabled && !child.disableCheckbox).length;
+    
+    if (checkedCount === 0 && indeterminateCount === 0) {
+      // 没有选中和半选的子节点
+      parent.checked = false;
+      parent.indeterminate = false;
+    } else if (checkedCount === enabledCount) {
+      // 所有可用子节点都被选中
+      parent.checked = true;
+      parent.indeterminate = false;
+    } else {
+      // 部分子节点被选中或半选
+      parent.checked = false;
+      parent.indeterminate = true;
+    }
+    
+    // 递归处理父节点的父节点
+    this.updateParentNodesStatus(parent);
+  }
 
   updateData() {
     this.valueChange.emit(this.value);
