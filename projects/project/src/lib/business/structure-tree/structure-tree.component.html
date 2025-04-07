@@ -1,85 +1,116 @@
 <!-- 组织架构树组件 -->
-<div class="structure-tree-container">
-    <ng-container *ngIf="data && data.length; else noData">
-        <div class="structure-tree">
-            <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: data, level: 0}"></ng-container>
-        </div>
-    </ng-container>
-    <ng-template #noData>
-        <div class="structure-tree-empty">暂无数据</div>
-    </ng-template>
-    <!-- 节点模板 -->
-    <ng-template #nodeTemplate let-nodes="nodes" let-level="level" let-parent="parent">
-        <div class="tree-level">
-            <!-- 每个节点 -->
-            <div class="tree-node-wrapper" *ngFor="let node of nodes; let i=index; let isLast=last">
-                <!-- 节点卡片 -->
-                <div *ngIf="parent && getWidth(node.__key, level) && getWidth(node.__key, level) < 5">
-                    <div 
-                        class="vertical-connector" 
-                        [style.height]="this.getHeight(node.__key) + 'px'"
-                        [style.top]="-this.getHeight(node.__key) + 'px'"
-                        >
-                    </div>
-                </div>
-                <div class="node-card">
-                    <!-- 连接线 -->
-
-                    <!-- 节点圆点 -->
-                    <div [id]="node.__key + 'top'" *ngIf="parent && parent.children && parent.children.length" class="circle-point point-top">
-                        <div 
-                            *ngIf="getWidth(node.__key, level) && getWidth(node.__key, level) > 5"
-                            class="line-wrap-box"
-                            [style.height]="getHeight(node.__key) + 'px'"
-                            [style.top]="(-getHeight(node.__key) / 2) + 'px'"
-                            [style.width]="getWidth(node.__key, level) + 'px'"
-                            [style.left]="getDirection(node.__key) === 'L' ? (-getWidth(node.__key, level) + 2 + 'px') : '0px'">
-                            <div style="position: relative;pointer-events: none;">
-                                <div *ngIf="getDirection(node.__key) === 'L'" class="line-wrapper-bottom-right" [style.border-bottom-left-radius]="lineRadius"></div>
-                                <div *ngIf="getDirection(node.__key) === 'R'" class="line-wrapper-bottom" [style.border-top-left-radius]="lineRadius"></div>
-                            </div>
-                            <div style="position: relative;pointer-events: none;">
-                                <div *ngIf="getDirection(node.__key) === 'L'" class="line-wrapper-top-right" [style.border-top-right-radius]="lineRadius"></div>
-                                <div *ngIf="getDirection(node.__key) === 'R'" class="line-wrapper-top" [style.border-bottom-right-radius]="lineRadius"></div>
-                            </div>
-                    </div>
-                    </div>
-
-                    <ng-container *ngTemplateOutlet="nodeTemplates || defaultNodeTemplate; context: {$implicit : node, level: level}"></ng-container>
-                    <ng-template #defaultNodeTemplate let-node>
-                        <div class="node-content" (click)="onNodeClick(node)">
-                            <div class="node-avatar">
-                                <img *ngIf="node.avatar" [src]="node.avatar" alt="avatar" />
-                                <div *ngIf="!node.avatar" class="default-avatar">{{ node.name?.charAt(0) }}</div>
-                            </div>
-                            <div class="node-info">
-                                <div class="node-name">{{ node.name }}</div>
-                                <div class="node-title">{{ node.title }}</div>
-                            </div>
-                            <div class="node-value">{{ node.value }}</div>
-                        </div>
-                    </ng-template>
-                    <!-- 子节点圆点 -->
-                    <div [id]="node.__key + 'bottom'" *ngIf="node.children && node.children.length" class="circle-point point-bottom"></div>
-                </div>
-
-                <!-- 连接线和子节点 -->
-                <div class="tree-children" *ngIf="node.children && node.children.length && node.showChildren">
-                    <!-- 顶部垂直连接器 -->
-                    <div class="connector-wrapper" *ngIf="node.children && node.children.length === 1">
-                        <div class="vertical-connector"></div>
-                    </div>
-
-                    <div class="children-container">
-                        <!-- 递归渲染子节点 -->
-                        <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: node.children, level: level + 1, parent: node}"></ng-container>
-                    </div>
-                </div>
+<div 
+class="out-box no-copy" 
+(wheel)="wheel($event)"
+(mousedown)="mousedown($event)"
+(mousemove)="mousemove($event)"
+(mouseup)="mouseup($event)"
+(mouseleave)="mouseleave($event)">
+    <div  class="structure-tree-container" [style.transform]="transform" [style.scale]="scaleSize">
+        <ng-container *ngIf="data && data.length; else noData">
+            <div class="structure-tree">
+                <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: showData, level: showData[0].__key && nodeLevelMap.get(showData[0].__key!) || 0}"></ng-container>
             </div>
-        </div>
-    </ng-template>
+        </ng-container>
+        <ng-template #noData>
+            <div class="structure-tree-empty">暂无数据</div>
+        </ng-template>
+        <!-- 节点模板 -->
+        <ng-template #nodeTemplate let-nodes="nodes" let-level="level" let-parent="parent">
+
+            <!-- 每个节点元素盒子 -->
+            <div 
+                *ngIf="getShowLevel(level)"
+                [ngClass]="adjustByParent(parent, level) ? 'tree-level-grid' : 'tree-level'"
+                [style.grid-template-columns]="getGridTemplate(parent)"
+                [style.gap]="(levelGap[level] || levelGap[levelGap.length - 1]) + 'px'">
+                <!-- 每个节点 -->
+                <ng-container *ngFor="let node of nodes; let i=index; let isLast=last">
+                    <div class="tree-node-wrapper" *ngIf="isNodeInShowPath(node, level)">
+                        <!-- 节点直线 -->
+                        <div *ngIf="parent && getLineWidth(node.__key, level) && getLineWidth(node.__key, level) < 5">
+                            <div 
+                                class="vertical-connector" 
+                                [style.left]="isDepartmentType() ? '50%' : ''"
+                                [style.height]="this.getLineHeight(node.__key) + 'px'"
+                                [style.top]="-this.getLineHeight(node.__key) + 'px'">
+                            </div>
+                        </div>
+                        <div class="node-card">
+                            <!-- 顶部节点圆点 -->
+                            <div 
+                                [id]="positionKey === '__key' ? node[positionKey] + 'top' : ''" 
+                                *ngIf="showTopPoint(parent, level)"
+                                [class.circle-point]="isUserType()"
+                                class="point-top point">
+                                <!-- 连接线 -->
+                                <div 
+                                    *ngIf="getLineWidth(node.__key, level) && getLineWidth(node.__key, level) > 5 && node.showLine !== false"
+                                    class="line-wrap-box" 
+                                    [style.height]="getLineHeight(node.__key) + 'px'"
+                                    [style.top]="(-getLineHeight(node.__key) / 2) + 'px'"
+                                    [style.width]="getLineWidth(node.__key, level) + 'px'"
+                                    [style.left]="getDirection(node.__key) === 'L' ? (-getLineWidth(node.__key, level) + 2  + 'px') : '0px'">
+                                    <div style="position: relative;pointer-events: none;">
+                                        <!-- 底部连接线 -->
+                                        <div 
+                                            *ngIf="getDirection(node.__key) === 'L'" 
+                                            class="line-wrapper-bottom-right"
+                                            [style.border-color]="lineColor"
+                                            [style.border-bottom-left-radius]="lineRadius">
+                                        </div>
+                                        <div 
+                                            *ngIf="getDirection(node.__key) === 'R'" 
+                                            class="line-wrapper-bottom"
+                                            [style.border-color]="lineColor"
+                                            [style.border-top-left-radius]="lineRadius">
+                                        </div>
+                                    </div>
+                                    <div style="position: relative;pointer-events: none;">
+                                        <!-- 顶部连接线 -->
+                                        <div 
+                                            *ngIf="getDirection(node.__key) === 'L'" 
+                                            class="line-wrapper-top-right"
+                                            [style.border-color]="lineColor"
+                                            [style.border-top-right-radius]="lineRadius">
+                                        </div>
+                                        <div 
+                                            *ngIf="getDirection(node.__key) === 'R'" 
+                                            class="line-wrapper-top"
+                                            [style.border-color]="lineColor"
+                                            [style.border-bottom-right-radius]="lineRadius">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-container *ngTemplateOutlet="nodeTemplates || defaultNodeTemplate; context: { $implicit : node, level: level }"></ng-container>
+                            <!-- 底部节点圆点 -->
+                            <div 
+                                *ngIf="showBottomPoint(node, level)"
+                                [id]="positionKey === '__key' ? node[positionKey] + 'bottom' : ''"
+                                [class.circle-point]="isUserType()"
+                                class="point-bottom point">
+                            </div>
+                        </div>
+                        <!-- 连接线和子节点 -->
+                        <div class="tree-children" *ngIf="node.children && node.children.length && node.showChildren">
+                            <div class="children-container" *ngIf="node.children.length !== 0">
+                                <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: node.children, level: level + 1, parent: node}"></ng-container>
+                            </div>
+                        </div>
+                        <div 
+                            *ngIf="selectedLevel === level && isLastLevel(node) && node.children && node.children.length"
+                            class="vertical-connector" 
+                            [style.height]="'80px'"
+                            [style.top]="'55px'">
+                        </div>
+                    </div>
+
+                </ng-container>
+            </div>
+        </ng-template>
+    </div>
 </div>
 
 
-<ng-template #defaultNodeTemplate let-node
-></ng-template>
+<ng-template #defaultNodeTemplate let-node let-level="level"></ng-template>

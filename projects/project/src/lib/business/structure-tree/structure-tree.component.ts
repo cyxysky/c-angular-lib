@@ -12,10 +12,16 @@ export interface StructureNode {
   value?: number;   // 数值
   editable?: boolean; // 是否可编辑
   showChildren?: boolean; // 是否显示子节点
+  showLine?: boolean; // 是否显示连接线
+  show?: boolean; // 是否显示
   children?: StructureNode[]; // 子节点
+  openChildren?: () => void; // 打开子节点的方法，如果不想手动获取节点实例，就调用该方法
   __key?: string; // 内置key
+  [key: string]: any; // 其他属性
 }
-
+/**
+ * 没有任何通用性，只为了特殊业务使用的组件，由于设计问题，无法支持任何通用性
+ */
 @Component({
   selector: 'lib-structure-tree',
   standalone: true,
@@ -25,25 +31,35 @@ export interface StructureNode {
   ],
   templateUrl: './structure-tree.component.html',
   styleUrl: './structure-tree.component.less',
-  encapsulation: ViewEncapsulation.None,
 })
 export class StructureTreeComponent implements OnInit {
   // 输入属性
   @Input() data: StructureNode[] = [];
   @Input() showLine: boolean = true;
-  @Input() widthLevel: number[] = [157, 157, 157];
-  @Input() gapLevel: number[] = [161, 161, 161];
+  @Input() levelMap?: { top: number, bottom: number };
+  @Input() levelGap: number[] = [4, 4, 4];
   @Input() lineRadius: string = '15px';
+  @Input() lineColor: string = '#32d8e7';
+  @Input() type: 'user' | 'department' | 'any' = 'user';
+  @Input() positionKey: string = '__key';
+  @Input() nodeKey: string = 'id';
+  @Input() selectedId: string = '';
+  @Input() selectedLevel: number = 0;
   @Input({ alias: 'nodeTemplate' }) nodeTemplates: TemplateRef<any> | undefined = undefined;
 
   // 输出事件
   @Output() nodeClick = new EventEmitter<StructureNode>();
   @Output() nodeEdit = new EventEmitter<StructureNode>();
+  @Output() nowLevelChange = new EventEmitter<number>();
 
   public lineHeight: number = 80;
-  nodeTopPointMap = new Map<string, any>();
-  nodeBottomPointMap = new Map<string, any>();
-  lineMap = new Map<string, any>();
+  public showData!: StructureNode[];
+  public showNodePath: StructureNode[] = [];
+  public nodeLevelMap = new Map<string, number>();
+  public nodeTopPointMap = new Map<string, any>();
+  public nodeBottomPointMap = new Map<string, any>();
+  public lineMap = new Map<string, any>();
+
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -54,96 +70,329 @@ export class StructureTreeComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.initData();
-    this.initNodePoint();
+    if (changes['data'] || changes['selectedId']) {
+      this.initData();
+    }
+    this.asyncUpdateLineWidthMap();
   }
 
   ngAfterViewInit() {
-    this.initNodePoint();
+    this.asyncUpdateLineWidthMap();
   }
 
-  initData() {
+  /**
+   * 异步更新节点连接线宽度
+   */
+  asyncUpdateLineWidthMap() {
+    let timer = setTimeout(() => {
+      this.initNodeLineWidthMap();
+      clearTimeout(timer);
+    }, 10);
+  }
+
+  /**
+   * 初始化数据
+   */
+  public initData() {
     this.data && this.data.length && this.data.forEach(item => {
-      this.getNodeAllChildrenLength(item);
+      this.initNodePrivateKey(item, 0);
+    });
+    this.getShowDataAndNodePath();
+  }
+
+  /**
+   * 初始化节点点
+   */
+  public initNodeLineWidthMap() {
+    this.lineMap.clear();
+    this.nodeTopPointMap.clear();
+    this.nodeBottomPointMap.clear();
+    this.data && this.data.length && this.data.forEach(item => {
+      this.getNodePointPosition(item);
     });
   }
-
-  initNodePoint() {
-    this.data && this.data.length && this.data.forEach(item => {
-      this.recursionNode(item);
-    });
-    console.log(this.lineMap)
-  }
-
-  // 节点点击事件
-  onNodeClick(node: StructureNode): void {
-    this.nodeClick.emit(node);
-  }
-
-  // 编辑按钮点击事件
-  onEditClick(event: Event, node: StructureNode): void {
-    event.stopPropagation();
-    this.nodeEdit.emit(node);
-  }
-
 
   /**
    * 获取当前节点所有子节点长度
    * @param node 当前节点
    */
-  getNodeAllChildrenLength(node: StructureNode) {
-    !node.__key && (node.__key = this.utilsService.getUUID());
+  public initNodePrivateKey(node: StructureNode, level: number, parentNode?: StructureNode) {
+    !node[this.positionKey] && (node[this.positionKey] = this.utilsService.getUUID());
+    this.nodeLevelMap.set(node[this.positionKey], level);
+    !node.openChildren && (node.openChildren = () => {
+      node.showChildren = !node.showChildren;
+      this.asyncUpdateLineWidthMap();
+    });
     if (node.children && node.children.length) {
       node.children.forEach((child: StructureNode) => {
-        this.getNodeAllChildrenLength(child);
+        this.initNodePrivateKey(child, level + 1, node);
       });
     }
+    // 特殊处理，如果节点没有子节点，并且类型为user，则不显示连接线
+    if ((!node.children || !node.children.length) && this.type === 'user' && parentNode && this.isLastLevel(parentNode)) {
+      node.showLine = false;
+    }
+  }
+
+  /**
+   * 获取当前级别数据
+   */
+  public getShowDataAndNodePath() {
+    this.showData = this.data;
+    const recursion = (node: StructureNode, stack: StructureNode[]) => {
+      if (node[this.nodeKey] === this.selectedId) {
+        if (this.levelMap) {
+          this.showData = stack[stack.length - this.levelMap.top - 1] ? [stack[stack.length - this.levelMap.top - 1]] : stack;
+          this.showNodePath = _.cloneDeep(stack);
+        }
+        return;
+      }
+      if (node.children && node.children.length) {
+        node.children.forEach((child: StructureNode) => {
+          stack.push(child);
+          recursion(child, stack);
+        });
+      }
+      stack.pop();
+    }
+    this.data.forEach((item: StructureNode) => {
+      let stack: StructureNode[] = [];
+      stack.push(item);
+      recursion(item, stack);
+    });
+  }
+
+  /**
+   * 获取当所有节点是否在展示的路径上
+   * @param node 当前节点
+   * @param level 当前节点层级
+   */
+  public isNodeInShowPath(node: StructureNode, level: number) {
+    if (!this.showNodePath || !this.showNodePath.length) return true;
+    if (!this.levelMap) return true;
+    if (this.selectedLevel + this.levelMap.bottom === level) return true;
+    return this.showNodePath.some((item: StructureNode) => node[this.positionKey] === item[this.positionKey]);
   }
 
   /**
    * 递归获取节点顶点位置
    * @param node 当前节点
    */
-  recursionNode(node: StructureNode, parentKey?: string) {
-    let topPoint = document.getElementById(`${node.__key}top`);
-    let bottomPoint = document.getElementById(`${node.__key}bottom`);
-    if (topPoint && node.__key) {
-      this.nodeTopPointMap.set(node.__key, topPoint.getBoundingClientRect());
+  public getNodePointPosition(node: StructureNode, parentKey?: string) {
+    let topPoint = document.getElementById(`${node[this.positionKey]}top`);
+    let bottomPoint = document.getElementById(`${node[this.positionKey]}bottom`);
+    if (topPoint && node[this.positionKey]) {
+      this.nodeTopPointMap.set(node[this.positionKey], topPoint.getBoundingClientRect());
     }
-    if (bottomPoint && node.__key) {
-      this.nodeBottomPointMap.set(node.__key, bottomPoint.getBoundingClientRect());
+    if (bottomPoint && node[this.positionKey]) {
+      this.nodeBottomPointMap.set(node[this.positionKey], bottomPoint.getBoundingClientRect());
     }
-    if (parentKey && topPoint && node.__key) {
+    if (parentKey && topPoint && node[this.positionKey] && this.nodeBottomPointMap.has(parentKey)) {
       let parentBottomPoint = this.nodeBottomPointMap.get(parentKey);
-      let width = Math.round(Math.abs(parentBottomPoint.x - topPoint.getBoundingClientRect().x)) + 2;
+      let width = Math.round(Math.abs(parentBottomPoint.x - topPoint.getBoundingClientRect().x));
       let height = Math.round(Math.abs(parentBottomPoint.y - topPoint.getBoundingClientRect().y));
-      this.lineMap.set(node.__key, {
-        width,
-        height,
+      this.lineMap.set(node[this.positionKey], {
+        width: width / this.scaleSize + 2,
+        height: height / this.scaleSize,
         direction: parentBottomPoint.x - topPoint.getBoundingClientRect().x < 0 ? 'L' : 'R'
       })
     }
     if (node.children && node.children.length) {
       node.children.forEach((child: StructureNode) => {
-        this.recursionNode(child, node.__key);
+        this.getNodePointPosition(child, node[this.positionKey]);
       })
     }
   }
 
-  getHeight(nodeKey: string) {
+  /**
+   * 获取节点连接线高度
+   * @param nodeKey 节点唯一标识
+   * @returns 节点连接线高度
+   */
+  public getLineHeight(nodeKey: string) {
     if (!this.lineMap.has(nodeKey)) return this.lineHeight;
     let height = this.lineMap.get(nodeKey)?.height;
     return height;
   }
 
-  getWidth(nodeKey: string, level: number) {
-    if (!this.lineMap.has(nodeKey)) return this.widthLevel[level] || this.widthLevel[this.widthLevel.length - 1];
+  /**
+   * 获取节点连接线宽度
+   * @param nodeKey 节点唯一标识
+   * @param level 节点层级
+   * @returns 节点连接线宽度
+   */
+  public getLineWidth(nodeKey: string, level: number) {
+    if (!this.lineMap.has(nodeKey)) 160;
     let width = this.lineMap.get(nodeKey)?.width;
     return width;
   }
 
-  getDirection(nodeKey: string) {
+  /**
+   * 获取节点连接线方向
+   * @param nodeKey 节点唯一标识
+   * @returns 节点连接线方向
+   */
+  public getDirection(nodeKey: string) {
     if (!this.lineMap.has(nodeKey)) return 'L';
     return this.lineMap.get(nodeKey)?.direction;
   }
+
+  /**
+   * 获取当前级别节点是否显示
+   * @param level 节点层级
+   * @returns 节点是否显示
+   */
+  public getShowLevel(level: number) {
+    if (!this.levelMap) return true;
+    return level >= this.selectedLevel - this.levelMap.top && this.selectedLevel + this.levelMap.bottom + 1 >= level;
+  }
+
+  /**
+   * 判断节点是否为最后一级
+   * @param node 当前节点
+   * @returns 是否为最后一级
+   */
+  public isLastLevel(node: StructureNode) {
+    if (this.type !== 'user') return false;
+    if (!node) return false;
+    if (!node.children || !node.children.length) return true;
+    return node.children.every((child: StructureNode) => (!child.children || !child.children.length));
+  }
+
+  /**
+   * 判断节点是否为当前级别
+   * @param node 当前节点
+   * @param level 当前节点层级
+   * @returns 是否为当前级别
+   */
+  public adjustByParent(node: StructureNode, level: number) {
+    if (this.selectedLevel + 1 === level && this.isLastLevel(node) && this.type === 'user') {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 获取当前级别节点网格模板
+   * @param node 当前节点
+   * @returns 网格模板
+   */
+  public getGridTemplate(node: StructureNode) {
+    if (this.type !== 'user' || !node) {
+      return '';
+    }
+    let number = node.children?.length || 1;
+    if (1 <= number && number <= 6) {
+      return '1fr 1fr';
+    } else if (7 <= number && number <= 15) {
+      return '1fr 1fr 1fr';
+    } else {
+      return '1fr 1fr 1fr 1fr';
+    }
+  }
+
+  /**
+   * 判断当前是否为部门类型
+   * @returns 是否为部门类型
+   */
+  public isDepartmentType() {
+    return this.type === 'department';
+  }
+
+  /**
+   * 判断当前是否为用户类型
+   * @returns 是否为用户类型
+   */
+  public isUserType() {
+    return this.type === 'user';
+  }
+
+  /**
+   * 判断当前是否显示底部节点圆点
+   * @returns 是否显示底部节点圆点
+   */
+  public showBottomPoint(node: StructureNode, level: number) {
+    if (this.type !== 'user') return true;
+    return node.children && node.children.length && !this.adjustByParent(node, level) && level - (this.levelMap?.bottom || 0) < this.selectedLevel;
+  }
+
+  /**
+   * 判断当前是否显示顶部节点圆点
+   * @returns 是否显示顶部节点圆点
+   */
+  public showTopPoint(parent: StructureNode, level: number) {
+    if (this.type !== 'user') return true;
+    return parent && parent.children && parent.children.length && !this.adjustByParent(parent, level);
+  }
+
+  //放大缩小的值
+  scaleSize = 2;
+  // 拖拽的执行标识
+  flag?: boolean;
+  // 拖拽的初始坐标
+  downX?: number;
+  downY?: number;
+  // 滚动条的坐标
+  scrollLeft: number = 0;
+  scrollTop: number = 0;
+  // 拖拽的坐标
+  transformX: number = 0;
+  transformY: number = 0;
+  // 拖拽的样式
+  transform: string = `translate(0px, 0px)`;
+
+  //界面的缩放
+  private scaleSizeChange(number: number): void {
+    this.scaleSize += number;
+  }
+
+  /**
+   * 通过鼠标滚轮放大缩小
+   * @param event 滚轮事件
+   */
+  public wheel = (event: any): void => {
+    this.scaleSizeChange(-event?.deltaY * 0.0005);
+    event.preventDefault();
+  }
+
+  /**
+   * 通过鼠标拖拽移动
+   * @param event 鼠标移动事件
+   */
+  public mousemove = (event: any): void => {
+    if (this.flag) {
+      this.transformX += (event.clientX - this.downX!);
+      this.transformY += (event.clientY - this.downY!);
+      this.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
+      this.downX = event.clientX;
+      this.downY = event.clientY;
+    }
+  }
+
+  /**
+   * 鼠标移出事件
+   * @param event 鼠标移出事件
+   */
+  public mouseleave = (event: any): void => {
+    this.flag = false;
+  }
+
+  /**
+   * 松开鼠标结束拖拽
+   * @param event 鼠标抬起事件
+   */
+  public mouseup = (event: any): void => {
+    this.flag = false;
+  }
+
+  /**
+   * 鼠标按下设置初始位置信息
+   * @param event 鼠标按下事件
+   */
+  public mousedown = (event: any): void => {
+    this.flag = true;
+    this.downX = event.clientX;
+    this.downY = event.clientY;
+  }
+
 }

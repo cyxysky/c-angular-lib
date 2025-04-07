@@ -491,10 +491,6 @@ export class ProcessTreeComponent {
       this.transformX += (event.clientX - this.downX!);
       this.transformY += (event.clientY - this.downY!);
       this.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
-      // element.scrollLeft = this.scrollLeft - scrollX
-      // element.scrollTop = this.scrollTop - scrollY
-      // this.scrollLeft = element.scrollLeft
-      // this.scrollTop = element.scrollTop
       this.downX = event.clientX;
       this.downY = event.clientY;
     }
