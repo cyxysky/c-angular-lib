@@ -80,17 +80,23 @@
     
     <!-- 状态节点 -->
     <app-doc-box
-      title="状态节点"
+      title="节点自定义"
       [sourceCode]="stateSource">
       <div demo>
         <lib-tree-select
           name="stateTreeSelect"
           [treeData]="stateTreeData"
           [(ngModel)]="stateValue"
+          [treeNodeTemplate]="stateNodeTemplate"
           [placeholder]="'请选择带状态的节点'"
-          [multiple]="true"
-          [filterState]="filterState">
+          [multiple]="true">
         </lib-tree-select>
+        <ng-template #stateNodeTemplate let-node>
+          <span class="state-node">
+            自定义节点-
+            <span class="state-node-title">{{ node.title }}</span>
+          </span>
+        </ng-template>
         <p class="example-value">当前值: {{ stateValue | json }}</p>
       </div>
       <div description>
@@ -108,7 +114,7 @@
           [treeData]="searchTreeData"
           [(ngModel)]="searchValue"
           [placeholder]="'搜索节点'"
-          [showSearch]="true"
+          [treeShowSearch]="true"
           [multiple]="true">
         </lib-tree-select>
         <p class="example-value">当前值: {{ searchValue | json }}</p>

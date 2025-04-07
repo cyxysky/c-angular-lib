@@ -1,18 +1,11 @@
 import { trigger, state, style, transition, animate } from "@angular/animations";
 
 export const expandCollapse = trigger('expandCollapse', [
-    state('void', style({
-        height: '0',
-        opacity: 0,
-      })),
-      state('*', style({
-        height: '*',
-        opacity: 1,
-      })),
-      transition('void => *', [
-        animate('200ms ease')
-      ]),
-      transition('* => void', [
-        animate('200ms ease')
-      ])
+  transition(':enter', [
+    style({ opacity: 0, height: '0' }),
+    animate('200ms ease', style({ opacity: 1, height: '*' })),
+  ]),
+  transition(':leave', [
+    animate('200ms ease', style({ opacity: 0, height: '0' }))
+  ])
 ])

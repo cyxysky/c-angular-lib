@@ -72,7 +72,7 @@
         [style.min-width]="dropdownWidth">
         
         <!-- 搜索结果树 -->
-        <div class="tree-container" [style.height.px]="dropdownHeight">
+        <div class="tree-container" [style.max-height.px]="dropdownHeight">
             <!-- 树组件 -->
             <lib-tree
                 [treeData]="treeData"
@@ -87,19 +87,18 @@
                 [treeVirtualHeight]="dropdownHeight"
                 [treeIsVirtualScroll]="treeVirtualScroll"
                 [treeExpandedIcon]="expandedIcon"
+                [treeVirtualHeight]="dropdownHeight"
+                [treeVirtualItemSize]="treeVirtualItemSize"
+                [treeVirtualMinBuffer]="treeVirtualMinBuffer"
+                [treeVirtualMaxBuffer]="treeVirtualMaxBuffer"
                 [treeDefaultExpandedKeys]="defaultExpandedKeys"
                 [treeDefaultSelectedKeys]="defaultSelectedKeys"
                 [treeDefaultCheckedKeys]="defaultCheckedKeys"
+                [treeTemplate]="treeNodeTemplate"
+                (expandChange)="focusSearch()"
                 (selectedChange)="onNodeSelect($event.node)"
                 (checkBoxChange)="onCheckBoxChange($event)"
                 (loadData)="onLoadData($event)">
-                <!-- 自定义节点模板 -->
-                <ng-template #treeTemplate let-node>
-                    <ng-container *ngTemplateOutlet="treeNodeTemplate || defaultNodeTemplate; context: {$implicit: node, node: node}"></ng-container>
-                    <ng-template #defaultNodeTemplate let-node>
-                        {{ node.title }}
-                    </ng-template>
-                </ng-template>
             </lib-tree>
         </div>
     </div>

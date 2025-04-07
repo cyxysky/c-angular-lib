@@ -72,9 +72,7 @@
       </div>
 
       <!-- 子节点递归 - 树节点模板中 -->
-      <div class="lib-tree-children" 
-           *ngIf="node.children && node.children.length && expandedKeys.has(node.key)"
-           [@expandCollapse]="!initData ? node.expanded ? 'expanded' : 'void' : 'void'"
+      <div class="lib-tree-children" *ngIf="node.children && node.children.length && expandedKeys.has(node.key)" @expandCollapse
            (@expandCollapse.done)="onAnimationDone($event, node)">
         <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
       </div>
@@ -102,7 +100,10 @@
           [class.lib-tree-title-disabled]="node.disabled" 
           [class.lib-tree-title-selected]="node.selected" 
           (click)="onNodeSelect(node, $event)">
-          {{ node.title }}
+          <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
+          <ng-template #defaultNodeTpl let-node>
+            {{ node.title }}
+          </ng-template>
       </div>
     </div>
   </li>

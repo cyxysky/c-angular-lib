@@ -41,8 +41,6 @@ export class StructureTreeComponent implements OnInit {
   @Output() nodeEdit = new EventEmitter<StructureNode>();
 
   public lineHeight: number = 80;
-  lengthMap = new Map<string, any>();
-  childrenLengthMap = new Map<string, any>();
   nodeTopPointMap = new Map<string, any>();
   nodeBottomPointMap = new Map<string, any>();
   lineMap = new Map<string, any>();
@@ -65,7 +63,6 @@ export class StructureTreeComponent implements OnInit {
   }
 
   initData() {
-    this.childrenLengthMap.clear();
     this.data && this.data.length && this.data.forEach(item => {
       this.getNodeAllChildrenLength(item);
     });
@@ -89,21 +86,6 @@ export class StructureTreeComponent implements OnInit {
     this.nodeEdit.emit(node);
   }
 
-  /**
-   * 递归获取子节点长度
-   * @param node 当前节点
-   * @param originKey 父节点key
-   */
-  public recursionToGetLength = (node: StructureNode, originKey: string) => {
-    if (node.children && node.showChildren) {
-      node.children.forEach((child: any) => {
-        if ((!child.children || (child.children && child.children.length === 0) || child.showChildren === false) && originKey) {
-          this.childrenLengthMap.set(originKey, this.childrenLengthMap.get(originKey) + 1);
-        }
-        this.recursionToGetLength(child, originKey);
-      });
-    }
-  }
 
   /**
    * 获取当前节点所有子节点长度
@@ -111,12 +93,6 @@ export class StructureTreeComponent implements OnInit {
    */
   getNodeAllChildrenLength(node: StructureNode) {
     !node.__key && (node.__key = this.utilsService.getUUID());
-    // 如果map中没有当前节点，设置map
-    if (!this.childrenLengthMap.has(node.__key)) {
-      this.childrenLengthMap.set(node.__key, 0);
-    }
-    // 获取子节点长度
-    this.recursionToGetLength(node, node.__key);
     if (node.children && node.children.length) {
       node.children.forEach((child: StructureNode) => {
         this.getNodeAllChildrenLength(child);

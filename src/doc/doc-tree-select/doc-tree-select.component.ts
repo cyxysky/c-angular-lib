@@ -36,6 +36,36 @@ export class DocTreeSelectComponent {
           key: 'node1-2',
           title: '子节点1-2'
         },
+        {
+          key: 'node1-3',
+          title: '子节点1-3'
+        },
+        {
+          key: 'node1-4',
+          title: '子节点1-4'
+        },
+        {
+          key: 'node1-5',
+          title: '子节点1-5'
+        },
+        {
+          key: 'node1-6',
+          title: '子节点1-6'
+        },
+        {
+          key: 'node1-7',
+          title: '子节点1-7'
+        },
+        {
+          key: 'node1-8',
+          title: '子节点1-8'
+        }, {
+          key: 'node1-9',
+          title: '子节点1-9'
+        }, {
+          key: 'node1-10',
+          title: '子节点1-10'
+        },
       ]
     },
     {
@@ -204,14 +234,14 @@ export class DocTreeSelectComponent {
         title: `父节点 ${i}`,
         children: []
       };
-      
+
       for (let j = 0; j < 10; j++) {
         parentNode.children?.push({
           key: `parent-${i}-child-${j}`,
           title: `子节点 ${i}-${j}`
         });
       }
-      
+
       this.virtualTreeData.push(parentNode);
     }
   }

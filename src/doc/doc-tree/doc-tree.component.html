@@ -87,6 +87,7 @@
         <lib-tree 
           [treeData]="customTreeData" 
           [treeDefaultExpandAll]="true"
+          [treeTemplate]="treeTemplate"
         >
           <ng-template #treeTemplate let-node let-origin="origin">
             <div class="custom-node">

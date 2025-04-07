@@ -36,7 +36,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /** 树节点数据 */
   @Input({ alias: 'treeData' }) treeData: TreeNodeOptions[] = [];
   /** 是否显示搜索框 */
-  @Input({ alias: 'showSearch', transform: booleanAttribute }) showSearch: boolean = true;
+  @Input({ alias: 'treeShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 是否禁用 */
   @Input({ alias: 'disabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 占位文本 */
@@ -79,13 +79,18 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   @Input({ alias: 'treeExpandedIcon' }) expandedIcon: TemplateRef<any> | null = null;
   /** 是否虚拟滚动 */
   @Input({ alias: 'treeVirtualScroll', transform: booleanAttribute }) treeVirtualScroll: boolean = false;
-  /** 状态过滤 */
-  @Input({ alias: 'filterState' }) filterState: 'error' | 'warning' | null = null;
+  /** 虚拟滚动项高度 */
+  @Input({ alias: 'treeVirtualItemSize' }) treeVirtualItemSize: number = 24;
+  /** 虚拟滚动最小缓冲区 */
+  @Input({ alias: 'treeVirtualMinBuffer' }) treeVirtualMinBuffer: number = 300;
+  /** 虚拟滚动最大缓冲区 */
+  @Input({ alias: 'treeVirtualMaxBuffer' }) treeVirtualMaxBuffer: number = 600;
   /** 默认展开的节点 */
   @Input({ alias: 'defaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
-
-  @Input() treeOptionHeight: number = 36;
-  @Input() treeIndent: number = 24;
+  /** 选项高度 */
+  @Input({ alias: 'treeOptionHeight' }) treeOptionHeight: number = 36;
+  /** 树节点缩进 */
+  @Input({ alias: 'treeIndent' }) treeIndent: number = 24;
 
   // 输出事件
   /** 值变化事件 */
@@ -100,8 +105,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   @Output() loadData = new EventEmitter<TreeNodeOptions>();
   /** 复选框变化事件 */
   @Output() checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
-  /** 状态过滤变化事件 */
-  @Output() stateFilterChange = new EventEmitter<'error' | 'warning' | null>();
 
   // 内部状态
   /** 选中值 */
@@ -578,7 +581,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   
   clear(event?: Event): void {
     if (event) event.stopPropagation();
-    
     // 清空所有状态和数据
     this.resetAllState();
     this.updateData();
@@ -593,12 +595,9 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   private updateNodeStatus(key: string, checked: boolean): string[] {
     const node = this.nodeMap.get(key);
     if (!node) return [key];
-    
     // 更新节点本身状态
     this.updateSingleNodeStatus(node, checked);
-    
     const keysToUpdate = [key];
-    
     // 处理子节点状态
     if (this.treeCheckable && node.children?.length) {
       node.children.forEach(child => {
@@ -607,12 +606,10 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         }
       });
     }
-    
     // 处理父节点状态
     if (this.treeCheckable) {
       this.updateAncestorNodesStatus(node);
     }
-    
     return keysToUpdate;
   }
   
@@ -623,7 +620,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (this.treeCheckable) {
       node.checked = checked;
       node.indeterminate = false;
-      
       if (this.parentNodeKeys.has(node.key) && !checked) {
         this.parentNodeKeys.delete(node.key);
       }
@@ -722,9 +718,20 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.defaultExpandedKeys = [];
   }
 
+  /**
+   * 更新下拉菜单位置
+   */
+  updateOverlayPosition(): void {
+    if (this.overlayRef) {
+      this.overlayService.asyncUpdateOverlayPosition(this.overlayRef, 0);
+    };
+  }
+
+  /**
+   * 更新数据
+   */
   updateData() {
     this.valueChange.emit(this.value);
-
     // 将value转换为节点列表
     const selectedNodes: TreeNodeOptions[] = [];
     const keys = Array.isArray(this.value) ? this.value : [this.value];
@@ -739,6 +746,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.selectionChange.emit(selectedNodes);
     this.onChange(this.value);
     this.focusSearch();
+    this.updateOverlayPosition();
     this.cdr.detectChanges();
   }
 
@@ -758,12 +766,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   showMultipleData(): boolean {
     return this.multiple && this.displayTags.length > 0;
-  }
-
-  setFilterState(state: 'error' | 'warning' | null): void {
-    this.filterState = state;
-    this.stateFilterChange.emit(state);
-    this.cdr.detectChanges();
   }
 
   getAllNodes(): Map<string, TreeNodeOptions> {

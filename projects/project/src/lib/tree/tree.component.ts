@@ -77,15 +77,19 @@ export class TreeComponent implements OnInit, OnChanges {
   /** 虚拟滚动项高度 */
   @Input({ alias: 'treeVirtualItemSize' }) virtualItemSize: number = 24;
   /** 虚拟滚动最小缓冲区 */
-  @Input({ alias: 'treeVirtualMinBuffer' }) virtualMinBuffer: number = 600;
+  @Input({ alias: 'treeVirtualMinBuffer' }) virtualMinBuffer: number = 300;
   /** 虚拟滚动最大缓冲区 */
-  @Input({ alias: 'treeVirtualMaxBuffer' }) virtualMaxBuffer: number = 300;
+  @Input({ alias: 'treeVirtualMaxBuffer' }) virtualMaxBuffer: number = 600;
   /** 默认选中的节点 */
   @Input({ alias: 'treeDefaultSelectedKeys' }) defaultSelectedKeys: string[] = [];
   /** 默认选中的节点 */
   @Input({ alias: 'treeDefaultCheckedKeys' }) defaultCheckedKeys: string[] = [];
   /** 默认展开的节点 */
   @Input({ alias: 'treeDefaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
+  /** 节点模板 */
+  @Input({ alias: 'treeTemplate' }) treeTemplate: TemplateRef<{ $implicit: TreeNodeOptions, isLast: boolean, level: number }> | null = null;
+  /** 是否展示动画 */
+  @Input() showAnimation: boolean = true;
   //#endregion
 
   //#region 输出事件 (Outputs)
@@ -102,7 +106,6 @@ export class TreeComponent implements OnInit, OnChanges {
   //#endregion
 
   //#region 内部状态变量
-  @ContentChild('treeTemplate') treeTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any, node: TreeNodeOptions }>;
   @ContentChild('iconTemplate') iconTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any }>;
   @ViewChild('treeContainer') treeContainer!: ElementRef;
 
@@ -135,14 +138,9 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['searchValue'] && !changes['searchValue'].firstChange) {
-      setTimeout(() => {
-        this.initData = true;
-        this.searching = true;
-        this.handleSearch();
-        this.initData = false;
-        this.searching = false;
-        this.cdr.detectChanges();
-      }, 0);
+      this.searching = true;
+      this.handleSearch();
+      this.searching = false;
     }
     this.initData = true;
     if (changes['treeData']) {
@@ -443,21 +441,32 @@ export class TreeComponent implements OnInit, OnChanges {
    * 处理搜索
    */
   handleSearch(): void {
-    console.log('搜索', this.searchValue);
     // 简化搜索逻辑
-    this.resetExpandedState();
     if (!this.searchValue) {
       this.searchResults = [];
+      this.resetExpandedState();
       this.cdr.detectChanges();
       return;
     }
     const searchTerm = this.searchValue.toLowerCase();
     this.searchResults = this.searchTreeNodes(this.treeData, searchTerm);
+    this.resetExpandedStateNoCdr();
     // 只在有结果时执行展开操作
     this.searchResults.length > 0 && this.expandSearchResults();
     this.cdr.detectChanges();
   }
 
+
+  /**
+   * 重置树的展开状态到初始状态
+   */
+  public resetExpandedStateNoCdr(): void {
+    // 清空当前展开的所有节点
+    this.expandedKeys.clear();
+    this.utilsService.traverseAllNodes(this.treeData, (node: any) => {
+      node.expanded = false;
+    });
+  }
 
 
   /**
@@ -537,7 +546,8 @@ export class TreeComponent implements OnInit, OnChanges {
   showEmptyState(): boolean {
     return this.searchValue !== undefined &&
       this.searchValue !== '' &&
-      this.searchResults.length === 0;
+      this.searchResults.length === 0 &&
+      !this.searching;
   }
 
   /**

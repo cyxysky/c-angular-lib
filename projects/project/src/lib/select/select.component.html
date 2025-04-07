@@ -27,7 +27,7 @@
             </ng-container>
         </div>
         <ng-container *ngIf="selectMode === 'multiple'">
-            <lib-select-tag *ngFor="let tag of _data;index as i" [size]="size" [closable]="true" (remove)="removeUser($event, tag)" style="padding-right: 4px;" [size]="size">
+            <lib-select-tag *ngFor="let tag of _data;index as i" [size]="size" [closable]="true" (remove)="removeUser($event, tag)" [size]="size">
                 <ng-container *ngIf="optionLabelTemplate">
                     <ng-container *ngFor="let option of optionList">
                         <ng-container *ngIf="option[optionValue] === tag">
