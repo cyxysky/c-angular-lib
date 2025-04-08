@@ -9,7 +9,7 @@ class="out-box no-copy"
     <div  class="structure-tree-container" [style.transform]="transform" [style.scale]="scaleSize">
         <ng-container *ngIf="data && data.length; else noData">
             <div class="structure-tree">
-                <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: showData, level: showData[0].__key && nodeLevelMap.get(showData[0].__key!) || 0}"></ng-container>
+                <ng-container *ngTemplateOutlet="nodeTemplate; context: {nodes: showData, level: showData[0][nodeKey] && nodeLevelMap.get(showData[0][nodeKey]!) || 0}"></ng-container>
             </div>
         </ng-container>
         <ng-template #noData>
@@ -28,39 +28,39 @@ class="out-box no-copy"
                 <ng-container *ngFor="let node of nodes; let i=index; let isLast=last">
                     <div class="tree-node-wrapper" *ngIf="isNodeInShowPath(node, level)">
                         <!-- 节点直线 -->
-                        <div *ngIf="parent && getLineWidth(node.__key, level) && getLineWidth(node.__key, level) < 5">
+                        <div *ngIf="parent && getLineWidth(node[nodeKey], level) && getLineWidth(node[nodeKey], level) < 5">
                             <div 
                                 class="vertical-connector" 
                                 [style.left]="isDepartmentType() ? '50%' : ''"
-                                [style.height]="this.getLineHeight(node.__key) + 'px'"
-                                [style.top]="-this.getLineHeight(node.__key) + 'px'">
+                                [style.height]="this.getLineHeight(node[nodeKey]) + 'px'"
+                                [style.top]="-this.getLineHeight(node[nodeKey]) + 'px'">
                             </div>
                         </div>
                         <div class="node-card">
                             <!-- 顶部节点圆点 -->
                             <div 
-                                [id]="positionKey === '__key' ? node[positionKey] + 'top' : ''" 
+                                [id]="node[nodeKey] + 'top'" 
                                 *ngIf="showTopPoint(parent, level)"
                                 [class.circle-point]="isUserType()"
                                 class="point-top point">
                                 <!-- 连接线 -->
                                 <div 
-                                    *ngIf="getLineWidth(node.__key, level) && getLineWidth(node.__key, level) > 5 && node.showLine !== false"
+                                    *ngIf="getLineWidth(node[nodeKey], level) && getLineWidth(node[nodeKey], level) > 5 && node.showLine !== false"
                                     class="line-wrap-box" 
-                                    [style.height]="getLineHeight(node.__key) + 'px'"
-                                    [style.top]="(-getLineHeight(node.__key) / 2) + 'px'"
-                                    [style.width]="getLineWidth(node.__key, level) + 'px'"
-                                    [style.left]="getDirection(node.__key) === 'L' ? (-getLineWidth(node.__key, level) + 2  + 'px') : '0px'">
+                                    [style.height]="getLineHeight(node[nodeKey]) + 'px'"
+                                    [style.top]="(-getLineHeight(node[nodeKey]) / 2) + 'px'"
+                                    [style.width]="getLineWidth(node[nodeKey], level) + 'px'"
+                                    [style.left]="getDirection(node[nodeKey]) === 'L' ? (-getLineWidth(node[nodeKey], level) + 2  + 'px') : '0px'">
                                     <div style="position: relative;pointer-events: none;">
                                         <!-- 底部连接线 -->
                                         <div 
-                                            *ngIf="getDirection(node.__key) === 'L'" 
+                                            *ngIf="getDirection(node[nodeKey]) === 'L'" 
                                             class="line-wrapper-bottom-right"
                                             [style.border-color]="lineColor"
                                             [style.border-bottom-left-radius]="lineRadius">
                                         </div>
                                         <div 
-                                            *ngIf="getDirection(node.__key) === 'R'" 
+                                            *ngIf="getDirection(node[nodeKey]) === 'R'" 
                                             class="line-wrapper-bottom"
                                             [style.border-color]="lineColor"
                                             [style.border-top-left-radius]="lineRadius">
@@ -69,13 +69,13 @@ class="out-box no-copy"
                                     <div style="position: relative;pointer-events: none;">
                                         <!-- 顶部连接线 -->
                                         <div 
-                                            *ngIf="getDirection(node.__key) === 'L'" 
+                                            *ngIf="getDirection(node[nodeKey]) === 'L'" 
                                             class="line-wrapper-top-right"
                                             [style.border-color]="lineColor"
                                             [style.border-top-right-radius]="lineRadius">
                                         </div>
                                         <div 
-                                            *ngIf="getDirection(node.__key) === 'R'" 
+                                            *ngIf="getDirection(node[nodeKey]) === 'R'" 
                                             class="line-wrapper-top"
                                             [style.border-color]="lineColor"
                                             [style.border-bottom-right-radius]="lineRadius">
@@ -87,7 +87,7 @@ class="out-box no-copy"
                             <!-- 底部节点圆点 -->
                             <div 
                                 *ngIf="showBottomPoint(node, level)"
-                                [id]="positionKey === '__key' ? node[positionKey] + 'bottom' : ''"
+                                [id]="node[nodeKey] + 'bottom'"
                                 [class.circle-point]="isUserType()"
                                 class="point-bottom point">
                             </div>

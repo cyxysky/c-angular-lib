@@ -41,10 +41,8 @@ export class StructureTreeComponent implements OnInit {
   @Input() lineRadius: string = '15px';
   @Input() lineColor: string = '#32d8e7';
   @Input() type: 'user' | 'department' | 'any' = 'user';
-  @Input() positionKey: string = '__key';
   @Input() nodeKey: string = 'id';
   @Input() selectedId: string = '';
-  @Input() selectedLevel: number = 0;
   @Input({ alias: 'nodeTemplate' }) nodeTemplates: TemplateRef<any> | undefined = undefined;
 
   // 输出事件
@@ -52,6 +50,7 @@ export class StructureTreeComponent implements OnInit {
   @Output() nodeEdit = new EventEmitter<StructureNode>();
   @Output() nowLevelChange = new EventEmitter<number>();
 
+  public selectedLevel: number = 0;
   public lineHeight: number = 80;
   public showData!: StructureNode[];
   public showNodePath: StructureNode[] = [];
@@ -67,6 +66,9 @@ export class StructureTreeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    setInterval(() => {
+      this.initNodeLineWidthMap();
+    }, 50);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,6 +76,10 @@ export class StructureTreeComponent implements OnInit {
       this.initData();
     }
     this.asyncUpdateLineWidthMap();
+  }
+
+  ngAfterViewChecked() {
+    // this.initNodeLineWidthMap();
   }
 
   ngAfterViewInit() {
@@ -98,6 +104,7 @@ export class StructureTreeComponent implements OnInit {
       this.initNodePrivateKey(item, 0);
     });
     this.getShowDataAndNodePath();
+    this.selectedLevel = this.nodeLevelMap.get(this.selectedId) || 0;
   }
 
   /**
@@ -117,8 +124,7 @@ export class StructureTreeComponent implements OnInit {
    * @param node 当前节点
    */
   public initNodePrivateKey(node: StructureNode, level: number, parentNode?: StructureNode) {
-    !node[this.positionKey] && (node[this.positionKey] = this.utilsService.getUUID());
-    this.nodeLevelMap.set(node[this.positionKey], level);
+    this.nodeLevelMap.set(node[this.nodeKey], level);
     !node.openChildren && (node.openChildren = () => {
       node.showChildren = !node.showChildren;
       this.asyncUpdateLineWidthMap();
@@ -171,7 +177,7 @@ export class StructureTreeComponent implements OnInit {
     if (!this.showNodePath || !this.showNodePath.length) return true;
     if (!this.levelMap) return true;
     if (this.selectedLevel + this.levelMap.bottom === level) return true;
-    return this.showNodePath.some((item: StructureNode) => node[this.positionKey] === item[this.positionKey]);
+    return this.showNodePath.some((item: StructureNode) => node[this.nodeKey] === item[this.nodeKey]);
   }
 
   /**
@@ -179,19 +185,19 @@ export class StructureTreeComponent implements OnInit {
    * @param node 当前节点
    */
   public getNodePointPosition(node: StructureNode, parentKey?: string) {
-    let topPoint = document.getElementById(`${node[this.positionKey]}top`);
-    let bottomPoint = document.getElementById(`${node[this.positionKey]}bottom`);
-    if (topPoint && node[this.positionKey]) {
-      this.nodeTopPointMap.set(node[this.positionKey], topPoint.getBoundingClientRect());
+    let topPoint = document.getElementById(`${node[this.nodeKey]}top`);
+    let bottomPoint = document.getElementById(`${node[this.nodeKey]}bottom`);
+    if (topPoint && node[this.nodeKey]) {
+      this.nodeTopPointMap.set(node[this.nodeKey], topPoint.getBoundingClientRect());
     }
-    if (bottomPoint && node[this.positionKey]) {
-      this.nodeBottomPointMap.set(node[this.positionKey], bottomPoint.getBoundingClientRect());
+    if (bottomPoint && node[this.nodeKey]) {
+      this.nodeBottomPointMap.set(node[this.nodeKey], bottomPoint.getBoundingClientRect());
     }
-    if (parentKey && topPoint && node[this.positionKey] && this.nodeBottomPointMap.has(parentKey)) {
+    if (parentKey && topPoint && node[this.nodeKey] && this.nodeBottomPointMap.has(parentKey)) {
       let parentBottomPoint = this.nodeBottomPointMap.get(parentKey);
       let width = Math.round(Math.abs(parentBottomPoint.x - topPoint.getBoundingClientRect().x));
       let height = Math.round(Math.abs(parentBottomPoint.y - topPoint.getBoundingClientRect().y));
-      this.lineMap.set(node[this.positionKey], {
+      this.lineMap.set(node[this.nodeKey], {
         width: width / this.scaleSize + 2,
         height: height / this.scaleSize,
         direction: parentBottomPoint.x - topPoint.getBoundingClientRect().x < 0 ? 'L' : 'R'
@@ -199,7 +205,7 @@ export class StructureTreeComponent implements OnInit {
     }
     if (node.children && node.children.length) {
       node.children.forEach((child: StructureNode) => {
-        this.getNodePointPosition(child, node[this.positionKey]);
+        this.getNodePointPosition(child, node[this.nodeKey]);
       })
     }
   }
@@ -326,7 +332,7 @@ export class StructureTreeComponent implements OnInit {
   }
 
   //放大缩小的值
-  scaleSize = 2;
+  scaleSize = 1;
   // 拖拽的执行标识
   flag?: boolean;
   // 拖拽的初始坐标
