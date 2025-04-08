@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { OverlayService } from '../service/overlay.service';
+import { OverlayService } from '../overlay/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
-import { UtilsService } from '../service/utils.service';
+import { UtilsService } from '../utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';

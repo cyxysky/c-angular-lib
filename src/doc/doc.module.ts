@@ -17,7 +17,7 @@ import { DocPopconfirmComponent } from './doc-popconfirm/doc-popconfirm.componen
 import { DocSelectComponent } from './doc-select/doc-select.component';
 import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
 import { DocTreeComponent } from './doc-tree/doc-tree.component';
-import { DocStructureTreeComponent } from './doc-structure.tree/doc-structure.tree.component';
+import { DocStructureTreeComponent } from './doc-structure-tree/doc-structure-tree.component';
 import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.component';
 @NgModule({
   declarations: [],

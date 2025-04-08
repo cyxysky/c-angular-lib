@@ -1,7 +1,7 @@
 import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { UtilsService } from '../service/utils.service';
+import { UtilsService } from '../utils/utils.service';
 
 export interface CheckboxOption {
   label: string;

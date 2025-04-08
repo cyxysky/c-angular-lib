@@ -5,7 +5,7 @@ import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } 
 import { trigger, state, style, transition, animate, AnimationEvent } from '@angular/animations';
 import { expandCollapse } from '../animation/expandCollapse.animation';
 import { rotate } from '../animation/rotate.animation';
-import { UtilsService } from '../service/utils.service';
+import { UtilsService } from '../utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 export interface TreeNodeOptions {
   key: string;

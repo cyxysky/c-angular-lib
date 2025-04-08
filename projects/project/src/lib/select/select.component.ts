@@ -5,8 +5,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import _ from 'lodash';
 import { CommonModule, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OverlayService } from '../service/overlay.service';
-import { UtilsService } from '../service/utils.service';
+import { OverlayService } from '../overlay/overlay.service';
+import { UtilsService } from '../utils/utils.service';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 @Component({

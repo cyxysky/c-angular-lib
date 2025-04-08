@@ -6,8 +6,8 @@ import { SegmentedComponent } from '@project';
 @Component({
   selector: 'app-doc-structure-tree',
   imports: [StructureTreeComponent, CommonModule, FormsModule, SegmentedComponent],
-  templateUrl: './doc-structure.tree.component.html',
-  styleUrl: './doc-structure.tree.component.less'
+  templateUrl: './doc-structure-tree.component.html',
+  styleUrl: './doc-structure-tree.component.less'
 })
 export class DocStructureTreeComponent {
   structureData: any[] = [

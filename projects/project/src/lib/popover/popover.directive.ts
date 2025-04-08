@@ -3,7 +3,7 @@ import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfig
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from './popover.component';
-import { OverlayService } from '../service/overlay.service';
+import { OverlayService } from '../overlay/overlay.service';
 import * as _ from 'lodash';
 @Directive({
   selector: '[libPopover]'

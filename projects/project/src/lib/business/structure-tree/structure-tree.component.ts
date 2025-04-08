@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, OnInit, ChangeDetectorRef, SimpleChanges, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UtilsService } from '../../service/utils.service';
+import { UtilsService } from '../../utils/utils.service';
 import * as _ from 'lodash';
 // 组织结构节点接口
 export interface StructureNode {

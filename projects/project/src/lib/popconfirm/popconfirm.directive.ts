@@ -4,7 +4,7 @@ import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from '@project';
 import _ from 'lodash';
-import { OverlayService } from '../service/overlay.service';
+import { OverlayService } from '../overlay/overlay.service';
 import { ButtonType, ButtonColor } from '../button/button.component.interface';
 
 @Directive({

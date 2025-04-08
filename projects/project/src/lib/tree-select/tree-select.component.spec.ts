@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreeSelectComponent } from './tree-select.component';
-import { UtilsService } from '../service/utils.service';
+import { UtilsService } from '../utils/utils.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TreeComponent } from '../tree/tree.component';

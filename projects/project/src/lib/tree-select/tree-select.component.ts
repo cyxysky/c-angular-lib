@@ -4,8 +4,8 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
-import { OverlayService } from '../service/overlay.service';
-import { UtilsService } from '../service/utils.service';
+import { OverlayService } from '../overlay/overlay.service';
+import { UtilsService } from '../utils/utils.service';
 import { TreeComponent, TreeNodeOptions } from '../tree/tree.component';
 
 export type TreeSelectSize = 'large' | 'default' | 'small';

@@ -49,6 +49,7 @@ import { RadioComponent } from './radio/radio.component';
 import { SliderComponent } from './slider/slider.component';
 import { PopoverComponent } from './popover/popover.component';
 import { CascaderComponent } from './cascader/cascader.component';
+import { ModalComponent } from './modal/modal.component';
 export * from './input/input.component';
 export * from './select/select.component';
 export * from './button/button.component';
@@ -66,7 +67,7 @@ export * from './radio/radio.component';
 export * from './slider/slider.component';
 export * from './popover/popover.component';
 export * from './cascader/cascader.component';
-
+export * from './modal/modal.component';
 
 @NgModule({
   declarations: [],
@@ -102,7 +103,8 @@ export * from './cascader/cascader.component';
     PopoverComponent,
     PopconfirmDirective,
     CascaderComponent,
-    StructureTreeComponent
+    StructureTreeComponent,
+    ModalComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -135,7 +137,8 @@ export * from './cascader/cascader.component';
     PopoverComponent,
     PopconfirmDirective,
     CascaderComponent,
-    StructureTreeComponent
+    StructureTreeComponent,
+    ModalComponent
   ]
 })
 export class ProjectModule { }

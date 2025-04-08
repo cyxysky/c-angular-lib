@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DocStructureTreeComponent } from './doc-structure.tree.component';
+import { DocStructureTreeComponent } from './doc-structure-tree.component';
 
 describe('DocStructureTreeComponent', () => {
   let component: DocStructureTreeComponent;
