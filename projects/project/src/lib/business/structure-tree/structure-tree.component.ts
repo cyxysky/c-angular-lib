@@ -37,7 +37,6 @@ export class StructureTreeComponent implements OnInit {
   @Input() data: StructureNode[] = [];
   @Input() showLine: boolean = true;
   @Input() levelMap?: { top: number, bottom: number };
-  @Input() levelGap: number[] = [4, 4, 4];
   @Input() lineRadius: string = '15px';
   @Input() lineColor: string = '#32d8e7';
   @Input() type: 'user' | 'department' | 'any' = 'user';

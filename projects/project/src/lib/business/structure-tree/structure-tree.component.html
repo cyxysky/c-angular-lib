@@ -22,8 +22,7 @@ class="out-box no-copy"
             <div 
                 *ngIf="getShowLevel(level)"
                 [ngClass]="adjustByParent(parent, level) ? 'tree-level-grid' : 'tree-level'"
-                [style.grid-template-columns]="getGridTemplate(parent)"
-                [style.gap]="(levelGap[level] || levelGap[levelGap.length - 1]) + 'px'">
+                [style.grid-template-columns]="getGridTemplate(parent)">
                 <!-- 每个节点 -->
                 <ng-container *ngFor="let node of nodes; let i=index; let isLast=last">
                     <div class="tree-node-wrapper" *ngIf="isNodeInShowPath(node, level)">
