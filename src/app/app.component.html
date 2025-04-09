@@ -22,6 +22,7 @@
                             <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
                             <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
                             <li nz-menu-item (click)="nowComponent.set('tree-select')">树选择器</li>
+                            <li nz-menu-item (click)="nowComponent.set('modal')">模态框</li>
                         </ul>
                     </li>
                 </ul>
@@ -128,6 +129,9 @@
         @case ('tree-select') {
         <app-doc-tree-select></app-doc-tree-select>
         }
+        @case ('modal') {
+        <app-doc-modal></app-doc-modal>
         }
+    }
     </div>
 </div>

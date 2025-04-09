@@ -1,0 +1,184 @@
+<div class="doc-container">
+  <h1 class="doc-title">对话框 Modal</h1>
+  
+  <p class="doc-description">
+    模态对话框，在浮层中显示，引导用户进行相关操作。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    需要用户处理事务，又不希望跳转页面以致打断工作流程时，可以使用 Modal 在当前页面正中打开一个浮层，承载相应的操作。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-button (click)="isBasicVisible = true">打开模态框</lib-button>
+        
+        <lib-modal
+          [(visible)]="isBasicVisible"
+          width="500px"
+          [centered]="true">
+          <div modalHeader>
+            <div>基本模态框</div>
+          </div>
+          <div modalBody>
+            <p>这是一个基本的模态框内容</p>
+            <p>您可以在这里放置任何内容</p>
+          </div>
+          <div modalFooter>
+            <lib-button style="margin-right: 8px;" (click)="isBasicVisible = false">取消</lib-button>
+            <lib-button color="primary" (click)="isBasicVisible = false">确定</lib-button>
+          </div>
+        </lib-modal>
+      </div>
+      <div description>
+        第一个对话框。
+      </div>
+    </app-doc-box>
+    
+    <!-- 服务创建模态框 -->
+    <app-doc-box
+      title="服务创建模态框"
+      [sourceCode]="serviceSource">
+      <div demo>
+        <lib-button (click)="openServiceModal()">服务打开模态框</lib-button>
+        
+        <!-- 标题模板 -->
+        <ng-template #serviceModalHeader>
+          <h3 style="margin: 0;">通过服务创建的模态框</h3>
+        </ng-template>
+        
+        <!-- 内容模板 -->
+        <ng-template #serviceModalBody>
+          <p>这种方式可以更加灵活地控制模态框</p>
+          <p>无需在模板中声明模态框组件</p>
+        </ng-template>
+        
+        <!-- 底部模板 -->
+        <ng-template #serviceModalFooter>
+          <div style="display: flex; justify-content: flex-end;">
+            <lib-button style="margin-right: 8px;" (click)="closeServiceModal()">取消</lib-button>
+            <lib-button color="primary" (click)="closeServiceModal()">确定</lib-button>
+          </div>
+        </ng-template>
+      </div>
+      <div description>
+        使用服务创建模态框，可以更灵活地控制模态框的生命周期。使用 ModalService 的 create 方法创建模态框，无需在模板中声明。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义位置和大小 -->
+    <app-doc-box
+      title="自定义位置和大小"
+      [sourceCode]="sizePositionSource">
+      <div demo>
+        <div style="display: flex; gap: 16px;">
+          <lib-button (click)="isSmallVisible = true">小模态框</lib-button>
+          <lib-button (click)="isLargeVisible = true">大模态框</lib-button>
+          <lib-button (click)="isCenteredVisible = true">居中模态框</lib-button>
+        </div>
+        
+        <lib-modal
+          [(visible)]="isSmallVisible"
+          width="400px"
+          height="300px">
+          <div modalHeader>小尺寸模态框</div>
+          <div modalBody>这是一个小型模态框</div>
+          <div modalFooter>
+            <lib-button (click)="isSmallVisible = false">关闭</lib-button>
+          </div>
+        </lib-modal>
+        
+        <lib-modal
+          [(visible)]="isLargeVisible"
+          width="800px"
+          height="600px">
+          <div modalHeader>大尺寸模态框</div>
+          <div modalBody>这是一个大型模态框</div>
+          <div modalFooter>
+            <lib-button (click)="isLargeVisible = false">关闭</lib-button>
+          </div>
+        </lib-modal>
+        
+        <lib-modal
+          [(visible)]="isCenteredVisible"
+          width="500px"
+          [centered]="true">
+          <div modalHeader>垂直居中模态框</div>
+          <div modalBody>这个模态框在垂直方向上居中显示</div>
+          <div modalFooter>
+            <lib-button (click)="isCenteredVisible = false">关闭</lib-button>
+          </div>
+        </lib-modal>
+      </div>
+      <div description>
+        可以自定义模态框的宽度、高度和位置，以适应不同的场景需求。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义页脚 -->
+    <app-doc-box
+      title="自定义页脚"
+      [sourceCode]="customFooterSource">
+      <div demo>
+        <lib-button (click)="isCustomFooterVisible = true">自定义页脚模态框</lib-button>
+        
+        <lib-modal
+          [(visible)]="isCustomFooterVisible"
+          width="500px">
+          <div modalHeader>自定义页脚</div>
+          <div modalBody>
+            <p>这个模态框具有自定义的页脚内容</p>
+          </div>
+          <div modalFooter>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <lib-button color="danger" (click)="isCustomFooterVisible = false">删除</lib-button>
+              <div>
+                <lib-button style="margin-right: 8px;" (click)="isCustomFooterVisible = false">取消</lib-button>
+                <lib-button color="primary" (click)="isCustomFooterVisible = false">确定</lib-button>
+              </div>
+            </div>
+          </div>
+        </lib-modal>
+      </div>
+      <div description>
+        模态框的页脚部分可以根据需求进行灵活的布局和定制。
+      </div>
+    </app-doc-box>
+    
+    <!-- 异步关闭 -->
+    <app-doc-box
+      title="异步关闭"
+      [sourceCode]="asyncCloseSource">
+      <div demo>
+        <lib-button (click)="showAsyncModal()">异步关闭模态框</lib-button>
+        
+        <lib-modal
+          [(visible)]="isAsyncVisible"
+          width="500px"
+          [maskClosable]="false">
+          <div modalHeader>异步关闭</div>
+          <div modalBody>
+            <p>点击确定按钮后，将在2秒后关闭模态框</p>
+          </div>
+          <div modalFooter>
+            <lib-button style="margin-right: 8px;" [buttonDisabled]="isLoading" (click)="handleAsyncCancel()">取消</lib-button>
+            <lib-button color="primary" [buttonDisabled]="isLoading" (click)="handleAsyncOk()">确定</lib-button>
+          </div>
+        </lib-modal>
+      </div>
+      <div description>
+        点击确定后异步关闭对话框，例如提交表单。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

@@ -1,11 +1,36 @@
-<div class="modal-content">
+<div class="modal-container" *ngIf="visible" (click)="maskClick()">
+  <div class="modal-mask" *ngIf="!isServiceMode"></div>
+  <div 
+    #modalContent
+    class="modal-content" 
+    [ngStyle]="getModalStyle()"
+    [@modalAnimation]="animationState"
+    (@modalAnimation.done)="animationDone($event)"
+    (click)="$event.stopPropagation()">
+    <button *ngIf="closable" class="modal-close" (click)="close()">×</button>
+    
     <div class="modal-header">
-        <ng-content select="[modalHeader], modalHeader"></ng-content>
+      <!-- 优先使用headerContent，其次使用投影内容 -->
+      <ng-container *ngIf="headerContent">
+        <ng-container *ngTemplateOutlet="headerContent; context: contentContext || {}"></ng-container>
+      </ng-container>
+      <ng-content *ngIf="!headerContent" select="[modalHeader], modalHeader"></ng-content>
     </div>
-    <div class="modal-body">
-        <ng-content select="[modalBody], modalBody"></ng-content>
+    
+    <div #modalBody class="modal-body">
+      <!-- 优先使用bodyContent，其次使用投影内容 -->
+      <ng-container *ngIf="bodyContent">
+        <ng-container *ngTemplateOutlet="bodyContent; context: contentContext || {}"></ng-container>
+      </ng-container>
+      <ng-content *ngIf="!bodyContent" select="[modalBody], modalBody"></ng-content>
     </div>
+    
     <div class="modal-footer">
-        <ng-content select="[modalFooter], modalFooter"></ng-content>
+      <!-- 优先使用footerContent，其次使用投影内容 -->
+      <ng-container *ngIf="footerContent">
+        <ng-container *ngTemplateOutlet="footerContent; context: contentContext || {}"></ng-container>
+      </ng-container>
+      <ng-content *ngIf="!footerContent" select="[modalFooter], modalFooter"></ng-content>
     </div>
+  </div>
 </div>

@@ -19,6 +19,7 @@ import { DocCascaderComponent } from './doc-cascader/doc-cascader.component';
 import { DocTreeComponent } from './doc-tree/doc-tree.component';
 import { DocStructureTreeComponent } from './doc-structure-tree/doc-structure-tree.component';
 import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.component';
+import { DocModalComponent } from './doc-modal/doc-modal.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -41,7 +42,8 @@ import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.compon
     DocCascaderComponent,
     DocTreeComponent,
     DocStructureTreeComponent,
-    DocTreeSelectComponent
+    DocTreeSelectComponent,
+    DocModalComponent
   ],
   exports: [
     DocButtonComponent,
@@ -62,7 +64,8 @@ import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.compon
     DocCascaderComponent,
     DocTreeComponent,
     DocStructureTreeComponent,
-    DocTreeSelectComponent
+    DocTreeSelectComponent,
+    DocModalComponent
   ]
 })
 export class DocModule { }

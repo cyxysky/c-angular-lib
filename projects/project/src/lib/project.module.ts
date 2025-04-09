@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+// 服务
+export * from './modal/modal.service';
+export * from './overlay/overlay.service';
+export * from './utils/utils.service';
 // 指令
 import { WidgetDirective } from './directive/widget.directive';
 import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.directive';
@@ -68,7 +71,6 @@ export * from './slider/slider.component';
 export * from './popover/popover.component';
 export * from './cascader/cascader.component';
 export * from './modal/modal.component';
-
 @NgModule({
   declarations: [],
   imports: [
