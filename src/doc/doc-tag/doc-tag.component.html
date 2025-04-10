@@ -62,20 +62,46 @@
           style="margin-right: 8px; margin-bottom: 8px;">
         </lib-tag>
       </div>
-      
       <h4>自定义颜色</h4>
       <div>
         <lib-tag 
-          *ngFor="let color of customColors"
-          [tagContent]="color"
+          *ngFor="let color of customColors; let i = index"
+          [tagContent]="'自定义颜色' + (i+1)"
           [tagColor]="color"
           style="margin-right: 8px; margin-bottom: 8px;">
         </lib-tag>
       </div>
     </div>
     <div description>
-      我们提供了多种预设色彩的标签样式：primary、success、warning、danger。<br>
-      您也可以设置自定义颜色。
+      我们提供了多种预设色彩的标签样式：primary、pink、red、orange、yellow、green、blue、purple等。<br>
+      您也可以设置自定义颜色对象，通过指定背景色、文本色和边框色。
+    </div>
+  </app-doc-box>
+
+  <!-- 无边框标签 -->
+  <app-doc-box title="无边框标签" [sourceCode]="noBorderTagSource">
+    <div demo>
+      <lib-tag 
+        [tagContent]="'无边框标签'"
+        [tagBorder]="false"
+        style="margin-right: 8px;">
+      </lib-tag>
+      <lib-tag 
+        [tagContent]="'无边框彩色标签'"
+        [tagBorder]="false"
+        [tagColor]="'blue'"
+        style="margin-right: 8px;">
+      </lib-tag>
+      <lib-tag 
+        [tagContent]="'无边框可选择标签'"
+        [tagBorder]="false"
+        [tagCheckable]="true"
+        [(checked)]="noBorderChecked"
+        style="margin-right: 8px;">
+      </lib-tag>
+    </div>
+    <div description>
+      设置 tagBorder 属性为 false 可以创建无边框的标签。
     </div>
   </app-doc-box>
 

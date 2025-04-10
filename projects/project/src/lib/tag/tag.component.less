@@ -24,20 +24,6 @@
 @tag-active-opacity: 0.8;
 @tag-disabled-opacity: 0.6;
 @tag-disabled-events: none;
-@tag-border-transparent: transparent;
-
-// 默认颜色变量（从主题文件继承）
-@primary: #0054e9;
-@primary-contrast: #fff;
-@success: #2dd55b;
-@success-contrast: #000;
-@warning: #ffc409;
-@warning-contrast: #000;
-@danger: #c5000f;
-@danger-contrast: #fff;
-@light: #f4f5f8;
-@light-contrast: #000;
-@light-shade: #d7d8da;
 
 .lib-tag {
     display: @tag-display;
@@ -47,50 +33,21 @@
     font-size: @tag-font-size;
     line-height: @tag-line-height;
     white-space: @tag-white-space;
-    background-color: @light;
-    border: @tag-border-width @tag-border-style @light-shade;
     border-radius: @tag-border-radius;
+    border: @tag-border-width @tag-border-style transparent;
     cursor: @tag-cursor-default;
     transition: @tag-transition;
 
     &.lib-tag-checkable {
         cursor: @tag-cursor-pointer;
+
         &:hover {
             opacity: @tag-hover-opacity;
         }
+
         &:active {
             opacity: @tag-active-opacity;
         }
-    }
-
-    &.lib-tag-checked {
-        background-color: @primary;
-        color: @primary-contrast;
-        border-color: @tag-border-transparent;
-    }
-
-    &.lib-tag-has-color {
-        border-color: @tag-border-transparent;
-    }
-
-    &.lib-tag-primary {
-        background-color: @primary;
-        color: @primary-contrast;
-    }
-
-    &.lib-tag-success {
-        background-color: @success;
-        color: @success-contrast;
-    }
-
-    &.lib-tag-warning {
-        background-color: @warning;
-        color: @warning-contrast;
-    }
-
-    &.lib-tag-danger {
-        background-color: @danger;
-        color: @danger-contrast;
     }
 
     .lib-tag-close-icon {

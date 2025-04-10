@@ -11,7 +11,9 @@
         <div class="placeHolder" *ngIf="(!_data || (_data && _data.length === 0)) && !searchOnCompositionValue">
             {{ placeHolder }}
         </div>
-        <div class="singal-data" *ngIf="selectMode === 'single' && searchOnCompositionValue === ''"
+        <div 
+            *ngIf="selectMode === 'single' && searchOnCompositionValue === ''"
+            class="singal-data" 
             [ngClass]="{'singal-data-gray': modalState === 'open'}">
             <!-- 使用自定义模板 -->
             <ng-container *ngIf="optionLabelTemplate && _data">
@@ -106,9 +108,11 @@
                     <!-- 无分组数据 -->
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length === 0">
                         <div 
-                            *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn"
+                            *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn; let i = index"
                             (click)="selectUser(option[optionValue], isOptionDisabled(option))"
-                            class="option" 
+                            (mouseenter)="activeOptionIndex = i"
+                            class="option"
+                            [class.option-active]="activeOptionIndex === i"
                             [class.disabled]="isOptionDisabled(option) || (reachedMaxCount && !_data.includes(option[optionValue]))"
                             [class.hidden]="hideSelected && _data.includes(option[optionValue])"
                             [class.select-option]="_data.includes(option[optionValue])">
@@ -126,14 +130,16 @@
                     </ng-container>
                     <!-- 有分组数据 -->
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length > 0">
-                        <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn" class="option-group">
+                        <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn; let i = index" class="option-group">
                             <!-- 分组标题 -->
                             <div *ngIf="item.type === 'group'" class="group-title">{{ item.label }}</div>
                             <!-- 分组选项 -->
                             <div 
                                 *ngIf="item.type === 'option'"
                                 (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
+                                (mouseenter)="activeOptionIndex = i"
                                 class="option" 
+                                [class.option-active]="activeOptionIndex === i"
                                 [class.cursor]="(isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))) ? 'not-allowed' : 'pointer'"
                                 [class.disabled]="isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))"
                                 [class.select-option]="_data.includes(item.option[optionValue])">

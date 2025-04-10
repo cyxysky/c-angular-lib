@@ -5,6 +5,13 @@ import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 
+// 定义ColorType接口用于自定义颜色
+interface ColorType {
+  color: string;
+  background: string;
+  borderColor: string;
+}
+
 @Component({
   selector: 'app-doc-tag',
   standalone: true,
@@ -32,11 +39,20 @@ export class DocTagComponent implements OnInit {
     { content: '选项三', checked: false }
   ];
   
+  // 无边框标签
+  noBorderChecked = false;
+  
   // 预设颜色
-  presetColors: string[] = ['primary', 'success', 'warning', 'danger'];
+  presetColors: string[] = ['default', 'pink', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'cyan', 'gold', 'lime', 'magenta', 'volcano', 'geekblue'];
   
   // 自定义颜色
-  customColors: string[] = ['#f50', '#2db7f5', '#87d068', '#108ee9', '#7265e6'];
+  customColors: ColorType[] = [
+    { color: '#fff', background: '#f50', borderColor: '#f50' },
+    { color: '#fff', background: '#2db7f5', borderColor: '#2db7f5' },
+    { color: '#fff', background: '#87d068', borderColor: '#87d068' },
+    { color: '#fff', background: '#108ee9', borderColor: '#108ee9' },
+    { color: '#fff', background: '#7265e6', borderColor: '#7265e6' }
+  ];
   
   // 禁用标签
   disabledTag = true;
@@ -115,6 +131,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagComponent } from 'project';
 
+// 定义ColorType接口用于自定义颜色
+interface ColorType {
+  color: string;
+  background: string;
+  borderColor: string;
+}
+
 @Component({
   selector: 'app-color-tag-demo',
   standalone: true,
@@ -133,8 +156,8 @@ import { TagComponent } from 'project';
     <h4 style="margin-top: 16px;">自定义颜色</h4>
     <div>
       <lib-tag 
-        *ngFor="let color of customColors"
-        [tagContent]="color"
+        *ngFor="let color of customColors; let i = index"
+        [tagContent]="'自定义颜色' + (i+1)"
         [tagColor]="color"
         style="margin-right: 8px;">
       </lib-tag>
@@ -142,8 +165,47 @@ import { TagComponent } from 'project';
   \`,
 })
 export class TagComponent {
-  presetColors: string[] = ['primary', 'success', 'warning', 'danger'];
-  customColors: string[] = ['#f50', '#2db7f5', '#87d068', '#108ee9', '#7265e6'];
+  presetColors: string[] = ['primary', 'pink', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'cyan', 'gold', 'lime', 'magenta', 'volcano', 'geekblue'];
+  customColors: ColorType[] = [
+    { color: '#fff', background: '#f50', borderColor: '#f50' },
+    { color: '#fff', background: '#2db7f5', borderColor: '#2db7f5' },
+    { color: '#fff', background: '#87d068', borderColor: '#87d068' },
+    { color: '#fff', background: '#108ee9', borderColor: '#108ee9' },
+    { color: '#fff', background: '#7265e6', borderColor: '#7265e6' }
+  ];
+}`;
+
+  noBorderTagSource = `
+import { Component } from '@angular/core';
+import { TagComponent } from 'project';
+
+@Component({
+  selector: 'app-no-border-tag-demo',
+  standalone: true,
+  imports: [TagComponent],
+  template: \`
+    <lib-tag 
+      [tagContent]="'无边框标签'"
+      [tagBorder]="false"
+      style="margin-right: 8px;">
+    </lib-tag>
+    <lib-tag 
+      [tagContent]="'无边框彩色标签'"
+      [tagBorder]="false"
+      [tagColor]="'blue'"
+      style="margin-right: 8px;">
+    </lib-tag>
+    <lib-tag 
+      [tagContent]="'无边框可选择标签'"
+      [tagBorder]="false"
+      [tagCheckable]="true"
+      [(checked)]="noBorderChecked"
+      style="margin-right: 8px;">
+    </lib-tag>
+  \`,
+})
+export class TagComponent {
+  noBorderChecked = false;
 }`;
 
   disabledTagSource = `
@@ -206,8 +268,8 @@ export class TagComponent {
         },
         {
           name: 'tagColor',
-          description: '标签色彩，可选值: primary, success, warning, danger 或自定义色值',
-          type: 'string',
+          description: '标签色彩，可选值: primary, pink, red, orange, yellow, green, blue, purple等预设颜色或自定义ColorType对象',
+          type: 'string | ColorType',
           default: "'primary'"
         },
         {
@@ -221,6 +283,12 @@ export class TagComponent {
           description: '标签内容',
           type: 'string',
           default: "''"
+        },
+        {
+          name: 'tagBorder',
+          description: '标签是否显示边框',
+          type: 'boolean',
+          default: 'true'
         }
       ]
     },

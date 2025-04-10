@@ -560,7 +560,6 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   public hasVerticalLine(node: TreeNodeOptions, index: number): boolean {
     const parents = this.getParentNodes(node);
-    console.log(parents);
     // 如果没有父节点，或者index大于父节点数量，则显示连接线
     if (!parents.length || index >= parents.length - 1) {
       return true;

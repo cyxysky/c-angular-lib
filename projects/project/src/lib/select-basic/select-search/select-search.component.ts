@@ -77,7 +77,11 @@ export class SelectSearchComponent {
     this.searchInputWidthChange();
   }
 
-  onPaste(event: ClipboardEvent): void {
+  /**
+   * 粘贴
+   * @param event 事件
+   */
+  public onPaste(event: ClipboardEvent): void {
     this.paste.emit(event);
   }
 }

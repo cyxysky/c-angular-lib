@@ -39,7 +39,6 @@ import { InputComponent } from './input/input.component';
 import { SelectComponent } from './select/select.component';
 import { ButtonComponent } from './button/button.component';
 import { NumberInputComponent } from './number-input/number-input.component';
-import { TabsComponent } from './tabs/tabs.component';
 import { TagComponent } from './tag/tag.component';
 import { TreeSelectComponent } from './tree-select/tree-select.component';
 import { TreeComponent } from './tree/tree.component';
@@ -53,6 +52,8 @@ import { SliderComponent } from './slider/slider.component';
 import { PopoverComponent } from './popover/popover.component';
 import { CascaderComponent } from './cascader/cascader.component';
 import { ModalComponent } from './modal/modal.component';
+import { TabComponent } from './tabs/tab.component';
+import { TabsComponent } from './tabs/tabs.component';
 export * from './input/input.component';
 export * from './select/select.component';
 export * from './button/button.component';
@@ -71,6 +72,8 @@ export * from './slider/slider.component';
 export * from './popover/popover.component';
 export * from './cascader/cascader.component';
 export * from './modal/modal.component';
+export * from './tabs/tab.component';
+export * from './tabs/tabs.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -106,7 +109,9 @@ export * from './modal/modal.component';
     PopconfirmDirective,
     CascaderComponent,
     StructureTreeComponent,
-    ModalComponent
+    ModalComponent,
+    TabComponent,
+    TabsComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -140,7 +145,9 @@ export * from './modal/modal.component';
     PopconfirmDirective,
     CascaderComponent,
     StructureTreeComponent,
-    ModalComponent
+    ModalComponent,
+    TabComponent,
+    TabsComponent
   ]
 })
 export class ProjectModule { }

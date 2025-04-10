@@ -107,6 +107,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   private debouncedSearch: ((value: string) => void) | null = null;
   /** 扁平化的分组选项 */
   public flattenedGroupOptions: Array<{ type: 'group' | 'option', label?: string, option?: any }> = [];
+  /** 悬浮选项索引 */
+  public hoverKey: string = '';
+  /** 当前激活选项的索引 */
+  public activeOptionIndex: number = -1;
   //#endregion
 
   //#region 构造函数
@@ -144,6 +148,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   }
 
   ngOnDestroy() {
+    // 移除键盘事件监听
+    document.removeEventListener('keydown', this.onKeyboardNavigate);
+
     // 清理防抖函数
     if (this.debouncedSearch) {
       this.debouncedSearch = null;
@@ -406,6 +413,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 重置搜索状态
    */
   private resetSearchState(): void {
+    this.searchInput.clear();
     this.searchValue = '';
     this.searchOnCompositionValue = '';
     this.filteredOptions = [...this.optionList];
@@ -476,33 +484,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     }
   }
 
-  /**
-   * 处理键盘事件
-   */
-  public handleKeydown(event: KeyboardEvent): void {
-    // 退格键删除最后一个选项
-    if (event.key === 'Backspace' &&
-      this.searchValue === '' &&
-      this.modalState === 'open' &&
-      this.selectMode === 'multiple' &&
-      Array.isArray(this._data) &&
-      this._data.length > 0) {
-
-      event.preventDefault();
-      const lastItem = this._data[this._data.length - 1];
-      this.handleSelectionChange(lastItem, 'remove');
-      return;
-    }
-
-    // 回车创建标签
-    if (event.key === 'Enter' && this.tagMode) {
-      event.preventDefault();
-      this.createCustomTag(this.searchValue);
-      this.resetSearchState();
-    }
-  }
   //#endregion
-
   //#region 浮层操作
   /**
    * 打开弹窗
@@ -562,6 +544,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.overlayTemplate,
       this.viewContainerRef
     );
+
+    // 添加键盘事件监听
+    document.addEventListener('keydown', this.onKeyboardNavigate);
   }
 
   /**
@@ -573,6 +558,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.resetSearchState();
     // 移除激活样式
     this.renderer.removeClass(this._overlayOrigin.elementRef.nativeElement, 'active');
+    // 重置激活索引
+    this.activeOptionIndex = -1;
+    // 移除键盘事件监听
+    document.removeEventListener('keydown', this.onKeyboardNavigate);
     this.cdr.detectChanges();
 
     // 使用setTimeout确保CSS过渡动画有时间完成
@@ -637,6 +626,130 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   }
   public registerOnTouched(fn: any): void {
     this.onTouch = fn;
+  }
+  //#endregion
+
+  //#region 键盘导航方法
+  /**
+   * 添加键盘导航方法
+   */
+  private onKeyboardNavigate = (event: KeyboardEvent): void => {
+    if (this.modalState !== 'open') return;
+
+    const options = this.getFilteredOptionsWithHideSelected();
+    const hasGroups = this.getObjectKeys(this.optionsGroups).length > 0;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.navigateOption('down', options, hasGroups);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.navigateOption('up', options, hasGroups);
+        break;
+      case 'Enter':
+        event.preventDefault();
+        // 回车创建标签
+        if (this.tagMode) {
+          event.preventDefault();
+          this.createCustomTag(this.searchValue);
+          this.resetSearchState();
+        } else {
+          this.selectActiveOption(options, hasGroups);
+        }
+        break;
+      case 'Backspace':
+        if (this.searchValue === '' &&
+          this.modalState === 'open' &&
+          this.selectMode === 'multiple' &&
+          Array.isArray(this._data) &&
+          this._data.length > 0) {
+
+          event.preventDefault();
+          const lastItem = this._data[this._data.length - 1];
+          this.handleSelectionChange(lastItem, 'remove');
+          return;
+        }
+    }
+  };
+
+  /**
+   * 导航选项方法
+   */
+  private navigateOption(direction: 'up' | 'down', options: any[], hasGroups: boolean): void {
+    const totalOptions = options.length;
+    if (totalOptions === 0) return;
+
+    let newIndex = this.activeOptionIndex;
+
+    if (direction === 'down') {
+      newIndex = this.activeOptionIndex < totalOptions - 1 ? this.activeOptionIndex + 1 : 0;
+    } else {
+      newIndex = this.activeOptionIndex > 0 ? this.activeOptionIndex - 1 : totalOptions - 1;
+    }
+
+    // 处理分组情况，跳过分组标题
+    if (hasGroups) {
+      while (newIndex < totalOptions && options[newIndex].type === 'group') {
+        newIndex = direction === 'down' ? newIndex + 1 : newIndex - 1;
+
+        // 边界检查
+        if (newIndex >= totalOptions) newIndex = 0;
+        if (newIndex < 0) newIndex = totalOptions - 1;
+      }
+
+      // 检查选项是否被禁用
+      if (newIndex < totalOptions && options[newIndex].type === 'option') {
+        const option = options[newIndex].option;
+        if (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]))) {
+          // 如果当前选项被禁用，继续查找下一个
+          this.activeOptionIndex = newIndex;
+          this.navigateOption(direction, options, hasGroups);
+          return;
+        }
+      }
+    } else {
+      // 检查选项是否被禁用
+      const option = options[newIndex];
+      if (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]))) {
+        // 如果当前选项被禁用，继续查找下一个
+        this.activeOptionIndex = newIndex;
+        this.navigateOption(direction, options, hasGroups);
+        return;
+      }
+    }
+
+    this.activeOptionIndex = newIndex;
+    this.cdr.detectChanges();
+
+    // 滚动到可视区域
+    setTimeout(() => {
+      const activeElements = document.querySelectorAll('.option-active');
+      if (activeElements.length > 0) {
+        (activeElements[0] as HTMLElement).scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }, 0);
+  }
+
+  /**
+   * 选择当前活动选项
+   */
+  private selectActiveOption(options: any[], hasGroups: boolean): void {
+    if (this.activeOptionIndex < 0 || this.activeOptionIndex >= options.length) return;
+
+    const activeItem = options[this.activeOptionIndex];
+
+    if (hasGroups) {
+      if (activeItem.type === 'option' && !this.isOptionDisabled(activeItem.option)) {
+        this.selectUser(activeItem.option[this.optionValue], this.isOptionDisabled(activeItem.option));
+      }
+    } else {
+      this.selectUser(activeItem[this.optionValue], this.isOptionDisabled(activeItem));
+    }
   }
   //#endregion
 }

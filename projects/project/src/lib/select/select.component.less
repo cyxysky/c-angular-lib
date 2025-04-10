@@ -130,6 +130,10 @@
     display: inline-block;
 }
 
+.hover-options, .option-active {
+    background-color: @select-hover-bg-color;
+}
+
 // 通用选项样式混合
 .option-base() {
     padding: @select-option-list-padding;
@@ -141,7 +145,7 @@
     color: @select-text-color;
     border-radius: @select-option-border-radius;
     transition: @select-transition;
-    &:hover {
+    &:hover, &.option-active {
         background-color: @select-hover-bg-color;
     }
     &.disabled {
@@ -149,7 +153,7 @@
         cursor: not-allowed;
         pointer-events: all;
         background-color: transparent;
-        &:hover {
+        &:hover, &.option-active {
             background-color: transparent;
         }
     }

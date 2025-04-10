@@ -1,7 +1,72 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, input, output, booleanAttribute, model, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type TagColor = 'primary' | 'success' | 'warning' | 'danger' | string;
+export interface ColorType {
+  color: string;
+  background: string;
+  borderColor: string;
+}
+
+export const presetColors: Record<string, {default: ColorType, inverse: ColorType}> = {
+  default: {
+    default: { background: '#1890ff', color: '#fff', borderColor: '#1890ff' },
+    inverse: { background: '#fff', color: '#000', borderColor: '#d9d9d9' }
+  },
+  pink: {
+    default: { color: '#c41d7f', background: '#fff0f6', borderColor: '#ffadd2' },
+    inverse: { color: '#fff', background: '#eb2f96', borderColor: '#eb2f96' }
+  },
+  magenta: {
+    default: { color: '#c41d7f', background: '#fff0f6', borderColor: '#ffadd2' },
+    inverse: { color: '#fff', background: '#eb2f96', borderColor: '#eb2f96' }
+  },
+  red: {
+    default: { color: '#cf1322', background: '#fff1f0', borderColor: '#ffa39e' },
+    inverse: { color: '#fff', background: '#f5222d', borderColor: '#f5222d' }
+  },
+  volcano: {
+    default: { color: '#d4380d', background: '#fff2e8', borderColor: '#ffbb96' },
+    inverse: { color: '#fff', background: '#fa541c', borderColor: '#fa541c' }
+  },
+  orange: {
+    default: { color: '#d46b08', background: '#fff7e6', borderColor: '#ffd591' },
+    inverse: { color: '#fff', background: '#fa8c16', borderColor: '#fa8c16' }
+  },
+  yellow: {
+    default: { color: '#d4b106', background: '#feffe6', borderColor: '#fffb8f' },
+    inverse: { color: '#fff', background: '#fadb14', borderColor: '#fadb14' }
+  },
+  gold: {
+    default: { color: '#d48806', background: '#fffbe6', borderColor: '#ffe58f' },
+    inverse: { color: '#fff', background: '#faad14', borderColor: '#faad14' }
+  },
+  cyan: {
+    default: { color: '#08979c', background: '#e6fffb', borderColor: '#87e8de' },
+    inverse: { color: '#fff', background: '#13c2c2', borderColor: '#13c2c2' }
+  },
+  lime: {
+    default: { color: '#7cb305', background: '#fcffe6', borderColor: '#eaff8f' },
+    inverse: { color: '#fff', background: '#a0d911', borderColor: '#a0d911' }
+  },
+  green: {
+    default: { color: '#389e0d', background: '#f6ffed', borderColor: '#b7eb8f' },
+    inverse: { color: '#fff', background: '#52c41a', borderColor: '#52c41a' }
+  },
+  blue: {
+    default: { color: '#096dd9', background: '#e6f7ff', borderColor: '#91d5ff' },
+    inverse: { color: '#fff', background: '#1890ff', borderColor: '#1890ff' }
+  },
+  geekblue: {
+    default: { color: '#1d39c4', background: '#f0f5ff', borderColor: '#adc6ff' },
+    inverse: { color: '#fff', background: '#2f54eb', borderColor: '#2f54eb' }
+  },
+  purple: {
+    default: { color: '#531dab', background: '#f9f0ff', borderColor: '#d3adf7' },
+    inverse: { color: '#fff', background: '#722ed1', borderColor: '#722ed1' }
+  }
+}
+
+export type TagColor = 'primary' | 'success' | 'warning' | 'danger' | 'pink' | 'magenta' | 'red' | 'volcano' | 'orange' | 'yellow' | 'gold' | 'cyan' | 'lime' | 'green' | 'blue' | 'geekblue' | 'purple' | string | ColorType;
 
 @Component({
   selector: 'lib-tag',
@@ -17,7 +82,7 @@ export class TagComponent {
   /** 标签是否可选中 */
   checkable = input(false, { transform: booleanAttribute, alias: 'tagCheckable' });
   /** 标签色彩，可选值: primary, success, warning, danger 或自定义色值 */
-  color = input<TagColor>('primary', { alias: 'tagColor' });
+  color = input<TagColor | ColorType>('primary', { alias: 'tagColor' });
   /** 标签是否禁用 */
   disabled = input(false, { transform: booleanAttribute, alias: 'tagDisabled' });
   /** 标签内容 */
@@ -28,29 +93,25 @@ export class TagComponent {
   close = output<string>();
   /** 点击标签时的事件 */
   checkedChange = output<boolean>();
-
-  // 使用 computed 替代旧的方法
-  isPresetColor = computed(() => {
-    return ['primary', 'success', 'warning', 'danger'].indexOf(this.color() || '') !== -1;
-  });
-
-  // 使用 computed 替代 updateClassMap
-  tagCustomClass = computed(() => {
-    return {
-      [`lib-tag-${this.color()}`]: this.isPresetColor(),
-    };
-  });
-
-  // 使用 computed 替代 updateStyleMap
+  /** 标签是否显示边框 */
+  border = input(true, { transform: booleanAttribute, alias: 'tagBorder' });
+  
+  /** 获取当前标签样式 */
   tagStyle = computed(() => {
-    if (this.color() && !this.isPresetColor()) {
-      return {
-        backgroundColor: this.color(),
-        color: '#fff'
-      };
+    const colorValue = this.color();
+    const isChecked = this.checked();
+    // 如果color是对象类型，直接使用自定义颜色
+    if (typeof colorValue === 'object') {
+      return colorValue;
     }
-    return {};
+    // 如果是预设颜色
+    if (typeof colorValue === 'string' && presetColors[colorValue]) {
+      // 选中状态使用inverse颜色
+      return isChecked && this.checkable() ? presetColors[colorValue].inverse : presetColors[colorValue].default;
+    }
+    return isChecked && this.checkable() ? presetColors['default'].inverse : presetColors['default'].default;
   });
+  
 
   closeTag(e: MouseEvent): void {
     e.stopPropagation();
@@ -58,7 +119,7 @@ export class TagComponent {
       this.close.emit('close');
     }
   }
-
+  
   handleClick(): void {
     if (this.checkable() && !this.disabled()) {
       const newValue = !this.checked();
