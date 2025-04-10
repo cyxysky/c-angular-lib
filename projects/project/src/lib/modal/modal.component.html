@@ -1,5 +1,5 @@
 <div class="modal-container" *ngIf="visible" (click)="maskClick()">
-  <div class="modal-mask" *ngIf="!isServiceMode"></div>
+  <div class="modal-mask" [@maskAnimation]="animationState"></div>
   <div 
     #modalContent
     class="modal-content" 

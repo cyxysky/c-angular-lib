@@ -12,14 +12,24 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     trigger('modalAnimation', [
       state('void', style({
         opacity: 0,
-        transform: 'scale(0.7)'
+        transform: 'scale(0.4)'
       })),
       state('visible', style({
         opacity: 1,
         transform: 'scale(1)'
       })),
       transition('void => visible', animate('150ms cubic-bezier(0, 0, 0.2, 1)')),
-      transition('visible => void', animate('100ms cubic-bezier(0.4, 0, 0.2, 1)'))
+      transition('visible => void', animate('150ms cubic-bezier(0.4, 0, 0.2, 1)'))
+    ]),
+    trigger('maskAnimation', [
+      state('void', style({
+        opacity: 0,
+      })),
+      state('visible', style({
+        opacity: 1,
+      })),
+      transition('void => visible', animate('150ms cubic-bezier(0, 0, 0.2, 1)')),
+      transition('visible => void', animate('150ms cubic-bezier(0.4, 0, 0.2, 1)'))
     ])
   ]
 })
@@ -29,25 +39,25 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   @Input() height: string | number = 'auto';
   @Input() zIndex: number = 1000;
   @Input() closable: boolean = true;
+  @Input() top: string = '100px';
   @Input() centered: boolean = false;
   @Input() maskClosable: boolean = true;
-  @Input() isServiceMode: boolean = false;
   @Input() headerContent: TemplateRef<any> | null = null;
   @Input() bodyContent: TemplateRef<any> | null = null;
   @Input() footerContent: TemplateRef<any> | null = null;
   @Input() contentContext: any = null;
   @Input() drag: boolean = false;
-  
+
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() afterOpen = new EventEmitter<void>();
   @Output() afterClose = new EventEmitter<void>();
-  
+
   @ViewChild('modalContent') modalContentRef!: ElementRef;
   @ViewChild('modalBody') modalBodyRef!: ElementRef;
   @ViewChild('modalHeader') modalHeaderRef!: ElementRef;
-  
+
   animationState: 'void' | 'visible' = 'void';
-  
+
   isDragging: boolean = false;
   dragStartX: number = 0;
   dragStartY: number = 0;
@@ -55,44 +65,46 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   transformY: number = 0;
   initialTransformX: number = 0;
   initialTransformY: number = 0;
-  
-  constructor(private renderer: Renderer2, private cd: ChangeDetectorRef) {}
-  
+
+  constructor(private renderer: Renderer2, private cd: ChangeDetectorRef) { }
+
   ngAfterViewInit(): void {
     this.updateAnimationState();
     this.cd.detectChanges();
   }
-  
+
   ngOnChanges(): void {
     this.updateAnimationState();
     if (this.visible) {
-      setTimeout(() => this.afterOpen.emit(), 0);
       if (this.drag) {
         this.resetDragPosition();
       }
     }
   }
-  
+
   ngOnDestroy(): void {
     // 清理工作
   }
-  
+
   updateAnimationState(): void {
     this.animationState = this.visible ? 'visible' : 'void';
   }
-  
+
   close(): void {
-    this.visible = false;
-    this.visibleChange.emit(false);
-    this.afterClose.emit();
+    this.animationState = 'void';
+    let timer = setTimeout(() => {
+      this.visible = false;
+      this.visibleChange.emit(false);
+      clearTimeout(timer);
+    }, 150);
   }
-  
+
   maskClick(): void {
     if (this.maskClosable) {
       this.close();
     }
   }
-  
+
   animationDone(event: any): void {
     if (event.toState === 'visible') {
       this.afterOpen.emit();
@@ -100,28 +112,28 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       this.afterClose.emit();
     }
   }
-  
+
   getModalStyle(): object {
     const style: any = {
       width: typeof this.width === 'number' ? `${this.width}px` : this.width,
       height: typeof this.height === 'number' ? `${this.height}px` : this.height,
       zIndex: this.zIndex
     };
-    
+
     if (this.centered) {
       style.marginTop = 'auto';
       style.marginBottom = 'auto';
     } else {
-      style.marginTop = '100px';
+      style.marginTop = this.top;
     }
 
     if (this.drag) {
       style.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
     }
-    
+
     return style;
   }
-  
+
   onDragStart(event: MouseEvent): void {
     if (this.drag) {
       this.isDragging = true;
@@ -130,7 +142,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       event.preventDefault();
     }
   }
-  
+
   @HostListener('document:mousemove', ['$event'])
   onDragMove(event: MouseEvent): void {
     if (this.isDragging && this.drag) {
@@ -143,12 +155,12 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       this.cd.detectChanges();
     }
   }
-  
+
   @HostListener('document:mouseup')
   onDragEnd(): void {
     this.isDragging = false;
   }
-  
+
   resetDragPosition(): void {
     this.transformX = 0;
     this.transformY = 0;

@@ -30,6 +30,8 @@ export interface ModalOptions {
   footerContent?: TemplateRef<any>;
   /** 内容 */
   bodyContent?: TemplateRef<any> | Component | any;
+  /** 模态框顶部位置 */
+  top?: string;
 }
 
 @Injectable({
@@ -78,7 +80,7 @@ export class ModalService {
         .centerHorizontally()
         .centerVertically(),
       scrollStrategy: this.overlay.scrollStrategies.block(),
-      hasBackdrop: true,
+      hasBackdrop: false,
       backdropClass: 'cdk-overlay-dark-backdrop'
     });
     
@@ -107,7 +109,7 @@ export class ModalService {
     modalInstance.closable = modalOptions.closable!;
     modalInstance.centered = modalOptions.centered!;
     modalInstance.maskClosable = modalOptions.maskClosable!;
-    modalInstance.isServiceMode = true;
+    modalInstance.top = modalOptions.top!;
     
     // 设置内容
     modalInstance.bodyContent = modalOptions.bodyContent || null;
@@ -131,7 +133,7 @@ export class ModalService {
     // 点击背景关闭
     if (modalOptions.maskClosable) {
       overlayRef.backdropClick().subscribe(() => {
-        modalInstance.close();
+        this.closeModal(modalId);
       });
     }
     
@@ -155,15 +157,9 @@ export class ModalService {
     const instance = this.modalInstances.get(modalId);
     if (instance) {
       const { overlayRef, componentRef } = instance;
-      
-      // 先设置可见性为false触发动画
       componentRef.instance.visible = false;
-      
-      // 延迟销毁，等待动画完成
-      setTimeout(() => {
-        overlayRef.dispose();
-        this.modalInstances.delete(modalId);
-      }, 200);
+      overlayRef.dispose();
+      this.modalInstances.delete(modalId);
     }
   }
   
