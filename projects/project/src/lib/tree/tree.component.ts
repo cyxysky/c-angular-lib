@@ -86,6 +86,8 @@ export class TreeComponent implements OnInit, OnChanges {
   @Input({ alias: 'treeDefaultCheckedKeys' }) defaultCheckedKeys: string[] = [];
   /** 默认展开的节点 */
   @Input({ alias: 'treeDefaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
+  /** 节点唯一标识名称 */
+  @Input({ alias: 'treeKeyName' }) keyName: string = 'key';
   /** 节点模板 */
   @Input({ alias: 'treeTemplate' }) treeTemplate: TemplateRef<{ $implicit: TreeNodeOptions, isLast: boolean, level: number }> | null = null;
   /** 是否展示动画 */
@@ -236,16 +238,16 @@ export class TreeComponent implements OnInit, OnChanges {
           level
         });
         if (parent) {
-          this.virtualFlattenNodesParentMap.set(node.key, parent.key);
+          this.virtualFlattenNodesParentMap.set(node[this.keyName], parent[this.keyName]);
         }
       }
       // 将多个条件判断合并成一个循环
-      this.flattenNodes.set(node.key, node);
-      node.expanded && this.expandedKeys.add(node.key);
-      node.selected && this.selectedKeys.add(node.key);
-      node.checked && this.checkedKeys.add(node.key);
-      node.indeterminate && this.indeterminateKeys.add(node.key);
-      parent && this.flattenNodesParentMap.set(node.key, parent.key);
+      this.flattenNodes.set(node[this.keyName], node);
+      node.expanded && this.expandedKeys.add(node[this.keyName]);
+      node.selected && this.selectedKeys.add(node[this.keyName]);
+      node.checked && this.checkedKeys.add(node[this.keyName]);
+      node.indeterminate && this.indeterminateKeys.add(node[this.keyName]);
+      parent && this.flattenNodesParentMap.set(node[this.keyName], parent[this.keyName]);
       // 简化子节点处理逻辑
       if (node.children?.length) {
         this.flattenTreeNodes(node.children, level + 1, node);
@@ -271,7 +273,7 @@ export class TreeComponent implements OnInit, OnChanges {
   private traverseNodesForExpandAll(nodes: TreeNodeOptions[]): void {
     nodes.forEach(node => {
       if (!node.isLeaf && node.children && node.children.length) {
-        this.expandedKeys.add(node.key);
+        this.expandedKeys.add(node[this.keyName]);
         node.expanded = true;
         this.traverseNodesForExpandAll(node.children);
       }
@@ -297,11 +299,11 @@ export class TreeComponent implements OnInit, OnChanges {
     if (node.expanded) {
       // 收起：先更新状态，保持DOM渲染直到动画结束
       node.expanded = false;
-      this.expandedKeys.delete(node.key);
+      this.expandedKeys.delete(node[this.keyName]);
       // nodeRenderMap保持不变，等动画结束后再移除
     } else {
       // 展开：先添加到渲染集合，再立即更新状态
-      this.expandedKeys.add(node.key);
+      this.expandedKeys.add(node[this.keyName]);
       node.expanded = true;
     }
     this.cdr.detectChanges();
@@ -316,7 +318,7 @@ export class TreeComponent implements OnInit, OnChanges {
   onAnimationDone(event: AnimationEvent, node: TreeNodeOptions): void {
     // 仅当收起动画完成时，从渲染集合中移除
     if (event.toState === 'collapsed' && !node.expanded) {
-      this.expandedKeys.delete(node.key);
+      this.expandedKeys.delete(node[this.keyName]);
       this.cdr.detectChanges();
     }
   }
@@ -335,12 +337,12 @@ export class TreeComponent implements OnInit, OnChanges {
     !this.multiple && this.utilsService.traverseAllNodes(this.treeData, (node: TreeNodeOptions) => {
       node.selected && (node.selected = false);
     });
-    if (this.selectedKeys.has(node.key)) {
-      this.selectedKeys.delete(node.key)
+    if (this.selectedKeys.has(node[this.keyName])) {
+      this.selectedKeys.delete(node[this.keyName])
       node.selected = false;
     } else {
       !this.multiple && this.selectedKeys.clear();
-      this.selectedKeys.add(node.key);
+      this.selectedKeys.add(node[this.keyName]);
       node.selected = true;
     }
     this.cdr.detectChanges();
@@ -359,11 +361,11 @@ export class TreeComponent implements OnInit, OnChanges {
     node.checked = checked;
     node.indeterminate = false;
     if (checked) {
-      this.checkedKeys.add(node.key);
-      this.indeterminateKeys.delete(node.key);
+      this.checkedKeys.add(node[this.keyName]);
+      this.indeterminateKeys.delete(node[this.keyName]);
     } else {
-      this.checkedKeys.delete(node.key);
-      this.indeterminateKeys.delete(node.key);
+      this.checkedKeys.delete(node[this.keyName]);
+      this.indeterminateKeys.delete(node[this.keyName]);
     }
     this.updateChildrenCheckState(node, checked);
     this.updateParentCheckState(node);
@@ -383,11 +385,11 @@ export class TreeComponent implements OnInit, OnChanges {
           child.checked = checked;
           child.indeterminate = false;
           if (checked) {
-            this.checkedKeys.add(child.key);
-            this.indeterminateKeys.delete(child.key);
+            this.checkedKeys.add(child[this.keyName]);
+            this.indeterminateKeys.delete(child[this.keyName]);
           } else {
-            this.checkedKeys.delete(child.key);
-            this.indeterminateKeys.delete(child.key);
+            this.checkedKeys.delete(child[this.keyName]);
+            this.indeterminateKeys.delete(child[this.keyName]);
           }
           this.updateChildrenCheckState(child, checked);
         }
@@ -400,7 +402,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 
    */
   public updateParentCheckState(node: TreeNodeOptions): void {
-    let parentKey = this.isVirtualScroll ? this.virtualFlattenNodesParentMap.get(node.key) : this.flattenNodesParentMap.get(node.key);
+    let parentKey = this.isVirtualScroll ? this.virtualFlattenNodesParentMap.get(node[this.keyName]) : this.flattenNodesParentMap.get(node[this.keyName]);
     if (!parentKey) return;
     const parent = this.flattenNodes.get(parentKey);
     if (!parent?.children) return;
@@ -416,22 +418,22 @@ export class TreeComponent implements OnInit, OnChanges {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = false;
         parent.indeterminate = false;
-        this.checkedKeys.delete(parent.key);
-        this.indeterminateKeys.delete(parent.key);
+        this.checkedKeys.delete(parent[this.keyName]);
+        this.indeterminateKeys.delete(parent[this.keyName]);
       }
     } else if (checkedChildren === totalEnabledChildren) {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = true;
         parent.indeterminate = false;
-        this.checkedKeys.add(parent.key);
-        this.indeterminateKeys.delete(parent.key);
+        this.checkedKeys.add(parent[this.keyName]);
+        this.indeterminateKeys.delete(parent[this.keyName]);
       }
     } else {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = false;
         parent.indeterminate = true;
-        this.checkedKeys.delete(parent.key);
-        this.indeterminateKeys.add(parent.key);
+        this.checkedKeys.delete(parent[this.keyName]);
+        this.indeterminateKeys.add(parent[this.keyName]);
       }
     }
     this.updateParentCheckState(parent);
@@ -529,12 +531,12 @@ export class TreeComponent implements OnInit, OnChanges {
     const parentNodes = this.getParentNodes(node);
     parentNodes.forEach(pathNode => {
       if (!pathNode.isLeaf && pathNode.children && pathNode.children.length) {
-        this.expandedKeys.add(pathNode.key);
+        this.expandedKeys.add(pathNode[this.keyName]);
         pathNode.expanded = true;
       }
     });
     if (expandSelf && !node.isLeaf && node.children && node.children.length) {
-      this.expandedKeys.add(node.key);
+      this.expandedKeys.add(node[this.keyName]);
       node.expanded = true;
     }
   }
@@ -558,23 +560,16 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   public hasVerticalLine(node: TreeNodeOptions, index: number): boolean {
     const parents = this.getParentNodes(node);
+    console.log(parents);
     // 如果没有父节点，或者index大于父节点数量，则显示连接线
-    if (!parents.length || index >= parents.length) {
+    if (!parents.length || index >= parents.length - 1) {
       return true;
     }
-    // 从当前层级往上遍历每一层
-    for (let i = parents.length - 1; i >= 0; i--) {
-      const parent = parents[i];
-      // 如果当前检查的缩进层级对应的父节点
-      if (parents.length - 1 - i === index) {
-        // 检查该父节点是否为其父节点的最后一个子节点
-        const parentOfParent = i > 0 ? parents[i - 1] : null;
-        if (parentOfParent && parentOfParent.children) {
-          // 如果是最后一个子节点，则不显示连接线
-          if (parentOfParent.children[parentOfParent.children.length - 1].key === parent.key) {
-            return false;
-          }
-        }
+    let nowParent = parents[index + 1];
+    let parentParent = parents[index];
+    if (nowParent && parentParent && parentParent.children) {
+      if (parentParent.children[parentParent.children.length - 1][this.keyName] === nowParent[this.keyName]) {
+        return false;
       }
     }
     return true;
@@ -594,7 +589,7 @@ export class TreeComponent implements OnInit, OnChanges {
         findParents(parentNode);
       }
     };
-    findParents(node.key);
+    findParents(node[this.keyName]);
     let parents: TreeNodeOptions[] = [];
     parentsKey.forEach(key => {
       const parent = this.flattenNodes.get(key);
@@ -620,7 +615,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @returns 可见的虚拟节点
    */
   getVisibleVirtualNodes(): Array<any> {
-    return !this.flattenVirtualNodes?.length ? [] : this.flattenVirtualNodes.filter(item => item.node && this.isNodeVisible(item.node.key));
+    return !this.flattenVirtualNodes?.length ? [] : this.flattenVirtualNodes.filter(item => item.node && this.isNodeVisible(item.node[this.keyName]));
   }
 
   /**

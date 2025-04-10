@@ -55,7 +55,7 @@
         >
           <ng-container *ngTemplateOutlet="iconTemplate || defaultIconTpl; context: { $implicit: node, origin: node }"></ng-container>
           <ng-template #defaultIconTpl>
-            <i class="tree-icon" [ngClass]="node.icon || (node.isLeaf ? 'file-icon' : (expandedKeys.has(node.key) ? 'folder-open-icon' : 'folder-icon'))"></i>
+            <i class="tree-icon" [ngClass]="node.icon || (node.isLeaf ? 'file-icon' : (expandedKeys.has(node[keyName]) ? 'folder-open-icon' : 'folder-icon'))"></i>
           </ng-template>
         </span>
         <!-- 节点内容 -->
@@ -72,7 +72,7 @@
       </div>
 
       <!-- 子节点递归 - 树节点模板中 -->
-      <div class="lib-tree-children" *ngIf="node.children && node.children.length && expandedKeys.has(node.key)" @expandCollapse
+      <div class="lib-tree-children" *ngIf="node.children && node.children.length && expandedKeys.has(node[keyName])" @expandCollapse
            (@expandCollapse.done)="onAnimationDone($event, node)">
         <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
       </div>

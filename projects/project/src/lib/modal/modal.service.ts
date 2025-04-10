@@ -1,41 +1,10 @@
-import { Injectable, Injector, Type, TemplateRef, ComponentRef, Inject } from '@angular/core';
+import { Injectable, Injector, Type, TemplateRef, ComponentRef, Inject, Component } from '@angular/core';
 import { OverlayService } from '../overlay/overlay.service';
 import { ModalComponent } from './modal.component';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { DOCUMENT } from '@angular/common';
 
-/**
- * 模态框配置项
- * 
- * 使用方法:
- * ```html
- * <ng-template #modalContent>
- *   <div class="modal-header">
- *     <h3>标题</h3>
- *   </div>
- *   <div class="modal-body">
- *     <p>内容</p>
- *   </div>
- *   <div class="modal-footer">
- *     <button>确定</button>
- *   </div>
- * </ng-template>
- * ```
- * 
- * ```typescript
- * @ViewChild('modalContent') modalContent: TemplateRef<any>;
- * 
- * constructor(private modalService: ModalService) {}
- * 
- * openModal() {
- *   this.modalService.create(this.modalContent, {
- *     width: '500px',
- *     centered: true
- *   });
- * }
- * ```
- */
 export interface ModalOptions {
   /** 模态框宽度 */
   width?: string | number;
@@ -59,6 +28,8 @@ export interface ModalOptions {
   headerContent?: TemplateRef<any>;
   /** 底部内容 */
   footerContent?: TemplateRef<any>;
+  /** 内容 */
+  bodyContent?: TemplateRef<any> | Component | any;
 }
 
 @Injectable({
@@ -87,7 +58,7 @@ export class ModalService {
    * @param options 模态框配置
    * @returns 模态框ID，可用于关闭模态框
    */
-  create(content: TemplateRef<any>, options: ModalOptions = {}): string {
+  create(options: ModalOptions = {}): string {
     const modalId = `modal-${this.modalCounter++}`;
     
     const modalOptions: ModalOptions = {
@@ -139,7 +110,7 @@ export class ModalService {
     modalInstance.isServiceMode = true;
     
     // 设置内容
-    modalInstance.bodyContent = content;
+    modalInstance.bodyContent = modalOptions.bodyContent || null;
     modalInstance.headerContent = modalOptions.headerContent || null;
     modalInstance.footerContent = modalOptions.footerContent || null;
     modalInstance.contentContext = { $implicit: modalOptions.data };

@@ -57,7 +57,15 @@ export class DocTreeComponent {
               ]
             }
           ]
-        }
+        },
+        {
+          key: '0-2',
+          title: '子节点1-3, key: 0-2',
+        },
+        {
+          key: '0-3',
+          title: '子节点1-4, key: 0-3',
+        },
       ]
     },
     {

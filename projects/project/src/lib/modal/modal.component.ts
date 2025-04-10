@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
@@ -23,7 +23,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ])
   ]
 })
-export class ModalComponent implements AfterViewInit {
+export class ModalComponent implements AfterViewInit, OnDestroy {
   @Input() visible: boolean = false;
   @Input() width: string | number = '520px';
   @Input() height: string | number = 'auto';
@@ -36,6 +36,7 @@ export class ModalComponent implements AfterViewInit {
   @Input() bodyContent: TemplateRef<any> | null = null;
   @Input() footerContent: TemplateRef<any> | null = null;
   @Input() contentContext: any = null;
+  @Input() drag: boolean = false;
   
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() afterOpen = new EventEmitter<void>();
@@ -43,8 +44,17 @@ export class ModalComponent implements AfterViewInit {
   
   @ViewChild('modalContent') modalContentRef!: ElementRef;
   @ViewChild('modalBody') modalBodyRef!: ElementRef;
+  @ViewChild('modalHeader') modalHeaderRef!: ElementRef;
   
   animationState: 'void' | 'visible' = 'void';
+  
+  isDragging: boolean = false;
+  dragStartX: number = 0;
+  dragStartY: number = 0;
+  transformX: number = 0;
+  transformY: number = 0;
+  initialTransformX: number = 0;
+  initialTransformY: number = 0;
   
   constructor(private renderer: Renderer2, private cd: ChangeDetectorRef) {}
   
@@ -57,7 +67,14 @@ export class ModalComponent implements AfterViewInit {
     this.updateAnimationState();
     if (this.visible) {
       setTimeout(() => this.afterOpen.emit(), 0);
+      if (this.drag) {
+        this.resetDragPosition();
+      }
     }
+  }
+  
+  ngOnDestroy(): void {
+    // 清理工作
   }
   
   updateAnimationState(): void {
@@ -97,7 +114,45 @@ export class ModalComponent implements AfterViewInit {
     } else {
       style.marginTop = '100px';
     }
+
+    if (this.drag) {
+      style.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
+    }
     
     return style;
+  }
+  
+  onDragStart(event: MouseEvent): void {
+    if (this.drag) {
+      this.isDragging = true;
+      this.dragStartX = event.clientX;
+      this.dragStartY = event.clientY;
+      event.preventDefault();
+    }
+  }
+  
+  @HostListener('document:mousemove', ['$event'])
+  onDragMove(event: MouseEvent): void {
+    if (this.isDragging && this.drag) {
+      const deltaX = event.clientX - this.dragStartX;
+      const deltaY = event.clientY - this.dragStartY;
+      this.transformX = this.transformX + deltaX;
+      this.transformY = this.transformY + deltaY;
+      this.dragStartX = event.clientX;
+      this.dragStartY = event.clientY;
+      this.cd.detectChanges();
+    }
+  }
+  
+  @HostListener('document:mouseup')
+  onDragEnd(): void {
+    this.isDragging = false;
+  }
+  
+  resetDragPosition(): void {
+    this.transformX = 0;
+    this.transformY = 0;
+    this.initialTransformX = 0;
+    this.initialTransformY = 0;
   }
 }

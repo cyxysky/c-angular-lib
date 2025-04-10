@@ -52,11 +52,12 @@ export class DocModalComponent implements AfterViewInit {
     }
     
     // 使用全局Overlay服务创建模态框
-    this.serviceModalId = this.modalService.create(this.serviceModalBody, {
+    this.serviceModalId = this.modalService.create({
       width: '500px',
       centered: true,
       headerContent: this.serviceModalHeader,
       footerContent: this.serviceModalFooter,
+      bodyContent: this.serviceModalBody,
       afterOpen: () => console.log('Service modal opened'),
       afterClose: () => console.log('Service modal closed')
     });
