@@ -1,0 +1,155 @@
+// 主题变量
+@primary-color: #1890ff;
+@heading-color: rgba(0, 0, 0, 0.85);
+@text-color: rgba(0, 0, 0, 0.65);
+@text-color-secondary: rgba(0, 0, 0, 0.45);
+@disabled-color: rgba(0, 0, 0, 0.25);
+@border-color-base: #d9d9d9;
+@border-color-split: #f0f0f0;
+@border-radius-base: 2px;
+@box-shadow-base: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+// Tabs样式
+.lib-tabs {
+  display: flex;
+  overflow: hidden;
+  &-top, &-bottom {
+    flex-direction: column;
+  }
+  &-left, &-right {
+    flex-direction: row;
+  }
+  &-left {
+    .lib-tabs-nav {
+      flex-direction: column;
+      margin-right: 16px;
+    }
+    .lib-tabs-ink-bar {
+      right: 0;
+      left: auto;
+      width: 2px;
+      height: auto;
+    }
+  }
+  &-right {
+    .lib-tabs-nav {
+      flex-direction: column;
+      order: 1;
+      margin-left: 16px;
+    }
+    .lib-tabs-ink-bar {
+      right: auto;
+      left: 0;
+      width: 2px;
+      height: auto;
+    }
+  }
+  &-bottom {
+    .lib-tabs-nav {
+      order: 1;
+      margin-top: 16px;
+      margin-bottom: 0;
+    }
+    .lib-tabs-ink-bar {
+      top: 0;
+      bottom: auto;
+    }
+  }
+  &-nav {
+    position: relative;
+    display: flex;
+    flex: none;
+    margin: 0 0 16px 0;
+    &-list {
+      display: flex;
+      flex: auto;
+      align-items: center;
+      transition: transform 0.3s;
+    }
+    &-centered {
+      .lib-tabs-nav-list {
+        justify-content: center;
+      }
+    }
+  }
+  &-tab {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin-right: 32px;
+    padding: 12px 0;
+    font-size: 14px;
+    background: transparent;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    &:last-of-type {
+      margin-right: 0;
+    }
+    &-btn {
+      outline: none;
+      transition: all 0.3s;
+    }
+    &-active &-btn {
+      color: @primary-color;
+      font-weight: 500;
+    }
+    &-disabled {
+      color: @disabled-color;
+      cursor: not-allowed;
+    }
+  }
+  &-ink-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background-color: @primary-color;
+    transform-origin: 0 0;
+    transition: transform 0.3s;
+  }
+  &-card {
+    .lib-tabs-tab {
+      margin-right: 2px;
+      padding: 8px 16px;
+      background: #fafafa;
+      border: 1px solid @border-color-base;
+      border-radius: @border-radius-base @border-radius-base 0 0;
+      transition: all 0.3s;
+      &-active {
+        background: #fff;
+        border-bottom-color: #fff;
+      }
+    }
+    .lib-tabs-ink-bar {
+      display: none;
+    }
+  }
+  &-small {
+    .lib-tabs-tab {
+      padding: 8px 0;
+      font-size: 12px;
+    }
+  }
+  &-large {
+    .lib-tabs-tab {
+      padding: 16px 0;
+      font-size: 16px;
+    }
+  }
+  &-content {
+    display: flex;
+    width: 100%;
+  }
+  &-tabpane {
+    flex: none;
+    width: 100%;
+    &-animated {
+      transition: all 0.3s;
+    }
+    &:not(&-active) {
+      display: none;
+    }
+  }
+}

@@ -136,16 +136,13 @@ export class ModalService {
         this.closeModal(modalId);
       });
     }
-    
     // 显示模态框
     modalInstance.visible = true;
-    
     // 存储实例
     this.modalInstances.set(modalId, {
       overlayRef,
       componentRef
     });
-    
     return modalId;
   }
   
@@ -157,9 +154,14 @@ export class ModalService {
     const instance = this.modalInstances.get(modalId);
     if (instance) {
       const { overlayRef, componentRef } = instance;
-      componentRef.instance.visible = false;
-      overlayRef.dispose();
-      this.modalInstances.delete(modalId);
+      componentRef.instance.animationState = 'void';
+      console.log(componentRef.instance.animationState);
+      let timer = setTimeout(() => {
+        componentRef.instance.visible = false;
+        overlayRef.dispose();
+        this.modalInstances.delete(modalId);
+        clearTimeout(timer);
+      }, 150);
     }
   }
   
@@ -169,7 +171,6 @@ export class ModalService {
   closeAllModals(): void {
     this.modalInstances.forEach(({ componentRef }, modalId) => {
       componentRef.instance.visible = false;
-      
       setTimeout(() => {
         this.closeModal(modalId);
       }, 200);

@@ -1,1 +1,21 @@
-<p>tabs works!</p>
+<div class="lib-tabs" [class.lib-tabs-top]="tabPosition === 'top'" [class.lib-tabs-bottom]="tabPosition === 'bottom'" [class.lib-tabs-left]="tabPosition === 'left'" [class.lib-tabs-right]="tabPosition === 'right'" [class.lib-tabs-card]="type === 'card'" [class.lib-tabs-small]="size === 'small'" [class.lib-tabs-large]="size === 'large'">
+  <!-- Tab导航区域 -->
+  <div class="lib-tabs-nav" [class.lib-tabs-nav-centered]="centered">
+    <!-- Tab列表 -->
+    <div class="lib-tabs-nav-list">
+      <!-- Tab项 -->
+      <div *ngFor="let tab of allTabs; let i = index" class="lib-tabs-tab" (click)="selectTab(i)" [class.lib-tabs-tab-active]="isActive(i)" [class.lib-tabs-tab-disabled]="tab.disabled">
+        <div class="lib-tabs-tab-btn">{{ tab.title }}</div>
+      </div>
+    </div>
+    <!-- 活动指示条（线条样式） -->
+    <div *ngIf="type === 'line'" class="lib-tabs-ink-bar"></div>
+  </div>
+  
+  <!-- Tab内容区域 -->
+  <div class="lib-tabs-content">
+    <div class="lib-tabs-tabpane" *ngFor="let tab of allTabs; let i = index" [class.lib-tabs-tabpane-active]="isActive(i)" [class.lib-tabs-tabpane-animated]="animated">
+      <ng-container *ngIf="isActive(i) || animated" [ngTemplateOutlet]="tab.content"></ng-container>
+    </div>
+  </div>
+</div>

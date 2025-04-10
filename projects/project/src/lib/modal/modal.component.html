@@ -1,4 +1,4 @@
-<div class="modal-container" *ngIf="visible" (click)="maskClick()">
+<div class="modal-container" *ngIf="isVisible" (click)="maskClick()">
   <div class="modal-mask" [@maskAnimation]="animationState"></div>
   <div 
     #modalContent

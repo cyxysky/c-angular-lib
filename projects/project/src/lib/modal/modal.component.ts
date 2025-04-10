@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
@@ -65,6 +65,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   transformY: number = 0;
   initialTransformX: number = 0;
   initialTransformY: number = 0;
+  isVisible: boolean = false;
 
   constructor(private renderer: Renderer2, private cd: ChangeDetectorRef) { }
 
@@ -73,8 +74,15 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     this.cd.detectChanges();
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.updateAnimationState();
+    if (changes['visible']) {
+      if (this.visible) {
+        this.isVisible = this.visible;
+      } else {
+        this.close();
+      }
+    }
     if (this.visible) {
       if (this.drag) {
         this.resetDragPosition();
@@ -91,10 +99,11 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   }
 
   close(): void {
-    this.animationState = 'void';
+    this.visible = false;
+    this.visibleChange.emit(false);
+    this.updateAnimationState();
     let timer = setTimeout(() => {
-      this.visible = false;
-      this.visibleChange.emit(false);
+      this.isVisible = false;
       clearTimeout(timer);
     }, 150);
   }
@@ -119,18 +128,15 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       height: typeof this.height === 'number' ? `${this.height}px` : this.height,
       zIndex: this.zIndex
     };
-
     if (this.centered) {
       style.marginTop = 'auto';
       style.marginBottom = 'auto';
     } else {
       style.marginTop = this.top;
     }
-
     if (this.drag) {
       style.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
     }
-
     return style;
   }
 
