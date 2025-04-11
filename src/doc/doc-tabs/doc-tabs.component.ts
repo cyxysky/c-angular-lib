@@ -5,7 +5,6 @@ import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { SegmentedComponent } from '@project';
 import { TabComponent, TabsComponent } from "@project";
-
 @Component({
   selector: 'app-doc-tabs',
   standalone: true,
@@ -16,7 +15,7 @@ import { TabComponent, TabsComponent } from "@project";
     DocApiTableComponent,
     SegmentedComponent,
     TabsComponent,
-    TabComponent
+    TabComponent,
   ],
   templateUrl: './doc-tabs.component.html',
   styleUrl: './doc-tabs.component.less'

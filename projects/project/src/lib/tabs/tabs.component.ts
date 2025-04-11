@@ -52,6 +52,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   @Input() type: 'line' | 'card' = 'line';
   @Input() animated = true;
   @Input() centered = true;
+  @Input() align: 'left' | 'center' | 'right' = 'left';
   @Input() hideAdd = true;
   @Input() addIcon = 'bi-plus-circle';
   @Input() closeIcon = 'bi-x-lg';
@@ -117,6 +118,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.updateInkBarStyles();
       this.checkScrollButtons();
       this.scrollToActiveTab();
+      this.setupScrollListener();
       clearTimeout(timer);
     }, 0);
     if (this.tabElements) {
@@ -135,6 +137,10 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
     }
+    
+    // 移除滚动监听器
+    this.removeScrollListener();
+    
     this.destroy$.next();
     this.destroy$.complete();
     this.scrollDebounce$.complete();
@@ -180,14 +186,13 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     const navContainer = this.tabsNav.nativeElement;
     const navWidth = navContainer.offsetWidth;
     const currentScroll = navContainer.scrollLeft;
+    
+    // 计算滚动步长，通常为容器宽度的一半
+    const scrollStep = navWidth / 2;
+    
     navContainer.scrollTo({
-      left: Math.max(0, currentScroll - navWidth / 2),
+      left: Math.max(0, currentScroll - scrollStep),
       behavior: 'smooth'
-    });
-    // 滚动后更新按钮状态
-    timer(0).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.checkScrollButtons();
-      this.updateInkBarStyles();
     });
   }
 
@@ -200,14 +205,13 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     const navWidth = navContainer.offsetWidth;
     const navScrollWidth = navContainer.scrollWidth;
     const currentScroll = navContainer.scrollLeft;
+    
+    // 计算滚动步长，通常为容器宽度的一半
+    const scrollStep = navWidth / 2;
+    
     navContainer.scrollTo({
-      left: Math.min(navScrollWidth - navWidth, currentScroll + navWidth / 2),
+      left: Math.min(navScrollWidth - navWidth, currentScroll + scrollStep),
       behavior: 'smooth'
-    });
-    // 滚动后更新按钮状态
-    timer(0).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.checkScrollButtons();
-      this.updateInkBarStyles();
     });
   }
 
@@ -217,31 +221,42 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   scrollToActiveTab(): void {
     if (!this.tabElements || !this.tabsNav || !this.isHorizontal) return;
     if (this.selectedIndex < 0 || this.selectedIndex >= this.tabElements.length) return;
+    
     const navContainer = this.tabsNav.nativeElement;
     const activeTab = this.tabElements.toArray()[this.selectedIndex].nativeElement;
+    
+    // 获取视图容器的宽度和滚动位置
     const navWidth = navContainer.offsetWidth;
+    const scrollLeft = navContainer.scrollLeft;
+    
+    // 获取标签的位置和宽度
     const tabLeft = activeTab.offsetLeft;
     const tabWidth = activeTab.offsetWidth;
     const tabRight = tabLeft + tabWidth;
-    const scrollLeft = navContainer.scrollLeft;
+    
+    // 计算可见区域的右边界
     const scrollRight = scrollLeft + navWidth;
+    
+    // 如果标签不在可见区域内，则滚动到正确位置
     if (tabLeft < scrollLeft) {
-      // 如果活动标签在左侧不可见
+      // 如果标签在左侧不可见，滚动使其左边缘可见
       navContainer.scrollTo({
         left: tabLeft,
         behavior: 'smooth'
       });
     } else if (tabRight > scrollRight) {
-      // 如果活动标签在右侧不可见
+      // 如果标签在右侧不可见，滚动使其右边缘可见
       navContainer.scrollTo({
         left: tabRight - navWidth,
         behavior: 'smooth'
       });
     }
-    timer(0).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    
+    // 在滚动完成后更新状态
+    setTimeout(() => {
       this.checkScrollButtons();
       this.updateInkBarStyles();
-    });
+    }, 300); // 滚动动画通常在300ms内完成
   }
 
   /**
@@ -267,19 +282,31 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         wrapperWidth = navParent.parentElement.offsetWidth;
       }
     }
+    
     // 计算实际可用容器宽度（减去按钮的空间）
     const availableWidth = Math.max(0, wrapperWidth - (buttonWidth * 2));
+    
     // 内容宽度
     const contentWidth = group.scrollWidth;
+    
     // 判断是否需要显示滚动按钮（内容宽度大于可用宽度）
     const hasOverflow = contentWidth > availableWidth;
+    
     // 更新按钮显示状态
     const oldShowScrollNav = this.showScrollNav;
     this.showScrollNav = hasOverflow;
+    
     if (hasOverflow) {
       // 更新按钮可用状态
       this.canScrollLeft = container.scrollLeft > 0;
       this.canScrollRight = container.scrollLeft + container.clientWidth < contentWidth;
+      
+      // 如果出现滚动按钮但滚动位置为0，可能需要将内容移动到左侧
+      // 特别是在居中或靠右模式下切换到滚动模式时
+      if (oldShowScrollNav !== this.showScrollNav && container.scrollLeft === 0) {
+        // 强制回到左侧起点
+        this.updateInkBarStyles();
+      }
     } else {
       this.canScrollLeft = false;
       this.canScrollRight = false;
@@ -290,10 +317,19 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       }
     }
 
-    // 只有状态变化时才触发变更检测
-    if (oldShowScrollNav !== this.showScrollNav ||
-      this.showScrollNav) { // 当按钮显示时，总是更新视图以反映按钮状态
+    // 状态变化时更新视图
+    if (oldShowScrollNav !== this.showScrollNav) {
+      // 滚动按钮显示状态改变，可能需要调整添加按钮样式
+      this.updateAddButtonStyle();
+      
+      // 强制更新一次ink-bar位置
+      this.updateInkBarStyles();
+      
+      // 触发变更检测
       this.cdr.detectChanges();
+    } else if (this.showScrollNav) {
+      // 当状态没变但滚动按钮可见时，也更新一次（以更新按钮状态）
+      this.cdr.markForCheck();
     }
   }
 
@@ -347,6 +383,9 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   }
 
   private buildAllTabs(): void {
+    // 保存旧的标签数量
+    const oldTabsCount = this.allTabs.length;
+    
     this.allTabs = [
       ...this.tabComponents?.map(tab => ({
         key: tab.key,
@@ -356,11 +395,36 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         customTitle: tab.customTemplate
       })) || []
     ];
-    if (this.selectedIndex >= this.allTabs.length) {
+    
+    // 如果是新增标签，自动选中新标签
+    if (this.allTabs.length > oldTabsCount && oldTabsCount > 0) {
+      this.selectedIndex = this.allTabs.length - 1;
+      this.selectedIndexChange.emit(this.selectedIndex);
+      this.selectChange.emit(this.allTabs[this.selectedIndex]);
+    } else if (this.selectedIndex >= this.allTabs.length) {
+      // 如果当前选中的标签已被移除
       this.selectedIndex = Math.max(0, this.allTabs.length - 1);
+      this.selectedIndexChange.emit(this.selectedIndex);
+      if (this.allTabs.length > 0) {
+        this.selectChange.emit(this.allTabs[this.selectedIndex]);
+      }
     }
+    
+    // 强制触发变更检测以更新DOM
     this.cdr.detectChanges();
-    this.recalculateAll();
+    
+    // 在DOM更新后执行滚动
+    setTimeout(() => {
+      this.checkScrollButtons();
+      
+      // 如果是新增标签，确保滚动到新标签位置
+      if (this.allTabs.length > oldTabsCount) {
+        this.scrollToActiveTab();
+      }
+      
+      // 最后更新ink-bar位置
+      this.updateInkBarStyles();
+    }, 0);
   }
 
   private updateSelectedIndex(): void {
@@ -390,20 +454,121 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   }
 
   private setInkBarStyles(element: HTMLElement): void {
-    if (!this.tabsNav) return;
-    const navContainer = this.tabsNav.nativeElement;
-    const { offsetWidth, offsetLeft } = element;
-    // 获取滚动位置，以修正ink-bar的位置
-    const scrollLeft = navContainer.scrollLeft;
-    this.inkBarStyle =
-    {
-      width: `${offsetWidth}px`,
+    if (!this.tabsNavList) return;
+    
+    // 使用简单的方式设置ink-bar样式
+    // 由于ink-bar现在在nav-list内部，无需考虑滚动位置
+    const tabWidth = element.offsetWidth;
+    const tabLeft = element.offsetLeft;
+    
+    this.inkBarStyle = {
+      width: `${tabWidth}px`,
+      left: `${tabLeft}px`,
       height: '2px',
-      transform: `translate3d(${offsetLeft - scrollLeft}px, 0, 0)`,
       top: this.tabPosition === 'top' ? 'auto' : '0',
-      bottom: this.tabPosition === 'top' ? '0' : 'auto',
-      left: '0'
-    }
+      bottom: this.tabPosition === 'top' ? '0' : 'auto'
+    };
+    
     this.cdr.markForCheck();
+  }
+
+  /**
+   * 设置滚动事件监听
+   */
+  private setupScrollListener(): void {
+    if (!this.tabsNav || !this.tabsNavList) return;
+    
+    const navContainer = this.tabsNav.nativeElement;
+    const navList = this.tabsNavList.nativeElement;
+    
+    // 处理常规滚动事件
+    const scrollHandler = () => {
+      this.ngZone.run(() => {
+        // 更新按钮状态和墨条位置
+        this.checkScrollButtons();
+        this.updateInkBarStyles();
+      });
+    };
+    
+    // 添加滚动事件监听
+    navContainer.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // 处理鼠标滚轮事件实现水平滚动
+    const wheelHandler = (event: WheelEvent) => {
+      if (!this.showScrollNav) return; // 不需要滚动时不处理
+      
+      // 阻止默认滚动行为
+      event.preventDefault();
+      
+      // 获取当前滚动位置和容器属性
+      const currentScroll = navContainer.scrollLeft;
+      const scrollStep = 200; // 每次滚动100px
+      const maxScrollLeft = navContainer.scrollWidth - navContainer.clientWidth;
+      
+      // 根据滚轮方向设置滚动方向和距离
+      // deltaY > 0表示向下滚动，对应水平向右滚动
+      // deltaY < 0表示向上滚动，对应水平向左滚动
+      let newScrollLeft = currentScroll;
+      if (event.deltaY > 0) {
+        // 向右滚动
+        newScrollLeft = Math.min(maxScrollLeft, currentScroll + scrollStep);
+      } else {
+        // 向左滚动
+        newScrollLeft = Math.max(0, currentScroll - scrollStep);
+      }
+      
+      // 平滑滚动到新位置
+      navContainer.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    };
+    
+    // 添加滚轮事件监听（在navList上，因为navContainer可能已经有其他滚轮事件）
+    navList.addEventListener('wheel', wheelHandler, { passive: false });
+    
+    // 保存引用以便在销毁时移除
+    (this as any)._scrollHandler = scrollHandler;
+    (this as any)._wheelHandler = wheelHandler;
+  }
+
+  /**
+   * 移除滚动事件监听
+   */
+  private removeScrollListener(): void {
+    if (!this.tabsNav || !this.tabsNavList) return;
+    
+    const navContainer = this.tabsNav.nativeElement;
+    const navList = this.tabsNavList.nativeElement;
+    
+    // 移除常规滚动事件监听
+    if ((this as any)._scrollHandler) {
+      navContainer.removeEventListener('scroll', (this as any)._scrollHandler);
+      (this as any)._scrollHandler = null;
+    }
+    
+    // 移除滚轮事件监听
+    if ((this as any)._wheelHandler) {
+      navList.removeEventListener('wheel', (this as any)._wheelHandler);
+      (this as any)._wheelHandler = null;
+    }
+  }
+
+  /**
+   * 更新添加按钮样式
+   */
+  private updateAddButtonStyle(): void {
+    // 在下一帧异步更新，确保DOM已经更新
+    setTimeout(() => {
+      const addButton = document.querySelector('.lib-tabs-tab-add') as HTMLElement;
+      if (addButton) {
+        // 根据滚动按钮显示状态设置样式
+        if (this.showScrollNav) {
+          addButton.classList.add('lib-tabs-tab-add-fixed');
+        } else {
+          addButton.classList.remove('lib-tabs-tab-add-fixed');
+        }
+      }
+    }, 0);
   }
 }

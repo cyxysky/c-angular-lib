@@ -81,6 +81,13 @@
         display: none;
         /* Chrome, Safari, Opera */
       }
+      
+      // 确保居中和靠右模式下的滚动效果
+      &.lib-tabs-nav-centered,
+      &.lib-tabs-nav-right {
+        display: flex;
+        min-width: 0;
+      }
     }
 
     &-list {
@@ -223,6 +230,7 @@
     &-add {
       padding: 0 8px;
       background: #fff;
+      z-index: 10;
 
       &:hover {
         color: @primary-color;
@@ -231,6 +239,20 @@
 
       &-icon {
         font-size: 12px;
+      }
+      
+      // 固定在右侧的添加按钮（当出现滚动按钮时）
+      &-fixed {
+        position: relative;
+        margin-left: 8px;
+        flex-shrink: 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-radius: @border-radius-base;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
       }
     }
   }
@@ -245,7 +267,7 @@
     z-index: 1;
     transition: transform @animation-duration-slow @ease-in-out,
       width @animation-duration-slow @ease-in-out,
-      height @animation-duration-slow @ease-in-out;
+      left @animation-duration-slow @ease-in-out;
   }
 
   // 卡片样式
@@ -346,4 +368,27 @@
 .lib-tabs-nav-centered {
   display: flex;
   justify-content: center;
+  
+  .lib-tabs-nav-list {
+    flex: 0 0 auto;
+  }
+  
+  // 当出现滚动按钮时取消居中
+  &.lib-tabs-nav-view {
+    justify-content: flex-start;
+  }
+}
+
+.lib-tabs-nav-right {
+  display: flex;
+  justify-content: flex-end;
+  
+  .lib-tabs-nav-list {
+    flex: 0 0 auto;
+  }
+  
+  // 当出现滚动按钮时取消靠右
+  &.lib-tabs-nav-view {
+    justify-content: flex-start;
+  }
 }
