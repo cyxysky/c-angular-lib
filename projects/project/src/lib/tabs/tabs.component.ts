@@ -48,7 +48,7 @@ export interface TabConfig extends Omit<TabItem, 'key'> {
 })
 export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit, OnDestroy {
   @Input() selectedIndex = 0;
-  @Input() tabPosition: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  @Input() tabPosition: 'top' | 'bottom' | 'left' | 'right' = 'left';
   @Input() size: 'default' | 'small' | 'large' = 'default';
   @Input() type: 'line' | 'card' = 'line';
   @Input() animated = true;
@@ -104,11 +104,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     }
 
     if (changes['tabPosition']) {
-      let timer = setTimeout(() => {
-        this.updateInkBarStyles();
-        clearTimeout(timer);
-      }, 0);
-      
+      this.updateInkBarStyles();
     }
   }
 
@@ -160,6 +156,11 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     
     this.previousIndex = this.selectedIndex;
     this.selectedIndex = index;
+    
+    // 设置动画方向
+    this.animateForward = this.selectedIndex > this.previousIndex;
+    this.animateBackward = this.selectedIndex < this.previousIndex;
+    
     this.selectedIndexChange.emit(index);
     this.tabClick.emit({ index, tab: this.allTabs[index] });
     this.selectChange.emit(this.allTabs[index]);
