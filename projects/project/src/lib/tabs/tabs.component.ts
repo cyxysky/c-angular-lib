@@ -319,9 +319,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
 
     // 状态变化时更新视图
     if (oldShowScrollNav !== this.showScrollNav) {
-      // 滚动按钮显示状态改变，可能需要调整添加按钮样式
-      this.updateAddButtonStyle();
-      
       // 强制更新一次ink-bar位置
       this.updateInkBarStyles();
       
@@ -496,15 +493,12 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     // 处理鼠标滚轮事件实现水平滚动
     const wheelHandler = (event: WheelEvent) => {
       if (!this.showScrollNav) return; // 不需要滚动时不处理
-      
       // 阻止默认滚动行为
       event.preventDefault();
-      
       // 获取当前滚动位置和容器属性
       const currentScroll = navContainer.scrollLeft;
       const scrollStep = 200; // 每次滚动100px
       const maxScrollLeft = navContainer.scrollWidth - navContainer.clientWidth;
-      
       // 根据滚轮方向设置滚动方向和距离
       // deltaY > 0表示向下滚动，对应水平向右滚动
       // deltaY < 0表示向上滚动，对应水平向左滚动
@@ -516,7 +510,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         // 向左滚动
         newScrollLeft = Math.max(0, currentScroll - scrollStep);
       }
-      
       // 平滑滚动到新位置
       navContainer.scrollTo({
         left: newScrollLeft,
@@ -552,23 +545,5 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       navList.removeEventListener('wheel', (this as any)._wheelHandler);
       (this as any)._wheelHandler = null;
     }
-  }
-
-  /**
-   * 更新添加按钮样式
-   */
-  private updateAddButtonStyle(): void {
-    // 在下一帧异步更新，确保DOM已经更新
-    setTimeout(() => {
-      const addButton = document.querySelector('.lib-tabs-tab-add') as HTMLElement;
-      if (addButton) {
-        // 根据滚动按钮显示状态设置样式
-        if (this.showScrollNav) {
-          addButton.classList.add('lib-tabs-tab-add-fixed');
-        } else {
-          addButton.classList.remove('lib-tabs-tab-add-fixed');
-        }
-      }
-    }, 0);
   }
 }

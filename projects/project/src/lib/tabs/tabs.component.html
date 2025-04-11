@@ -44,6 +44,18 @@
               </span>
             </div>
           </div>
+          
+          <!-- 无滚动按钮时的添加按钮 -->
+          <div *ngIf="!hideAdd && !showScrollNav" 
+               class="lib-tabs-tab lib-tabs-tab-add" 
+               (click)="onAddTab()">
+            <div class="lib-tabs-tab-btn">
+              <span class="lib-tabs-tab-add-icon">
+                <i [class]="addIcon"></i>
+              </span>
+            </div>
+          </div>
+          
           <!-- 选中下划线 -->
           <div *ngIf="type === 'line'" class="lib-tabs-ink-bar" [ngStyle]="inkBarStyle"></div>
         </div>
@@ -58,17 +70,20 @@
       <i class="lib-tabs-nav-arrow-icon"></i>
     </button>
     
-    <!-- 添加标签（只有当出现滚动按钮时才固定在右侧） -->
-    <div *ngIf="!hideAdd" 
-         class="lib-tabs-tab lib-tabs-tab-add" 
-         [class.lib-tabs-tab-add-fixed]="showScrollNav"
-         (click)="onAddTab()">
-      <div class="lib-tabs-tab-btn">
-        <span class="lib-tabs-tab-add-icon">
-          <i [class]="addIcon"></i>
-        </span>
+    <!-- 添加标签按钮 -->
+    <!-- 当showScrollNav为true时，固定在最右侧；否则显示在常规位置 -->
+    <ng-container *ngIf="!hideAdd">
+      <!-- 当有滚动按钮时，固定在右侧显示 -->
+      <div *ngIf="showScrollNav" 
+           class="lib-tabs-tab lib-tabs-tab-add lib-tabs-tab-add-fixed"
+           (click)="onAddTab()">
+        <div class="lib-tabs-tab-btn">
+          <span class="lib-tabs-tab-add-icon">
+            <i [class]="addIcon"></i>
+          </span>
+        </div>
       </div>
-    </div>
+    </ng-container>
   </div>
   
   <div class="lib-tabs-content">
