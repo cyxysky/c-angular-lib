@@ -5,46 +5,66 @@
      [class.lib-tabs-right]="tabPosition === 'right'" 
      [class.lib-tabs-card]="type === 'card'" 
      [class.lib-tabs-small]="size === 'small'" 
-     [class.lib-tabs-large]="size === 'large'" 
-     [class.lib-tabs-animated]="animated">
-  <div class="lib-tabs-nav" [class.lib-tabs-nav-centered]="centered">
-    <div class="lib-tabs-nav-list">
-      <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab" 
-           class="lib-tabs-tab" 
-           (click)="selectTab(i)" 
-           [class.lib-tabs-tab-active]="isActive(i)" 
-           [class.lib-tabs-tab-disabled]="tab.disabled"
-           #tabItem>
-        <div class="lib-tabs-tab-btn">
-          <ng-container *ngIf="tab.customTitle; else defaultTitle">
-            <ng-container [ngTemplateOutlet]="tab.customTitle"></ng-container>
-          </ng-container>
-          <ng-template #defaultTitle>
-            <span *ngIf="tab.icon" class="lib-tabs-tab-icon"><i class="{{tab.icon}}"></i></span>
-            <span class="lib-tabs-tab-text">{{tab.title}}</span>
-          </ng-template>
-          <span *ngIf="closable && !tab.disabled" 
-                class="lib-tabs-tab-close" 
-                (click)="onCloseTab(i, $event)">×</span>
+     [class.lib-tabs-large]="size === 'large'">
+  <div class="lib-tabs-nav-wrapper" #navWrapper>
+    <!-- 左侧滚动按钮 -->
+    <button *ngIf="showScrollNav && isHorizontal" 
+            class="lib-tabs-nav-arrow lib-tabs-nav-prev" 
+            [class.lib-tabs-nav-arrow-disabled]="!canScrollLeft"
+            (click)="scrollPrev()">
+      <i class="lib-tabs-nav-arrow-icon"></i>
+    </button>
+    
+    <div class="lib-tabs-nav" [class.lib-tabs-nav-centered]="centered">
+      <!-- 主内容区 -->
+      <div class="lib-tabs-nav-view" #tabsNav (scroll)="onScroll()">
+        <div class="lib-tabs-nav-list" #tabsNavList>
+          <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab" 
+               class="lib-tabs-tab"
+               (click)="selectTab(i)"
+               [class.lib-tabs-tab-active]="isActive(i)" 
+               [class.lib-tabs-tab-disabled]="tab.disabled"
+               #tabItem>
+            <div class="lib-tabs-tab-btn">
+              <ng-container *ngIf="tab.customTitle; else defaultTitle">
+                <ng-container [ngTemplateOutlet]="tab.customTitle"></ng-container>
+              </ng-container>
+              <ng-template #defaultTitle>
+                <span *ngIf="tab.icon" class="lib-tabs-tab-icon"><i class="{{tab.icon}}"></i></span>
+                <span class="lib-tabs-tab-text">{{tab.title}}</span>
+              </ng-template>
+              <span *ngIf="closable && !tab.disabled" 
+                    class="lib-tabs-tab-close" 
+                    (click)="onCloseTab(i, $event)">×</span>
+            </div>
+          </div>
+          
+          <div *ngIf="!hideAdd" class="lib-tabs-tab lib-tabs-tab-add" (click)="onAddTab()">
+            <div class="lib-tabs-tab-btn">
+              <span class="lib-tabs-tab-add-icon"><i class="bi bi-plus-circle"></i></span>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div *ngIf="!hideAdd" class="lib-tabs-tab lib-tabs-tab-add" (click)="onAddTab()">
-        <div class="lib-tabs-tab-btn">
-          <span class="lib-tabs-tab-add-icon"><i class="bi bi-plus-circle"></i></span>
-        </div>
-      </div>
+      <div *ngIf="type === 'line'" class="lib-tabs-ink-bar" [ngStyle]="inkBarStyle"></div>
     </div>
     
-    <div *ngIf="type === 'line'" class="lib-tabs-ink-bar" [ngStyle]="inkBarStyle"></div>
+    <!-- 右侧滚动按钮 -->
+    <button *ngIf="showScrollNav && isHorizontal" 
+            class="lib-tabs-nav-arrow lib-tabs-nav-next" 
+            [class.lib-tabs-nav-arrow-disabled]="!canScrollRight"
+            (click)="scrollNext()">
+      <i class="lib-tabs-nav-arrow-icon"></i>
+    </button>
   </div>
-  
+  <!-- 内容区域 -->
   <div class="lib-tabs-content">
     <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab"
          class="lib-tabs-tabpane"
          [class.lib-tabs-tabpane-active]="isActive(i)"
-         [style.display]="(!animated && !isActive(i)) ? 'none' : 'block'">
-      <ng-container *ngIf="isActive(i) || animated">
+         [style.display]="!isActive(i) ? 'none' : 'block'">
+      <ng-container *ngIf="isActive(i)">
         <ng-container [ngTemplateOutlet]="tab.content"></ng-container>
       </ng-container>
     </div>

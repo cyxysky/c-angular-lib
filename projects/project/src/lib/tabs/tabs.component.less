@@ -22,6 +22,16 @@
   &-top, &-bottom { flex-direction: column; }
   &-left, &-right { flex-direction: row; }
   
+  // 导航栏外部包装器
+  &-nav-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 16px 0;
+    width: 100%;
+    gap: 8px;
+  }
+  
   // 左侧tabs样式
   &-left {
     .lib-tabs-nav {
@@ -33,6 +43,7 @@
       .lib-tabs-nav-list {
         flex-direction: column;
         align-items: flex-start;
+
       }
       
       .lib-tabs-tab {
@@ -85,11 +96,15 @@
   
   // 底部tabs样式
   &-bottom {
-    .lib-tabs-nav {
+    .lib-tabs-nav-wrapper {
       order: 1;
       margin-top: 16px;
       margin-bottom: 0;
+    }
+    
+    .lib-tabs-nav {
       border-top: 1px solid @border-color-base;
+      border-bottom: none;
     }
     
     .lib-tabs-ink-bar {
@@ -109,20 +124,96 @@
   &-nav {
     position: relative;
     display: flex;
-    flex: none;
-    margin: 0 0 16px 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    
+    // 滚动视图容器
+    &-view {
+      flex: 1;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 和 Edge */
+      
+      &::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+    }
     
     &-list {
       display: flex;
-      flex: auto;
+      flex: none;
       align-items: center;
       transition: transform 0.3s;
       position: relative;
+      white-space: nowrap;
+      width: fit-content;
     }
     
     &-centered {
       .lib-tabs-nav-list {
         justify-content: center;
+      }
+    }
+    
+    // 滚动箭头按钮
+    &-arrow {
+      flex: 0 0 32px;
+      min-width: 32px;
+      max-width: 32px;
+      width: 32px;
+      height: 32px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: #fff;
+      border: 0;
+      outline: none;
+      cursor: pointer;
+      color: @text-color-secondary;
+      transition: color 0.3s;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      border-radius: 50%;
+      
+      &:hover {
+        color: @text-color;
+      }
+      
+      &-disabled {
+        color: @disabled-color;
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.5;
+      }
+      
+      &-icon {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        display: inline-block;
+      }
+    }
+    
+    &-prev {
+      margin-right: 8px;
+      
+      .lib-tabs-nav-arrow-icon {
+        border-width: 6px 8px 6px 0;
+        border-color: transparent currentColor transparent transparent;
+      }
+    }
+    
+    &-next {
+      margin-left: 8px;
+      
+      .lib-tabs-nav-arrow-icon {
+        border-width: 6px 0 6px 8px;
+        border-color: transparent transparent transparent currentColor;
       }
     }
   }
@@ -245,6 +336,19 @@
       &-icon { font-size: 12px; }
       &-close { font-size: 10px; }
     }
+    
+    .lib-tabs-nav-arrow {
+      width: 24px;
+      height: 24px;
+      
+      &-icon {
+        border-width: 4px 6px 4px 0;
+      }
+      
+      &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
+        border-width: 4px 0 4px 6px;
+      }
+    }
   }
   
   &-large {
@@ -253,6 +357,19 @@
       font-size: 16px;
       
       &-icon { font-size: 16px; }
+    }
+    
+    .lib-tabs-nav-arrow {
+      width: 36px;
+      height: 36px;
+      
+      &-icon {
+        border-width: 7px 9px 7px 0;
+      }
+      
+      &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
+        border-width: 7px 0 7px 9px;
+      }
     }
   }
   
@@ -270,30 +387,5 @@
     
     &-active { z-index: 1; }
   }
-  
-  // 动画效果
-  &-animated {
-    .lib-tabs-content {
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .lib-tabs-tabpane {
-      transition: opacity 0.3s @ease-in-out;
-      
-      &:not(.lib-tabs-tabpane-active) {
-        position: absolute;
-        pointer-events: none;
-        user-select: none;
-        opacity: 0;
-      }
-      
-      &-active { opacity: 1; }
-    }
-  }
-}
 
-@keyframes tabFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
