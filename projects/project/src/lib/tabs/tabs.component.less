@@ -38,7 +38,7 @@
       margin-right: 16px;
       padding-right: 8px;
       border-right: 1px solid @border-color-base;
-      min-width: 120px;
+      width: 120px;
       
       .lib-tabs-nav-list {
         flex-direction: column;
@@ -52,6 +52,12 @@
         justify-content: flex-start;
         width: 100%;
         padding: 8px 12px;
+
+        .lib-tabs-tab-btn {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
     
@@ -61,7 +67,6 @@
       top: 0;
       width: 2px;
     }
-    
     .lib-tabs-content { flex: 1; }
   }
   
@@ -73,7 +78,7 @@
       margin-left: 16px;
       padding-left: 8px;
       border-left: 1px solid @border-color-base;
-      min-width: 120px;
+      width: 120px;
       
       .lib-tabs-nav-list {
         flex-direction: column;
@@ -87,6 +92,12 @@
         justify-content: flex-start;
         width: 100%;
         padding: 8px 12px;
+
+        .lib-tabs-tab-btn {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
     
@@ -262,7 +273,6 @@
     
     &-active &-btn {
       color: @primary-color;
-      font-weight: 500;
     }
     
     &-disabled {
@@ -390,38 +400,5 @@
     height: 100%;
     
     &-active { z-index: 1; }
-  }
-  
-  // 动画效果
-  &-animated {
-    .lib-tabs-content {
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .lib-tabs-tabpane {
-      transition: transform 0.3s @ease-in-out, opacity 0.3s @ease-in-out;
-      
-      &:not(.lib-tabs-tabpane-active) {
-        position: absolute;
-        pointer-events: none;
-        user-select: none;
-        opacity: 0;
-        transform: translateX(100%);
-      }
-      
-      &-active {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    &.animate-backward {
-      .lib-tabs-tabpane {
-        &:not(.lib-tabs-tabpane-active) {
-          transform: translateX(-100%);
-        }
-      }
-    }
   }
 }

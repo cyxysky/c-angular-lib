@@ -20,7 +20,6 @@ export class TabComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() title: string = '';
   @Input() disabled: boolean = false;
   @Input() key: string = '';
-  @Input() icon: string = '';
   @Input() titleTemplate: TemplateRef<any> | null = null;
   
   @ViewChild('contentTemplate', { static: true }) contentTemplate!: TemplateRef<any>;
