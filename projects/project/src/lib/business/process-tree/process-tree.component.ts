@@ -114,6 +114,7 @@ export enum NodeType {
   selector: 'lib-process-tree',
   imports: [ProcessTreeNodeComponent],
   templateUrl: './process-tree.component.html',
+  standalone: true,
   styleUrl: './process-tree.component.less'
 })
 export class ProcessTreeComponent {

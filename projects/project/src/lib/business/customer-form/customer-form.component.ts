@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'lib-customer-form',
+  standalone: true,
   imports: [CustomerFormModalComponent, CommonModule, FormsModule],
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.less'

@@ -1,57 +1,18 @@
-import { Injectable, Injector, Type, TemplateRef, ComponentRef, Inject, Component } from '@angular/core';
-import { OverlayService } from '../overlay/overlay.service';
+import { Injectable } from '@angular/core';
 import { ModalComponent } from './modal.component';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { DOCUMENT } from '@angular/common';
-
-export interface ModalOptions {
-  /** 模态框宽度 */
-  width?: string | number;
-  /** 模态框高度 */
-  height?: string | number;
-  /** 模态框z-index值 */
-  zIndex?: number;
-  /** 是否显示关闭按钮 */
-  closable?: boolean;
-  /** 是否居中显示 */
-  centered?: boolean;
-  /** 点击蒙层是否允许关闭 */
-  maskClosable?: boolean;
-  /** 传递给模态框内容的数据 */
-  data?: any;
-  /** 模态框关闭后的回调 */
-  afterClose?: () => void;
-  /** 模态框打开后的回调 */
-  afterOpen?: () => void;
-  /** 头部内容 */
-  headerContent?: TemplateRef<any>;
-  /** 底部内容 */
-  footerContent?: TemplateRef<any>;
-  /** 内容 */
-  bodyContent?: TemplateRef<any> | Component | any;
-  /** 模态框顶部位置 */
-  top?: string;
-}
-
+import { ModalOptions, ModalRefMap } from './modal.interface';
 @Injectable({
   providedIn: 'root'
 })
 export class ModalService {
-  private modalInstances: Map<string, {
-    overlayRef: OverlayRef,
-    componentRef: ComponentRef<ModalComponent>
-  }> = new Map();
+  private modalInstances: ModalRefMap = new Map();
   private modalCounter = 0;
-  private document: Document;
 
   constructor(
-    private overlayService: OverlayService,
     private overlay: Overlay,
-    private injector: Injector,
-    @Inject(DOCUMENT) document: any
   ) {
-    this.document = document;
   }
 
   /**
@@ -62,7 +23,6 @@ export class ModalService {
    */
   create(options: ModalOptions = {}): string {
     const modalId = `modal-${this.modalCounter++}`;
-    
     const modalOptions: ModalOptions = {
       width: '520px',
       height: 'auto',
@@ -72,7 +32,6 @@ export class ModalService {
       maskClosable: true,
       ...options
     };
-    
     // 创建全局Overlay
     const overlayRef = this.overlay.create({
       positionStrategy: this.overlay.position()
@@ -83,22 +42,9 @@ export class ModalService {
       hasBackdrop: false,
       backdropClass: 'cdk-overlay-dark-backdrop'
     });
-    
-    // 创建自定义注入器，用于传递数据
-    const customInjector = Injector.create({
-      parent: this.injector,
-      providers: [
-        { provide: 'MODAL_DATA', useValue: modalOptions.data },
-        { provide: 'MODAL_CLOSE', useValue: () => {
-          this.closeModal(modalId);
-        }}
-      ]
-    });
-    
     // 创建并附加模态框组件
-    const modalPortal = new ComponentPortal(ModalComponent, null, customInjector);
+    const modalPortal = new ComponentPortal(ModalComponent, null);
     const componentRef = overlayRef.attach(modalPortal);
-    
     // 获取模态框实例
     const modalInstance = componentRef.instance;
     
@@ -110,26 +56,22 @@ export class ModalService {
     modalInstance.centered = modalOptions.centered!;
     modalInstance.maskClosable = modalOptions.maskClosable!;
     modalInstance.top = modalOptions.top!;
-    
     // 设置内容
     modalInstance.bodyContent = modalOptions.bodyContent || null;
     modalInstance.headerContent = modalOptions.headerContent || null;
     modalInstance.footerContent = modalOptions.footerContent || null;
     modalInstance.contentContext = { $implicit: modalOptions.data };
-    
     // 设置回调
     modalInstance.afterClose.subscribe(() => {
       if (modalOptions.afterClose) {
         modalOptions.afterClose();
       }
     });
-    
     modalInstance.afterOpen.subscribe(() => {
       if (modalOptions.afterOpen) {
         modalOptions.afterOpen();
       }
     });
-    
     // 点击背景关闭
     if (modalOptions.maskClosable) {
       overlayRef.backdropClick().subscribe(() => {

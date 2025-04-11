@@ -26,6 +26,7 @@ export interface svgData {
 
 @Component({
   selector: 'lib-generate-png',
+  standalone: true,
   imports: [
     NzInputModule,
     NzSliderModule,

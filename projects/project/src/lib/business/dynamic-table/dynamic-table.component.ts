@@ -3,6 +3,7 @@ import { Params } from '@angular/router';
 import * as _ from 'lodash';
 @Component({
   selector: 'lib-dynamic-table',
+  standalone: true,
   imports: [],
   templateUrl: './dynamic-table.component.html',
   styleUrl: './dynamic-table.component.less'

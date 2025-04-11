@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { rippleAnimation } from '../animation/ripple.animation';
 import * as _ from 'lodash';
-import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.component.interface';
+import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.interface';
 @Component({
 	selector: 'lib-button',
 	imports: [CommonModule],
@@ -39,6 +39,7 @@ export class ButtonComponent {
 	ngOnInit() { }
 
 	ripple: { x?: number; y?: number; size?: number } = {};
+	
 	/**
 	 * 创建波纹
 	 * @param event 事件

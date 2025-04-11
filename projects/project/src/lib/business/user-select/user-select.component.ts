@@ -6,8 +6,6 @@ import { CdkOverlayOrigin, Overlay, OverlayConfig, OverlayModule, OverlayRef } f
 import { TemplatePortal } from '@angular/cdk/portal';
 import user from './user';
 import * as _ from 'lodash';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { BooleanInput } from 'ng-zorro-antd/core/types';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { timer } from 'rxjs';
 
@@ -21,6 +19,7 @@ export enum ORDER_TYPE {
   imports: [CommonModule, FormsModule, OverlayModule],
   templateUrl: './user-select.component.html',
   styleUrl: './user-select.component.less',
+  standalone: true,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { CustomerFormComponentComponent } from '../customer-form-component/customer-form-component.component';
 @Component({
   selector: 'lib-customer-form-modal',
+  standalone: true,
   imports: [FormsModule, CommonModule, CustomerFormComponentComponent],
   templateUrl: './customer-form-modal.component.html',
   styleUrl: './customer-form-modal.component.less'

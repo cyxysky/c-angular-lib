@@ -1,11 +1,11 @@
 <div class="input-container" [class]="getInputClass()">
-
+  <!-- 前缀 -->
   <span class="input-prefix" *ngIf="prefix() || prefixIcon()">
     <ng-content select="[prefix]"></ng-content>
     <i *ngIf="prefixIcon()" class="input-prefix-icon" [class]="prefixIcon()"></i>
     <span *ngIf="prefix()">{{ prefix() }}</span>
   </span>
-  
+  <!-- 输入框 -->
   <input 
     [ngModel]="_data"
     [disabled]="disabled()"
@@ -28,7 +28,7 @@
     [attr.autofocus]="autofocus() ? 'autofocus' : null"
     class="input-control"
   />
-  
+  <!-- 后缀 -->
   <span class="input-suffix" *ngIf="suffix() || suffixIcon() || (allowClear() && _data) || (showCount() && maxlength())">
     <!-- 后缀 -->
     <span *ngIf="suffix()">{{ suffix() }}</span>
@@ -46,6 +46,6 @@
       </svg>
     </span>
   </span>
-  
-  <div class="input-error" *ngIf="error">{{ error }}</div>
+  <!-- 错误信息 -->
 </div>
+<div class="input-error" *ngIf="error">{{ error }}</div>

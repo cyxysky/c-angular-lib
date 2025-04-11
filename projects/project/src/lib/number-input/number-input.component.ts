@@ -1,4 +1,4 @@
-import { Component, forwardRef, signal, computed, input, output } from '@angular/core';
+import { Component, forwardRef, signal, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
@@ -17,7 +17,6 @@ import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/f
   ]
 })
 export class NumberInputComponent implements ControlValueAccessor {
-  //#region 输入属性 (Inputs)
   /** 最小值 */
   min = input<number | null>(null, { alias: 'numberInputMin' });
   /** 最大值 */
@@ -46,134 +45,59 @@ export class NumberInputComponent implements ControlValueAccessor {
   status = input<'normal' | 'error' | 'warning'>('normal', { alias: 'numberInputStatus' });
   /** 格式化函数 */
   formatter = input<(value: number) => any>(value => value, { alias: 'numberInputFormatter' });
-  //#endregion
 
-  //#region 内部状态变量
   /** 当前值 */
-  valueSignal = signal<number | null>(null);
+  public value = signal<number | null>(null);
   /** 是否获得焦点 */
-  focused = signal<boolean>(false);
-  /** 输入框值 */
-  inputValue = signal<number | null>(null);
+  public focused = signal<boolean>(false);
 
-  /** 状态CSS类 */
-  statusClass = computed(() => {
-    return this.status() === 'error' ? 'lib-number-input-error' : 
-           this.status() === 'warning' ? 'lib-number-input-warning' : '';
-  });
 
   /** 显示值（经过格式化处理） */
   displayValue = computed(() => {
-    const value = this.valueSignal();
-    if (value === null) return '';
-    
-    let formattedValue = this.formatter()(value);
-    if (typeof formattedValue === 'number') {
-      formattedValue = value.toFixed(this.precision());
-    }
-    return formattedValue;
+    const val = this.value();
+    if (val === null) return '';
+    const formattedValue = this.applyFormatter(val);
+    return typeof formattedValue === 'number' ? this.formatWithPrecision(formattedValue) : formattedValue;
   });
-  //#endregion
 
-  //#region 业务方法
   /**
    * 增加值
    */
   increase(): void {
-    if (this.disabled() || this.readonly()) return;
-    
-    // 获取当前步进值
-    const stepValue = this.step();
-    
-    // 默认从0开始，或使用当前值
-    const currentValue = this.valueSignal() === null ? 0 : this.valueSignal()!;
-    const newValue = currentValue + stepValue;
-    
-    // 检查最大值限制
-    if (this.max() !== null && newValue > this.max()!) {
-      return;
+    if (this.isDisabled()) return;
+    const currentValue = this.value() ?? 0;
+    const newValue = currentValue + this.step();
+    if (this.isValueInRange(newValue)) {
+      this.updateValue(newValue);
     }
-    
-    this.setValue(newValue);
   }
 
   /**
    * 减少值
    */
   decrease(): void {
-    if (this.disabled() || this.readonly()) return;
-    
-    // 获取当前步进值
-    const stepValue = this.step();
-    
-    // 默认从0开始，或使用当前值
-    const currentValue = this.valueSignal() === null ? 0 : this.valueSignal()!;
-    const newValue = currentValue - stepValue;
-    
-    // 检查最小值限制
-    if (this.min() !== null && newValue < this.min()!) {
-      return;
+    if (this.isDisabled()) return;
+    const currentValue = this.value() ?? 0;
+    const newValue = currentValue - this.step();
+    if (this.isValueInRange(newValue)) {
+      this.updateValue(newValue);
     }
-    
-    this.setValue(newValue);
   }
   
   /**
-   * 设置值
+   * 输入框值变更处理
    */
-  setValue(value: number | null): void {
-    if (value !== null) {
-      // 限制在min和max范围内
-      if (this.min() !== null && value < this.min()!) {
-        value = this.min()!;
-      }
-      if (this.max() !== null && value > this.max()!) {
-        value = this.max()!;
-      }
-      
-      // 根据精度处理值
-      const precision = this.precision();
-      if (precision >= 0) {
-        // 使用toFixed保证精确的小数位数
-        value = parseFloat(value.toFixed(precision));
-      }
-    }
-    
-    this.valueSignal.set(value);
-    this.updateInputValue(); // 更新显示值
-    if (this.formatter() !== null) {
-      this.onChange(this.formatter()(value!));
-    }
-  }
-
-  /**
-   * 模型值变更处理
-   */
-  onModelChange(value: number): void {
-    // 处理空值
+  onInputChange(value: number | null): void {
     if (value === null) {
-      this.setValue(null);
+      this.updateValue(null);
       return;
     }
-        
-    // 尝试解析值
-    if (!isNaN(value)) {
-      // 最小值和最大值限制
-      let finalValue = value;
-      if (this.min() !== null && finalValue < this.min()!) {
-        finalValue = this.min()!;
-        this.setValue(finalValue); // 立即限制并更新显示
-      } else if (this.max() !== null && finalValue > this.max()!) {
-        finalValue = this.max()!;
-        this.setValue(finalValue); // 立即限制并更新显示
-      } else {
-        // 不立即格式化显示，存储原始值
-        this.valueSignal.set(value);
-        this.onChange(value);
-      }
-    } else {
-      // 解析失败，恢复原值
-      this.updateInputValue();
+    if (isNaN(value)) return;
+    // 应用范围限制
+    const boundedValue = this.applyBounds(value);
+    if (boundedValue === value) {
+      this.value.set(value);
+      this.onChange(value);
     }
   }
 
@@ -183,11 +107,10 @@ export class NumberInputComponent implements ControlValueAccessor {
   onBlur(): void {
     this.focused.set(false);
     this.onTouched();
-    // 失去焦点时应用精度和验证
-    const currentValue = this.valueSignal();
+    // 失去焦点时应用精度和范围限制
+    const currentValue = this.value();
     if (currentValue !== null) {
-      // 应用精度
-      this.setValue(currentValue);
+      this.updateValue(currentValue);
     }
   }
 
@@ -197,29 +120,91 @@ export class NumberInputComponent implements ControlValueAccessor {
   onFocus(): void {
     this.focused.set(true);
   }
-  //#endregion
 
-  //#region 工具方法
   /**
-   * 更新输入框值
+   * 判断是否禁用
+   * @returns 是否禁用
    */
-  private updateInputValue(): void {
-    const value = this.valueSignal();
-    if (value === null) {
-      this.inputValue.set(0);
-    } else {
-      // 根据精度格式化显示值
-      const precision = this.precision();
-      if (precision >= 0) {
-        this.inputValue.set(Number(value.toFixed(precision)));
-      } else {
-        this.inputValue.set(Number(value.toString()));
-      }
-    }
+  private isDisabled(): boolean {
+    return this.disabled() || this.readonly();
   }
-  //#endregion
 
-  //#region ControlValueAccessor 实现
+  /**
+   * 判断值是否在范围内
+   * @param value 值
+   * @returns 是否在范围内
+   */
+  private isValueInRange(value: number): boolean {
+    const minVal = this.min();
+    const maxVal = this.max();
+    return (minVal === null || value >= minVal) && (maxVal === null || value <= maxVal);
+  }
+
+  /**
+   * 应用范围限制
+   * @param value 值
+   * @returns 范围限制后的值
+   */
+  private applyBounds(value: number): number {
+    const minVal = this.min();
+    const maxVal = this.max();
+    if (minVal !== null && value < minVal) return minVal;
+    if (maxVal !== null && value > maxVal) return maxVal;
+    return value;
+  }
+
+  /**
+   * 应用精度
+   * @param value 值
+   * @returns 精度处理后的值
+   */
+  private applyPrecision(value: number): number {
+    const precisionVal = this.precision();
+    if (precisionVal >= 0) {
+      return parseFloat(value.toFixed(precisionVal));
+    }
+    return value;
+  }
+
+  /**
+   * 格式化值
+   * @param value 值
+   * @returns 格式化后的值
+   */
+  private formatWithPrecision(value: number): string {
+    return value.toFixed(this.precision());
+  }
+
+  /**
+   * 应用格式化函数
+   * @param value 值
+   * @returns 格式化后的值
+   */
+  private applyFormatter(value: number): any {
+    return this.formatter()(value);
+  }
+  
+  /**
+   * 更新值
+   * @param value 值
+   */
+  private updateValue(value: number | null): void {
+    if (value === null) {
+      this.value.set(null);
+      this.onChange(null);
+      return;
+    }
+    // 应用范围限制
+    const boundedValue = this.applyBounds(value);
+    // 应用精度
+    const preciseValue = this.applyPrecision(boundedValue);
+    // 更新内部值
+    this.value.set(preciseValue);
+    // 通知表单控件
+    this.onChange(preciseValue);
+  }
+
+  // 实现ControlValueAccessor接口
   private onChange: (value: number | null) => void = () => {};
   private onTouched: () => void = () => {};
 
@@ -227,16 +212,14 @@ export class NumberInputComponent implements ControlValueAccessor {
    * 写入值
    */
   writeValue(value: number | null): void {
-    // 确保新值符合精度要求
-    if (value !== null) {
-      const precision = this.precision();
-      if (precision >= 0) {
-        value = parseFloat(value.toFixed(precision));
-      }
+    if (value === null) {
+      this.value.set(null);
+      return;
     }
     
-    this.valueSignal.set(value);
-    this.updateInputValue();
+    // 应用精度
+    const preciseValue = this.applyPrecision(value);
+    this.value.set(preciseValue);
   }
 
   /**
@@ -259,5 +242,4 @@ export class NumberInputComponent implements ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     // 由于使用信号API，我们不能直接修改input信号
   }
-  //#endregion
 }

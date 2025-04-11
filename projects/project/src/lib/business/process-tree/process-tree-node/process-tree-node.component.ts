@@ -9,6 +9,7 @@ import { WidgetSource } from '../../../directive/widget.directive';
 
 @Component({
   selector: 'lib-process-tree-node',
+  standalone: true,
   imports: [FormsModule, CommonModule, NzDropDownModule],
   templateUrl: './process-tree-node.component.html',
   styleUrl: './process-tree-node.component.less',

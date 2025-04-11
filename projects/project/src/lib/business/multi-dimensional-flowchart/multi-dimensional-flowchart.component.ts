@@ -16,6 +16,7 @@ export interface Stage {
 
 @Component({
   selector: 'lib-multi-dimensional-flowchart',
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './multi-dimensional-flowchart.component.html',
   styleUrl: './multi-dimensional-flowchart.component.less'

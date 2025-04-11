@@ -4,6 +4,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { NzInputModule } from 'ng-zorro-antd/input';
 @Component({
   selector: 'lib-customer-form-component',
+  standalone: true,
   imports: [CommonModule, FormsModule, NzInputModule],
   templateUrl: './customer-form-component.component.html',
   styleUrl: './customer-form-component.component.less',

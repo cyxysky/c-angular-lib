@@ -7,23 +7,8 @@ import { UtilsService } from '../utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
-export interface CascaderOption {
-  value: any;
-  label: string;
-  disabled?: boolean;
-  children?: CascaderOption[];
-  isLeaf?: boolean;
-  disableCheckbox?: boolean;
-  [key: string]: any;
-  path?: any[];
-  loading?: boolean;
-  checked?: boolean;       // 选中状态
-  halfChecked?: boolean;   // 半选状态
-}
+import { CascaderExpandTrigger, CascaderOption, CascaderSize, CascaderTriggerType } from './cascader.interface';
 
-export type CascaderExpandTrigger = 'click' | 'hover';
-export type CascaderTriggerType = 'click' | 'hover';
-export type CascaderSize = 'large' | 'default' | 'small';
 
 @Component({
   selector: 'lib-cascader',

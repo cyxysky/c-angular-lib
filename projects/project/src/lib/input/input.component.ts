@@ -4,8 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-export type InputSize = 'large' | 'default' | 'small';
-export type InputStatus = 'error' | 'warning' | '';
+import { InputSize, InputStatus } from './input.interface';
 
 @Component({
   selector: 'lib-input',
@@ -48,7 +47,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   /** 输入框类型 */
   type = input<string>('text', { alias: 'inputType' });
   /** 输入框状态 */
-  status = input<InputStatus>('', { alias: 'inputStatus' });
+  status = input<InputStatus>('default', { alias: 'inputStatus' });
   /** 边框 */
   bordered = input(true, { transform: coerceBooleanProperty, alias: 'inputBordered' });
   /** 是否显示字数统计 */
@@ -86,9 +85,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   /** 焦点状态 */
   hasFocus = signal<boolean>(false);
   /** 左内边距 */
-  paddingLeft = signal<number>(11);
+  paddingLeft = signal<number>(12);
   /** 右内边距 */
-  paddingRight = signal<number>(11);
+  paddingRight = signal<number>(12);
   /** 错误信息 */
   error = '';
   /** 内部数据 */
@@ -97,15 +96,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
 
   //#region 生命周期钩子
   ngOnInit(): void {
-    // 初始化时计算左右内边距
-    this.calculatePadding();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // 属性变更时重新计算内边距
-    if (changes['prefix'] || changes['suffix'] || changes['allowClear']) {
-      this.calculatePadding();
-    }
   }
   //#endregion
 
@@ -201,23 +194,6 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnChanges {
   //#endregion
 
   //#region 工具方法
-  /**
-   * 计算内边距
-   */
-  calculatePadding(): void {
-    // 默认左右内边距
-    let left = 12;
-    let right = 12;
-
-    // 根据后缀和清除图标调整右内边距
-    if (this.suffix() || this.suffixIcon()) {
-      right = 12;
-    }
-
-    this.paddingLeft.set(left);
-    this.paddingRight.set(right);
-  }
-
   /**
    * 计算字符统计
    */

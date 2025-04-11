@@ -5,7 +5,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from '@project';
 import _ from 'lodash';
 import { OverlayService } from '../overlay/overlay.service';
-import { ButtonType, ButtonColor } from '../button/button.component.interface';
+import { ButtonType, ButtonColor } from '../button/button.interface';
 
 @Directive({
   selector: '[libPopconfirm]'

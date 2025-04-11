@@ -2,10 +2,12 @@
      [class.focused]="focused()" 
      [class.disabled]="disabled()"
      [class.readonly]="readonly()"
-     [class]="statusClass()">
+     [class.lib-number-input-normal]="status() === 'normal'"
+     [class.lib-number-input-error]="status() === 'error'"
+     [class.lib-number-input-warning]="status() === 'warning'">
   
   <!-- 前缀 -->
-  <span class="lib-number-input-prefix">
+  <span class="lib-number-input-prefix" *ngIf="prefix() || prefixIcon()">
     <ng-content select="[prefix]"></ng-content>
     {{ prefix() }}
     <i *ngIf="prefixIcon()" [class]="prefixIcon()"></i>
@@ -16,17 +18,16 @@
     <input type="number"
            [style.color]="color()"
            class="lib-number-input"
-           [(ngModel)]="inputValue"
-           (ngModelChange)="onModelChange($event)"
+           [(ngModel)]="value"
+           (ngModelChange)="onInputChange($event)"
            [placeholder]="placeholder()"
            [disabled]="disabled()"
            [readonly]="readonly()"
            (focus)="onFocus()"
            (blur)="onBlur()">
   </div>
-  
   <!-- 后缀 -->
-  <span class="lib-number-input-suffix">
+  <span class="lib-number-input-suffix" *ngIf="suffix() || suffixIcon()">
     <ng-content select="[suffix]"></ng-content>
     {{ suffix() }}
     <i *ngIf="suffixIcon()" [class]="suffixIcon()"></i>
@@ -36,13 +37,13 @@
   <div class="lib-number-input-handler-wrap" *ngIf="!readonly()">
     <button type="button"
             class="lib-number-input-handler lib-number-input-handler-up"
-            [disabled]="disabled() || (max() !== null && valueSignal() !== null && valueSignal()! >= max()!)"
+            [disabled]="disabled() || (max() !== null && value() !== null && value()! >= max()!)"
             (click)="increase()">
       <span class="lib-number-input-handler-up-inner"></span>
     </button>
     <button type="button"
             class="lib-number-input-handler lib-number-input-handler-down"
-            [disabled]="disabled() || (min() !== null && valueSignal() !== null && valueSignal()! <= min()!)"
+            [disabled]="disabled() || (min() !== null && value() !== null && value()! <= min()!)"
             (click)="decrease()">
       <span class="lib-number-input-handler-down-inner"></span>
     </button>

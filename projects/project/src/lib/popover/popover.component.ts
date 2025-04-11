@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { OverlayBasicPosition } from '../overlay/overlay-basic.directive';
 import { CommonModule } from '@angular/common';
-import { ButtonType, ButtonColor } from '../button/button.component.interface';
+import { ButtonType, ButtonColor } from '../button/button.interface';
 import { ButtonComponent } from '../button/button.component';
 @Component({
   selector: 'lib-popover',
