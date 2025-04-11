@@ -13,9 +13,12 @@
       <i class="lib-tabs-nav-arrow-icon"></i>
     </button>
     <!-- 导航栏 -->
-    <div class="lib-tabs-nav" [class.lib-tabs-nav-centered]="centered">
+    <div class="lib-tabs-nav">
       <!-- 主内容区 -->
-      <div class="lib-tabs-nav-view" #tabsNav (scroll)="onScroll()">
+      <div 
+        #tabsNav
+        class="lib-tabs-nav-view"
+        [class.lib-tabs-nav-centered]="centered">
         <div class="lib-tabs-nav-list" #tabsNavList>
           <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab" 
                class="lib-tabs-tab"

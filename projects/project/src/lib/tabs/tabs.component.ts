@@ -51,7 +51,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   @Input() size: 'default' | 'small' | 'large' = 'default';
   @Input() type: 'line' | 'card' = 'line';
   @Input() animated = true;
-  @Input() centered = false;
+  @Input() centered = true;
   @Input() hideAdd = true;
   @Input() addIcon = 'bi-plus-circle';
   @Input() closeIcon = 'bi-x-lg';
@@ -242,15 +242,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.checkScrollButtons();
       this.updateInkBarStyles();
     });
-  }
-
-  /**
-   * 处理滚动事件
-   */
-  onScroll(): void {
-    // 直接检查滚动按钮状态
-    this.checkScrollButtons();
-    this.updateInkBarStyles();
   }
 
   /**
