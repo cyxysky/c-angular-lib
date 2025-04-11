@@ -140,7 +140,6 @@ export * from './directive';
     ModalComponent,
     TabComponent,
     TabsComponent,
-
   ],
   providers: [
 

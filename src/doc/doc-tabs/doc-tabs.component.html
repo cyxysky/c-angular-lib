@@ -1,1 +1,148 @@
-<p>doc-tabs works!</p>
+<div class="doc-container">
+    <h1 class="doc-title">标签页 Tabs</h1>
+
+    <p class="doc-description">
+        选项卡切换组件，用于在不同视图之间进行切换展示。
+    </p>
+
+    <h2 class="doc-section-title">何时使用</h2>
+    <p class="doc-description">
+        当内容较多需要分类展现时，或者不同类型的内容需要进行平级切换展示时使用。
+    </p>
+
+    <h2 class="doc-section-title">代码演示</h2>
+
+    <div class="doc-grid">
+        <!-- 基本用法 -->
+        <app-doc-box title="基本用法" [sourceCode]="basicSource">
+            <div demo>
+                <lib-tabs [selectedIndex]="0">
+                    <lib-tab title="标签页1">内容1</lib-tab>
+                    <lib-tab title="标签页2">内容2</lib-tab>
+                    <lib-tab title="标签页3">内容3</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                最简单的用法，通过lib-tab组件定义标签页内容。
+            </div>
+        </app-doc-box>
+
+        <!-- 位置 -->
+        <app-doc-box title="标签位置" [sourceCode]="positionSource">
+            <div demo>
+                <div style="margin-bottom: 16px;">
+                    <lib-segmented [segmentedOptions]="positionOptions" [(ngModel)]="tabPosition">
+                    </lib-segmented>
+                </div>
+                <lib-tabs [tabPosition]="tabPosition">
+                    <lib-tab title="标签页1">内容1</lib-tab>
+                    <lib-tab title="标签页2">内容2</lib-tab>
+                    <lib-tab title="标签页3">内容3</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                标签页可以设置在上、下、左、右四个方向，默认为顶部（top）。
+            </div>
+        </app-doc-box>
+
+        <!-- 卡片式 -->
+        <app-doc-box title="卡片式标签页" [sourceCode]="cardSource">
+            <div demo>
+                <lib-tabs [type]="'card'">
+                    <lib-tab title="标签页1">内容1</lib-tab>
+                    <lib-tab title="标签页2">内容2</lib-tab>
+                    <lib-tab title="标签页3">内容3</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                另一种样式的标签页，具有卡片式外观。
+            </div>
+        </app-doc-box>
+
+        <!-- 尺寸 -->
+        <app-doc-box title="尺寸" [sourceCode]="sizeSource">
+            <div demo>
+                <div style="margin-bottom: 16px;">
+                    <lib-segmented [segmentedOptions]="sizeOptions" [(ngModel)]="tabSize">
+                    </lib-segmented>
+                </div>
+                <lib-tabs [size]="tabSize">
+                    <lib-tab title="标签页1">内容1</lib-tab>
+                    <lib-tab title="标签页2">内容2</lib-tab>
+                    <lib-tab title="标签页3">内容3</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                标签页有大、中、小三种尺寸。
+            </div>
+        </app-doc-box>
+
+        <!-- 禁用 -->
+        <app-doc-box title="禁用标签页" [sourceCode]="disabledSource">
+            <div demo>
+                <lib-tabs>
+                    <lib-tab title="标签页1">内容1</lib-tab>
+                    <lib-tab title="标签页2" [disabled]="true">内容2</lib-tab>
+                    <lib-tab title="标签页3">内容3</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                可以通过disabled属性禁用某个标签页。
+            </div>
+        </app-doc-box>
+
+        <!-- 带图标 -->
+        <app-doc-box title="带图标的标签页" [sourceCode]="iconSource">
+            <div demo>
+                <lib-tabs>
+                    <lib-tab title="用户" icon="bi-person">用户相关内容</lib-tab>
+                    <lib-tab title="设置" icon="bi-gear">设置相关内容</lib-tab>
+                    <lib-tab title="消息" icon="bi-bell">消息相关内容</lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                可以在标签页中展示图标。
+            </div>
+        </app-doc-box>
+
+        <!-- 动态添加标签页 -->
+        <app-doc-box title="动态添加标签页" [sourceCode]="dynamicSource">
+            <div demo>
+                <lib-tabs [hideAdd]="false" (add)="addTab()" [closable]="true" (close)="closeTab($event)">
+                    <lib-tab *ngFor="let tab of dynamicTabs; let i = index" [title]="tab.title" [key]="tab.key">
+                        {{ tab.content }}
+                    </lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                可以动态添加和关闭标签页。
+            </div>
+        </app-doc-box>
+
+        <!-- 自定义模板 -->
+        <app-doc-box title="自定义标题模板" [sourceCode]="customSource">
+            <div demo>
+                <lib-tabs>
+                    <lib-tab [titleTemplate]="customTitle1">
+                        自定义标题模板内容1
+                        <ng-template #customTitle1>
+                            <span style="color: red">自定义</span>标题1
+                        </ng-template>
+                    </lib-tab>
+                    <lib-tab [titleTemplate]="customTitle2">
+                        自定义标题模板内容2
+                        <ng-template #customTitle2>
+                            <span style="color: blue">自定义</span>标题2
+                        </ng-template>
+                    </lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                可以自定义标签页的标题模板。
+            </div>
+        </app-doc-box>
+    </div>
+
+    <h2 class="doc-section-title">API</h2>
+    <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

@@ -20,6 +20,7 @@ import { DocTreeComponent } from './doc-tree/doc-tree.component';
 import { DocStructureTreeComponent } from './doc-structure-tree/doc-structure-tree.component';
 import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.component';
 import { DocModalComponent } from './doc-modal/doc-modal.component';
+import { DocTabsComponent } from './doc-tabs/doc-tabs.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -43,7 +44,8 @@ import { DocModalComponent } from './doc-modal/doc-modal.component';
     DocTreeComponent,
     DocStructureTreeComponent,
     DocTreeSelectComponent,
-    DocModalComponent
+    DocModalComponent,
+    DocTabsComponent
   ],
   exports: [
     DocButtonComponent,
@@ -65,7 +67,8 @@ import { DocModalComponent } from './doc-modal/doc-modal.component';
     DocTreeComponent,
     DocStructureTreeComponent,
     DocTreeSelectComponent,
-    DocModalComponent
+    DocModalComponent,
+    DocTabsComponent
   ]
 })
 export class DocModule { }

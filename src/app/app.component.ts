@@ -21,7 +21,7 @@ export class AppComponent {
   mySignal = signal({
     ok: 'false'
   });
-  nowComponent = signal('modal');
+  nowComponent = signal('tabs');
   checked = signal(false);
   onCheckedChange(checked: boolean) {
     this.checked.set(checked);

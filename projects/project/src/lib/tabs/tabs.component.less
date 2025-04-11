@@ -9,69 +9,125 @@
 @border-radius-base: 2px;
 @box-shadow-base: 0 2px 8px rgba(0, 0, 0, 0.15);
 
-// Tabs样式
+// 动画
+@ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+@animation-duration-slow: 0.3s;
+
+// Tabs基础样式
 .lib-tabs {
   display: flex;
   overflow: hidden;
-  &-top, &-bottom {
-    flex-direction: column;
-  }
-  &-left, &-right {
-    flex-direction: row;
-  }
+  
+  // 布局方向
+  &-top, &-bottom { flex-direction: column; }
+  &-left, &-right { flex-direction: row; }
+  
+  // 左侧tabs样式
   &-left {
     .lib-tabs-nav {
       flex-direction: column;
       margin-right: 16px;
+      padding-right: 8px;
+      border-right: 1px solid @border-color-base;
+      
+      .lib-tabs-nav-list {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .lib-tabs-tab {
+        margin-right: 0;
+        margin-bottom: 12px;
+        justify-content: flex-start;
+      }
     }
+    
     .lib-tabs-ink-bar {
-      right: 0;
-      left: auto;
+      right: auto;
+      left: 0;
+      top: 0;
       width: 2px;
-      height: auto;
     }
+    
+    .lib-tabs-content { flex: 1; }
   }
+  
+  // 右侧tabs样式
   &-right {
     .lib-tabs-nav {
       flex-direction: column;
       order: 1;
       margin-left: 16px;
+      padding-left: 8px;
+      border-left: 1px solid @border-color-base;
+      
+      .lib-tabs-nav-list {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .lib-tabs-tab {
+        margin-right: 0;
+        margin-bottom: 12px;
+        justify-content: flex-start;
+      }
     }
+    
     .lib-tabs-ink-bar {
       right: auto;
       left: 0;
+      top: 0;
       width: 2px;
-      height: auto;
     }
+    
+    .lib-tabs-content { flex: 1; }
   }
+  
+  // 底部tabs样式
   &-bottom {
     .lib-tabs-nav {
       order: 1;
       margin-top: 16px;
       margin-bottom: 0;
+      border-top: 1px solid @border-color-base;
     }
+    
     .lib-tabs-ink-bar {
       top: 0;
       bottom: auto;
     }
   }
+  
+  // 顶部tabs样式
+  &-top {
+    .lib-tabs-nav {
+      border-bottom: 1px solid @border-color-base;
+    }
+  }
+  
+  // 导航区域
   &-nav {
     position: relative;
     display: flex;
     flex: none;
     margin: 0 0 16px 0;
+    
     &-list {
       display: flex;
       flex: auto;
       align-items: center;
       transition: transform 0.3s;
+      position: relative;
     }
+    
     &-centered {
       .lib-tabs-nav-list {
         justify-content: center;
       }
     }
   }
+  
+  // 标签页
   &-tab {
     position: relative;
     display: flex;
@@ -84,31 +140,82 @@
     border: 0;
     outline: none;
     cursor: pointer;
-    &:last-of-type {
-      margin-right: 0;
-    }
+    transition: color 0.3s @ease-in-out;
+    
+    &:last-of-type { margin-right: 0; }
+    
     &-btn {
+      display: flex;
+      align-items: center;
       outline: none;
       transition: all 0.3s;
     }
+    
+    &-icon {
+      margin-right: 8px;
+      font-size: 14px;
+      
+      i { display: inline-block; }
+    }
+    
+    &-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
     &-active &-btn {
       color: @primary-color;
       font-weight: 500;
     }
+    
     &-disabled {
       color: @disabled-color;
       cursor: not-allowed;
     }
+    
+    // 关闭按钮
+    &-close {
+      margin-left: 8px;
+      padding: 0;
+      font-size: 12px;
+      background: transparent;
+      border: 0;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      &:hover { color: @heading-color; }
+    }
+    
+    // 添加按钮
+    &-add {
+      padding: 0 8px;
+      background: #fff;
+      
+      &:hover {
+        color: @primary-color;
+        border-color: @primary-color;
+      }
+      
+      &-icon { font-size: 12px; }
+    }
   }
+  
+  // 下划线指示器
   &-ink-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     height: 2px;
     background-color: @primary-color;
-    transform-origin: 0 0;
-    transition: transform 0.3s;
+    z-index: 1;
+    transition: transform @animation-duration-slow @ease-in-out, 
+                width @animation-duration-slow @ease-in-out, 
+                height @animation-duration-slow @ease-in-out;
   }
+  
+  // 卡片样式
   &-card {
     .lib-tabs-tab {
       margin-right: 2px;
@@ -116,40 +223,77 @@
       background: #fafafa;
       border: 1px solid @border-color-base;
       border-radius: @border-radius-base @border-radius-base 0 0;
-      transition: all 0.3s;
+      transition: all 0.3s @ease-in-out;
+      
       &-active {
         background: #fff;
         border-bottom-color: #fff;
       }
+      
+      &-close { margin-left: 8px; }
     }
-    .lib-tabs-ink-bar {
-      display: none;
-    }
+    
+    .lib-tabs-ink-bar { display: none; }
   }
+  
+  // 尺寸变体
   &-small {
     .lib-tabs-tab {
       padding: 8px 0;
       font-size: 12px;
+      
+      &-icon { font-size: 12px; }
+      &-close { font-size: 10px; }
     }
   }
+  
   &-large {
     .lib-tabs-tab {
       padding: 16px 0;
       font-size: 16px;
+      
+      &-icon { font-size: 16px; }
     }
   }
+  
+  // 内容区域
   &-content {
-    display: flex;
+    position: relative;
+    flex: 1;
     width: 100%;
   }
+  
   &-tabpane {
-    flex: none;
+    position: relative;
     width: 100%;
-    &-animated {
-      transition: all 0.3s;
+    height: 100%;
+    
+    &-active { z-index: 1; }
+  }
+  
+  // 动画效果
+  &-animated {
+    .lib-tabs-content {
+      position: relative;
+      overflow: hidden;
     }
-    &:not(&-active) {
-      display: none;
+    
+    .lib-tabs-tabpane {
+      transition: opacity 0.3s @ease-in-out;
+      
+      &:not(.lib-tabs-tabpane-active) {
+        position: absolute;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+      }
+      
+      &-active { opacity: 1; }
     }
   }
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

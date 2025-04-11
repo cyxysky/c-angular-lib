@@ -16,11 +16,11 @@ import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.inter
 	],
 	host: {
 		'[class]': 'disabled() ? "disabled" : ""',
+		'[style.pointer-events]': 'disabled() ? "none" : "auto"',
 		'[style.display]': 'block() ? "block" : "inline-block"',
 	}
 })
 export class ButtonComponent {
-	constructor() { }
 	/** 按钮大小 */
 	size = input<ButtonSize>('middle', { alias: 'buttonSize' });
 	/** 按钮类型 */
@@ -35,11 +35,8 @@ export class ButtonComponent {
 	content = input<string>(undefined, { alias: 'buttonContent' });
 	/** 是否撑满父元素 */
 	block = input(false, { transform: booleanAttribute, alias: 'buttonBlock' });
-
-	ngOnInit() { }
-
-	ripple: { x?: number; y?: number; size?: number } = {};
-	
+	/** 波纹 */
+	public ripple: { x?: number; y?: number; size?: number } = {};
 	/**
 	 * 创建波纹
 	 * @param event 事件
