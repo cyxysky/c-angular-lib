@@ -44,12 +44,10 @@ export class DocTabsComponent {
   ];
 
   // 位置示例
-  tabPosition: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  tabPosition: 'top' | 'bottom' = 'top';
   positionOptions = [
     { value: 'top', label: '顶部' },
     { value: 'bottom', label: '底部' },
-    { value: 'left', label: '左侧' },
-    { value: 'right', label: '右侧' }
   ];
 
   // 尺寸示例

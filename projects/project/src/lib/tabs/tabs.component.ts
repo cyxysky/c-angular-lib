@@ -47,7 +47,7 @@ export interface TabConfig extends Omit<TabItem, 'key'> {
 })
 export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit, OnDestroy {
   @Input() selectedIndex = 0;
-  @Input() tabPosition: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  @Input() tabPosition: 'top' | 'bottom' = 'top';
   @Input() size: 'default' | 'small' | 'large' = 'default';
   @Input() type: 'line' | 'card' = 'line';
   @Input() animated = true;
@@ -69,9 +69,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   @ViewChild('tabsNavList') tabsNavList!: ElementRef;
   @ViewChild('navWrapper', { static: false }) navWrapper!: ElementRef;
 
-  @HostBinding('class.animate-forward') animateForward = false;
-  @HostBinding('class.animate-backward') animateBackward = false;
-
   // 滚动相关状态
   canScrollLeft = false;
   canScrollRight = false;
@@ -79,7 +76,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
 
   allTabs: TabItem[] = [];
   inkBarStyle: { [key: string]: string } = {};
-  private previousIndex = 0;
   private destroy$ = new Subject<void>();
   private resizeObserver: ResizeObserver | null = null;
   private scrollDebounce$ = new Subject<void>();
@@ -148,11 +144,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     if (this.allTabs[index]?.disabled || this.selectedIndex === index) {
       return;
     }
-    this.previousIndex = this.selectedIndex;
     this.selectedIndex = index;
     // 设置动画方向
-    this.animateForward = this.selectedIndex > this.previousIndex;
-    this.animateBackward = this.selectedIndex < this.previousIndex;
     this.selectedIndexChange.emit(index);
     this.tabClick.emit({ index, tab: this.allTabs[index] });
     this.selectChange.emit(this.allTabs[index]);
@@ -347,25 +340,11 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
             this.recalculateAll();
           });
         });
-
-        if (this.tabsNav) {
-          this.resizeObserver.observe(this.tabsNav.nativeElement);
-        }
-
-        if (this.tabsNavList) {
-          this.resizeObserver.observe(this.tabsNavList.nativeElement);
-        }
-
         // 监听整个文档和body的变化
         const documentElement = document.documentElement;
         if (documentElement) {
           this.resizeObserver.observe(documentElement);
         }
-
-        if (document.body) {
-          this.resizeObserver.observe(document.body);
-        }
-
         // 监听窗口大小变化
         window.addEventListener('resize', () => {
           this.ngZone.run(() => {
@@ -386,17 +365,14 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         customTitle: tab.customTemplate
       })) || []
     ];
-
     if (this.selectedIndex >= this.allTabs.length) {
       this.selectedIndex = Math.max(0, this.allTabs.length - 1);
     }
-
     this.cdr.detectChanges();
     this.recalculateAll();
   }
 
   private updateSelectedIndex(): void {
-    this.previousIndex = this.selectedIndex;
     this.cdr.markForCheck();
     this.updateInkBarStyles();
     this.scrollToActiveTab();
@@ -406,7 +382,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     if (this.type !== 'line' || this.allTabs.length === 0) {
       return;
     }
-
     if (this.tabElements && this.tabElements.length > this.selectedIndex) {
       const activeElement = this.tabElements.toArray()[this.selectedIndex].nativeElement;
       if (activeElement) {
@@ -414,7 +389,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         return;
       }
     }
-
     const tabElements = document.querySelectorAll('.lib-tabs-tab');
     if (tabElements && tabElements.length > this.selectedIndex) {
       const activeElement = tabElements[this.selectedIndex] as HTMLElement;
@@ -426,32 +400,19 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
 
   private setInkBarStyles(element: HTMLElement): void {
     if (!this.tabsNav) return;
-
     const navContainer = this.tabsNav.nativeElement;
-    const { offsetWidth, offsetHeight, offsetLeft, offsetTop } = element;
-    const isHorizontal = this.tabPosition === 'top' || this.tabPosition === 'bottom';
-
+    const { offsetWidth, offsetLeft } = element;
     // 获取滚动位置，以修正ink-bar的位置
     const scrollLeft = navContainer.scrollLeft;
-
-    this.inkBarStyle = isHorizontal ?
-      {
-        width: `${offsetWidth}px`,
-        height: '2px',
-        transform: `translate3d(${offsetLeft - scrollLeft}px, 0, 0)`,
-        top: this.tabPosition === 'top' ? 'auto' : '0',
-        bottom: this.tabPosition === 'top' ? '0' : 'auto',
-        left: '0'
-      } :
-      {
-        width: '2px',
-        height: `${offsetHeight}px`,
-        transform: `translate3d(0, ${offsetTop}px, 0)`,
-        top: '0',
-        left: this.tabPosition === 'left' ? '100%' : '0',
-        right: 'auto'
-      };
-
+    this.inkBarStyle =
+    {
+      width: `${offsetWidth}px`,
+      height: '2px',
+      transform: `translate3d(${offsetLeft - scrollLeft}px, 0, 0)`,
+      top: this.tabPosition === 'top' ? 'auto' : '0',
+      bottom: this.tabPosition === 'top' ? '0' : 'auto',
+      left: '0'
+    }
     this.cdr.markForCheck();
   }
 }
