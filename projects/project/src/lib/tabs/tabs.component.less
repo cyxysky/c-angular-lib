@@ -387,5 +387,25 @@
     
     &-active { z-index: 1; }
   }
-
+  
+  // 动画效果
+  &-animated {
+    .lib-tabs-content {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .lib-tabs-tabpane {
+      transition: opacity 0.3s @ease-in-out;
+      
+      &:not(.lib-tabs-tabpane-active) {
+        position: absolute;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+      }
+      
+      &-active { opacity: 1; }
+    }
+  }
 }

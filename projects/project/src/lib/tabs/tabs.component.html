@@ -5,8 +5,9 @@
      [class.lib-tabs-right]="tabPosition === 'right'" 
      [class.lib-tabs-card]="type === 'card'" 
      [class.lib-tabs-small]="size === 'small'" 
-     [class.lib-tabs-large]="size === 'large'">
-  <div class="lib-tabs-nav-wrapper" #navWrapper>
+     [class.lib-tabs-large]="size === 'large'" 
+     [class.lib-tabs-animated]="animated">
+  <div class="lib-tabs-nav-wrapper">
     <!-- 左侧滚动按钮 -->
     <button *ngIf="showScrollNav && isHorizontal" 
             class="lib-tabs-nav-arrow lib-tabs-nav-prev" 
@@ -58,13 +59,13 @@
       <i class="lib-tabs-nav-arrow-icon"></i>
     </button>
   </div>
-  <!-- 内容区域 -->
+  
   <div class="lib-tabs-content">
     <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab"
          class="lib-tabs-tabpane"
          [class.lib-tabs-tabpane-active]="isActive(i)"
-         [style.display]="!isActive(i) ? 'none' : 'block'">
-      <ng-container *ngIf="isActive(i)">
+         [style.display]="(!animated && !isActive(i)) ? 'none' : 'block'">
+      <ng-container *ngIf="isActive(i) || animated">
         <ng-container [ngTemplateOutlet]="tab.content"></ng-container>
       </ng-container>
     </div>
