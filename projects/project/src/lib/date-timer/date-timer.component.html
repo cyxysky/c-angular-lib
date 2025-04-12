@@ -92,7 +92,9 @@
     <div *ngIf="currentPanelMode === 'month'" class="date-timer-month-panel">
       <div class="date-timer-header">
         <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
-        <span *ngIf="mode === 'date'" class="date-timer-header-view date-timer-header-clickable" (click)="onHeaderClick('month-header')">{{ getYear(currentViewDate) }}</span>
+        <span *ngIf="mode === 'date'" class="date-timer-header-view">
+          <span class="date-timer-header-clickable" (click)="onHeaderClick('year')">{{ getYear(currentViewDate) }}年</span>
+        </span>
         <span *ngIf="mode !== 'date'" class="date-timer-header-view">{{ getYear(currentViewDate) }}</span>
         <button class="date-timer-next-year-btn" (click)="nextYear()">&gt;&gt;</button>
       </div>
@@ -137,8 +139,16 @@
       <div class="date-timer-header">
         <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
         <button class="date-timer-prev-month-btn" (click)="prevMonth()">&lt;</button>
-        <span *ngIf="mode === 'date'" class="date-timer-header-view date-timer-header-clickable" (click)="onHeaderClick('date-header')">{{ getHeaderText() }}</span>
+        
+        <!-- 日期模式下的可点击标题 -->
+        <span *ngIf="mode === 'date'" class="date-timer-header-view">
+          <span class="date-timer-header-clickable" (click)="onHeaderClick('year')">{{ getHeaderYear() }}</span>
+          <span class="date-timer-header-clickable" (click)="onHeaderClick('month')">{{ getHeaderMonth() }}</span>
+        </span>
+        
+        <!-- 其他模式下的只读标题 -->
         <span *ngIf="mode !== 'date'" class="date-timer-header-view">{{ getHeaderText() }}</span>
+        
         <button class="date-timer-next-month-btn" (click)="nextMonth()">&gt;</button>
         <button class="date-timer-next-year-btn" (click)="nextYear()">&gt;&gt;</button>
       </div>

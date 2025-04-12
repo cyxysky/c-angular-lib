@@ -989,6 +989,14 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
   }
 
+  getHeaderYear(): string {
+    return `${getYear(this.currentViewDate)}年`;
+  }
+
+  getHeaderMonth(): string {
+    return `${getMonth(this.currentViewDate) + 1}月`;
+  }
+
   renderDateCell(date: Date): string | TemplateRef<any> {
     if (this.dateRender) {
       return this.dateRender(date);
@@ -1056,12 +1064,12 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   // 修改标题点击处理方法
   onHeaderClick(headerType: string): void {
     if (this.mode === 'date') {
-      if (headerType === 'date-header') {
-        // 如果点击的是日期标题（如：2025年7月），则切换到月份面板
-        this.currentPanelMode = 'month';
-      } else if (headerType === 'month-header') {
-        // 如果点击的是月份标题（如：2025年），则切换到年份面板
+      if (headerType === 'year') {
+        // 点击年份部分，进入年份选择面板
         this.currentPanelMode = 'year';
+      } else if (headerType === 'month') {
+        // 点击月份部分，进入月份选择面板
+        this.currentPanelMode = 'month';
       }
       this.cdr.markForCheck();
     }
