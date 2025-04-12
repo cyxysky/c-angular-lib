@@ -1132,7 +1132,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       if (this.showTime) {
         this.displayValue = `${this.formatDate(startDate)} 00:00:00 ~`;
         // 完成日期选择后，如果是showTime模式，直接进入时间选择模式
-        this.currentPanelMode = 'time';
         this.timeSelectStep = 'hour';
       } else {
         this.displayValue = `${this.formatDate(startDate)} ~`;
@@ -1177,7 +1176,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       if (this.showTime) {
         this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(endDate)} ${this.timeSelectStep === 'complete' ? this.formatTime(endDate) : '00:00:00'}`;
         // 如果是showTime模式，选择完日期后切换到时间选择面板
-        this.currentPanelMode = 'time';
         this.timeSelectStep = 'hour';
       } else {
         this.displayValue = `${this.formatDate(this.rangeStart)} ~ ${this.formatDate(endDate)}`;
@@ -1204,14 +1202,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式
+      // 单选模式，更新小时值但不改变当前选择步骤
       this.updateTimeValue('hour', hour);
-      
-      if (this.timeSelectStep === 'hour') {
-        // 进入分钟选择
-        this.timeSelectStep = 'minute';
-      }
-      
       this.cdr.markForCheck();
       return;
     }
@@ -1237,13 +1229,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         }
       }
       
+      // 更新小时值但不改变当前选择步骤
       this.updateTimeRangeValue('hour', hour);
-      
-      if (this.timeSelectStep === 'hour') {
-        // 进入分钟选择
-        this.timeSelectStep = 'minute';
-      }
-      
       this.cdr.markForCheck();
     }
   }
@@ -1255,14 +1242,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式
+      // 单选模式，更新分钟值但不改变当前选择步骤
       this.updateTimeValue('minute', minute);
-      
-      if (this.timeSelectStep === 'minute') {
-        // 进入秒选择
-        this.timeSelectStep = 'second';
-      }
-      
       this.cdr.markForCheck();
       return;
     }
@@ -1288,13 +1269,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         }
       }
       
+      // 更新分钟值但不改变当前选择步骤
       this.updateTimeRangeValue('minute', minute);
-      
-      if (this.timeSelectStep === 'minute') {
-        // 进入秒选择
-        this.timeSelectStep = 'second';
-      }
-      
       this.cdr.markForCheck();
     }
   }
@@ -1306,19 +1282,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式
+      // 单选模式，更新秒值但不改变当前选择步骤
       this.updateTimeValue('second', second);
-      
-      if (this.timeSelectStep === 'second') {
-        // 完成时间选择
-        this.timeSelectStep = 'complete';
-        
-        // 如果是日期时间模式，完成选择后关闭面板
-        if (this.mode === 'time') {
-          this.closeDropdown();
-        }
-      }
-      
       this.cdr.markForCheck();
       return;
     }
@@ -1347,22 +1312,13 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         }
       }
       
+      // 更新秒值但不改变当前选择步骤
       this.updateTimeRangeValue('second', second);
       
-      if (this.timeSelectStep === 'second') {
-        // 完成当前部分的时间选择
-        this.timeSelectStep = 'complete';
-        
-        if (this.rangePart === 'start') {
-          // 完成开始时间选择后，切换到结束时间选择
-          this.rangePart = 'end';
-          this.timeSelectStep = 'hour';
-        } else {
-          // 完成结束时间选择，关闭面板
-          if (this.mode === 'time') {
-            this.closeDropdown();
-          }
-        }
+      // 只有在完成选择开始时间后，才自动切换到结束时间选择
+      if (this.rangePart === 'start' && this.timeSelectStep === 'complete') {
+        this.rangePart = 'end';
+        this.timeSelectStep = 'hour';
       }
       
       this.cdr.markForCheck();
@@ -2051,6 +2007,9 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       if (headerType === 'year') {
         // 点击年份部分，进入年份选择面板
         this.currentPanelMode = 'year';
+        // 重新生成年份列表
+        this.years = [];
+        this.updateYears();
       } else if (headerType === 'month') {
         // 点击月份部分，进入月份选择面板
         this.currentPanelMode = 'month';
@@ -2787,6 +2746,13 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 更新onChange
     this._onChange(this.selectedValue);
     
+    this.cdr.markForCheck();
+  }
+
+  // 添加方法：当点击时间列标题时切换到对应的时间选择步骤
+  onTimeColumnTitleClick(step: 'hour' | 'minute' | 'second'): void {
+    // 允许随时切换到任何时间单位选择
+    this.timeSelectStep = step;
     this.cdr.markForCheck();
   }
 }

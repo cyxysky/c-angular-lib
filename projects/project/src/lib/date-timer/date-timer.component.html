@@ -159,7 +159,7 @@
       </div>
       
       <!-- 日期面板（用于日期和周选择） -->
-      <div *ngIf="currentPanelMode === 'date' || ['date', 'week'].includes(mode)" class="date-timer-date-panel"
+      <div *ngIf="currentPanelMode === 'date'" class="date-timer-date-panel"
            [class.date-timer-date-panel-week-mode]="mode === 'week'">
         <!-- 面板头部 -->
         <div class="date-timer-header">
@@ -250,15 +250,21 @@
         
         <!-- 时间选择步骤指示器 -->
         <div class="date-timer-time-steps" *ngIf="selectType === 'range'">
-          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'hour'">时</span> → 
-          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'minute'">分</span> → 
-          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'second'">秒</span>
+          <span class="date-timer-time-step" 
+                [class.date-timer-time-step-active]="timeSelectStep === 'hour'"
+                (click)="onTimeColumnTitleClick('hour')">时</span> → 
+          <span class="date-timer-time-step" 
+                [class.date-timer-time-step-active]="timeSelectStep === 'minute'"
+                (click)="onTimeColumnTitleClick('minute')">分</span> → 
+          <span class="date-timer-time-step" 
+                [class.date-timer-time-step-active]="timeSelectStep === 'second'"
+                (click)="onTimeColumnTitleClick('second')">秒</span>
         </div>
         
         <div class="date-timer-time-columns">
           <!-- 小时 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'hour'">
-            <div class="date-timer-time-column-title">时</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('hour')">时</div>
             <ul>
               <li *ngFor="let hour of hours" 
                   class="date-timer-time-cell"
@@ -273,7 +279,7 @@
           </div>
           <!-- 分钟 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'minute'">
-            <div class="date-timer-time-column-title">分</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('minute')">分</div>
             <ul>
               <li *ngFor="let minute of minutes" 
                   class="date-timer-time-cell"
@@ -288,7 +294,7 @@
           </div>
           <!-- 秒钟 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'second'">
-            <div class="date-timer-time-column-title">秒</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('second')">秒</div>
             <ul>
               <li *ngFor="let second of seconds" 
                   class="date-timer-time-cell"
@@ -309,7 +315,7 @@
         <div class="date-timer-time-columns">
           <!-- 小时 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title">时</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('hour')">时</div>
             <ul>
               <li *ngFor="let hour of hours" 
                   class="date-timer-time-cell"
@@ -324,7 +330,7 @@
           </div>
           <!-- 分钟 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title">分</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('minute')">分</div>
             <ul>
               <li *ngFor="let minute of minutes" 
                   class="date-timer-time-cell"
@@ -339,7 +345,7 @@
           </div>
           <!-- 秒钟 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title">秒</div>
+            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('second')">秒</div>
             <ul>
               <li *ngFor="let second of seconds" 
                   class="date-timer-time-cell"
