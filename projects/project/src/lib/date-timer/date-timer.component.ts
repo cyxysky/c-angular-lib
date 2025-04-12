@@ -386,18 +386,65 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       
       switch (this.mode) {
         case 'year':
+          if (range.end) {
+            // 跨年范围
+            if (getYear(range.start) !== getYear(range.end)) {
+              return `${getYear(range.start)} ~ ${getYear(range.end)}`;
+            } 
+            // 单年选择
+            return `${getYear(range.start)}`;
+          }
           return `${getYear(range.start)}`;
+          
         case 'month':
+          if (range.end) {
+            // 跨月范围
+            if (getYear(range.start) !== getYear(range.end) || getMonth(range.start) !== getMonth(range.end)) {
+              return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')} ~ ${getYear(range.end)}-${String(getMonth(range.end) + 1).padStart(2, '0')}`;
+            }
+            // 单月选择
+            return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')}`;
+          }
           return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')}`;
+          
         case 'quarter':
+          if (range.end) {
+            const startQuarter = Math.floor(getMonth(range.start) / 3) + 1;
+            const endQuarter = Math.floor(getMonth(range.end) / 3) + 1;
+            // 跨季度范围
+            if (getYear(range.start) !== getYear(range.end) || startQuarter !== endQuarter) {
+              return `${getYear(range.start)}-Q${startQuarter} ~ ${getYear(range.end)}-Q${endQuarter}`;
+            }
+            // 单季度选择
+            return `${getYear(range.start)}-Q${startQuarter}`;
+          }
           const quarter = Math.floor(getMonth(range.start) / 3) + 1;
           return `${getYear(range.start)}-Q${quarter}`;
+          
         case 'week':
+          if (range.end) {
+            // 获取周数
+            const startFirstDayOfYear = new Date(getYear(range.start), 0, 1);
+            const startPastDaysOfYear = differenceInDays(range.start, startFirstDayOfYear);
+            const startWeekNumber = Math.ceil((startPastDaysOfYear + getDay(startFirstDayOfYear)) / 7);
+            
+            const endFirstDayOfYear = new Date(getYear(range.end), 0, 1);
+            const endPastDaysOfYear = differenceInDays(range.end, endFirstDayOfYear);
+            const endWeekNumber = Math.ceil((endPastDaysOfYear + getDay(endFirstDayOfYear)) / 7);
+            
+            // 跨周范围
+            if (getYear(range.start) !== getYear(range.end) || startWeekNumber !== endWeekNumber) {
+              return `${getYear(range.start)}-${startWeekNumber}周 ~ ${getYear(range.end)}-${endWeekNumber}周`;
+            }
+            // 单周选择
+            return `${getYear(range.start)}-${startWeekNumber}周`;
+          }
           // 获取周数
           const firstDayOfYear = new Date(getYear(range.start), 0, 1);
           const pastDaysOfYear = differenceInDays(range.start, firstDayOfYear);
           const weekNumber = Math.ceil((pastDaysOfYear + getDay(firstDayOfYear)) / 7);
-          return `${getYear(range.start)}-${weekNumber}`;
+          return `${getYear(range.start)}-${weekNumber}周`;
+          
         default:
           if (range.end) {
             return `${this.formatDate(range.start)} ~ ${this.formatDate(range.end)}`;
@@ -460,14 +507,20 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     this.currentViewDate = setYear(this.currentViewDate, year);
     
     if (this.mode === 'year') {
-      const start = new Date(year, 0, 1, 0, 0, 0);  // 1月1日 00:00:00
-      const end = new Date(year, 11, 31, 23, 59, 59);  // 12月31日 23:59:59
-      
-      this.selectedValue = { start, end };
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
-      
-      this.closeDropdown();
+      if (this.selectType === 'single') {
+        const start = new Date(year, 0, 1, 0, 0, 0);  // 1月1日 00:00:00
+        const end = new Date(year, 11, 31, 23, 59, 59);  // 12月31日 23:59:59
+        
+        this.selectedValue = { start, end };
+        this.displayValue = this.formatSelectedValue(this.selectedValue);
+        this._onChange(this.selectedValue);
+        
+        this.closeDropdown();
+      } else if (this.selectType === 'range') {
+        // 范围选择模式，需要选择两次
+        const selectedDate = new Date(year, 0, 1);
+        this.onSelectRangeDate(selectedDate);
+      }
     } else {
       this.currentPanelMode = 'month';
       this.cdr.markForCheck();
@@ -478,16 +531,22 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     this.currentViewDate = setMonth(this.currentViewDate, month);
     
     if (this.mode === 'month') {
-      const year = getYear(this.currentViewDate);
-      const lastDay = new Date(year, month + 1, 0).getDate(); // 获取当月最后一天
-      const start = new Date(year, month, 1, 0, 0, 0); // 当月1日 00:00:00
-      const end = new Date(year, month, lastDay, 23, 59, 59); // 当月最后一天 23:59:59
-      
-      this.selectedValue = { start, end };
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
-      
-      this.closeDropdown();
+      if (this.selectType === 'single') {
+        const year = getYear(this.currentViewDate);
+        const lastDay = new Date(year, month + 1, 0).getDate(); // 获取当月最后一天
+        const start = new Date(year, month, 1, 0, 0, 0); // 当月1日 00:00:00
+        const end = new Date(year, month, lastDay, 23, 59, 59); // 当月最后一天 23:59:59
+        
+        this.selectedValue = { start, end };
+        this.displayValue = this.formatSelectedValue(this.selectedValue);
+        this._onChange(this.selectedValue);
+        
+        this.closeDropdown();
+      } else if (this.selectType === 'range') {
+        // 范围选择模式，需要选择两次
+        const selectedDate = new Date(getYear(this.currentViewDate), month, 1);
+        this.onSelectRangeDate(selectedDate);
+      }
     } else {
       this.currentPanelMode = 'date';
       this.generateDateMatrix();
@@ -502,16 +561,22 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     this.currentViewDate = date;
     
     if (this.mode === 'quarter') {
-      const start = new Date(year, startMonth, 1, 0, 0, 0); // 季度第一天 00:00:00
-      const endMonth = startMonth + 2;
-      const lastDay = new Date(year, endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
-      const end = new Date(year, endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
-      
-      this.selectedValue = { start, end };
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
-      
-      this.closeDropdown();
+      if (this.selectType === 'single') {
+        const start = new Date(year, startMonth, 1, 0, 0, 0); // 季度第一天 00:00:00
+        const endMonth = startMonth + 2;
+        const lastDay = new Date(year, endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
+        const end = new Date(year, endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
+        
+        this.selectedValue = { start, end };
+        this.displayValue = this.formatSelectedValue(this.selectedValue);
+        this._onChange(this.selectedValue);
+        
+        this.closeDropdown();
+      } else if (this.selectType === 'range') {
+        // 范围选择模式，需要选择两次
+        const selectedDate = new Date(year, startMonth, 1);
+        this.onSelectRangeDate(selectedDate);
+      }
     } else {
       this.currentPanelMode = 'date';
       this.generateDateMatrix();
@@ -523,13 +588,19 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     if (dates && dates.length === 0) return;
     
     const firstDate = dates[0];
-    const weekStart = startOfWeek(firstDate, { weekStartsOn: 0 });
-    const weekEnd = endOfWeek(firstDate, { weekStartsOn: 0 });
     
-    this.selectedValue = { start: weekStart, end: weekEnd };
-    this.displayValue = this.formatSelectedValue(this.selectedValue);
-    this._onChange(this.selectedValue);
-    this.closeDropdown();
+    if (this.selectType === 'single') {
+      const weekStart = startOfWeek(firstDate, { weekStartsOn: 0 });
+      const weekEnd = endOfWeek(firstDate, { weekStartsOn: 0 });
+      
+      this.selectedValue = { start: weekStart, end: weekEnd };
+      this.displayValue = this.formatSelectedValue(this.selectedValue);
+      this._onChange(this.selectedValue);
+      this.closeDropdown();
+    } else if (this.selectType === 'range') {
+      // 范围选择模式，需要选择两次
+      this.onSelectRangeDate(firstDate);
+    }
   }
 
   onCellHover(date: Date): void {
@@ -604,21 +675,50 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (!this.rangeStart) {
-      this.rangeStart = date;
+      // 根据不同mode设置范围起始值
+      let start = date;
+      if (this.mode === 'year') {
+        start = startOfYear(date);
+      } else if (this.mode === 'month') {
+        start = startOfMonth(date);
+      } else if (this.mode === 'quarter') {
+        start = startOfQuarter(date);
+      } else if (this.mode === 'week') {
+        start = startOfWeek(date, { weekStartsOn: 0 });
+      } else if (this.mode === 'date') {
+        start = startOfDay(date);
+      }
+      
+      this.rangeStart = start;
       this.rangePart = 'end';
-      this.selectedValue = { start: date, end: null };
-      this.displayValue = `${this.formatDate(date)} ~`;
+      this.selectedValue = { start, end: null };
+      this.displayValue = `${this.formatDate(start)} ~`;
     } else {
       let start = this.rangeStart;
       let end = date;
       
-      if (isBefore(date, this.rangeStart)) {
-        start = date;
-        end = this.rangeStart;
+      // 根据不同mode生成正确的结束日期
+      if (this.mode === 'year') {
+        end = endOfYear(date);
+      } else if (this.mode === 'month') {
+        end = endOfMonth(date);
+      } else if (this.mode === 'quarter') {
+        end = endOfQuarter(date);
+      } else if (this.mode === 'week') {
+        end = endOfWeek(date, { weekStartsOn: 0 });
+      } else if (this.mode === 'date') {
+        end = endOfDay(date);
       }
       
+      // 确保开始日期在结束日期之前
+      if (isBefore(end, start)) {
+        const temp = start;
+        start = end;
+        end = temp;
+      }
+      
+      // 保留时间部分
       if (this.showTime) {
-        // 保留时间部分
         const rangeValue = this.selectedValue as RangeValue<Date> || { start: null, end: null };
         
         if (rangeValue.start) {
@@ -904,10 +1004,23 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     
     if (this.isRangeValue(this.selectedValue)) {
       const range = this.selectedValue as RangeValue<Date>;
-      return Boolean(
-        (range.start && isSameDay(date, range.start)) || 
-        (range.end && isSameDay(date, range.end))
-      );
+      if (this.mode === 'date' || this.mode === 'week') {
+        const isStartSelected = range.start ? isSameDay(date, range.start) : false;
+        const isEndSelected = range.end ? isSameDay(date, range.end) : false;
+        return isStartSelected || isEndSelected;
+      } else if (this.mode === 'month') {
+        const isStartSelected = range.start ? isSameMonth(date, range.start) : false;
+        const isEndSelected = range.end ? isSameMonth(date, range.end) : false;
+        return isStartSelected || isEndSelected;
+      } else if (this.mode === 'quarter') {
+        const isStartSelected = range.start ? (Math.floor(getMonth(date) / 3) === Math.floor(getMonth(range.start) / 3) && getYear(date) === getYear(range.start)) : false;
+        const isEndSelected = range.end ? (Math.floor(getMonth(date) / 3) === Math.floor(getMonth(range.end) / 3) && getYear(date) === getYear(range.end)) : false;
+        return isStartSelected || isEndSelected;
+      } else if (this.mode === 'year') {
+        const isStartSelected = range.start ? (getYear(date) === getYear(range.start)) : false;
+        const isEndSelected = range.end ? (getYear(date) === getYear(range.end)) : false;
+        return isStartSelected || isEndSelected;
+      }
     } else if (this.isSingleDate(this.selectedValue)) {
       return isSameDay(date, this.selectedValue);
     }
@@ -915,33 +1028,15 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     return false;
   }
 
-  isInRange(date: Date | null): boolean {
-    if (!date || this.selectType !== 'range') return false;
-    
-    if (this.isRangeValue(this.selectedValue)) {
-      const range = this.selectedValue as RangeValue<Date>;
-      if (!range.start || !range.end) {
-        if (this.rangeStart && this.hoverValue) {
-          const start = isBefore(this.rangeStart, this.hoverValue) ? this.rangeStart : this.hoverValue;
-          const end = isBefore(this.rangeStart, this.hoverValue) ? this.hoverValue : this.rangeStart;
-          return isAfter(date, start) && isBefore(date, end);
-        }
-        return false;
-      }
-      
-      return isAfter(date, range.start) && isBefore(date, range.end);
-    }
-    
-    return false;
-  }
-
-  isSelectedMonth(month: number): boolean {
+  isSelectedMonth(month: number): boolean| any {
     if (!this.selectedValue) return false;
     
     if (this.isRangeValue(this.selectedValue)) {
       const range = this.selectedValue as RangeValue<Date>;
       if (range.start) {
-        return getMonth(range.start) === month && isSameYear(range.start, this.currentViewDate);
+        const isStartSelected = getMonth(range.start) === month && isSameYear(range.start, this.currentViewDate);
+        const isEndSelected = range.end && getMonth(range.end) === month && isSameYear(range.end, this.currentViewDate);
+        return isStartSelected || isEndSelected;
       }
     } else if (this.isSingleDate(this.selectedValue)) {
       return getMonth(this.selectedValue) === month && isSameYear(this.selectedValue, this.currentViewDate);
@@ -949,13 +1044,15 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     return false;
   }
 
-  isSelectedQuarter(quarter: number): boolean {
+  isSelectedQuarter(quarter: number): boolean | any {
     if (!this.selectedValue) return false;
     
     if (this.isRangeValue(this.selectedValue)) {
       const range = this.selectedValue as RangeValue<Date>;
       if (range.start) {
-        return Math.floor(getMonth(range.start) / 3) === quarter && isSameYear(range.start, this.currentViewDate);
+        const isStartSelected = Math.floor(getMonth(range.start) / 3) === quarter && isSameYear(range.start, this.currentViewDate);
+        const isEndSelected = range.end && Math.floor(getMonth(range.end) / 3) === quarter && isSameYear(range.end, this.currentViewDate);
+        return isStartSelected || isEndSelected;
       }
     } else if (this.isSingleDate(this.selectedValue)) {
       return Math.floor(getMonth(this.selectedValue) / 3) === quarter && isSameYear(this.selectedValue, this.currentViewDate);
@@ -963,13 +1060,15 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     return false;
   }
 
-  isSelectedYear(year: number): boolean {
+  isSelectedYear(year: number): boolean | any {
     if (!this.selectedValue) return false;
     
     if (this.isRangeValue(this.selectedValue)) {
       const range = this.selectedValue as RangeValue<Date>;
       if (range.start) {
-        return getYear(range.start) === year;
+        const isStartSelected = getYear(range.start) === year;
+        const isEndSelected = range.end && getYear(range.end) === year;
+        return isStartSelected || isEndSelected;
       }
     } else if (this.isSingleDate(this.selectedValue)) {
       return getYear(this.selectedValue) === year;
@@ -1121,4 +1220,287 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   private _onChange: (value: Date | RangeValue<Date> | null) => void = () => {};
   private _onTouched: () => void = () => {};
+
+  isInRange(date: Date | null): boolean {
+    if (!date || this.selectType !== 'range') return false;
+    
+    if (this.isRangeValue(this.selectedValue)) {
+      const range = this.selectedValue as RangeValue<Date>;
+      
+      // 处理还未完成的范围选择（用户选择了起始日期但还未选择结束日期）
+      if (!range.start || !range.end) {
+        if (this.rangeStart && this.hoverValue) {
+          // 根据不同mode比较日期
+          if (this.mode === 'year') {
+            const startYear = getYear(this.rangeStart);
+            const endYear = getYear(this.hoverValue);
+            const currentYear = getYear(date);
+            
+            return (startYear <= currentYear && currentYear <= endYear) || 
+                   (endYear <= currentYear && currentYear <= startYear);
+          } else if (this.mode === 'month') {
+            const startYear = getYear(this.rangeStart);
+            const startMonth = getMonth(this.rangeStart);
+            const endYear = getYear(this.hoverValue);
+            const endMonth = getMonth(this.hoverValue);
+            const currentYear = getYear(date);
+            const currentMonth = getMonth(date);
+            
+            const startValue = startYear * 12 + startMonth;
+            const endValue = endYear * 12 + endMonth;
+            const currentValue = currentYear * 12 + currentMonth;
+            
+            return (startValue <= currentValue && currentValue <= endValue) || 
+                   (endValue <= currentValue && currentValue <= startValue);
+          } else if (this.mode === 'quarter') {
+            const startYear = getYear(this.rangeStart);
+            const startQuarter = Math.floor(getMonth(this.rangeStart) / 3);
+            const endYear = getYear(this.hoverValue);
+            const endQuarter = Math.floor(getMonth(this.hoverValue) / 3);
+            const currentYear = getYear(date);
+            const currentQuarter = Math.floor(getMonth(date) / 3);
+            
+            const startValue = startYear * 4 + startQuarter;
+            const endValue = endYear * 4 + endQuarter;
+            const currentValue = currentYear * 4 + currentQuarter;
+            
+            return (startValue <= currentValue && currentValue <= endValue) || 
+                   (endValue <= currentValue && currentValue <= startValue);
+          } else if (this.mode === 'week') {
+            // 周模式使用日期比较
+            const start = isBefore(this.rangeStart, this.hoverValue) ? this.rangeStart : this.hoverValue;
+            const end = isBefore(this.rangeStart, this.hoverValue) ? this.hoverValue : this.rangeStart;
+            return isAfter(date, start) && isBefore(date, end);
+          } else {
+            // 日期模式使用日期比较
+            const start = isBefore(this.rangeStart, this.hoverValue) ? this.rangeStart : this.hoverValue;
+            const end = isBefore(this.rangeStart, this.hoverValue) ? this.hoverValue : this.rangeStart;
+            return isAfter(date, start) && isBefore(date, end);
+          }
+        }
+        return false;
+      }
+      
+      // 已完成的范围选择
+      if (this.mode === 'year') {
+        const startYear = getYear(range.start);
+        const endYear = getYear(range.end);
+        const currentYear = getYear(date);
+        
+        return startYear <= currentYear && currentYear <= endYear;
+      } else if (this.mode === 'month') {
+        const startYear = getYear(range.start);
+        const startMonth = getMonth(range.start);
+        const endYear = getYear(range.end);
+        const endMonth = getMonth(range.end);
+        const currentYear = getYear(date);
+        const currentMonth = getMonth(date);
+        
+        const startValue = startYear * 12 + startMonth;
+        const endValue = endYear * 12 + endMonth;
+        const currentValue = currentYear * 12 + currentMonth;
+        
+        return startValue <= currentValue && currentValue <= endValue;
+      } else if (this.mode === 'quarter') {
+        const startYear = getYear(range.start);
+        const startQuarter = Math.floor(getMonth(range.start) / 3);
+        const endYear = getYear(range.end);
+        const endQuarter = Math.floor(getMonth(range.end) / 3);
+        const currentYear = getYear(date);
+        const currentQuarter = Math.floor(getMonth(date) / 3);
+        
+        const startValue = startYear * 4 + startQuarter;
+        const endValue = endYear * 4 + endQuarter;
+        const currentValue = currentYear * 4 + currentQuarter;
+        
+        return startValue <= currentValue && currentValue <= endValue;
+      } else {
+        // 日期和周模式使用日期比较
+        return isAfter(date, range.start) && isBefore(date, range.end);
+      }
+    }
+    
+    return false;
+  }
+
+  // 年份选择的Hover事件
+  onCellYearHover(year: number): void {
+    const date = new Date(year, 0, 1);
+    this.hoverValue = date;
+    this.cdr.markForCheck();
+  }
+
+  // 月份选择的Hover事件
+  onCellMonthHover(month: number): void {
+    const date = new Date(getYear(this.currentViewDate), month, 1);
+    this.hoverValue = date;
+    this.cdr.markForCheck();
+  }
+
+  // 季度选择的Hover事件
+  onCellQuarterHover(quarter: number): void {
+    const startMonth = quarter * 3;
+    const date = new Date(getYear(this.currentViewDate), startMonth, 1);
+    this.hoverValue = date;
+    this.cdr.markForCheck();
+  }
+
+  // 判断年份是否在选择范围内
+  isInYearRange(year: number): boolean {
+    if (this.selectType !== 'range') return false;
+    
+    // 处理已完成的范围选择
+    if (this.isRangeValue(this.selectedValue)) {
+      const range = this.selectedValue as RangeValue<Date>;
+      if (range.start && range.end) {
+        const startYear = getYear(range.start);
+        const endYear = getYear(range.end);
+        return year >= startYear && year <= endYear;
+      }
+    }
+    
+    // 处理还未完成的范围选择（用户选择了起始日期但还未选择结束日期）
+    if (this.rangeStart && this.hoverValue) {
+      const startYear = getYear(this.rangeStart);
+      const endYear = getYear(this.hoverValue);
+      
+      if (startYear <= endYear) {
+        return year >= startYear && year <= endYear;
+      } else {
+        return year >= endYear && year <= startYear;
+      }
+    }
+    
+    return false;
+  }
+
+  // 判断月份是否在选择范围内
+  isInMonthRange(month: number): boolean {
+    if (this.selectType !== 'range') return false;
+    
+    const currentYear = getYear(this.currentViewDate);
+    const currentMonthValue = currentYear * 12 + month;
+    
+    // 处理已完成的范围选择
+    if (this.isRangeValue(this.selectedValue)) {
+      const range = this.selectedValue as RangeValue<Date>;
+      if (range.start && range.end) {
+        const startYear = getYear(range.start);
+        const startMonth = getMonth(range.start);
+        const endYear = getYear(range.end);
+        const endMonth = getMonth(range.end);
+        
+        const startValue = startYear * 12 + startMonth;
+        const endValue = endYear * 12 + endMonth;
+        
+        return currentMonthValue >= startValue && currentMonthValue <= endValue;
+      }
+    }
+    
+    // 处理还未完成的范围选择
+    if (this.rangeStart && this.hoverValue) {
+      const startYear = getYear(this.rangeStart);
+      const startMonth = getMonth(this.rangeStart);
+      const endYear = getYear(this.hoverValue);
+      const endMonth = getMonth(this.hoverValue);
+      
+      const startValue = startYear * 12 + startMonth;
+      const endValue = endYear * 12 + endMonth;
+      
+      if (startValue <= endValue) {
+        return currentMonthValue >= startValue && currentMonthValue <= endValue;
+      } else {
+        return currentMonthValue >= endValue && currentMonthValue <= startValue;
+      }
+    }
+    
+    return false;
+  }
+
+  // 判断季度是否在选择范围内
+  isInQuarterRange(quarter: number): boolean {
+    if (this.selectType !== 'range') return false;
+    
+    const currentYear = getYear(this.currentViewDate);
+    const currentQuarterValue = currentYear * 4 + quarter;
+    
+    // 处理已完成的范围选择
+    if (this.isRangeValue(this.selectedValue)) {
+      const range = this.selectedValue as RangeValue<Date>;
+      if (range.start && range.end) {
+        const startYear = getYear(range.start);
+        const startQuarter = Math.floor(getMonth(range.start) / 3);
+        const endYear = getYear(range.end);
+        const endQuarter = Math.floor(getMonth(range.end) / 3);
+        
+        const startValue = startYear * 4 + startQuarter;
+        const endValue = endYear * 4 + endQuarter;
+        
+        return currentQuarterValue >= startValue && currentQuarterValue <= endValue;
+      }
+    }
+    
+    // 处理还未完成的范围选择
+    if (this.rangeStart && this.hoverValue) {
+      const startYear = getYear(this.rangeStart);
+      const startQuarter = Math.floor(getMonth(this.rangeStart) / 3);
+      const endYear = getYear(this.hoverValue);
+      const endQuarter = Math.floor(getMonth(this.hoverValue) / 3);
+      
+      const startValue = startYear * 4 + startQuarter;
+      const endValue = endYear * 4 + endQuarter;
+      
+      if (startValue <= endValue) {
+        return currentQuarterValue >= startValue && currentQuarterValue <= endValue;
+      } else {
+        return currentQuarterValue >= endValue && currentQuarterValue <= startValue;
+      }
+    }
+    
+    return false;
+  }
+
+  // 周选择的Hover事件
+  onCellWeekHover(week: Date[]): void {
+    if (week && week.length > 0) {
+      this.hoverValue = week[0];  // 使用周的第一天作为hover值
+      this.cdr.markForCheck();
+    }
+  }
+
+  // 判断周是否在选择范围内
+  isInWeekRange(week: Date[]): boolean {
+    if (this.selectType !== 'range' || !week || week.length === 0) return false;
+    
+    const weekStart = week[0];
+    const weekEnd = week[week.length - 1];
+    
+    // 处理已完成的范围选择
+    if (this.isRangeValue(this.selectedValue)) {
+      const range = this.selectedValue as RangeValue<Date>;
+      if (range.start && range.end) {
+        // 检查周的开始或结束日期是否在选择范围内
+        return (
+          !isBefore(weekStart, range.start) && !isAfter(weekStart, range.end) ||
+          !isBefore(weekEnd, range.start) && !isAfter(weekEnd, range.end) ||
+          !isBefore(range.start, weekStart) && !isAfter(range.start, weekEnd)
+        );
+      }
+    }
+    
+    // 处理还未完成的范围选择
+    if (this.rangeStart && this.hoverValue) {
+      const start = isBefore(this.rangeStart, this.hoverValue) ? this.rangeStart : this.hoverValue;
+      const end = isBefore(this.rangeStart, this.hoverValue) ? this.hoverValue : this.rangeStart;
+      
+      // 检查周的开始或结束日期是否在选择范围内
+      return (
+        !isBefore(weekStart, start) && !isAfter(weekStart, end) ||
+        !isBefore(weekEnd, start) && !isAfter(weekEnd, end) ||
+        !isBefore(start, weekStart) && !isAfter(start, weekEnd)
+      );
+    }
+    
+    return false;
+  }
 }

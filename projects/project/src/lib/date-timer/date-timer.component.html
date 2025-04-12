@@ -81,7 +81,9 @@
               *ngFor="let year of years" 
               class="date-timer-year-cell"
               [class.date-timer-cell-selected]="isSelectedYear(year)"
+              [class.date-timer-cell-in-range]="isInYearRange(year)"
               (click)="onSelectYear(year)"
+              (mouseenter)="selectType === 'range' && onCellYearHover(year)"
             >
               {{ year }}
             </div>
@@ -105,7 +107,9 @@
               *ngFor="let month of months; let i = index" 
               class="date-timer-month-cell"
               [class.date-timer-cell-selected]="isSelectedMonth(i)"
+              [class.date-timer-cell-in-range]="isInMonthRange(i)"
               (click)="onSelectMonth(i)"
+              (mouseenter)="selectType === 'range' && onCellMonthHover(i)"
             >
               {{ i + 1 }}月
             </div>
@@ -126,7 +130,9 @@
               *ngFor="let quarter of quarters; let i = index" 
               class="date-timer-quarter-cell"
               [class.date-timer-cell-selected]="isSelectedQuarter(i)"
+              [class.date-timer-cell-in-range]="isInQuarterRange(i)"
               (click)="onSelectQuarter(i)"
+              (mouseenter)="selectType === 'range' && onCellQuarterHover(i)"
             >
               {{ i + 1 }}季度
             </div>
@@ -198,11 +204,13 @@
                 class="date-timer-cell"
                 [class.date-timer-cell-in-week]="isWeekInDateRange(week)"
                 [class.date-timer-cell-selected]="isSelectedDay(day)"
+                [class.date-timer-cell-in-range]="isInWeekRange(week)"
                 [class.date-timer-cell-disabled]="isDateDisabled(day)"
                 [class.date-timer-cell-prev-month]="getMonth(day) !== getMonth(currentViewDate)"
                 [class.date-timer-cell-next-month]="getMonth(day) !== getMonth(currentViewDate)"
                 [class.date-timer-cell-today]="isToday(day)"
                 (click)="onSelectWeek(week)"
+                (mouseenter)="selectType === 'range' && onCellWeekHover(week)"
               >
                 <div class="date-timer-cell-content">{{ getDate(day) }}</div>
               </div>

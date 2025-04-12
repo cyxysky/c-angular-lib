@@ -64,6 +64,8 @@
         </div>
         <lib-date-timer
           [(ngModel)]="modeValue"
+          selectType="range"
+
           [mode]="currentMode">
         </lib-date-timer>
         <p class="example-value">当前值: {{ modeValue | json }}</p>
