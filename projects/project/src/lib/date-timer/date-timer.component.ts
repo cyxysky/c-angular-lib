@@ -1198,96 +1198,174 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 时间选择方法部分的修改
   onSelectHour(hour: number): void {
-    if (this.mode === 'time') {
-      if (this.selectType === 'range') {
-        this.updateTimeRangeValue('hour', hour);
-      } else {
-        this.updateTimeValue('hour', hour);
+    // 检查是否禁用
+    if (this.isTimeDisabled('hour', hour)) {
+      return;
+    }
+    
+    if (this.selectType === 'single') {
+      // 单选模式
+      this.updateTimeValue('hour', hour);
+      
+      if (this.timeSelectStep === 'hour') {
+        // 进入分钟选择
+        this.timeSelectStep = 'minute';
       }
-    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
-      if (this.selectType === 'range') {
-        // 处理日期和时间组合的范围选择
-        if (this.rangePart === 'start') {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
-            ? new Date(this.selectedValue.start) 
-            : this.rangeStart ? new Date(this.rangeStart) : new Date();
-          date.setHours(hour);
-          this.updateRangeTimeValue(date, 'start');
-          this.timeSelectStep = 'minute';
-        } else {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
-            ? new Date(this.selectedValue.end) 
-            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
-          date.setHours(hour);
-          this.updateRangeTimeValue(date, 'end');
-          this.timeSelectStep = 'minute';
+      
+      this.cdr.markForCheck();
+      return;
+    }
+    
+    if (this.selectType === 'range') {
+      // 范围选择模式
+      
+      // 检查是否是结束时间选择且小于开始时间
+      if (this.rangePart === 'end' && this.rangeStart) {
+        const startDate = new Date(this.rangeStart);
+        
+        // 如果是同一天，确保时间不早于开始时间
+        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          const endDate = new Date(this.selectedValue.end);
+          const isSameDay = startDate.getFullYear() === endDate.getFullYear() && 
+                            startDate.getMonth() === endDate.getMonth() && 
+                            startDate.getDate() === endDate.getDate();
+          
+          if (isSameDay && hour < startDate.getHours()) {
+            // 不允许选择早于开始时间的小时
+            return;
+          }
         }
-      } else {
-        this.updateTimeValue('hour', hour);
       }
+      
+      this.updateTimeRangeValue('hour', hour);
+      
+      if (this.timeSelectStep === 'hour') {
+        // 进入分钟选择
+        this.timeSelectStep = 'minute';
+      }
+      
+      this.cdr.markForCheck();
     }
   }
 
   onSelectMinute(minute: number): void {
-    if (this.mode === 'time') {
-      if (this.selectType === 'range') {
-        this.updateTimeRangeValue('minute', minute);
-      } else {
-        this.updateTimeValue('minute', minute);
+    // 检查是否禁用
+    if (this.isTimeDisabled('minute', minute)) {
+      return;
+    }
+    
+    if (this.selectType === 'single') {
+      // 单选模式
+      this.updateTimeValue('minute', minute);
+      
+      if (this.timeSelectStep === 'minute') {
+        // 进入秒选择
+        this.timeSelectStep = 'second';
       }
-    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
-      if (this.selectType === 'range') {
-        // 处理日期和时间组合的范围选择
-        if (this.rangePart === 'start') {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
-            ? new Date(this.selectedValue.start) 
-            : this.rangeStart ? new Date(this.rangeStart) : new Date();
-          date.setMinutes(minute);
-          this.updateRangeTimeValue(date, 'start');
-          this.timeSelectStep = 'second';
-        } else {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
-            ? new Date(this.selectedValue.end) 
-            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
-          date.setMinutes(minute);
-          this.updateRangeTimeValue(date, 'end');
-          this.timeSelectStep = 'second';
+      
+      this.cdr.markForCheck();
+      return;
+    }
+    
+    if (this.selectType === 'range') {
+      // 范围选择模式
+      
+      // 检查是否是结束时间选择且可能小于开始时间
+      if (this.rangePart === 'end' && this.rangeStart) {
+        const startDate = new Date(this.rangeStart);
+        
+        // 如果是同一天同一小时，确保分钟不早于开始时间
+        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          const endDate = new Date(this.selectedValue.end);
+          const isSameDay = startDate.getFullYear() === endDate.getFullYear() && 
+                            startDate.getMonth() === endDate.getMonth() && 
+                            startDate.getDate() === endDate.getDate();
+          
+          if (isSameDay && endDate.getHours() === startDate.getHours() && minute < startDate.getMinutes()) {
+            // 不允许选择早于开始时间的分钟
+            return;
+          }
         }
-      } else {
-        this.updateTimeValue('minute', minute);
       }
+      
+      this.updateTimeRangeValue('minute', minute);
+      
+      if (this.timeSelectStep === 'minute') {
+        // 进入秒选择
+        this.timeSelectStep = 'second';
+      }
+      
+      this.cdr.markForCheck();
     }
   }
 
   onSelectSecond(second: number): void {
-    if (this.mode === 'time') {
-      if (this.selectType === 'range') {
-        this.updateTimeRangeValue('second', second);
-      } else {
-        this.updateTimeValue('second', second);
+    // 检查是否禁用
+    if (this.isTimeDisabled('second', second)) {
+      return;
+    }
+    
+    if (this.selectType === 'single') {
+      // 单选模式
+      this.updateTimeValue('second', second);
+      
+      if (this.timeSelectStep === 'second') {
+        // 完成时间选择
+        this.timeSelectStep = 'complete';
+        
+        // 如果是日期时间模式，完成选择后关闭面板
+        if (this.mode === 'time') {
+          this.closeDropdown();
+        }
       }
-    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
-      if (this.selectType === 'range') {
-        // 处理日期和时间组合的范围选择
+      
+      this.cdr.markForCheck();
+      return;
+    }
+    
+    if (this.selectType === 'range') {
+      // 范围选择模式
+      
+      // 检查是否是结束时间选择且可能小于开始时间
+      if (this.rangePart === 'end' && this.rangeStart) {
+        const startDate = new Date(this.rangeStart);
+        
+        // 如果是同一天同一小时同一分钟，确保秒不早于开始时间
+        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          const endDate = new Date(this.selectedValue.end);
+          const isSameDay = startDate.getFullYear() === endDate.getFullYear() && 
+                            startDate.getMonth() === endDate.getMonth() && 
+                            startDate.getDate() === endDate.getDate();
+          
+          if (isSameDay && 
+              endDate.getHours() === startDate.getHours() && 
+              endDate.getMinutes() === startDate.getMinutes() && 
+              second < startDate.getSeconds()) {
+            // 不允许选择早于开始时间的秒
+            return;
+          }
+        }
+      }
+      
+      this.updateTimeRangeValue('second', second);
+      
+      if (this.timeSelectStep === 'second') {
+        // 完成当前部分的时间选择
+        this.timeSelectStep = 'complete';
+        
         if (this.rangePart === 'start') {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
-            ? new Date(this.selectedValue.start) 
-            : this.rangeStart ? new Date(this.rangeStart) : new Date();
-          date.setSeconds(second);
-          this.updateRangeTimeValue(date, 'start');
+          // 完成开始时间选择后，切换到结束时间选择
           this.rangePart = 'end';
           this.timeSelectStep = 'hour';
         } else {
-          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
-            ? new Date(this.selectedValue.end) 
-            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
-          date.setSeconds(second);
-          this.updateRangeTimeValue(date, 'end');
-          this.timeSelectStep = 'complete';
+          // 完成结束时间选择，关闭面板
+          if (this.mode === 'time') {
+            this.closeDropdown();
+          }
         }
-      } else {
-        this.updateTimeValue('second', second);
       }
+      
+      this.cdr.markForCheck();
     }
   }
 
@@ -1761,26 +1839,66 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   isTimeDisabled(type: 'hour' | 'minute' | 'second', value: number): boolean {
-    if (!this.disabledTime) return false;
-    
-    let date: Date | null = null;
-    if (this.selectType === 'single' && this.isSingleDate(this.selectedValue)) {
-      date = this.selectedValue;
-    } else if (this.selectType === 'range' && this.isRangeValue(this.selectedValue)) {
-      date = this.rangePart === 'start' ? this.selectedValue.start : this.selectedValue.end;
+    // 如果有自定义禁用规则
+    if (this.disabledTime) {
+      const currentDate = this.getCurrentTimeValue() || new Date();
+      const disabledTimeConfig = this.disabledTime(currentDate);
+      
+      if (disabledTimeConfig) {
+        if (type === 'hour' && disabledTimeConfig.hour && disabledTimeConfig.hour[value]) {
+          return true;
+        } else if (type === 'minute' && disabledTimeConfig.minute && disabledTimeConfig.minute[value]) {
+          return true;
+        } else if (type === 'second' && disabledTimeConfig.second && disabledTimeConfig.second[value]) {
+          return true;
+        }
+      }
     }
     
-    if (!date) return false;
-    
-    const disabledItems = this.disabledTime(date);
-    if (!disabledItems) return false;
-    
-    if (type === 'hour' && disabledItems.hour) {
-      return disabledItems.hour[value] === true;
-    } else if (type === 'minute' && disabledItems.minute) {
-      return disabledItems.minute[value] === true;
-    } else if (type === 'second' && disabledItems.second) {
-      return disabledItems.second[value] === true;
+    // 范围选择时，确保结束时间不早于开始时间
+    if (this.selectType === 'range' && this.rangePart === 'end' && this.rangeStart) {
+      const startDate = new Date(this.rangeStart);
+      
+      // 如果当前正在构建的日期存在
+      if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+        const endDate = new Date(this.selectedValue.end);
+        
+        // 检查日期是否是同一天
+        const isSameDay = startDate.getFullYear() === endDate.getFullYear() && 
+                           startDate.getMonth() === endDate.getMonth() && 
+                           startDate.getDate() === endDate.getDate();
+        
+        // 只有同一天才需要检查时间大小
+        if (isSameDay) {
+          if (type === 'hour') {
+            // 禁用小于开始时间的小时
+            return value < startDate.getHours();
+          } else if (type === 'minute') {
+            // 如果是同一小时，禁用小于开始时间的分钟
+            if (endDate.getHours() === startDate.getHours()) {
+              return value < startDate.getMinutes();
+            }
+          } else if (type === 'second') {
+            // 如果是同一小时和分钟，禁用小于开始时间的秒钟
+            if (endDate.getHours() === startDate.getHours() && 
+                endDate.getMinutes() === startDate.getMinutes()) {
+              return value < startDate.getSeconds();
+            }
+          }
+        }
+      } else if (type === 'hour' && this.timeSelectStep === 'hour') {
+        // 正在选择结束时间的小时，但还没有选择日期的情况
+        // 检查是否是同一天的选择
+        if (this.hoverValue) {
+          const isSameDay = startDate.getFullYear() === this.hoverValue.getFullYear() && 
+                             startDate.getMonth() === this.hoverValue.getMonth() && 
+                             startDate.getDate() === this.hoverValue.getDate();
+          
+          if (isSameDay) {
+            return value < startDate.getHours();
+          }
+        }
+      }
     }
     
     return false;

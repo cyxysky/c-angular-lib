@@ -1,818 +1,885 @@
 .date-timer-range-separator {
-  padding: 0 8px;
+    padding: 0 8px;
 }
 
 // 范围选择Tab样式
 .date-timer-range-tabs {
-  display: flex;
-  width: 100%;
-  height: 40px;
-  border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid #f0f0f0;
 }
+
 .date-timer-range-tab {
-  flex: 1;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  outline: none;
-  &:hover {
-    color: #1890ff;
-  }
-  &.date-timer-range-tab-active {
-    color: #1890ff;
-    background-color: #e6f7ff;
-    font-weight: 500;
-    position: relative;
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 20px;
-      height: 2px;
-      background-color: #1890ff;
-      transform: translateX(-50%);
+    flex: 1;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    outline: none;
+
+    &:hover {
+        color: #1890ff;
     }
-  }
+
+    &.date-timer-range-tab-active {
+        color: #1890ff;
+        background-color: #e6f7ff;
+        font-weight: 500;
+        position: relative;
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 20px;
+            height: 2px;
+            background-color: #1890ff;
+            transform: translateX(-50%);
+        }
+    }
 }
 
 // 新增范围部分指示器样式
 .date-timer-range-part-indicator {
-  display: inline-block;
-  margin-left: 8px;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.45);
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
 }
+
 .date-timer-range-part-active {
-  color: #1890ff;
-  font-weight: 500;
+    color: #1890ff;
+    font-weight: 500;
 }
 
 // 时间选择步骤指示器样式
 .date-timer-time-steps {
-  display: flex;
-  justify-content: center;
-  padding: 8px 0;
-  margin-bottom: 8px;
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 13px;
-  border-bottom: 1px dashed #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 0 0;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 13px;
+    border-bottom: 1px dashed #f0f0f0;
 }
+
 .date-timer-time-step {
-  padding: 2px 8px;
-  &.date-timer-time-step-active {
-    color: #1890ff;
-    font-weight: 500;
-    background: #e6f7ff;
-    border-radius: 2px;
-  }
+    padding: 2px 8px;
+
+    &.date-timer-time-step-active {
+        color: #1890ff;
+        font-weight: 500;
+        background: #e6f7ff;
+        border-radius: 2px;
+    }
 }
 
 // 当前活动的时间列样式
 .date-timer-time-column-active {
-  border-radius: 4px;
-  .date-timer-time-column-title {
-    color: #1890ff;
-    font-weight: 500;
-  }
+    border-radius: 4px;
+
+    .date-timer-time-column-title {
+        color: #1890ff;
+        font-weight: 500;
+    }
 }
 
 .date-timer-container {
-  display: inline-block;
-  position: relative;
-  width: 100%;
+    display: inline-block;
+    position: relative;
+    width: 100%;
 }
-.date-timer-single, .date-timer-range {
-  display: inline-flex;
-  width: 100%;
+
+.date-timer-single,
+.date-timer-range {
+    display: inline-flex;
+    width: 100%;
 }
+
 .date-timer-input {
-  position: relative;
-  display: inline-flex;
-  width: 100%;
-  min-width: 0;
-  padding: 4px 11px;
-  color: rgba(0, 0, 0, 0.85);
-  font-size: 14px;
-  line-height: 1.5;
-  background-color: #fff;
-  background-image: none;
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
-  transition: all 0.3s;
-  &:hover {
-    border-color: #40a9ff;
-  }
-  &.date-timer-input-focused {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-    outline: 0;
-  }
-  &.date-timer-input-disabled {
-    color: rgba(0, 0, 0, 0.25);
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-    opacity: 1;
-  }
-  &.date-timer-input-borderless {
-    border: 0;
-    box-shadow: none;
-  }
-  &.date-timer-input-error {
-    border-color: #ff4d4f;
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 11px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+
     &:hover {
-      border-color: #ff7875;
+        border-color: #40a9ff;
     }
+
     &.date-timer-input-focused {
-      box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        outline: 0;
     }
-  }
-  &.date-timer-input-warning {
-    border-color: #faad14;
-    &:hover {
-      border-color: #ffc53d;
+
+    &.date-timer-input-disabled {
+        color: rgba(0, 0, 0, 0.25);
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        opacity: 1;
     }
-    &.date-timer-input-focused {
-      box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+
+    &.date-timer-input-borderless {
+        border: 0;
+        box-shadow: none;
     }
-  }
-  &.date-timer-input-small {
-    padding: 0 7px;
-    height: 24px;
-  }
-  &.date-timer-input-large {
-    padding: 6.5px 11px;
-    height: 40px;
-    font-size: 16px;
-  }
+
+    &.date-timer-input-error {
+        border-color: #ff4d4f;
+
+        &:hover {
+            border-color: #ff7875;
+        }
+
+        &.date-timer-input-focused {
+            box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+        }
+    }
+
+    &.date-timer-input-warning {
+        border-color: #faad14;
+
+        &:hover {
+            border-color: #ffc53d;
+        }
+
+        &.date-timer-input-focused {
+            box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+        }
+    }
+
+    &.date-timer-input-small {
+        padding: 0 7px;
+        height: 24px;
+    }
+
+    &.date-timer-input-large {
+        padding: 6.5px 11px;
+        height: 40px;
+        font-size: 16px;
+    }
 }
+
 .date-timer-input input {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  min-width: 0;
-  color: rgba(0, 0, 0, 0.85);
-  font-size: inherit;
-  line-height: 1.5;
-  background-color: transparent;
-  background-image: none;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  &::placeholder {
-    color: rgba(0, 0, 0, 0.25);
-  }
-  &:disabled {
-    color: rgba(0, 0, 0, 0.25);
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-    opacity: 1;
-  }
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    min-width: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: inherit;
+    line-height: 1.5;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &::placeholder {
+        color: rgba(0, 0, 0, 0.25);
+    }
+
+    &:disabled {
+        color: rgba(0, 0, 0, 0.25);
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        opacity: 1;
+    }
 }
+
 .date-timer-suffix {
-  position: absolute;
-  top: 50%;
-  right: 11px;
-  display: flex;
-  align-items: center;
-  transform: translateY(-50%);
-  color: rgba(0, 0, 0, 0.45);
-  transition: all 0.3s;
-}
-.date-timer-clear-btn {
-  display: inline-block;
-  margin-right: 4px;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-  transition: color 0.3s;
-  &:hover {
+    position: absolute;
+    top: 50%;
+    right: 11px;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
     color: rgba(0, 0, 0, 0.45);
-  }
+    transition: all 0.3s;
 }
+
+.date-timer-clear-btn {
+    display: inline-block;
+    margin-right: 4px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+        color: rgba(0, 0, 0, 0.45);
+    }
+}
+
 .date-timer-icon {
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.35);
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.35);
 }
 
 // 范围选择
 .date-timer-range {
-  .date-timer-input {
-    display: flex;
-    align-items: center;
-  }
-  .date-timer-range-separator {
-    display: inline-block;
-    width: 24px;
-    color: rgba(0, 0, 0, 0.45);
-    line-height: 1;
-    text-align: center;
-  }
-  input {
-    width: calc(50% - 12px);
-    text-align: center;
-  }
+    .date-timer-input {
+        display: flex;
+        align-items: center;
+    }
+
+    .date-timer-range-separator {
+        display: inline-block;
+        width: 24px;
+        color: rgba(0, 0, 0, 0.45);
+        line-height: 1;
+        text-align: center;
+    }
+
+    input {
+        width: calc(50% - 12px);
+        text-align: center;
+    }
 }
 
 // 下拉面板
 .date-timer-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1050;
-  width: 280px;
-  margin-top: 4px;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
-  &.date-timer-dropdown-time {
-    width: 180px;
-  }
-  &.date-timer-dropdown-date-time {
-    width: 480px;
-    
-    .date-timer-panels-container {
-      display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1050;
+    width: 280px;
+    margin-top: 4px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+
+    &.date-timer-dropdown-time {
+        width: 180px;
     }
-    
-    .date-timer-date-panel {
-      width: 280px;
-      border-right: 1px solid #f0f0f0;
+
+    &.date-timer-dropdown-date-time {
+        width: 480px;
+
+        .date-timer-panels-container {
+            display: flex;
+        }
+
+        .date-timer-date-panel {
+            width: 280px;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .date-timer-time-panel-combined {
+            width: 200px;
+        }
     }
-    
-    .date-timer-time-panel-combined {
-      width: 200px;
-    }
-  }
 }
 
 // 面板容器
 .date-timer-panels-container {
-  position: relative;
+    position: relative;
 }
 
 // 浮层位置样式
 .date-timer-dropdown-panel {
-  &.date-timer-dropdown-position-top {
-    transform-origin: center bottom;
-    animation: dateTimerDropdownSlideDown 0.2s;
-  }
-  &.date-timer-dropdown-position-bottom {
-    transform-origin: center top;
-    animation: dateTimerDropdownSlideUp 0.2s;
-  }
+    &.date-timer-dropdown-position-top {
+        transform-origin: center bottom;
+        animation: dateTimerDropdownSlideDown 0.2s;
+    }
+
+    &.date-timer-dropdown-position-bottom {
+        transform-origin: center top;
+        animation: dateTimerDropdownSlideUp 0.2s;
+    }
 }
+
 @keyframes dateTimerDropdownSlideDown {
-  0% {
-    opacity: 0;
-    transform: scaleY(0.8) translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scaleY(1) translateY(0);
-  }
+    0% {
+        opacity: 0;
+        transform: scaleY(0.8) translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
 }
+
 @keyframes dateTimerDropdownSlideUp {
-  0% {
-    opacity: 0;
-    transform: scaleY(0.8) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scaleY(1) translateY(0);
-  }
+    0% {
+        opacity: 0;
+        transform: scaleY(0.8) translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
 }
 
 // 模式选择器
 .date-timer-mode-selector {
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 5px 0;
-  margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 5px 0;
+    margin-bottom: 5px;
 }
+
 .date-timer-mode-item {
-  display: inline-block;
-  min-width: 38px;
-  height: 28px;
-  margin: 0 4px;
-  padding: 0 8px;
-  color: rgba(0, 0, 0, 0.65);
-  line-height: 28px;
-  text-align: center;
-  background: transparent;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.3s;
-  &:hover {
-    color: #1890ff;
-    background: #e6f7ff;
-  }
-  &.date-timer-mode-active {
-    color: #1890ff;
-    background: #e6f7ff;
-    font-weight: 500;
-  }
+    display: inline-block;
+    min-width: 38px;
+    height: 28px;
+    margin: 0 4px;
+    padding: 0 8px;
+    color: rgba(0, 0, 0, 0.65);
+    line-height: 28px;
+    text-align: center;
+    background: transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        color: #1890ff;
+        background: #e6f7ff;
+    }
+
+    &.date-timer-mode-active {
+        color: #1890ff;
+        background: #e6f7ff;
+        font-weight: 500;
+    }
 }
 
 // 年份选择面板
 .date-timer-year-panel,
 .date-timer-month-panel,
 .date-timer-quarter-panel {
-  width: 280px;
-  padding: 8px;
+    width: 280px;
+    padding: 8px;
 }
+
 .date-timer-year-grid,
 .date-timer-month-grid,
 .date-timer-quarter-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 8px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px 0;
 }
+
 .date-timer-year-cell,
 .date-timer-month-cell,
 .date-timer-quarter-cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  margin: 0;
-  padding: 0 8px;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
-  text-align: center;
-  background: transparent;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-  z-index: 1;
-  &:hover {
-    background: #f5f5f5;
-  }
-  &.date-timer-cell-selected {
-    color: #fff;
-    background: #1890ff;
-    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    margin: 0;
+    padding: 0 8px;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    text-align: center;
+    background: transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
     position: relative;
-  }
-  &.date-timer-cell-in-range {
-    background: #e6f7ff;
-    color: #1890ff;
-    // 选中边缘的样式覆盖
-    &.date-timer-cell-selected {
-      color: #fff;
-      background: #1890ff;
+    z-index: 1;
+
+    &:hover {
+        background: #f5f5f5;
     }
-  }
+
+    &.date-timer-cell-selected {
+        color: #fff;
+        background: #1890ff;
+        font-weight: 500;
+        position: relative;
+    }
+
+    &.date-timer-cell-in-range {
+        background: #e6f7ff;
+        color: #1890ff;
+
+        // 选中边缘的样式覆盖
+        &.date-timer-cell-selected {
+            color: #fff;
+            background: #1890ff;
+        }
+    }
 }
 
 // 周选择
 .date-timer-week-panel {
-  width: 280px;
-  padding: 8px;
+    width: 280px;
+    padding: 8px;
 }
+
 .date-timer-week-number {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  margin: 2px 8px 2px 0;
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 12px;
-  line-height: 24px;
-  text-align: center;
-  border-radius: 2px;
-  cursor: pointer;
-  &:hover {
-    color: #1890ff;
-    background: #e6f7ff;
-  }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 2px 8px 2px 0;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 2px;
+    cursor: pointer;
+
+    &:hover {
+        color: #1890ff;
+        background: #e6f7ff;
+    }
 }
+
 .date-timer-week-selected {
-  background: rgba(24, 144, 255, 0.1);
-  border-radius: 4px;
+    background: rgba(24, 144, 255, 0.1);
+    border-radius: 4px;
 }
+
 .date-timer-cell-in-week {
-  background: #e6f7ff;
+    background: #e6f7ff;
 }
 
 // 周选择增强
 .date-timer-week {
-  display: flex;
-  position: relative;
-  &.date-timer-week-in-range {
-    background: #e6f7ff;
-  }
-  .date-timer-week-indicator {
-    position: absolute;
-    left: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 26px;
-    height: 26px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.45);
-    border-radius: 2px;
-    cursor: pointer;
-    &:hover {
-      background: #e6f7ff;
-      color: #1890ff;
+    position: relative;
+
+    &.date-timer-week-in-range {
+        background: #e6f7ff;
     }
-  }
+
+    .date-timer-week-indicator {
+        position: absolute;
+        left: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 26px;
+        height: 26px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        border-radius: 2px;
+        cursor: pointer;
+
+        &:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+    }
 }
 
 // 日期面板
 .date-timer-date-panel {
-  width: 280px;
-  padding: 8px;
-  position: relative;
-  
-  &.date-timer-date-panel-week-mode {
-    padding-left: 38px; /* 增加左侧padding以容纳周数指示器 */
-  }
+    width: 280px;
+    padding: 8px;
+    position: relative;
+
+    &.date-timer-date-panel-week-mode {
+        padding-left: 38px;
+        /* 增加左侧padding以容纳周数指示器 */
+    }
 }
+
 .date-timer-header {
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  height: 40px;
-  border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    height: 40px;
+    border-bottom: 1px solid #f0f0f0;
 }
+
 .date-timer-prev-year-btn,
 .date-timer-prev-month-btn,
 .date-timer-next-month-btn,
 .date-timer-next-year-btn {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  color: rgba(0, 0, 0, 0.25);
-  line-height: 24px;
-  text-align: center;
-  background: transparent;
-  border: 0;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-  transition: color 0.3s;
-  &:hover {
-    color: rgba(0, 0, 0, 0.85);
-  }
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.25);
+    line-height: 24px;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+        color: rgba(0, 0, 0, 0.85);
+    }
 }
+
 .date-timer-header-view {
-  flex: auto;
-  font-weight: 500;
-  line-height: 40px;
-  color: rgba(0, 0, 0, 0.85);
-  text-align: center;
-  cursor: default;
+    flex: auto;
+    font-weight: 500;
+    line-height: 40px;
+    color: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    cursor: default;
 }
 
 .date-timer-header-clickable {
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 2px;
-  transition: all 0.3s;
-  
-  &:hover {
-    color: #1890ff;
-    background-color: rgba(24, 144, 255, 0.1);
-  }
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: all 0.3s;
+
+    &:hover {
+        color: #1890ff;
+        background-color: rgba(24, 144, 255, 0.1);
+    }
 }
 
 .date-timer-weekdays {
-  display: flex;
-  padding: 4px 0;
+    display: flex;
+    padding: 4px 0;
 }
+
 .date-timer-weekday {
-  flex: 1;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.65);
+    flex: 1;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.65);
 }
+
 .date-timer-body {
-  padding: 4px 0;
-  position: relative;
+    padding: 4px 0;
+    position: relative;
 }
+
 .date-timer-week {
-  display: flex;
-  position: relative;
-  &.date-timer-week-in-range {
-    background: #e6f7ff;
-  }
-  .date-timer-week-indicator {
-    position: absolute;
-    left: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 26px;
-    height: 26px;
+    display: flex;
+    position: relative;
+
+    &.date-timer-week-in-range {
+        background: #e6f7ff;
+    }
+
+    .date-timer-week-indicator {
+        position: absolute;
+        left: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 26px;
+        height: 26px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        border-radius: 2px;
+        cursor: pointer;
+
+        &:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+    }
+}
+
+.date-timer-cell {
+    position: relative;
+    flex: 1;
+    min-width: 24px;
+    height: 24px;
+    margin: 2px 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s, border 0.3s;
+
+    &:hover:not(.date-timer-cell-disabled) {
+        background: #f5f5f5;
+    }
+
+    &.date-timer-cell-disabled {
+        color: rgba(0, 0, 0, 0.25);
+        background: transparent;
+        cursor: not-allowed;
+
+        &.date-timer-cell-selected .date-timer-cell-content {
+            color: #fff;
+            background: #1890ff;
+            border-color: #1890ff;
+            font-weight: bold;
+            position: relative;
+        }
+    }
+
+    &.date-timer-cell-selected .date-timer-cell-content {
+        color: #fff;
+        background: #1890ff;
+        border-color: #1890ff;
+        font-weight: bold;
+        position: relative;
+    }
+
+    &.date-timer-cell-today .date-timer-cell-content {
+        border: 1px solid #1890ff;
+    }
+
+    &.date-timer-cell-in-range {
+        background: #e6f7ff;
+        position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: #e6f7ff;
+            z-index: -1;
+        }
+    }
+
+    &.date-timer-cell-prev-month,
+    &.date-timer-cell-next-month {
+        color: rgba(0, 0, 0, 0.25);
+    }
+}
+
+.date-timer-cell-content {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.45);
+    width: 24px;
+    height: 24px;
+    margin: 0 auto;
+    color: inherit;
     border-radius: 2px;
-    cursor: pointer;
-    &:hover {
-      background: #e6f7ff;
-      color: #1890ff;
-    }
-  }
-}
-.date-timer-cell {
-  position: relative;
-  flex: 1;
-  min-width: 24px;
-  height: 24px;
-  margin: 2px 0;
-  padding: 0;
-  color: rgba(0, 0, 0, 0.85);
-  text-align: center;
-  border: 0;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.3s, border 0.3s;
-  &:hover:not(.date-timer-cell-disabled) {
-    background: #f5f5f5 ;
-  }
-  &.date-timer-cell-disabled {
-    color: rgba(0, 0, 0, 0.25);
-    background: transparent;
-    cursor: not-allowed;
-    
-    &.date-timer-cell-selected .date-timer-cell-content {
-      color: #fff ;
-      background: #1890ff ;
-      border-color: #1890ff ;
-      font-weight: bold ;
-      position: relative;
-    }
-  }
-  &.date-timer-cell-selected .date-timer-cell-content {
-    color: #fff ;
-    background: #1890ff ;
-    border-color: #1890ff ;
-    font-weight: bold ;
-    position: relative;
-  }
-  &.date-timer-cell-today .date-timer-cell-content {
-    border: 1px solid #1890ff ;
-  }
-  &.date-timer-cell-in-range {
-    background: #e6f7ff ;
-    position: relative;
-    
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background: #e6f7ff ;
-      z-index: -1;
-    }
-  }
-  &.date-timer-cell-prev-month,
-  &.date-timer-cell-next-month {
-    color: rgba(0, 0, 0, 0.25);
-  }
-}
-.date-timer-cell-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  margin: 0 auto;
-  color: inherit;
-  border-radius: 2px;
-  transition: background 0.3s, border 0.3s;
+    transition: background 0.3s, border 0.3s;
 }
 
 // 时间面板
 .date-timer-time-panel {
-  width: 180px;
-  padding: 8px 0;
+    width: 180px;
+    padding: 8px 0;
 }
+
 .date-timer-time-columns {
-  display: flex;
-  justify-content: space-around;
-  height: 224px;
+    display: flex;
+    justify-content: space-around;
+    height: 224px;
 }
+
 .date-timer-time-column {
-  flex: 1;
-  position: relative;
-  max-height: 224px;
-  overflow: hidden auto;
-  text-align: center;
-  list-style: none;
-  transition: background 0.3s;
-  .date-timer-time-column-title {
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 12px;
-    padding: 6px 0;
-    font-weight: 500;
-  }
-  ul {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-}
-.date-timer-time-cell {
-  display: block;
-  width: 100%;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-  color: rgba(0, 0, 0, 0.85);
-  line-height: 28px;
-  text-align: center;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background 0.3s;
-  &:hover {
-    background: #f5f5f5;
-  }
-  &.date-timer-time-cell-selected {
-    background: #1890ff !important;
-    color: #fff !important;
-    font-weight: 500;
-  }
-  &.date-timer-time-cell-in-range {
-    background: #e6f7ff;
-    color: rgba(0, 0, 0, 0.85);
+    flex: 1;
     position: relative;
-    
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background: #e6f7ff;
-      z-index: -1;
+    max-height: 224px;
+    overflow: hidden auto;
+    text-align: center;
+    list-style: none;
+    transition: background 0.3s;
+
+    .date-timer-time-column-title {
+        color: rgba(0, 0, 0, 0.45);
+        font-size: 12px;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        background-color: #fff;
     }
-    
+
+    ul {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+}
+
+.date-timer-time-cell {
+    display: block;
+    width: 100%;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    line-height: 28px;
+    text-align: center;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 0.3s;
+
     &:hover {
-      background: #cce7ff;
+        background: #f5f5f5;
     }
-    
+
     &.date-timer-time-cell-selected {
-      background: #1890ff !important;
-      color: #fff !important;
-      font-weight: 500;
-      z-index: 1;
+        background: #1890ff !important;
+        color: #fff !important;
+        font-weight: 500;
     }
-  }
-  &.date-timer-time-cell-disabled {
-    color: rgba(0, 0, 0, 0.25);
-    background: transparent;
-    cursor: not-allowed;
-    
-    &.date-timer-time-cell-selected {
-      background: #1890ff !important;
-      color: #fff !important;
-      font-weight: 500;
+
+    &.date-timer-time-cell-in-range {
+        background: #e6f7ff;
+        color: rgba(0, 0, 0, 0.85);
+
+        &:hover {
+            background: #cce7ff;
+        }
+
+        &.date-timer-time-cell-selected {
+            background: #1890ff !important;
+            color: #fff !important;
+            font-weight: 500;
+            z-index: 1;
+        }
     }
-  }
+
+    &.date-timer-time-cell-disabled {
+        color: rgba(0, 0, 0, 0.25);
+        background: transparent;
+        cursor: not-allowed;
+
+        &.date-timer-time-cell-selected {
+            background: #1890ff !important;
+            color: #fff !important;
+            font-weight: 500;
+        }
+    }
 }
 
 // 底部
 .date-timer-footer {
-  width: 100%;
-  padding: 8px;
-  line-height: 36px;
-  text-align: center;
-  border-top: 1px solid #f0f0f0;
+    width: 100%;
+    padding: 8px;
+    line-height: 36px;
+    text-align: center;
+    border-top: 1px solid #f0f0f0;
 }
+
 .date-timer-time-display {
-  display: inline-block;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 500;
+    display: inline-block;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
 }
+
 .date-timer-footer-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
 }
+
 .date-timer-now-btn,
 .date-timer-ok-btn {
-  display: inline-block;
-  height: 24px;
-  margin-left: 8px;
-  padding: 0 7px;
-  font-size: 14px;
-  line-height: 22px;
-  color: #1890ff;
-  background: transparent;
-  border: 1px solid #1890ff;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.3s;
-  &:hover {
-    color: #40a9ff;
-    border-color: #40a9ff;
-  }
+    display: inline-block;
+    height: 24px;
+    margin-left: 8px;
+    padding: 0 7px;
+    font-size: 14px;
+    line-height: 22px;
+    color: #1890ff;
+    background: transparent;
+    border: 1px solid #1890ff;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        color: #40a9ff;
+        border-color: #40a9ff;
+    }
 }
+
 .date-timer-ok-btn {
-  color: #fff;
-  background: #1890ff;
-  border-color: #1890ff;
-  &:hover {
     color: #fff;
-    background: #40a9ff;
-    border-color: #40a9ff;
-  }
+    background: #1890ff;
+    border-color: #1890ff;
+
+    &:hover {
+        color: #fff;
+        background: #40a9ff;
+        border-color: #40a9ff;
+    }
 }
+
 .date-timer-footer-extra {
-  padding: 0 12px;
-  color: rgba(0, 0, 0, 0.65);
-  text-align: left;
-  line-height: 38px;
-  border-top: 1px solid #f0f0f0;
+    padding: 0 12px;
+    color: rgba(0, 0, 0, 0.65);
+    text-align: left;
+    line-height: 38px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .date-timer-weekday-week-num {
-  flex: 1;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.65);
+    flex: 1;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.65);
 }
 
 /* 时间面板组合模式样式优化 */
 .date-timer-time-panel-combined {
-  .date-timer-time-column-title {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-  }
+    .date-timer-time-column-title {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+    }
 }
 
 // 时间单元格在范围内的样式
 .date-timer-time-cell-in-range {
-  background: #e6f7ff !important;
-  position: relative;
-  color: rgba(0, 0, 0, 0.65) !important;
-  
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: #e6f7ff;
-    z-index: -1;
-  }
-  
-  &:hover {
-    background: #cce7ff !important;
-  }
-  
-  &.date-timer-time-cell-selected {
-    background: #1890ff !important;
-    color: #fff !important;
-    font-weight: 500;
-    z-index: 1;
-  }
+    background: #e6f7ff !important;
+    color: rgba(0, 0, 0, 0.65) !important;
+
+    &:hover {
+        background: #cce7ff !important;
+    }
+
+    &.date-timer-time-cell-selected {
+        background: #1890ff !important;
+        color: #fff !important;
+        font-weight: 500;
+        z-index: 1;
+    }
 }
 
 /* 修改文件末尾添加的覆盖样式 */
 .date-timer-time-cell.date-timer-time-cell-selected {
-  background-color: #e6f7ff !important;
-  color: #1890ff !important;
-  font-weight: 500 !important;
+    background-color: #e6f7ff !important;
+    color: #1890ff !important;
+    font-weight: 500 !important;
 }
 
 .date-timer-time-cell.date-timer-time-cell-in-range {
-  background-color: #e6f7ff !important;
-  color: rgba(0, 0, 0, 0.85) !important;
+    background-color: #e6f7ff !important;
+    color: rgba(0, 0, 0, 0.85) !important;
 }
 
 .date-timer-time-cell.date-timer-time-cell-in-range.date-timer-time-cell-selected {
-  background-color: #e6f7ff !important;
-  color: #1890ff !important;
-  font-weight: 500 !important;
-  z-index: 2 !important;
+    background-color: #e6f7ff !important;
+    color: #1890ff !important;
+    font-weight: 500 !important;
 }

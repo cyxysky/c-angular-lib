@@ -265,7 +265,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="onSelectHour(hour)"
+                  (click)="!isTimeDisabled('hour', hour) && onSelectHour(hour)"
                   (mouseenter)="onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
@@ -280,7 +280,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="onSelectMinute(minute)"
+                  (click)="!isTimeDisabled('minute', minute) && onSelectMinute(minute)"
                   (mouseenter)="onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
@@ -295,7 +295,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="onSelectSecond(second)"
+                  (click)="!isTimeDisabled('second', second) && onSelectSecond(second)"
                   (mouseenter)="onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
@@ -316,7 +316,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="onSelectHour(hour)"
+                  (click)="!isTimeDisabled('hour', hour) && onSelectHour(hour)"
                   (mouseenter)="onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
@@ -331,7 +331,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="onSelectMinute(minute)"
+                  (click)="!isTimeDisabled('minute', minute) && onSelectMinute(minute)"
                   (mouseenter)="onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
@@ -346,7 +346,7 @@
                   [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="onSelectSecond(second)"
+                  (click)="!isTimeDisabled('second', second) && onSelectSecond(second)"
                   (mouseenter)="onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
