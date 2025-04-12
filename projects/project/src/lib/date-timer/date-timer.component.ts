@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, forwardRef, TemplateRef, ViewEncapsulation, ElementRef, ViewChild, HostListener, ChangeDetectorRef, NgZone, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, forwardRef, TemplateRef, ViewEncapsulation, ElementRef, ViewChild, HostListener, ChangeDetectorRef, NgZone, ViewContainerRef, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { DateTimer, DateTimerMode, DateTimerSize, DateTimerStatus, DateTimerSelectType, RangeValue } from './date-timer.interface';
@@ -110,7 +110,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       this.format = 'yyyy-MM-dd HH:mm:ss';
     }
     
-    this.currentPanelMode = this.mode === 'time' ? 'time' : this.mode;
+    // 设置初始面板模式 - 直接对应当前mode
+    this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
     
     if (this.autoFocus && this.datePickerInput) {
       setTimeout(() => {
@@ -118,6 +119,13 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       });
     }
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['mode']) {
+      this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+    }
+  }
+    
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
@@ -440,103 +448,76 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     this.currentViewDate = setYear(this.currentViewDate, year);
     
     if (this.mode === 'year') {
-      const start = startOfYear(this.currentViewDate);
-      const end = endOfYear(this.currentViewDate);
+      const start = new Date(year, 0, 1, 0, 0, 0);  // 1月1日 00:00:00
+      const end = new Date(year, 11, 31, 23, 59, 59);  // 12月31日 23:59:59
       
-      if (this.selectType === 'single') {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      } else {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      }
+      this.selectedValue = { start, end };
+      this.displayValue = this.formatSelectedValue(this.selectedValue);
+      this._onChange(this.selectedValue);
       
       this.closeDropdown();
     } else {
       this.currentPanelMode = 'month';
+      this.cdr.markForCheck();
     }
-    this.cdr.markForCheck();
   }
 
   onSelectMonth(month: number): void {
     this.currentViewDate = setMonth(this.currentViewDate, month);
     
     if (this.mode === 'month') {
-      const start = startOfMonth(this.currentViewDate);
-      const end = endOfMonth(this.currentViewDate);
+      const year = getYear(this.currentViewDate);
+      const lastDay = new Date(year, month + 1, 0).getDate(); // 获取当月最后一天
+      const start = new Date(year, month, 1, 0, 0, 0); // 当月1日 00:00:00
+      const end = new Date(year, month, lastDay, 23, 59, 59); // 当月最后一天 23:59:59
       
-      if (this.selectType === 'single') {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      } else {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      }
+      this.selectedValue = { start, end };
+      this.displayValue = this.formatSelectedValue(this.selectedValue);
+      this._onChange(this.selectedValue);
       
       this.closeDropdown();
     } else {
       this.currentPanelMode = 'date';
       this.generateDateMatrix();
+      this.cdr.markForCheck();
     }
-    this.cdr.markForCheck();
   }
 
   onSelectQuarter(quarter: number): void {
-    const date = new Date(getYear(this.currentViewDate), quarter * 3, 1);
+    const startMonth = quarter * 3;
+    const year = getYear(this.currentViewDate);
+    const date = new Date(year, startMonth, 1);
     this.currentViewDate = date;
     
     if (this.mode === 'quarter') {
-      const start = startOfQuarter(date);
-      const end = endOfQuarter(date);
+      const start = new Date(year, startMonth, 1, 0, 0, 0); // 季度第一天 00:00:00
+      const endMonth = startMonth + 2;
+      const lastDay = new Date(year, endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
+      const end = new Date(year, endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
       
-      if (this.selectType === 'single') {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      } else {
-        this.selectedValue = { start, end };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      }
+      this.selectedValue = { start, end };
+      this.displayValue = this.formatSelectedValue(this.selectedValue);
+      this._onChange(this.selectedValue);
       
       this.closeDropdown();
     } else {
       this.currentPanelMode = 'date';
       this.generateDateMatrix();
+      this.cdr.markForCheck();
     }
-    this.cdr.markForCheck();
   }
 
   onSelectWeek(dates: Date[]): void {
-    if (this.mode === 'week') {
-      const weekStart = startOfWeek(dates[0], { weekStartsOn: 0 });
-      const weekEnd = endOfWeek(dates[0], { weekStartsOn: 0 });
-      
-      if (this.selectType === 'single') {
-        this.selectedValue = { start: weekStart, end: weekEnd };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      } else {
-        this.selectedValue = { start: weekStart, end: weekEnd };
-        this.displayValue = this.formatSelectedValue(this.selectedValue);
-        this._onChange(this.selectedValue);
-      }
-      
-      this.closeDropdown();
-    } else {
-      // 如果当前模式不是周选择，继续正常流程
-      if (dates && dates.length > 0) {
-        if (this.selectType === 'single') {
-          this.onSelectDate(dates[0]);
-        } else {
-          this.onSelectRangeDate(dates[0]);
-        }
-      }
-    }
+    if (dates && dates.length === 0) return;
+    
+    const firstDate = dates[0];
+    const weekStart = startOfWeek(firstDate, { weekStartsOn: 0 });
+    const weekEnd = endOfWeek(firstDate, { weekStartsOn: 0 });
+    
+    this.selectedValue = { start: weekStart, end: weekEnd };
+    this.displayValue = this.formatSelectedValue(this.selectedValue);
+    this._onChange(this.selectedValue);
+    this.closeDropdown();
   }
 
   onCellHover(date: Date): void {
@@ -827,16 +808,21 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         
         switch (this.mode) {
           case 'year':
-            start = startOfYear(today);
-            end = endOfYear(today);
+            start = new Date(getYear(today), 0, 1, 0, 0, 0);
+            end = new Date(getYear(today), 11, 31, 23, 59, 59);
             break;
           case 'month':
-            start = startOfMonth(today);
-            end = endOfMonth(today);
+            const lastDay = new Date(getYear(today), getMonth(today) + 1, 0).getDate();
+            start = new Date(getYear(today), getMonth(today), 1, 0, 0, 0);
+            end = new Date(getYear(today), getMonth(today), lastDay, 23, 59, 59);
             break;
           case 'quarter':
-            start = startOfQuarter(today);
-            end = endOfQuarter(today);
+            const quarter = Math.floor(getMonth(today) / 3);
+            const startMonth = quarter * 3;
+            const endMonth = startMonth + 2;
+            const quarterLastDay = new Date(getYear(today), endMonth + 1, 0).getDate();
+            start = new Date(getYear(today), startMonth, 1, 0, 0, 0);
+            end = new Date(getYear(today), endMonth, quarterLastDay, 23, 59, 59);
             break;
           case 'week':
             start = startOfWeek(today, { weekStartsOn: 0 });
@@ -1065,6 +1051,20 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     return this.selectedValue as Date;
+  }
+
+  // 修改标题点击处理方法
+  onHeaderClick(headerType: string): void {
+    if (this.mode === 'date') {
+      if (headerType === 'date-header') {
+        // 如果点击的是日期标题（如：2025年7月），则切换到月份面板
+        this.currentPanelMode = 'month';
+      } else if (headerType === 'month-header') {
+        // 如果点击的是月份标题（如：2025年），则切换到年份面板
+        this.currentPanelMode = 'year';
+      }
+      this.cdr.markForCheck();
+    }
   }
 
   private _onChange: (value: Date | RangeValue<Date> | null) => void = () => {};

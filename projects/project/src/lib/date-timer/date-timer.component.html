@@ -65,37 +65,8 @@
   <div 
     class="date-timer-dropdown"
     [class.date-timer-dropdown-time]="currentPanelMode === 'time'"
-    [class.date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(currentPanelMode)"
+    [class.date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(mode)"
   >
-    <!-- 模式选择器 -->
-    <div class="date-timer-mode-selector">
-      <span 
-        class="date-timer-mode-item" 
-        [class.date-timer-mode-active]="currentPanelMode === 'year'"
-        (click)="setMode('year')"
-      >年</span>
-      <span 
-        class="date-timer-mode-item" 
-        [class.date-timer-mode-active]="currentPanelMode === 'month'"
-        (click)="setMode('month')"
-      >月</span>
-      <span 
-        class="date-timer-mode-item" 
-        [class.date-timer-mode-active]="currentPanelMode === 'quarter'"
-        (click)="setMode('quarter')"
-      >季度</span>
-      <span 
-        class="date-timer-mode-item" 
-        [class.date-timer-mode-active]="currentPanelMode === 'week'"
-        (click)="setMode('week')"
-      >周</span>
-      <span 
-        class="date-timer-mode-item" 
-        [class.date-timer-mode-active]="currentPanelMode === 'date'"
-        (click)="setMode('date')"
-      >日</span>
-    </div>
-    
     <!-- 年份选择面板 -->
     <div *ngIf="currentPanelMode === 'year'" class="date-timer-year-panel">
       <div class="date-timer-header">
@@ -121,7 +92,8 @@
     <div *ngIf="currentPanelMode === 'month'" class="date-timer-month-panel">
       <div class="date-timer-header">
         <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
-        <span class="date-timer-header-view">{{ getYear(currentViewDate) }}</span>
+        <span *ngIf="mode === 'date'" class="date-timer-header-view date-timer-header-clickable" (click)="onHeaderClick('month-header')">{{ getYear(currentViewDate) }}</span>
+        <span *ngIf="mode !== 'date'" class="date-timer-header-view">{{ getYear(currentViewDate) }}</span>
         <button class="date-timer-next-year-btn" (click)="nextYear()">&gt;&gt;</button>
       </div>
       <div class="date-timer-body">
@@ -159,50 +131,14 @@
       </div>
     </div>
     
-    <!-- 周选择面板 -->
-    <div *ngIf="currentPanelMode === 'week'" class="date-timer-date-panel">
-      <div class="date-timer-header">
-        <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
-        <button class="date-timer-prev-month-btn" (click)="prevMonth()">&lt;</button>
-        <span class="date-timer-header-view">{{ getHeaderText() }}</span>
-        <button class="date-timer-next-month-btn" (click)="nextMonth()">&gt;</button>
-        <button class="date-timer-next-year-btn" (click)="nextYear()">&gt;&gt;</button>
-      </div>
-      
-      <!-- 星期标题 -->
-      <div class="date-timer-weekdays">
-        <div *ngFor="let weekday of weekdays" class="date-timer-weekday">{{ weekday }}</div>
-      </div>
-      
-      <!-- 日期表（带周选择） -->
-      <div class="date-timer-body">
-        <div *ngFor="let week of dateMatrix; let i = index" 
-             class="date-timer-week"
-             [class.date-timer-week-selected]="isWeekInDateRange(week)">
-          <div 
-            *ngFor="let day of week" 
-            class="date-timer-cell"
-            [class.date-timer-cell-in-week]="isWeekInDateRange(week)"
-            [class.date-timer-cell-selected]="isSelectedDay(day)"
-            [class.date-timer-cell-disabled]="isDateDisabled(day)"
-            [class.date-timer-cell-prev-month]="getMonth(day) !== getMonth(currentViewDate)"
-            [class.date-timer-cell-next-month]="getMonth(day) !== getMonth(currentViewDate)"
-            [class.date-timer-cell-today]="isToday(day)"
-            (click)="onSelectWeek(week)"
-          >
-            <div class="date-timer-cell-content">{{ getDate(day) }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 日期选择面板 -->
+    <!-- 日期选择面板（用于日期和周选择） -->
     <div *ngIf="currentPanelMode === 'date'" class="date-timer-date-panel">
       <!-- 面板头部 -->
       <div class="date-timer-header">
         <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
         <button class="date-timer-prev-month-btn" (click)="prevMonth()">&lt;</button>
-        <span class="date-timer-header-view">{{ getHeaderText() }}</span>
+        <span *ngIf="mode === 'date'" class="date-timer-header-view date-timer-header-clickable" (click)="onHeaderClick('date-header')">{{ getHeaderText() }}</span>
+        <span *ngIf="mode !== 'date'" class="date-timer-header-view">{{ getHeaderText() }}</span>
         <button class="date-timer-next-month-btn" (click)="nextMonth()">&gt;</button>
         <button class="date-timer-next-year-btn" (click)="nextYear()">&gt;&gt;</button>
       </div>
@@ -214,29 +150,53 @@
 
       <!-- 日期表 -->
       <div class="date-timer-body">
-        <div *ngFor="let week of dateMatrix" class="date-timer-week">
-          <div 
-            *ngFor="let day of week" 
-            class="date-timer-cell"
-            [class.date-timer-cell-disabled]="isDateDisabled(day)"
-            [class.date-timer-cell-selected]="isSelectedDay(day)"
-            [class.date-timer-cell-in-range]="isInRange(day)"
-            [class.date-timer-cell-prev-month]="getMonth(day) !== getMonth(currentViewDate)"
-            [class.date-timer-cell-next-month]="getMonth(day) !== getMonth(currentViewDate)"
-            [class.date-timer-cell-today]="isToday(day)"
-            (click)="onSelectDate(day)"
-            (mouseenter)="onCellHover(day)"
-          >
-            <div class="date-timer-cell-content">
-              <ng-container *ngIf="dateRender; else defaultCellContent">
-                {{ renderDateCell(day) }}
-              </ng-container>
-              <ng-template #defaultCellContent>
-                {{ getDate(day) }}
-              </ng-template>
+        <!-- 日期选择 -->
+        <ng-container *ngIf="mode !== 'week'">
+          <div class="date-timer-week" *ngFor="let week of dateMatrix">
+            <div 
+              *ngFor="let day of week" 
+              class="date-timer-cell"
+              [class.date-timer-cell-disabled]="isDateDisabled(day)"
+              [class.date-timer-cell-selected]="isSelectedDay(day)"
+              [class.date-timer-cell-in-range]="isInRange(day)"
+              [class.date-timer-cell-prev-month]="getMonth(day) !== getMonth(currentViewDate)"
+              [class.date-timer-cell-next-month]="getMonth(day) !== getMonth(currentViewDate)"
+              [class.date-timer-cell-today]="isToday(day)"
+              (click)="onSelectDate(day)"
+              (mouseenter)="onCellHover(day)"
+            >
+              <div class="date-timer-cell-content">
+                <ng-container *ngIf="dateRender; else defaultCellContent">
+                  {{ renderDateCell(day) }}
+                </ng-container>
+                <ng-template #defaultCellContent>
+                  {{ getDate(day) }}
+                </ng-template>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+        
+        <!-- 周选择 -->
+        <ng-container *ngIf="mode === 'week'">
+          <div class="date-timer-week" 
+               *ngFor="let week of dateMatrix; let i = index"
+               [class.date-timer-week-selected]="isWeekInDateRange(week)">
+            <div 
+              *ngFor="let day of week" 
+              class="date-timer-cell"
+              [class.date-timer-cell-in-week]="isWeekInDateRange(week)"
+              [class.date-timer-cell-selected]="isSelectedDay(day)"
+              [class.date-timer-cell-disabled]="isDateDisabled(day)"
+              [class.date-timer-cell-prev-month]="getMonth(day) !== getMonth(currentViewDate)"
+              [class.date-timer-cell-next-month]="getMonth(day) !== getMonth(currentViewDate)"
+              [class.date-timer-cell-today]="isToday(day)"
+              (click)="onSelectWeek(week)"
+            >
+              <div class="date-timer-cell-content">{{ getDate(day) }}</div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </div>
 
