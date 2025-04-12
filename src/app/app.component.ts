@@ -21,7 +21,7 @@ export class AppComponent {
   mySignal = signal({
     ok: 'false'
   });
-  nowComponent = signal('tabs');
+  nowComponent = signal('date-timer');
   checked = signal(false);
   onCheckedChange(checked: boolean) {
     this.checked.set(checked);

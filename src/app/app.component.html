@@ -24,6 +24,7 @@
                             <li nz-menu-item (click)="nowComponent.set('tree-select')">树选择器</li>
                             <li nz-menu-item (click)="nowComponent.set('modal')">模态框</li>
                             <li nz-menu-item (click)="nowComponent.set('tabs')">标签页</li>
+                            <li nz-menu-item (click)="nowComponent.set('date-timer')">日期时间选择器</li>
                         </ul>
                     </li>
                 </ul>
@@ -135,6 +136,9 @@
         }
         @case ('tabs') {
         <app-doc-tabs></app-doc-tabs>
+        }
+        @case ('date-timer') {
+        <app-doc-date-timer></app-doc-date-timer>
         }
     }
     </div>

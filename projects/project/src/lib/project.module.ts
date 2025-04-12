@@ -36,6 +36,7 @@ import { CascaderComponent } from './cascader/cascader.component';
 import { ModalComponent } from './modal/modal.component';
 import { TabComponent } from './tabs/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
+import { DateTimerComponent } from './date-timer/date-timer.component';
 // 服务
 
 export * from './business';
@@ -62,7 +63,7 @@ export * from './popconfirm';
 export * from './select-basic';
 export * from './animation';
 export * from './directive';
-
+export * from './date-timer';
 
 
 
@@ -104,6 +105,7 @@ export * from './directive';
     ModalComponent,
     TabComponent,
     TabsComponent,
+    DateTimerComponent,
   ],
   exports: [
     CustomerFormComponent,
@@ -140,6 +142,7 @@ export * from './directive';
     ModalComponent,
     TabComponent,
     TabsComponent,
+    DateTimerComponent,
   ],
   providers: [
 
