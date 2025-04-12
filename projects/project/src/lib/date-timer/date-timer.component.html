@@ -140,8 +140,9 @@
         </div>
       </div>
       
-      <!-- 日期选择面板（用于日期和周选择） -->
-      <div *ngIf="currentPanelMode === 'date' || (showTime && ['date', 'week'].includes(mode))" class="date-timer-date-panel">
+      <!-- 日期面板（用于日期和周选择） -->
+      <div *ngIf="currentPanelMode === 'date' || (showTime && ['date', 'week'].includes(mode))" class="date-timer-date-panel"
+           [class.date-timer-date-panel-week-mode]="mode === 'week'">
         <!-- 面板头部 -->
         <div class="date-timer-header">
           <button class="date-timer-prev-year-btn" (click)="prevYear()">&lt;&lt;</button>
@@ -162,6 +163,8 @@
 
         <!-- 星期标题 -->
         <div class="date-timer-weekdays">
+          <!-- 周模式下才显示周数标题列 -->
+          <div *ngIf="mode === 'week'" class="date-timer-weekday-week-num">周</div>
           <div *ngFor="let weekday of weekdays" class="date-timer-weekday">{{ weekday }}</div>
         </div>
 
@@ -198,7 +201,12 @@
           <ng-container *ngIf="mode === 'week'">
             <div class="date-timer-week" 
                  *ngFor="let week of dateMatrix; let i = index"
-                 [class.date-timer-week-selected]="isWeekInDateRange(week)">
+                 [class.date-timer-week-selected]="isWeekInDateRange(week)"
+                 [class.date-timer-week-in-range]="isInWeekRange(week)">
+              <!-- 周数指示器 -->
+              <div class="date-timer-week-indicator" (click)="onSelectWeek(week)">
+                {{ getWeekNumber(week[0]) }}
+              </div>
               <div 
                 *ngFor="let day of week" 
                 class="date-timer-cell"
@@ -220,52 +228,56 @@
       </div>
 
       <!-- 时间选择面板 - 独立模式 -->
-      <div *ngIf="mode === 'time' && currentPanelMode === 'time' && !showTime" class="date-timer-time-panel">
+      <div *ngIf="mode === 'time' && currentPanelMode === 'time' && !showTime" class="date-timer-time-panel">        
+        <!-- 时间选择步骤指示器 -->
+        <div class="date-timer-time-steps" *ngIf="selectType === 'range'">
+          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'hour'">时</span> → 
+          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'minute'">分</span> → 
+          <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'second'">秒</span>
+        </div>
+        
         <div class="date-timer-time-columns">
           <!-- 小时 -->
-          <div class="date-timer-time-column">
+          <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'hour'">
+            <div class="date-timer-time-column-title">时</div>
             <ul>
               <li *ngFor="let hour of hours" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getHours() === hour)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="onSelectHour(hour)">
+                  (click)="onSelectHour(hour)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
             </ul>
           </div>
           <!-- 分钟 -->
-          <div class="date-timer-time-column">
+          <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'minute'">
+            <div class="date-timer-time-column-title">分</div>
             <ul>
               <li *ngFor="let minute of minutes" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getMinutes() === minute)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="onSelectMinute(minute)">
+                  (click)="onSelectMinute(minute)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
             </ul>
           </div>
           <!-- 秒钟 -->
-          <div class="date-timer-time-column">
+          <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'second'">
+            <div class="date-timer-time-column-title">秒</div>
             <ul>
               <li *ngFor="let second of seconds" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getSeconds() === second)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="onSelectSecond(second)">
+                  (click)="onSelectSecond(second)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
             </ul>
@@ -278,48 +290,45 @@
         <div class="date-timer-time-columns">
           <!-- 小时 -->
           <div class="date-timer-time-column">
+            <div class="date-timer-time-column-title">时</div>
             <ul>
               <li *ngFor="let hour of hours" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getHours() === hour) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getHours() === hour)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="onSelectHour(hour)">
+                  (click)="onSelectHour(hour)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
             </ul>
           </div>
           <!-- 分钟 -->
           <div class="date-timer-time-column">
+            <div class="date-timer-time-column-title">分</div>
             <ul>
               <li *ngFor="let minute of minutes" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getMinutes() === minute) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getMinutes() === minute)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="onSelectMinute(minute)">
+                  (click)="onSelectMinute(minute)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
             </ul>
           </div>
           <!-- 秒钟 -->
           <div class="date-timer-time-column">
+            <div class="date-timer-time-column-title">秒</div>
             <ul>
               <li *ngFor="let second of seconds" 
                   class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="
-                    (isSingleDate(selectedValue) && selectType === 'single' && selectedValue.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'single' && selectedValue.start && selectedValue.start.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'start' && selectedValue.start && selectedValue.start.getSeconds() === second) || 
-                    (isRangeValue(selectedValue) && selectType === 'range' && rangePart === 'end' && selectedValue.end && selectedValue.end.getSeconds() === second)"
+                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
+                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="onSelectSecond(second)">
+                  (click)="onSelectSecond(second)"
+                  (mouseenter)="selectType === 'range' && onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
             </ul>
@@ -347,10 +356,15 @@
         </ng-container>
         <ng-container *ngIf="selectType === 'range' && isRangeValue(selectedValue)">
           <ng-container *ngIf="rangePart === 'start' && selectedValue.start">
-            {{ selectedValue.start.getHours() | number:'2.0-0' }}:{{ selectedValue.start.getMinutes() | number:'2.0-0' }}:{{ selectedValue.start.getSeconds() | number:'2.0-0' }}
+            开始: {{ selectedValue.start.getHours() | number:'2.0-0' }}:{{ selectedValue.start.getMinutes() | number:'2.0-0' }}:{{ selectedValue.start.getSeconds() | number:'2.0-0' }}
           </ng-container>
-          <ng-container *ngIf="rangePart === 'end' && selectedValue.end">
-            {{ selectedValue.end.getHours() | number:'2.0-0' }}:{{ selectedValue.end.getMinutes() | number:'2.0-0' }}:{{ selectedValue.end.getSeconds() | number:'2.0-0' }}
+          <ng-container *ngIf="rangePart === 'end'">
+            <ng-container *ngIf="selectedValue.start && !selectedValue.end">
+              结束: 请选择结束时间
+            </ng-container>
+            <ng-container *ngIf="selectedValue.start && selectedValue.end">
+              结束: {{ selectedValue.end.getHours() | number:'2.0-0' }}:{{ selectedValue.end.getMinutes() | number:'2.0-0' }}:{{ selectedValue.end.getSeconds() | number:'2.0-0' }}
+            </ng-container>
           </ng-container>
         </ng-container>
       </div>

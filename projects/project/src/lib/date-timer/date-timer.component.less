@@ -2,6 +2,47 @@
   padding: 0 8px;
 }
 
+// 新增范围部分指示器样式
+.date-timer-range-part-indicator {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+.date-timer-range-part-active {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+// 时间选择步骤指示器样式
+.date-timer-time-steps {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  border-bottom: 1px dashed #f0f0f0;
+}
+.date-timer-time-step {
+  padding: 2px 8px;
+  &.date-timer-time-step-active {
+    color: #1890ff;
+    font-weight: 500;
+    background: #e6f7ff;
+    border-radius: 2px;
+  }
+}
+
+// 当前活动的时间列样式
+.date-timer-time-column-active {
+  background-color: rgba(24, 144, 255, 0.05);
+  .date-timer-time-column-title {
+    color: #1890ff;
+    font-weight: 500;
+  }
+}
+
 .date-timer-container {
   display: inline-block;
   position: relative;
@@ -272,6 +313,8 @@
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.3s;
+  position: relative;
+  z-index: 1;
   &:hover {
     background: #f5f5f5;
   }
@@ -280,6 +323,15 @@
     background: #1890ff;
     font-weight: 500;
     position: relative;
+  }
+  &.date-timer-cell-in-range {
+    background: #e6f7ff;
+    color: #1890ff;
+    // 选中边缘的样式覆盖
+    &.date-timer-cell-selected {
+      color: #fff;
+      background: #1890ff;
+    }
   }
 }
 
@@ -314,10 +366,43 @@
   background: #e6f7ff;
 }
 
+// 周选择增强
+.date-timer-week {
+  display: flex;
+  position: relative;
+  &.date-timer-week-in-range {
+    background: #e6f7ff;
+  }
+  .date-timer-week-indicator {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    border-radius: 2px;
+    cursor: pointer;
+    &:hover {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+  }
+}
+
 // 日期面板
 .date-timer-date-panel {
   width: 280px;
   padding: 8px;
+  position: relative;
+  
+  &.date-timer-date-panel-week-mode {
+    padding-left: 38px; /* 增加左侧padding以容纳周数指示器 */
+  }
 }
 .date-timer-header {
   display: flex;
@@ -381,9 +466,33 @@
 }
 .date-timer-body {
   padding: 4px 0;
+  position: relative;
 }
 .date-timer-week {
   display: flex;
+  position: relative;
+  &.date-timer-week-in-range {
+    background: #e6f7ff;
+  }
+  .date-timer-week-indicator {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    border-radius: 2px;
+    cursor: pointer;
+    &:hover {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+  }
 }
 .date-timer-cell {
   position: relative;
@@ -454,6 +563,12 @@
   text-align: center;
   list-style: none;
   transition: background 0.3s;
+  .date-timer-time-column-title {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    padding: 6px 0;
+    font-weight: 500;
+  }
   ul {
     width: 100%;
     padding: 0;
@@ -480,7 +595,19 @@
     background: #e6f7ff;
     color: #1890ff;
     font-weight: 500;
-    position: relative;
+  }
+  &.date-timer-time-cell-in-range {
+    background: #e6f7ff;
+    color: rgba(0, 0, 0, 0.85);
+    &.date-timer-time-cell-selected {
+      background: #1890ff;
+      color: #fff;
+    }
+  }
+  &.date-timer-time-cell-disabled {
+    color: rgba(0, 0, 0, 0.25);
+    background: transparent;
+    cursor: not-allowed;
   }
 }
 
@@ -537,4 +664,21 @@
   text-align: left;
   line-height: 38px;
   border-top: 1px solid #f0f0f0;
+}
+
+.date-timer-weekday-week-num {
+  flex: 1;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 时间面板组合模式样式优化 */
+.date-timer-time-panel-combined {
+  .date-timer-time-column-title {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+  }
 }
