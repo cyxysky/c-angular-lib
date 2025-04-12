@@ -67,6 +67,24 @@
     [class.date-timer-dropdown-time]="currentPanelMode === 'time' && !showTime"
     [class.date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(mode)"
   >
+    <!-- 添加开始/结束选择按钮Tab，只在范围选择模式下显示 -->
+    <div *ngIf="selectType === 'range'" class="date-timer-range-tabs">
+      <button 
+        class="date-timer-range-tab" 
+        [class.date-timer-range-tab-active]="rangePart === 'start'"
+        (click)="switchRangePart('start')"
+      >
+        开始
+      </button>
+      <button 
+        class="date-timer-range-tab" 
+        [class.date-timer-range-tab-active]="rangePart === 'end'"
+        (click)="switchRangePart('end')"
+      >
+        结束
+      </button>
+    </div>
+    
     <div class="date-timer-panels-container">
       <!-- 年份选择面板 -->
       <div *ngIf="currentPanelMode === 'year'" class="date-timer-year-panel">
@@ -228,7 +246,8 @@
       </div>
 
       <!-- 时间选择面板 - 独立模式 -->
-      <div *ngIf="mode === 'time' && currentPanelMode === 'time' && !showTime" class="date-timer-time-panel">        
+      <div *ngIf="mode === 'time' && currentPanelMode === 'time' && !showTime" class="date-timer-time-panel">
+        
         <!-- 时间选择步骤指示器 -->
         <div class="date-timer-time-steps" *ngIf="selectType === 'range'">
           <span class="date-timer-time-step" [class.date-timer-time-step-active]="timeSelectStep === 'hour'">时</span> → 
@@ -247,7 +266,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
                   (click)="onSelectHour(hour)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('hour', hour)">
+                  (mouseenter)="onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
             </ul>
@@ -262,7 +281,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
                   (click)="onSelectMinute(minute)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('minute', minute)">
+                  (mouseenter)="onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
             </ul>
@@ -277,7 +296,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
                   (click)="onSelectSecond(second)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('second', second)">
+                  (mouseenter)="onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
             </ul>
@@ -298,7 +317,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
                   (click)="onSelectHour(hour)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('hour', hour)">
+                  (mouseenter)="onTimeHover('hour', hour)">
                 {{ hour < 10 ? '0' + hour : hour }}
               </li>
             </ul>
@@ -313,7 +332,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
                   (click)="onSelectMinute(minute)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('minute', minute)">
+                  (mouseenter)="onTimeHover('minute', minute)">
                 {{ minute < 10 ? '0' + minute : minute }}
               </li>
             </ul>
@@ -328,7 +347,7 @@
                   [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
                   [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
                   (click)="onSelectSecond(second)"
-                  (mouseenter)="selectType === 'range' && onTimeHover('second', second)">
+                  (mouseenter)="onTimeHover('second', second)">
                 {{ second < 10 ? '0' + second : second }}
               </li>
             </ul>

@@ -282,19 +282,34 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 打开下拉框
   openDropdown(): void {
-    if (!this.disabled && !this.showDropdown) {
-      this.showDropdown = true;
-      // 确保mode为time时直接显示时间面板
-      if (this.mode === 'time') {
-        this.currentPanelMode = 'time';
-      } else if (this.mode === 'date' || this.mode === 'week') {
-        this.currentPanelMode = 'date';
-      } else {
-        this.currentPanelMode = this.mode;
-      }
-      this.openChange.emit(true);
-      this.createDropdownOverlay();
+    if (this.disabled || this.showDropdown) return;
+    
+    // 每次打开时，重置为选择开始时间
+    this.rangePart = 'start';
+    
+    // 如果是时间范围选择模式且已经完成选择，重置为选择开始时间
+    if (this.selectType === 'range' && this.mode === 'time' && this.timeSelectStep === 'complete') {
+      this.timeSelectStep = 'hour';
     }
+
+    this.showDropdown = true;
+    this.isFocused = true;
+    
+    if (this.mode !== this.currentPanelMode) {
+      this.currentPanelMode = this.mode;
+    }
+    
+    // 根据当前模式生成初始数据
+    if (this.currentPanelMode === 'date') {
+      this.generateDateMatrix();
+    } else if (this.currentPanelMode === 'month') {
+      // 月份选择不需要特殊处理
+    } else if (this.currentPanelMode === 'year') {
+      this.updateYears();
+    }
+    
+    this.createDropdownOverlay();
+    this.openChange.emit(true);
   }
 
   /**
@@ -385,32 +400,33 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 关闭下拉框
   closeDropdown(): void {
-    if (this.showDropdown) {
-      this.showDropdown = false;
-      this.openChange.emit(false);
-      this.rangeStart = null;
-      
-      if (this.overlayRef) {
-        this.overlayRef.dispose();
-        this.overlayRef = null;
-      }
-      
-      this.cdr.markForCheck();
+    this.showDropdown = false;
+    this.isFocused = false;
+    
+    // 关闭时将rangePart重置为'start'，以便下次打开时从开始选择
+    this.rangePart = 'start';
+    
+    if (this.overlayRef) {
+      this.overlayRef.dispose();
+      this.overlayRef = null;
     }
+    
+    this.openChange.emit(false);
+    this.cdr.markForCheck();
   }
 
   // 清除选择
   clearValue(event: Event): void {
     event.stopPropagation();
-    if (this.allowClear) {
-      this.value = null;
-      this.selectedValue = null;
-      this.rangeStart = null;
-      this.rangePart = 'start'; // 重置rangePart
-      this.displayValue = '';
-      this._onChange(null);
-      this.valueChange.emit(null);
-    }
+    this.value = null;
+    this.selectedValue = null;
+    this.displayValue = '';
+    this.rangeStart = null;
+    this.rangePart = 'start';
+    this.timeSelectStep = 'hour';
+    this._onChange(null);
+    this.valueChange.emit(null);
+    this.cdr.markForCheck();
   }
 
   // 模式切换
@@ -607,68 +623,204 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 日期选择方法
   onSelectYear(year: number): void {
-    this.currentViewDate = setYear(this.currentViewDate, year);
+    const oldViewDate = new Date(this.currentViewDate);
+    this.currentViewDate.setFullYear(year);
     
-    if (this.mode === 'year') {
-      if (this.selectType === 'single') {
-        const start = new Date(year, 0, 1, 0, 0, 0);  // 1月1日 00:00:00
-        const end = new Date(year, 11, 31, 23, 59, 59);  // 12月31日 23:59:59
-        
-        this.selectedValue = { start, end };
+    // 单选模式
+    if (this.selectType === 'single') {
+      if (this.mode === 'year') {
+        // 年份选择模式直接设置年份并关闭
+        const dateValue = this.getDateValue() || new Date();
+        dateValue.setFullYear(year);
+        this.selectedValue = new Date(dateValue);
+        this.value = this.selectedValue;
         this.displayValue = this.formatSelectedValue(this.selectedValue);
         this._onChange(this.selectedValue);
         
-        this.closeDropdown();
-      } else if (this.selectType === 'range') {
-        // 范围选择模式，需要选择两次
-        const selectedDate = new Date(year, 0, 1);
-        this.onSelectRangeDate(selectedDate);
+        if (!this.showTime) {
+          this.closeDropdown();
+        } else {
+          this.currentPanelMode = 'date';
+          this.generateDateMatrix();
+        }
+      } else {
+        // 其他模式设置年份后跳转到月份选择
+        this.currentPanelMode = 'month';
+        this.generateDateMatrix();
       }
-    } else {
-      this.currentPanelMode = 'month';
-      this.cdr.markForCheck();
     }
+    // 范围选择模式
+    else if (this.selectType === 'range') {
+      if (this.mode === 'year') {
+        // 年份选择模式
+        const date = new Date(year, 0, 1);
+        if (this.rangePart === 'start') {
+          // 开始日期
+          const endDate = this.getEndDate();
+          if (endDate && date > endDate) {
+            // 如果选择的开始日期大于结束日期，清空结束日期
+            this.selectedValue = {
+              start: date,
+              end: null
+            };
+            this.rangeStart = date;
+          } else {
+            this.selectedValue = {
+              start: date,
+              end: endDate
+            };
+            this.rangeStart = date;
+          }
+          // 自动切换到结束日期选择
+          this.rangePart = 'end';
+        } else {
+          // 结束日期
+          const startDate = this.getStartDate();
+          if (startDate && date < startDate) {
+            // 如果选择的结束日期小于开始日期，设置为开始日期的值
+            date.setFullYear(startDate.getFullYear());
+            date.setMonth(startDate.getMonth());
+            date.setDate(startDate.getDate());
+          }
+          this.selectedValue = {
+            start: startDate,
+            end: date
+          };
+          
+          // 完成选择
+          this.value = [this.selectedValue.start!, this.selectedValue.end!];
+          this.displayValue = this.formatSelectedValue(this.selectedValue);
+          this._onChange(this.selectedValue);
+          
+          if (!this.showTime) {
+            this.closeDropdown();
+          } else {
+            // 如果显示时间，切换到日期面板准备选择时间
+            this.currentPanelMode = 'date';
+            this.timeSelectStep = 'hour';
+            this.rangePart = 'start'; // 从开始时间开始选择
+            this.generateDateMatrix();
+          }
+        }
+      } else {
+        // 其他模式下，设置年份后跳转到月份选择
+        this.currentPanelMode = 'month';
+        this.generateDateMatrix();
+      }
+    }
+    
+    this.years = [];
+    this.updateYears();
+    this.cdr.markForCheck();
   }
 
   onSelectMonth(month: number): void {
-    this.currentViewDate = setMonth(this.currentViewDate, month);
+    // 保存当前视图日期
+    const oldViewDate = new Date(this.currentViewDate);
+    this.currentViewDate.setMonth(month);
     
-    if (this.mode === 'month') {
-      if (this.selectType === 'single') {
-        const year = getYear(this.currentViewDate);
-        const lastDay = new Date(year, month + 1, 0).getDate(); // 获取当月最后一天
-        const start = new Date(year, month, 1, 0, 0, 0); // 当月1日 00:00:00
-        const end = new Date(year, month, lastDay, 23, 59, 59); // 当月最后一天 23:59:59
-        
-        this.selectedValue = { start, end };
+    // 单选模式
+    if (this.selectType === 'single') {
+      if (this.mode === 'month') {
+        // 月份选择模式直接设置月份并关闭
+        const dateValue = this.getDateValue() || new Date();
+        dateValue.setFullYear(this.currentViewDate.getFullYear());
+        dateValue.setMonth(month);
+        this.selectedValue = new Date(dateValue);
+        this.value = this.selectedValue;
         this.displayValue = this.formatSelectedValue(this.selectedValue);
         this._onChange(this.selectedValue);
         
-        this.closeDropdown();
-      } else if (this.selectType === 'range') {
-        // 范围选择模式，需要选择两次
-        const selectedDate = new Date(getYear(this.currentViewDate), month, 1);
-        this.onSelectRangeDate(selectedDate);
+        if (!this.showTime) {
+          this.closeDropdown();
+        } else {
+          this.currentPanelMode = 'date';
+          this.generateDateMatrix();
+        }
+      } else {
+        // 其他模式设置月份后返回到日期选择
+        this.currentPanelMode = 'date';
+        this.generateDateMatrix();
       }
-    } else {
-      this.currentPanelMode = 'date';
-      this.generateDateMatrix();
-      this.cdr.markForCheck();
     }
+    // 范围选择模式
+    else if (this.selectType === 'range') {
+      if (this.mode === 'month') {
+        // 月份选择模式
+        const date = new Date(this.currentViewDate.getFullYear(), month, 1);
+        
+        if (this.rangePart === 'start') {
+          // 开始日期
+          const endDate = this.getEndDate();
+          if (endDate && date > endDate) {
+            // 如果选择的开始日期大于结束日期，清空结束日期
+            this.selectedValue = {
+              start: date,
+              end: null
+            };
+            this.rangeStart = date;
+          } else {
+            this.selectedValue = {
+              start: date,
+              end: endDate
+            };
+            this.rangeStart = date;
+          }
+          // 自动切换到结束日期选择
+          this.rangePart = 'end';
+        } else {
+          // 结束日期
+          const startDate = this.getStartDate();
+          if (startDate && date < startDate) {
+            // 如果选择的结束日期小于开始日期，设置为开始日期的值
+            date.setFullYear(startDate.getFullYear());
+            date.setMonth(startDate.getMonth());
+          }
+          
+          // 设置月份的最后一天作为结束日期
+          const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+          date.setDate(lastDay);
+          
+          this.selectedValue = {
+            start: startDate,
+            end: date
+          };
+          
+          // 完成选择
+          this.value = [this.selectedValue.start!, this.selectedValue.end!];
+          this.displayValue = this.formatSelectedValue(this.selectedValue);
+          this._onChange(this.selectedValue);
+          
+          if (!this.showTime) {
+            this.closeDropdown();
+          } else {
+            // 如果显示时间，切换到日期面板准备选择时间
+            this.currentPanelMode = 'date';
+            this.timeSelectStep = 'hour';
+            this.rangePart = 'start'; // 从开始时间开始选择
+            this.generateDateMatrix();
+          }
+        }
+      } else {
+        // 其他模式下，设置月份后返回到日期选择
+        this.currentPanelMode = 'date';
+        this.generateDateMatrix();
+      }
+    }
+    
+    this.cdr.markForCheck();
   }
 
   onSelectQuarter(quarter: number): void {
-    const startMonth = quarter * 3;
-    const year = getYear(this.currentViewDate);
-    const date = new Date(year, startMonth, 1);
-    this.currentViewDate = date;
+    const date = new Date(this.currentViewDate);
+    date.setMonth(quarter * 3); // 季度的第一个月
     
     if (this.mode === 'quarter') {
       if (this.selectType === 'single') {
-        const start = new Date(year, startMonth, 1, 0, 0, 0); // 季度第一天 00:00:00
-        const endMonth = startMonth + 2;
-        const lastDay = new Date(year, endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
-        const end = new Date(year, endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
+        const start = new Date(date);
+        const endMonth = start.getMonth() + 2;
+        const lastDay = new Date(date.getFullYear(), endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
+        const end = new Date(date.getFullYear(), endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
         
         this.selectedValue = { start, end };
         this.displayValue = this.formatSelectedValue(this.selectedValue);
@@ -677,7 +829,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         this.closeDropdown();
       } else if (this.selectType === 'range') {
         // 范围选择模式，需要选择两次
-        const selectedDate = new Date(year, startMonth, 1);
+        const selectedDate = new Date(date);
         this.onSelectRangeDate(selectedDate);
       }
     } else {
@@ -688,22 +840,24 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelectWeek(dates: Date[]): void {
-    if (dates && dates.length === 0) return;
+    if (dates.length === 0) return;
     
-    const firstDate = dates[0];
-    
-    if (this.selectType === 'single') {
-      const weekStart = startOfWeek(firstDate, { weekStartsOn: 1 });
-      const weekEnd = endOfWeek(firstDate, { weekStartsOn: 1 });
-      
-      this.selectedValue = { start: weekStart, end: weekEnd };
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
-      this.closeDropdown();
-    } else if (this.selectType === 'range') {
-      // 范围选择模式，需要选择两次
-      this.onSelectRangeDate(firstDate);
+    if (this.mode === 'week') {
+      if (this.selectType === 'single') {
+        const weekStart = startOfWeek(dates[0], { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(dates[0], { weekStartsOn: 1 });
+        
+        this.selectedValue = { start: weekStart, end: weekEnd };
+        this.displayValue = this.formatSelectedValue(this.selectedValue);
+        this._onChange(this.selectedValue);
+        this.closeDropdown();
+      } else if (this.selectType === 'range') {
+        // 范围选择模式，需要选择两次
+        this.onSelectRangeDate(dates[0]);
+      }
     }
+    
+    this.cdr.markForCheck();
   }
 
   onCellHover(date: Date): void {
@@ -777,345 +931,312 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       return;
     }
     
-    if (!this.rangeStart) {
-      // 根据不同mode设置范围起始值
-      let start = date;
-      if (this.mode === 'year') {
-        start = startOfYear(date);
-      } else if (this.mode === 'month') {
-        start = startOfMonth(date);
-      } else if (this.mode === 'quarter') {
-        start = startOfQuarter(date);
-      } else if (this.mode === 'week') {
-        start = startOfWeek(date, { weekStartsOn: 0 });
-      } else if (this.mode === 'date') {
-        start = startOfDay(date);
-      }
+    // 处理开始时间选择
+    if (this.rangePart === 'start' || !this.rangeStart) {
+      // 选择范围开始日期
+      let startDate = new Date(date);
       
-      this.rangeStart = start;
-      this.rangePart = 'end';
-      this.selectedValue = { start, end: null };
-      this.displayValue = `${this.formatDate(start)} ~`;
-      
-      // 对于时间模式，在选择第一部分后强制刷新UI
-      if (this.mode === 'time') {
-        setTimeout(() => {
-          if (this.overlayRef) {
-            this.overlayRef.updatePosition();
-          }
-        }, 0);
-      }
-    } else {
-      let start = this.rangeStart;
-      let end = date;
-      
-      // 根据不同mode生成正确的结束日期
-      if (this.mode === 'year') {
-        end = endOfYear(date);
-      } else if (this.mode === 'month') {
-        end = endOfMonth(date);
-      } else if (this.mode === 'quarter') {
-        end = endOfQuarter(date);
-      } else if (this.mode === 'week') {
-        end = endOfWeek(date, { weekStartsOn: 0 });
-      } else if (this.mode === 'date') {
-        end = endOfDay(date);
-      }
-      
-      // 确保开始日期在结束日期之前
-      if (isBefore(end, start)) {
-        const temp = start;
-        start = end;
-        end = temp;
-      }
-      
-      // 保留时间部分
+      // 如果需要支持时间选择，保留默认时间为00:00:00
       if (this.showTime) {
-        const rangeValue = this.selectedValue as RangeValue<Date> || { start: null, end: null };
-        
-        if (rangeValue.start) {
-          const currentStart = rangeValue.start;
-          start = setHours(start, getHours(currentStart));
-          start = setMinutes(start, getMinutes(currentStart));
-          start = setSeconds(start, getSeconds(currentStart));
-        }
-        
-        if (rangeValue.end) {
-          const currentEnd = rangeValue.end;
-          end = setHours(end, getHours(currentEnd));
-          end = setMinutes(end, getMinutes(currentEnd));
-          end = setSeconds(end, getSeconds(currentEnd));
+        startDate.setHours(0, 0, 0, 0);
+      }
+      
+      this.rangeStart = startDate;
+      this.selectedValue = { start: startDate, end: null };
+      
+      if (this.showTime) {
+        this.displayValue = `${this.formatDate(startDate)} 00:00:00 ~`;
+        // 完成日期选择后，如果是showTime模式，直接进入时间选择模式
+        this.currentPanelMode = 'time';
+        this.timeSelectStep = 'hour';
+      } else {
+        this.displayValue = `${this.formatDate(startDate)} ~`;
+      }
+      
+      // 选择完开始日期后，自动切换到结束选择
+      if (!this.showTime) {
+        this.rangePart = 'end';
+        this._onChange(this.selectedValue);
+      }
+      // 如果是showTime模式，不要立即切换到结束选择，等完成时间选择后再切换
+      
+    } else if (this.rangePart === 'end') {
+      // 选择范围结束日期
+      let endDate = new Date(date);
+      
+      // 如果需要支持时间选择，保留时间为当前选择的时间或默认23:59:59
+      if (this.showTime) {
+        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          // 保留已选择的时间部分
+          endDate.setHours(
+            this.selectedValue.end.getHours(),
+            this.selectedValue.end.getMinutes(),
+            this.selectedValue.end.getSeconds()
+          );
+        } else {
+          // 默认设置结束时间为23:59:59
+          endDate.setHours(23, 59, 59, 0);
         }
       }
       
-      this.selectedValue = { start, end };
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
+      // 如果结束日期早于开始日期，则交换
+      if (endDate < this.rangeStart) {
+        const temp = this.rangeStart;
+        this.rangeStart = endDate;
+        endDate = temp;
+      }
       
-      this.rangeStart = null;
-      this.rangePart = 'start';
+      this.selectedValue = { start: this.rangeStart, end: endDate };
+      this.value = [this.rangeStart, endDate];
       
-      // 如果不显示时间，选择后关闭下拉框
-      if (!this.showTime) {
-        this.closeDropdown();
-      } else if (['date', 'week'].includes(this.mode)) {
-        // 对于日期和周模式，在有时间选择的情况下不关闭面板
-        if (this.overlayRef) {
-          setTimeout(() => {
-            this.overlayRef?.updatePosition();
-          }, 0);
-        }
+      if (this.showTime) {
+        this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(endDate)} ${this.timeSelectStep === 'complete' ? this.formatTime(endDate) : '00:00:00'}`;
+        // 如果是showTime模式，选择完日期后切换到时间选择面板
+        this.currentPanelMode = 'time';
+        this.timeSelectStep = 'hour';
       } else {
-        // 其他模式，关闭下拉框
+        this.displayValue = `${this.formatDate(this.rangeStart)} ~ ${this.formatDate(endDate)}`;
+        // 非showTime模式，选择完成后关闭下拉
         this.closeDropdown();
+      }
+      
+      // 如果不显示时间，则直接触发onChange和完成选择
+      if (!this.showTime) {
+        this._onChange(this.selectedValue);
+        this.valueChange.emit(this.value);
+        this.ok.emit(this.selectedValue);
       }
     }
     
     this.cdr.markForCheck();
   }
 
-  // 时间选择
+  // 时间选择方法部分的修改
   onSelectHour(hour: number): void {
-    if (this.isTimeDisabled('hour', hour)) {
-      return;
-    }
-    
-    if (this.selectType === 'single') {
-      this.updateTimeValue('hour', hour);
-    } else if (this.selectType === 'range') {
-      // 将步骤设为小时选择
-      this.timeSelectStep = 'hour';
-      // 范围选择模式下的时间选择
-      this.updateTimeRangeValue('hour', hour);
+    if (this.mode === 'time') {
+      if (this.selectType === 'range') {
+        this.updateTimeRangeValue('hour', hour);
+      } else {
+        this.updateTimeValue('hour', hour);
+      }
+    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
+      if (this.selectType === 'range') {
+        // 处理日期和时间组合的范围选择
+        if (this.rangePart === 'start') {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
+            ? new Date(this.selectedValue.start) 
+            : this.rangeStart ? new Date(this.rangeStart) : new Date();
+          date.setHours(hour);
+          this.updateRangeTimeValue(date, 'start');
+          this.timeSelectStep = 'minute';
+        } else {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
+            ? new Date(this.selectedValue.end) 
+            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
+          date.setHours(hour);
+          this.updateRangeTimeValue(date, 'end');
+          this.timeSelectStep = 'minute';
+        }
+      } else {
+        this.updateTimeValue('hour', hour);
+      }
     }
   }
 
   onSelectMinute(minute: number): void {
-    if (this.isTimeDisabled('minute', minute)) {
-      return;
-    }
-    
-    if (this.selectType === 'single') {
-      this.updateTimeValue('minute', minute);
-    } else if (this.selectType === 'range') {
-      // 将步骤设为分钟选择
-      this.timeSelectStep = 'minute';
-      // 范围选择模式下的时间选择
-      this.updateTimeRangeValue('minute', minute);
+    if (this.mode === 'time') {
+      if (this.selectType === 'range') {
+        this.updateTimeRangeValue('minute', minute);
+      } else {
+        this.updateTimeValue('minute', minute);
+      }
+    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
+      if (this.selectType === 'range') {
+        // 处理日期和时间组合的范围选择
+        if (this.rangePart === 'start') {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
+            ? new Date(this.selectedValue.start) 
+            : this.rangeStart ? new Date(this.rangeStart) : new Date();
+          date.setMinutes(minute);
+          this.updateRangeTimeValue(date, 'start');
+          this.timeSelectStep = 'second';
+        } else {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
+            ? new Date(this.selectedValue.end) 
+            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
+          date.setMinutes(minute);
+          this.updateRangeTimeValue(date, 'end');
+          this.timeSelectStep = 'second';
+        }
+      } else {
+        this.updateTimeValue('minute', minute);
+      }
     }
   }
 
   onSelectSecond(second: number): void {
-    if (this.isTimeDisabled('second', second)) {
-      return;
-    }
-    
-    if (this.selectType === 'single') {
-      this.updateTimeValue('second', second);
-    } else if (this.selectType === 'range') {
-      // 将步骤设为秒选择
-      this.timeSelectStep = 'second';
-      // 范围选择模式下的时间选择
-      this.updateTimeRangeValue('second', second);
+    if (this.mode === 'time') {
+      if (this.selectType === 'range') {
+        this.updateTimeRangeValue('second', second);
+      } else {
+        this.updateTimeValue('second', second);
+      }
+    } else if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
+      if (this.selectType === 'range') {
+        // 处理日期和时间组合的范围选择
+        if (this.rangePart === 'start') {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.start 
+            ? new Date(this.selectedValue.start) 
+            : this.rangeStart ? new Date(this.rangeStart) : new Date();
+          date.setSeconds(second);
+          this.updateRangeTimeValue(date, 'start');
+          this.rangePart = 'end';
+          this.timeSelectStep = 'hour';
+        } else {
+          const date = this.isRangeValue(this.selectedValue) && this.selectedValue.end 
+            ? new Date(this.selectedValue.end) 
+            : new Date(this.isRangeValue(this.selectedValue) && this.selectedValue.start ? this.selectedValue.start : new Date());
+          date.setSeconds(second);
+          this.updateRangeTimeValue(date, 'end');
+          this.timeSelectStep = 'complete';
+        }
+      } else {
+        this.updateTimeValue('second', second);
+      }
     }
   }
 
   // 更新范围选择中的时间值
   updateTimeRangeValue(type: 'hour' | 'minute' | 'second', value: number): void {
-    if (!this.rangeStart && type === 'hour') {
-      // 第一次选择，创建初始时间并选择小时
-      const now = new Date();
-      const start = new Date(now);
-      start.setHours(value);
-      start.setMinutes(0);
-      start.setSeconds(0);
-      
-      this.rangeStart = start;
-      this.selectedValue = { start, end: null };
-      this.displayValue = `${this.padZero(value)}:00:00`;
-      this._onChange(this.selectedValue);
-      
-      // 设置为分钟选择步骤
-      this.timeSelectStep = 'minute';
-      this.cdr.markForCheck();
-    } else if (this.rangeStart && this.isRangeValue(this.selectedValue) && !this.selectedValue.end && this.timeSelectStep === 'minute' && type === 'minute') {
-      // 选择分钟
-      const updatedStart = new Date(this.rangeStart);
-      updatedStart.setMinutes(value);
-      
-      this.rangeStart = updatedStart;
-      this.selectedValue = { start: updatedStart, end: null };
-      this.displayValue = `${this.padZero(updatedStart.getHours())}:${this.padZero(value)}:00`;
-      this._onChange(this.selectedValue);
-      
-      // 设置为秒选择步骤
-      this.timeSelectStep = 'second';
-      this.cdr.markForCheck();
-    } else if (this.rangeStart && this.isRangeValue(this.selectedValue) && !this.selectedValue.end && this.timeSelectStep === 'second' && type === 'second') {
-      // 选择秒，完成起始时间选择
-      const updatedStart = new Date(this.rangeStart);
-      updatedStart.setSeconds(value);
-      
-      this.rangeStart = updatedStart;
-      this.selectedValue = { start: updatedStart, end: null };
-      this.displayValue = `${this.formatTime(updatedStart)} ~`;
-      this._onChange(this.selectedValue);
-      
-      // 重置为小时选择步骤，为结束时间选择做准备
-      this.timeSelectStep = 'hour';
-      this.rangePart = 'end';
-      this.cdr.markForCheck();
-    } else if (this.rangeStart && this.rangePart === 'end' && type === 'hour') {
-      // 选择结束时间的小时
-      let end = new Date();
-      
-      // 从rangeStart复制年月日
-      end.setFullYear(this.rangeStart.getFullYear());
-      end.setMonth(this.rangeStart.getMonth());
-      end.setDate(this.rangeStart.getDate());
-      
-      // 设置小时，重置分钟和秒
-      end.setHours(value);
-      end.setMinutes(0);
-      end.setSeconds(0);
-      
-      this.selectedValue = { start: this.rangeStart, end };
-      this.displayValue = `${this.formatTime(this.rangeStart)} ~ ${this.padZero(value)}:00:00`;
-      this._onChange(this.selectedValue);
-      
-      // 设置为分钟选择步骤
-      this.timeSelectStep = 'minute';
-      this.cdr.markForCheck();
-    } else if (this.rangeStart && this.rangePart === 'end' && this.isRangeValue(this.selectedValue) && this.timeSelectStep === 'minute' && type === 'minute') {
-      // 选择结束时间的分钟
-      let end = this.selectedValue.end ? new Date(this.selectedValue.end) : new Date();
-      
-      if (!this.selectedValue.end) {
-        // 从rangeStart复制年月日
-        end.setFullYear(this.rangeStart.getFullYear());
-        end.setMonth(this.rangeStart.getMonth());
-        end.setDate(this.rangeStart.getDate());
-      }
-      
-      // 设置分钟，重置秒
-      end.setMinutes(value);
-      end.setSeconds(0);
-      
-      this.selectedValue = { start: this.rangeStart, end };
-      this.displayValue = `${this.formatTime(this.rangeStart)} ~ ${this.padZero(end.getHours())}:${this.padZero(value)}:00`;
-      this._onChange(this.selectedValue);
-      
-      // 设置为秒选择步骤
-      this.timeSelectStep = 'second';
-      this.cdr.markForCheck();
-    } else if (this.rangeStart && this.rangePart === 'end' && this.isRangeValue(this.selectedValue) && this.timeSelectStep === 'second' && type === 'second') {
-      // 选择结束时间的秒，完成整个时间范围选择
-      let end = this.selectedValue.end ? new Date(this.selectedValue.end) : new Date();
-      
-      if (!this.selectedValue.end) {
-        // 从rangeStart复制年月日
-        end.setFullYear(this.rangeStart.getFullYear());
-        end.setMonth(this.rangeStart.getMonth());
-        end.setDate(this.rangeStart.getDate());
-      }
-      
-      // 设置秒
-      end.setSeconds(value);
-      
-      // 确保开始时间在结束时间之前
-      let start = this.rangeStart;
-      if (isBefore(end, start)) {
-        const temp = start;
-        start = end;
-        end = temp;
-      }
-      
-      this.selectedValue = { start, end };
-      this.displayValue = `${this.formatTime(start)} ~ ${this.formatTime(end)}`;
-      this._onChange(this.selectedValue);
-      
-      // 重置状态
-      this.rangeStart = null;
-      this.rangePart = 'start';
-      this.timeSelectStep = 'hour';
-      
-      // 如果不显示时间选择器，关闭下拉框
-      if (!this.showTime) {
-        this.closeDropdown();
-      }
-      
-      this.cdr.markForCheck();
-    } else {
-      // 处理单步选择的情况或类型不匹配的情况
+    // 如果当前是开始时间选择
+    if (this.rangePart === 'start') {
+      // 开始时间的选择逻辑
       if (type === 'hour') {
-        this.timeSelectStep = 'hour';
+        // 初始化开始时间或更新已有开始时间的小时
+        const startDate = this.rangeStart ? new Date(this.rangeStart) : new Date();
+        startDate.setHours(value, 0, 0);
         
-        // 更新当前选择的时间值
-        if (this.rangePart === 'start' && this.rangeStart) {
-          const updatedStart = new Date(this.rangeStart);
-          updatedStart.setHours(value);
-          this.rangeStart = updatedStart;
-          if (this.isRangeValue(this.selectedValue)) {
-            this.selectedValue = { start: updatedStart, end: this.selectedValue.end };
-          } else {
-            this.selectedValue = { start: updatedStart, end: null };
-          }
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
-          this._onChange(this.selectedValue);
-        } else if (this.rangePart === 'end' && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
-          const updatedEnd = new Date(this.selectedValue.end);
-          updatedEnd.setHours(value);
-          this.selectedValue = { start: this.selectedValue.start, end: updatedEnd };
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
-          this._onChange(this.selectedValue);
-        }
-      } else if (type === 'minute') {
+        this.rangeStart = startDate;
+        this.selectedValue = { start: startDate, end: null };
+        this.displayValue = `${this.formatDate(startDate)} ${this.formatTime(startDate)} ~`;
+        
+        // 更新为分钟选择步骤
         this.timeSelectStep = 'minute';
         
-        // 更新当前选择的时间值
-        if (this.rangePart === 'start' && this.rangeStart) {
+        this._onChange(this.selectedValue);
+        this.cdr.markForCheck();
+      } 
+      else if (type === 'minute' && this.timeSelectStep === 'minute') {
+        // 更新开始时间的分钟
+        if (this.rangeStart) {
           const updatedStart = new Date(this.rangeStart);
           updatedStart.setMinutes(value);
+          
           this.rangeStart = updatedStart;
-          if (this.isRangeValue(this.selectedValue)) {
-            this.selectedValue = { start: updatedStart, end: this.selectedValue.end };
-          } else {
-            this.selectedValue = { start: updatedStart, end: null };
-          }
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
+          this.selectedValue = { start: updatedStart, end: null };
+          this.displayValue = `${this.formatDate(updatedStart)} ${this.formatTime(updatedStart)} ~`;
+          
+          // 更新为秒选择步骤
+          this.timeSelectStep = 'second';
+          
           this._onChange(this.selectedValue);
-        } else if (this.rangePart === 'end' && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
-          const updatedEnd = new Date(this.selectedValue.end);
-          updatedEnd.setMinutes(value);
-          this.selectedValue = { start: this.selectedValue.start, end: updatedEnd };
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
-          this._onChange(this.selectedValue);
+          this.cdr.markForCheck();
         }
-      } else if (type === 'second') {
-        this.timeSelectStep = 'second';
-        
-        // 更新当前选择的时间值
-        if (this.rangePart === 'start' && this.rangeStart) {
+      } 
+      else if (type === 'second' && this.timeSelectStep === 'second') {
+        // 更新开始时间的秒钟
+        if (this.rangeStart) {
           const updatedStart = new Date(this.rangeStart);
           updatedStart.setSeconds(value);
+          
           this.rangeStart = updatedStart;
-          if (this.isRangeValue(this.selectedValue)) {
-            this.selectedValue = { start: updatedStart, end: this.selectedValue.end };
+          this.selectedValue = { start: updatedStart, end: null };
+          this.displayValue = `${this.formatDate(updatedStart)} ${this.formatTime(updatedStart)} ~`;
+          
+          // 选择完成后切换到结束选择
+          this.rangePart = 'end';
+          
+          // 如果是日期模式+showTime，选择完开始时间后应该返回到日期面板选择结束日期
+          if (this.showTime && ['date', 'week', 'month', 'year', 'quarter'].includes(this.mode)) {
+            this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+            this.timeSelectStep = 'hour';
           } else {
-            this.selectedValue = { start: updatedStart, end: null };
+            // 纯时间模式，继续选择结束时间
+            this.timeSelectStep = 'hour';
           }
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
+          
           this._onChange(this.selectedValue);
-        } else if (this.rangePart === 'end' && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
-          const updatedEnd = new Date(this.selectedValue.end);
-          updatedEnd.setSeconds(value);
-          this.selectedValue = { start: this.selectedValue.start, end: updatedEnd };
-          this.displayValue = this.formatSelectedValue(this.selectedValue);
-          this._onChange(this.selectedValue);
+          this.cdr.markForCheck();
         }
       }
-      
-      this.cdr.markForCheck();
+    }
+    // 如果当前是结束时间选择
+    else if (this.rangePart === 'end') {
+      // 纯时间模式的结束时间选择逻辑
+      if (type === 'hour' && this.rangeStart) {
+        // 初始化结束时间或更新已有结束时间的小时
+        let end = new Date();
+        
+        // 从rangeStart复制年月日
+        end.setFullYear(this.rangeStart.getFullYear());
+        end.setMonth(this.rangeStart.getMonth());
+        end.setDate(this.rangeStart.getDate());
+        
+        // 设置小时，重置分钟和秒
+        end.setHours(value, 0, 0);
+        
+        // 更新临时结束时间
+        this.selectedValue = { start: this.rangeStart, end };
+        this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(end)} ${this.padZero(value)}:00:00`;
+        
+        // 更新为分钟选择步骤
+        this.timeSelectStep = 'minute';
+        
+        this.cdr.markForCheck();
+      } 
+      else if (type === 'minute' && this.timeSelectStep === 'minute') {
+        // 更新结束时间的分钟
+        if (this.rangeStart && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          const updatedEnd = new Date(this.selectedValue.end);
+          updatedEnd.setMinutes(value);
+          
+          this.selectedValue = { start: this.rangeStart, end: updatedEnd };
+          this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(updatedEnd)} ${this.padZero(updatedEnd.getHours())}:${this.padZero(value)}:00`;
+          
+          // 更新为秒选择步骤
+          this.timeSelectStep = 'second';
+          
+          this.cdr.markForCheck();
+        }
+      } 
+      else if (type === 'second' && this.timeSelectStep === 'second') {
+        // 更新结束时间的秒钟，完成整个选择
+        if (this.rangeStart && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          const updatedEnd = new Date(this.selectedValue.end);
+          updatedEnd.setSeconds(value);
+          
+          // 确保结束时间不早于开始时间
+          if (updatedEnd < this.rangeStart) {
+            updatedEnd.setTime(this.rangeStart.getTime() + 60 * 60 * 1000); // 加一小时
+          }
+          
+          this.selectedValue = { start: this.rangeStart, end: updatedEnd };
+          this.value = [this.rangeStart, updatedEnd];
+          this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(updatedEnd)} ${this.formatTime(updatedEnd)}`;
+          
+          // 选择完成
+          this.timeSelectStep = 'complete';
+          
+          // 触发onChange
+          this._onChange(this.selectedValue);
+          this.valueChange.emit(this.value);
+          
+          // 选择完成后，关闭弹出层
+          this.closeDropdown();
+          
+          this.cdr.markForCheck();
+        }
+      }
     }
   }
 
@@ -1165,7 +1286,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       }
     } else {
       // 范围选择模式
-      const range = this.selectedValue as RangeValue<Date> || { start: null, end: null };
+      const range = this.selectedValue as RangeValue<Date>;
       
       if (this.rangePart === 'start' && range.start) {
         let date = new Date(range.start);
@@ -1522,11 +1643,28 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   isWeekInDateRange(week: Date[]): boolean {
-    if (!week || week.length === 0) return false;
-    return week.some(date => {
-      if (!date) return false;
-      return this.isInRange(date) || this.isSelectedDay(date);
-    });
+    if (!week || week.length === 0 || this.selectType !== 'range' || !this.isRangeValue(this.selectedValue)) {
+      return false;
+    }
+    
+    const start = this.selectedValue.start;
+    const end = this.selectedValue.end;
+    
+    if (!start || !end) {
+      return false;
+    }
+    
+    // 检查周的任何一天是否在选定的日期范围内
+    for (const day of week) {
+      if (day >= start && day <= end) {
+        return true;
+      }
+    }
+    
+    // 检查选定的日期范围是否在这一周内
+    const weekStart = week[0];
+    const weekEnd = week[week.length - 1];
+    return (start >= weekStart && start <= weekEnd) || (end >= weekStart && end <= weekEnd);
   }
 
   // 输入框焦点方法
@@ -1938,10 +2076,26 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       const range = this.selectedValue as RangeValue<Date>;
       
       if (this.selectType === 'range') {
-        // 范围选择模式下，根据当前选择的部分(start/end)判断
+        // 范围选择模式下，根据当前选择的部分(start/end)和当前步骤判断
         if (this.rangePart === 'start' && range.start) {
+          // 在选择开始时间的情况下
+          if (this.timeSelectStep === 'hour' && unit === 'hour') {
+            return getHours(range.start) === value;
+          } else if (this.timeSelectStep === 'minute' && unit === 'minute') {
+            return getMinutes(range.start) === value;
+          } else if (this.timeSelectStep === 'second' && unit === 'second') {
+            return getSeconds(range.start) === value;
+          }
           return this.isTimeUnitMatch(range.start, unit, value);
         } else if (this.rangePart === 'end' && range.end) {
+          // 在选择结束时间的情况下
+          if (this.timeSelectStep === 'hour' && unit === 'hour') {
+            return getHours(range.end) === value;
+          } else if (this.timeSelectStep === 'minute' && unit === 'minute') {
+            return getMinutes(range.end) === value;
+          } else if (this.timeSelectStep === 'second' && unit === 'second') {
+            return getSeconds(range.end) === value;
+          }
           return this.isTimeUnitMatch(range.end, unit, value);
         }
       } else {
@@ -1974,92 +2128,100 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  // 判断时间单位是否在范围内
+  // 修改isInTimeRange方法，增强时间范围的显示效果
   isInTimeRange(unit: 'hour' | 'minute' | 'second', value: number): boolean {
-    if (this.selectType !== 'range') return false;
-    
-    // 处理已完成的范围选择
-    if (this.isRangeValue(this.selectedValue)) {
-      const range = this.selectedValue as RangeValue<Date>;
-      if (range.start && range.end) {
-        const startValue = this.getTimeUnitValue(range.start, unit);
-        const endValue = this.getTimeUnitValue(range.end, unit);
-        
-        // 只有在同一天内的时间范围才显示范围高亮
-        if (isSameDay(range.start, range.end)) {
-          // 如果其他时间单位不同，则需要考虑它们
-          if (unit === 'hour') {
-            return value > startValue && value < endValue;
-          } else if (unit === 'minute') {
-            const startHour = getHours(range.start);
-            const endHour = getHours(range.end);
-            
-            if (startHour === endHour) {
-              return value > startValue && value < endValue;
-            } else {
-              // 不同小时，只在边界小时显示范围
-              const currentVal = this.getCurrentTimeValue();
-              if (!currentVal) return false;
-              
-              if (getHours(currentVal) === startHour) {
-                return value > startValue;
-              } else if (getHours(currentVal) === endHour) {
-                return value < endValue;
-              }
-            }
-          } else if (unit === 'second') {
-            const startHour = getHours(range.start);
-            const endHour = getHours(range.end);
-            const startMinute = getMinutes(range.start);
-            const endMinute = getMinutes(range.end);
-            
-            if (startHour === endHour && startMinute === endMinute) {
-              return value > startValue && value < endValue;
-            } else {
-              // 不同小时或分钟，只在边界显示范围
-              const currentVal = this.getCurrentTimeValue();
-              if (!currentVal) return false;
-              
-              if (getHours(currentVal) === startHour && getMinutes(currentVal) === startMinute) {
-                return value > startValue;
-              } else if (getHours(currentVal) === endHour && getMinutes(currentVal) === endMinute) {
-                return value < endValue;
-              }
-            }
-          }
-        }
-      }
+    // 单选模式
+    if (this.selectType === 'single') {
+      return false; // 单选模式不需要范围高亮
     }
     
-    // 处理还未完成的范围选择
-    if (this.rangeStart && this.hoverValue) {
-      const startValue = this.getTimeUnitValue(this.rangeStart, unit);
-      const endValue = this.getTimeUnitValue(this.hoverValue, unit);
+    // 范围选择模式
+    if (this.selectType === 'range') {
+      // 没有hover值或开始值，不高亮
+      if (!this.hoverValue && !this.rangeStart) {
+        return false;
+      }
       
-      // 只有在同一天内的时间范围才显示范围高亮
-      if (isSameDay(this.rangeStart, this.hoverValue)) {
-        // 为不同的时间单位应用不同的逻辑
+      // 开始时间选择阶段
+      if (this.rangePart === 'start') {
+        // 只有在有hover值的情况下才进行高亮
+        if (!this.hoverValue) {
+          return false;
+        }
+        
+        // 对于小时单位
         if (unit === 'hour') {
-          return (startValue < endValue && value > startValue && value < endValue) ||
-                 (startValue > endValue && value > endValue && value < startValue);
-        } else if (unit === 'minute') {
-          const startHour = getHours(this.rangeStart);
-          const endHour = getHours(this.hoverValue);
-          
-          if (startHour === endHour) {
-            return (startValue < endValue && value > startValue && value < endValue) ||
-                   (startValue > endValue && value > endValue && value < startValue);
+          return value === this.hoverValue.getHours();
+        } 
+        // 对于分钟单位
+        else if (unit === 'minute') {
+          // 在小时选择阶段，不高亮分钟
+          if (this.timeSelectStep === 'hour') {
+            return false;
           }
-        } else if (unit === 'second') {
-          const startHour = getHours(this.rangeStart);
-          const endHour = getHours(this.hoverValue);
-          const startMinute = getMinutes(this.rangeStart);
-          const endMinute = getMinutes(this.hoverValue);
-          
-          if (startHour === endHour && startMinute === endMinute) {
-            return (startValue < endValue && value > startValue && value < endValue) ||
-                   (startValue > endValue && value > endValue && value < startValue);
+          // 只有在选择的小时匹配时，才高亮相应的分钟
+          return this.hoverValue.getHours() === (this.rangeStart?.getHours() || 0) && 
+                 value === this.hoverValue.getMinutes();
+        } 
+        // 对于秒单位
+        else if (unit === 'second') {
+          // 在小时或分钟选择阶段，不高亮秒
+          if (this.timeSelectStep === 'hour' || this.timeSelectStep === 'minute') {
+            return false;
           }
+          // 只有在选择的小时和分钟都匹配时，才高亮相应的秒
+          return this.hoverValue.getHours() === (this.rangeStart?.getHours() || 0) && 
+                 this.hoverValue.getMinutes() === (this.rangeStart?.getMinutes() || 0) && 
+                 value === this.hoverValue.getSeconds();
+        }
+      }
+      // 结束时间选择阶段
+      else if (this.rangePart === 'end') {
+        // 必须有开始时间
+        if (!this.rangeStart) {
+          return false;
+        }
+        
+        // 如果没有hover值，不进行高亮
+        if (!this.hoverValue) {
+          return false;
+        }
+        
+        // 对于小时单位
+        if (unit === 'hour') {
+          const startHour = this.rangeStart.getHours();
+          const hoverHour = this.hoverValue.getHours();
+          
+          // 仅高亮hover的小时
+          return value === hoverHour;
+        } 
+        // 对于分钟单位
+        else if (unit === 'minute') {
+          // 在小时选择阶段，不高亮分钟
+          if (this.timeSelectStep === 'hour') {
+            return false;
+          }
+          
+          const isHourMatch = this.hoverValue.getHours() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ? 
+                                                          this.selectedValue.end.getHours() : 0);
+          
+          // 只有在选择的小时匹配时，才高亮相应的分钟
+          return isHourMatch && value === this.hoverValue.getMinutes();
+        } 
+        // 对于秒单位
+        else if (unit === 'second') {
+          // 在小时或分钟选择阶段，不高亮秒
+          if (this.timeSelectStep === 'hour' || this.timeSelectStep === 'minute') {
+            return false;
+          }
+          
+          const isHourMatch = this.hoverValue.getHours() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ? 
+                                                          this.selectedValue.end.getHours() : 0);
+          const isMinuteMatch = this.hoverValue.getMinutes() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ? 
+                                                                 this.selectedValue.end.getMinutes() : 0);
+          
+          // 只有在选择的小时和分钟都匹配时，才高亮相应的秒
+          return isHourMatch && isMinuteMatch && value === this.hoverValue.getSeconds();
         }
       }
     }
@@ -2067,72 +2229,85 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     return false;
   }
 
-  // 获取时间单位的值
-  getTimeUnitValue(date: Date, unit: 'hour' | 'minute' | 'second'): number {
-    if (!date) return 0;
-    
-    switch (unit) {
-      case 'hour':
-        return getHours(date);
-      case 'minute':
-        return getMinutes(date);
-      case 'second':
-        return getSeconds(date);
-      default:
-        return 0;
-    }
-  }
-
-  // 判断两个日期除了指定单位外的其他时间单位是否相同
-  isSameTimeExcept(date1: Date, date2: Date, exceptUnit: 'hour' | 'minute' | 'second'): boolean {
-    if (!date1 || !date2) return false;
-    
-    // 如果不是同一天，则认为不在同一个范围内
-    if (!isSameDay(date1, date2)) return false;
-    
-    switch (exceptUnit) {
-      case 'hour':
-        // 比较分钟和秒
-        return getMinutes(date1) === getMinutes(date2) && getSeconds(date1) === getSeconds(date2);
-      case 'minute':
-        // 比较小时和秒
-        return getHours(date1) === getHours(date2) && getSeconds(date1) === getSeconds(date2);
-      case 'second':
-        // 比较小时和分钟
-        return getHours(date1) === getHours(date2) && getMinutes(date1) === getMinutes(date2);
-      default:
-        return false;
-    }
-  }
-
-  // 处理时间选择的hover事件
+  // 增强onTimeHover方法，改进悬浮时间的处理
   onTimeHover(unit: 'hour' | 'minute' | 'second', value: number): void {
-    if (!this.rangeStart) return;
-    
-    // 根据当前所选时间单位创建一个新的日期对象
-    let hoverDate: Date;
-    
-    if (this.isRangeValue(this.selectedValue) && (this.selectedValue as RangeValue<Date>).start) {
-      const start = (this.selectedValue as RangeValue<Date>).start!;
+    if (this.selectType === 'single') {
+      // 单选模式下的hover效果处理
+      const currentValue = this.getCurrentTimeValue() || new Date();
+      const hoverDate = new Date(currentValue);
       
-      // 复制开始日期，然后修改相应的时间单位
-      hoverDate = new Date(start);
-      
-      switch (unit) {
-        case 'hour':
-          hoverDate = setHours(hoverDate, value);
-          break;
-        case 'minute':
-          hoverDate = setMinutes(hoverDate, value);
-          break;
-        case 'second':
-          hoverDate = setSeconds(hoverDate, value);
-          break;
+      if (unit === 'hour') {
+        hoverDate.setHours(value);
+      } else if (unit === 'minute') {
+        hoverDate.setMinutes(value);
+      } else if (unit === 'second') {
+        hoverDate.setSeconds(value);
       }
       
       this.hoverValue = hoverDate;
-      this.cdr.markForCheck();
+    } else if (this.selectType === 'range') {
+      // 范围选择模式下的hover效果处理
+      
+      // 对于开始时间的hover
+      if (this.rangePart === 'start') {
+        const baseDate = this.rangeStart || new Date();
+        const hoverDate = new Date(baseDate);
+        
+        if (unit === 'hour') {
+          hoverDate.setHours(value);
+          if (this.timeSelectStep === 'hour') {
+            hoverDate.setMinutes(0);
+            hoverDate.setSeconds(0);
+          }
+        } else if (unit === 'minute') {
+          hoverDate.setMinutes(value);
+          if (this.timeSelectStep === 'minute') {
+            hoverDate.setSeconds(0);
+          }
+        } else if (unit === 'second') {
+          hoverDate.setSeconds(value);
+        }
+        
+        this.hoverValue = hoverDate;
+      }
+      // 对于结束时间的hover
+      else if (this.rangePart === 'end') {
+        // 确保存在开始时间
+        if (!this.rangeStart) {
+          return;
+        }
+        
+        let baseDate: Date;
+        
+        // 使用已选的结束时间或从开始时间复制一个新的
+        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
+          baseDate = new Date(this.selectedValue.end);
+        } else {
+          baseDate = new Date(this.rangeStart);
+        }
+        
+        const hoverDate = new Date(baseDate);
+        
+        if (unit === 'hour') {
+          hoverDate.setHours(value);
+          if (this.timeSelectStep === 'hour') {
+            hoverDate.setMinutes(0);
+            hoverDate.setSeconds(0);
+          }
+        } else if (unit === 'minute') {
+          hoverDate.setMinutes(value);
+          if (this.timeSelectStep === 'minute') {
+            hoverDate.setSeconds(0);
+          }
+        } else if (unit === 'second') {
+          hoverDate.setSeconds(value);
+        }
+        
+        this.hoverValue = hoverDate;
+      }
     }
+    
+    this.cdr.markForCheck();
   }
 
   // 获取当前正在操作的时间值
@@ -2156,5 +2331,133 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     return null;
+  }
+
+  updateRangeTimeValue(date: Date, part: 'start' | 'end'): void {
+    if (part === 'start') {
+      this.rangeStart = date;
+      this.selectedValue = { 
+        start: date, 
+        end: this.isRangeValue(this.selectedValue) ? this.selectedValue.end : null 
+      };
+      
+      if (!this.isRangeValue(this.selectedValue) || !this.selectedValue.end) {
+        this.displayValue = `${this.formatDate(date)} ${this.formatTime(date)} ~`;
+      } else {
+        this.displayValue = `${this.formatDate(date)} ${this.formatTime(date)} ~ ${this.formatDate(this.selectedValue.end)} ${this.formatTime(this.selectedValue.end)}`;
+      }
+      
+      if (this.timeSelectStep === 'second') {
+        // 完成开始时间的选择，切换到结束时间
+        this._onChange(this.selectedValue);
+      }
+    } else {
+      // 结束日期
+      if (this.rangeStart) {
+        if (date < this.rangeStart) {
+          // 如果结束日期小于开始日期，交换它们
+          const temp = this.rangeStart;
+          this.rangeStart = date;
+          date = temp;
+        }
+        
+        this.selectedValue = { start: this.rangeStart, end: date };
+        this.value = [this.rangeStart, date];
+        this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(date)} ${this.formatTime(date)}`;
+        
+        if (this.timeSelectStep === 'complete') {
+          // 完成结束时间选择
+          this._onChange(this.selectedValue);
+          this.valueChange.emit(this.value);
+        }
+      }
+    }
+    
+    this.cdr.markForCheck();
+  }
+
+  // 添加切换范围选择部分的方法
+  switchRangePart(part: 'start' | 'end'): void {
+    if (this.rangePart === part) return;
+    
+    // 切换到目标部分
+    this.rangePart = part;
+    
+    // 如果切换到开始时间选择
+    if (part === 'start') {
+      // 保留原有的开始时间，以便重新选择
+      if (this.isRangeValue(this.selectedValue) && this.selectedValue && (this.selectedValue as RangeValue<Date>).start) {
+        const originalStart = (this.selectedValue as RangeValue<Date>).start!;
+        
+        // 仅保留开始时间，删除结束时间
+        this.selectedValue = { start: originalStart, end: null };
+        
+        if (this.mode === 'time') {
+          this.displayValue = `${this.formatTime(originalStart)} ~`;
+        } else {
+          this.displayValue = `${this.formatDate(originalStart)} ~`;
+        }
+      } else {
+        // 如果没有原始开始时间，则重置选择
+        this.rangeStart = null;
+        this.selectedValue = null;
+        this.displayValue = '';
+      }
+      
+      // 重置时间选择步骤
+      if (this.mode === 'time' || this.showTime) {
+        this.timeSelectStep = 'hour';
+      }
+    }
+    // 如果从开始时间切换到结束时间，但开始时间还未选择，则设置默认值
+    else if (part === 'end' && (!this.rangeStart || !this.selectedValue)) {
+      // 创建当前时间作为默认开始时间
+      const defaultStart = new Date();
+      
+      // 如果是时间模式，设置时分秒
+      if (this.mode === 'time') {
+        // 设置默认时间为当前时间的整点，分秒为0
+        defaultStart.setMinutes(0);
+        defaultStart.setSeconds(0);
+        this.rangeStart = defaultStart;
+        this.selectedValue = { start: defaultStart, end: null };
+        this.displayValue = `${this.formatTime(defaultStart)} ~`;
+      } 
+      // 如果是日期相关模式，设置日期
+      else {
+        if (this.mode === 'date' || this.mode === 'week') {
+          // 不做特殊处理，使用当前日期
+        } else if (this.mode === 'month') {
+          // 设置为当月1日
+          defaultStart.setDate(1);
+        } else if (this.mode === 'year') {
+          // 设置为当年1月1日
+          defaultStart.setMonth(0);
+          defaultStart.setDate(1);
+        } else if (this.mode === 'quarter') {
+          // 设置为当季度第一个月1日
+          const currentMonth = defaultStart.getMonth();
+          const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+          defaultStart.setMonth(quarterStartMonth);
+          defaultStart.setDate(1);
+        }
+        
+        // 如果还有showTime，则设置时分秒为0
+        if (this.showTime) {
+          defaultStart.setHours(0);
+          defaultStart.setMinutes(0);
+          defaultStart.setSeconds(0);
+        }
+        
+        this.rangeStart = defaultStart;
+        this.selectedValue = { start: defaultStart, end: null };
+        this.displayValue = `${this.formatDate(defaultStart)} ~`;
+      }
+    }
+    
+    // 更新onChange
+    this._onChange(this.selectedValue);
+    
+    this.cdr.markForCheck();
   }
 }
