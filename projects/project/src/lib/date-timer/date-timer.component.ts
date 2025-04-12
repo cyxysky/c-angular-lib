@@ -488,93 +488,121 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   formatSelectedValue(value: Date | RangeValue<Date>): string {
-    if (this.customFormat) {
-      return this.customFormat(value);
+    if (!value) return '';
+    
+    // 单选模式
+    if (this.isSingleDate(value)) {
+      // 根据不同模式格式化
+      if (this.mode === 'year') {
+        // 年份模式只显示年份
+        return `${value.getFullYear()}`;
+      } else if (this.mode === 'month') {
+        // 月份模式显示 yyyy-M
+        return `${value.getFullYear()}-${value.getMonth() + 1}`;
+      } else if (this.mode === 'quarter') {
+        // 季度模式显示 yyyy-Q季度
+        const quarter = Math.floor(value.getMonth() / 3) + 1;
+        return `${value.getFullYear()}-Q${quarter}`;
+      } else if (this.mode === 'week') {
+        // 周模式
+        const weekNumber = this.getWeekNumber(value);
+        return `${value.getFullYear()}-W${weekNumber}`;
+      } else {
+        // 日期模式使用标准格式
+        if (this.customFormat) {
+          return this.customFormat(value);
+        }
+        
+        let dateStr = this.formatDate(value);
+        
+        // 如果有时间显示，加上时间
+        if (this.showTime) {
+          dateStr += ' ' + this.formatTime(value);
+        }
+        
+        return dateStr;
+      }
     }
     
+    // 范围选择模式
     if (this.isRangeValue(value)) {
-      const range = value as RangeValue<Date>;
-      if (!range.start) return '';
+      const start = value.start;
+      const end = value.end;
       
-      switch (this.mode) {
-        case 'year':
-          if (range.end) {
-            // 跨年范围
-            if (getYear(range.start) !== getYear(range.end)) {
-              return `${getYear(range.start)} ~ ${getYear(range.end)}`;
-            } 
-            // 单年选择
-            return `${getYear(range.start)}`;
+      if (!start) return '';
+      
+      // 范围的结束时间不存在时，只显示开始时间
+      if (!end) {
+        if (this.mode === 'year') {
+          return `${start.getFullYear()} ~`;
+        } else if (this.mode === 'month') {
+          return `${start.getFullYear()}-${start.getMonth() + 1} ~`;
+        } else if (this.mode === 'quarter') {
+          const quarter = Math.floor(start.getMonth() / 3) + 1;
+          return `${start.getFullYear()}-Q${quarter} ~`;
+        } else if (this.mode === 'week') {
+          const weekNumber = this.getWeekNumber(start);
+          return `${start.getFullYear()}-W${weekNumber} ~`;
+        } else {
+          let startStr = this.formatDate(start);
+          if (this.showTime) {
+            startStr += ' ' + this.formatTime(start);
           }
-          return `${getYear(range.start)}`;
-          
-        case 'month':
-          if (range.end) {
-            // 跨月范围
-            if (getYear(range.start) !== getYear(range.end) || getMonth(range.start) !== getMonth(range.end)) {
-              return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')} ~ ${getYear(range.end)}-${String(getMonth(range.end) + 1).padStart(2, '0')}`;
-            }
-            // 单月选择
-            return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')}`;
-          }
-          return `${getYear(range.start)}-${String(getMonth(range.start) + 1).padStart(2, '0')}`;
-          
-        case 'quarter':
-          if (range.end) {
-            const startQuarter = Math.floor(getMonth(range.start) / 3) + 1;
-            const endQuarter = Math.floor(getMonth(range.end) / 3) + 1;
-            // 跨季度范围
-            if (getYear(range.start) !== getYear(range.end) || startQuarter !== endQuarter) {
-              return `${getYear(range.start)}-Q${startQuarter} ~ ${getYear(range.end)}-Q${endQuarter}`;
-            }
-            // 单季度选择
-            return `${getYear(range.start)}-Q${startQuarter}`;
-          }
-          const quarter = Math.floor(getMonth(range.start) / 3) + 1;
-          return `${getYear(range.start)}-Q${quarter}`;
-          
-        case 'week':
-          if (range.end) {
-            // 获取周数
-            const startFirstDayOfYear = new Date(getYear(range.start), 0, 1);
-            const startPastDaysOfYear = differenceInDays(range.start, startFirstDayOfYear);
-            const startWeekNumber = Math.ceil((startPastDaysOfYear + getDay(startFirstDayOfYear)) / 7);
-            
-            const endFirstDayOfYear = new Date(getYear(range.end), 0, 1);
-            const endPastDaysOfYear = differenceInDays(range.end, endFirstDayOfYear);
-            const endWeekNumber = Math.ceil((endPastDaysOfYear + getDay(endFirstDayOfYear)) / 7);
-            
-            // 跨周范围
-            if (getYear(range.start) !== getYear(range.end) || startWeekNumber !== endWeekNumber) {
-              return `${getYear(range.start)}-${startWeekNumber}周 ~ ${getYear(range.end)}-${endWeekNumber}周`;
-            }
-            // 单周选择
-            return `${getYear(range.start)}-${startWeekNumber}周`;
-          }
-          // 获取周数
-          const firstDayOfYear = new Date(getYear(range.start), 0, 1);
-          const pastDaysOfYear = differenceInDays(range.start, firstDayOfYear);
-          const weekNumber = Math.ceil((pastDaysOfYear + getDay(firstDayOfYear)) / 7);
-          return `${getYear(range.start)}-${weekNumber}周`;
-          
-        case 'time':
-          if (range.end) {
-            return `${this.formatTime(range.start)} ~ ${this.formatTime(range.end)}`;
-          } else {
-            return this.formatTime(range.start);
-          }
-          
-        default:
-          if (range.end) {
-            return `${this.formatDate(range.start)} ~ ${this.formatDate(range.end)}`;
-          } else {
-            return this.formatDate(range.start);
-          }
+          return `${startStr} ~`;
+        }
       }
-    } else {
-      // 对于date和time模式，直接使用formatDate
-      return this.formatDate(value as Date);
+      
+      // 有开始和结束时间
+      if (this.mode === 'year') {
+        if (start.getFullYear() === end.getFullYear()) {
+          // 同一年份时只显示一个年份
+          return `${start.getFullYear()}`;
+        } else {
+          return `${start.getFullYear()} ~ ${end.getFullYear()}`;
+        }
+      } else if (this.mode === 'month') {
+        if (start.getFullYear() === end.getFullYear() && 
+            start.getMonth() === end.getMonth()) {
+          // 同一月份时只显示一个月份
+          return `${start.getFullYear()}-${start.getMonth() + 1}`;
+        } else {
+          return `${start.getFullYear()}-${start.getMonth() + 1} ~ ${end.getFullYear()}-${end.getMonth() + 1}`;
+        }
+      } else if (this.mode === 'quarter') {
+        const startQuarter = Math.floor(start.getMonth() / 3) + 1;
+        const endQuarter = Math.floor(end.getMonth() / 3) + 1;
+        
+        if (start.getFullYear() === end.getFullYear() && startQuarter === endQuarter) {
+          // 同一季度时只显示一个季度
+          return `${start.getFullYear()}-Q${startQuarter}`;
+        } else {
+          return `${start.getFullYear()}-Q${startQuarter} ~ ${end.getFullYear()}-Q${endQuarter}`;
+        }
+      } else if (this.mode === 'week') {
+        const startWeek = this.getWeekNumber(start);
+        const endWeek = this.getWeekNumber(end);
+        
+        if (start.getFullYear() === end.getFullYear() && startWeek === endWeek) {
+          // 同一周时只显示一个周
+          return `${start.getFullYear()}-W${startWeek}`;
+        } else {
+          return `${start.getFullYear()}-W${startWeek} ~ ${end.getFullYear()}-W${endWeek}`;
+        }
+      } else {
+        // 日期范围
+        let startStr = this.formatDate(start);
+        let endStr = this.formatDate(end);
+        
+        if (this.showTime) {
+          startStr += ' ' + this.formatTime(start);
+          endStr += ' ' + this.formatTime(end);
+        }
+        
+        return `${startStr} ~ ${endStr}`;
+      }
     }
+    
+    return '';
   }
 
   formatDate(date: Date): string {
@@ -629,13 +657,19 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 单选模式
     if (this.selectType === 'single') {
       if (this.mode === 'year') {
-        // 年份选择模式直接设置年份并关闭
-        const dateValue = this.getDateValue() || new Date();
-        dateValue.setFullYear(year);
-        this.selectedValue = new Date(dateValue);
-        this.value = this.selectedValue;
+        // 年份选择模式，设置为整年范围
+        const startDate = new Date(year, 0, 1); // 1月1日
+        const endDate = new Date(year, 11, 31, 23, 59, 59, 999); // 12月31日 23:59:59.999
+        
+        // 虽然是单选模式，但返回的是一个代表整年的日期对象
+        this.selectedValue = startDate;
+        this.value = startDate;
         this.displayValue = this.formatSelectedValue(this.selectedValue);
         this._onChange(this.selectedValue);
+        
+        // 触发额外事件
+        this.valueChange.emit(this.value);
+        this.ok.emit(this.selectedValue);
         
         if (!this.showTime) {
           this.closeDropdown();
@@ -653,54 +687,72 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     else if (this.selectType === 'range') {
       if (this.mode === 'year') {
         // 年份选择模式
-        const date = new Date(year, 0, 1);
         if (this.rangePart === 'start') {
-          // 开始日期
+          // 开始日期 - 设置为年份第一天
+          const startDate = new Date(year, 0, 1);
+          this.rangeStart = startDate;
+          
+          // 结束日期如果已存在但早于新的开始日期，则清空结束日期
           const endDate = this.getEndDate();
-          if (endDate && date > endDate) {
-            // 如果选择的开始日期大于结束日期，清空结束日期
+          if (endDate && startDate > endDate) {
             this.selectedValue = {
-              start: date,
+              start: startDate,
               end: null
             };
-            this.rangeStart = date;
           } else {
             this.selectedValue = {
-              start: date,
+              start: startDate,
               end: endDate
             };
-            this.rangeStart = date;
           }
+          
           // 自动切换到结束日期选择
           this.rangePart = 'end';
+          this._onChange(this.selectedValue);
         } else {
-          // 结束日期
+          // 结束日期 - 设置为年份最后一天
+          let endDate = new Date(year, 11, 31, 23, 59, 59, 999);
           const startDate = this.getStartDate();
-          if (startDate && date < startDate) {
-            // 如果选择的结束日期小于开始日期，设置为开始日期的值
-            date.setFullYear(startDate.getFullYear());
-            date.setMonth(startDate.getMonth());
-            date.setDate(startDate.getDate());
+          
+          if (!startDate) {
+            // 如果没有开始日期，设置为同一年
+            this.rangeStart = new Date(year, 0, 1);
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
+          } else {
+            // 如果选择的结束年份早于开始年份
+            if (year < startDate.getFullYear()) {
+              // 交换开始和结束日期
+              const tempYear = startDate.getFullYear();
+              this.rangeStart = new Date(year, 0, 1);
+              endDate = new Date(tempYear, 11, 31, 23, 59, 59, 999);
+            }
+            
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
           }
-          this.selectedValue = {
-            start: startDate,
-            end: date
-          };
+          
+          // 如果开始和结束是同一年，使用特殊格式
+          if (this.rangeStart && this.rangeStart.getFullYear() === endDate.getFullYear()) {
+            const singleYear = this.rangeStart.getFullYear();
+            this.selectedValue = {
+              start: new Date(singleYear, 0, 1),
+              end: new Date(singleYear, 11, 31, 23, 59, 59, 999)
+            };
+          }
           
           // 完成选择
           this.value = [this.selectedValue.start!, this.selectedValue.end!];
           this.displayValue = this.formatSelectedValue(this.selectedValue);
           this._onChange(this.selectedValue);
+          this.valueChange.emit(this.value);
+          this.ok.emit(this.selectedValue);
           
-          if (!this.showTime) {
-            this.closeDropdown();
-          } else {
-            // 如果显示时间，切换到日期面板准备选择时间
-            this.currentPanelMode = 'date';
-            this.timeSelectStep = 'hour';
-            this.rangePart = 'start'; // 从开始时间开始选择
-            this.generateDateMatrix();
-          }
+          this.closeDropdown();
         }
       } else {
         // 其他模式下，设置年份后跳转到月份选择
@@ -722,14 +774,21 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 单选模式
     if (this.selectType === 'single') {
       if (this.mode === 'month') {
-        // 月份选择模式直接设置月份并关闭
-        const dateValue = this.getDateValue() || new Date();
-        dateValue.setFullYear(this.currentViewDate.getFullYear());
-        dateValue.setMonth(month);
-        this.selectedValue = new Date(dateValue);
-        this.value = this.selectedValue;
+        // 月份选择模式，设置为整月范围
+        const year = this.currentViewDate.getFullYear();
+        const startDate = new Date(year, month, 1); // 月份第一天
+        const lastDay = new Date(year, month + 1, 0).getDate(); // 获取月份最后一天的日期
+        const endDate = new Date(year, month, lastDay, 23, 59, 59, 999); // 月份最后一天 23:59:59.999
+        
+        // 虽然是单选模式，但返回的是一个代表整月的日期对象
+        this.selectedValue = startDate;
+        this.value = startDate;
         this.displayValue = this.formatSelectedValue(this.selectedValue);
         this._onChange(this.selectedValue);
+        
+        // 触发额外事件
+        this.valueChange.emit(this.value);
+        this.ok.emit(this.selectedValue);
         
         if (!this.showTime) {
           this.closeDropdown();
@@ -747,59 +806,83 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     else if (this.selectType === 'range') {
       if (this.mode === 'month') {
         // 月份选择模式
-        const date = new Date(this.currentViewDate.getFullYear(), month, 1);
+        const year = this.currentViewDate.getFullYear();
         
         if (this.rangePart === 'start') {
-          // 开始日期
+          // 开始日期 - 设置为月份第一天
+          const startDate = new Date(year, month, 1);
+          this.rangeStart = startDate;
+          
+          // 结束日期如果已存在但早于新的开始日期，则清空结束日期
           const endDate = this.getEndDate();
-          if (endDate && date > endDate) {
-            // 如果选择的开始日期大于结束日期，清空结束日期
+          if (endDate && startDate > endDate) {
             this.selectedValue = {
-              start: date,
+              start: startDate,
               end: null
             };
-            this.rangeStart = date;
           } else {
             this.selectedValue = {
-              start: date,
+              start: startDate,
               end: endDate
             };
-            this.rangeStart = date;
           }
+          
           // 自动切换到结束日期选择
           this.rangePart = 'end';
+          this._onChange(this.selectedValue);
         } else {
-          // 结束日期
+          // 结束日期 - 设置为月份最后一天
+          const lastDay = new Date(year, month + 1, 0).getDate();
+          let endDate = new Date(year, month, lastDay, 23, 59, 59, 999);
           const startDate = this.getStartDate();
-          if (startDate && date < startDate) {
-            // 如果选择的结束日期小于开始日期，设置为开始日期的值
-            date.setFullYear(startDate.getFullYear());
-            date.setMonth(startDate.getMonth());
+          
+          if (!startDate) {
+            // 如果没有开始日期，设置为同一月
+            this.rangeStart = new Date(year, month, 1);
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
+          } else {
+            // 如果选择的结束月份早于开始月份
+            const startYear = startDate.getFullYear();
+            const startMonth = startDate.getMonth();
+            
+            if ((year < startYear) || (year === startYear && month < startMonth)) {
+              // 交换开始和结束日期
+              this.rangeStart = new Date(year, month, 1);
+              const tempLastDay = new Date(startYear, startMonth + 1, 0).getDate();
+              endDate = new Date(startYear, startMonth, tempLastDay, 23, 59, 59, 999);
+            }
+            
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
           }
           
-          // 设置月份的最后一天作为结束日期
-          const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-          date.setDate(lastDay);
-          
-          this.selectedValue = {
-            start: startDate,
-            end: date
-          };
+          // 如果开始和结束是同一月，使用特殊格式
+          if (this.rangeStart && 
+              this.rangeStart.getFullYear() === endDate.getFullYear() && 
+              this.rangeStart.getMonth() === endDate.getMonth()) {
+            const singleYear = this.rangeStart.getFullYear();
+            const singleMonth = this.rangeStart.getMonth();
+            const lastDayOfMonth = new Date(singleYear, singleMonth + 1, 0).getDate();
+            
+            this.selectedValue = {
+              start: new Date(singleYear, singleMonth, 1),
+              end: new Date(singleYear, singleMonth, lastDayOfMonth, 23, 59, 59, 999)
+            };
+          }
           
           // 完成选择
           this.value = [this.selectedValue.start!, this.selectedValue.end!];
           this.displayValue = this.formatSelectedValue(this.selectedValue);
           this._onChange(this.selectedValue);
+          this.valueChange.emit(this.value);
+          this.ok.emit(this.selectedValue);
           
-          if (!this.showTime) {
-            this.closeDropdown();
-          } else {
-            // 如果显示时间，切换到日期面板准备选择时间
-            this.currentPanelMode = 'date';
-            this.timeSelectStep = 'hour';
-            this.rangePart = 'start'; // 从开始时间开始选择
-            this.generateDateMatrix();
-          }
+          this.closeDropdown();
         }
       } else {
         // 其他模式下，设置月份后返回到日期选择
@@ -812,31 +895,133 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelectQuarter(quarter: number): void {
-    const date = new Date(this.currentViewDate);
-    date.setMonth(quarter * 3); // 季度的第一个月
+    const year = this.currentViewDate.getFullYear();
     
-    if (this.mode === 'quarter') {
-      if (this.selectType === 'single') {
-        const start = new Date(date);
-        const endMonth = start.getMonth() + 2;
-        const lastDay = new Date(date.getFullYear(), endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
-        const end = new Date(date.getFullYear(), endMonth, lastDay, 23, 59, 59); // 季度最后一天 23:59:59
+    // 计算季度的起止月份
+    const startMonth = quarter * 3;
+    const endMonth = startMonth + 2;
+    
+    // 单选模式
+    if (this.selectType === 'single') {
+      if (this.mode === 'quarter') {
+        // 季度选择模式，设置为整季度范围
+        const startDate = new Date(year, startMonth, 1); // 季度第一天
+        const lastDay = new Date(year, endMonth + 1, 0).getDate(); // 季度最后一个月的最后一天
+        const endDate = new Date(year, endMonth, lastDay, 23, 59, 59, 999); // 季度最后一天 23:59:59.999
         
-        this.selectedValue = { start, end };
+        // 虽然是单选模式，但返回的是一个代表整季度的日期对象
+        this.selectedValue = startDate;
+        this.value = startDate;
         this.displayValue = this.formatSelectedValue(this.selectedValue);
         this._onChange(this.selectedValue);
         
-        this.closeDropdown();
-      } else if (this.selectType === 'range') {
-        // 范围选择模式，需要选择两次
-        const selectedDate = new Date(date);
-        this.onSelectRangeDate(selectedDate);
+        // 触发额外事件
+        this.valueChange.emit(this.value);
+        this.ok.emit(this.selectedValue);
+        
+        if (!this.showTime) {
+          this.closeDropdown();
+        } else {
+          this.currentPanelMode = 'date';
+          this.generateDateMatrix();
+        }
+      } else {
+        // 其他模式，一般不会进入这里
+        this.currentPanelMode = 'date';
+        this.generateDateMatrix();
       }
-    } else {
-      this.currentPanelMode = 'date';
-      this.generateDateMatrix();
-      this.cdr.markForCheck();
     }
+    // 范围选择模式
+    else if (this.selectType === 'range') {
+      if (this.mode === 'quarter') {
+        // 季度选择模式
+        if (this.rangePart === 'start') {
+          // 开始日期 - 设置为季度第一天
+          const startDate = new Date(year, startMonth, 1);
+          this.rangeStart = startDate;
+          
+          // 结束日期如果已存在但早于新的开始日期，则清空结束日期
+          const endDate = this.getEndDate();
+          if (endDate && startDate > endDate) {
+            this.selectedValue = {
+              start: startDate,
+              end: null
+            };
+          } else {
+            this.selectedValue = {
+              start: startDate,
+              end: endDate
+            };
+          }
+          
+          // 自动切换到结束日期选择
+          this.rangePart = 'end';
+          this._onChange(this.selectedValue);
+        } else {
+          // 结束日期 - 设置为季度最后一天
+          const lastDay = new Date(year, endMonth + 1, 0).getDate();
+          let endDate = new Date(year, endMonth, lastDay, 23, 59, 59, 999);
+          const startDate = this.getStartDate();
+          
+          if (!startDate) {
+            // 如果没有开始日期，设置为同一季度
+            this.rangeStart = new Date(year, startMonth, 1);
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
+          } else {
+            // 如果选择的结束季度早于开始季度
+            const startYear = startDate.getFullYear();
+            const startQuarter = Math.floor(startDate.getMonth() / 3);
+            
+            if ((year < startYear) || (year === startYear && quarter < startQuarter)) {
+              // 交换开始和结束日期
+              this.rangeStart = new Date(year, startMonth, 1);
+              const tempEndMonth = startQuarter * 3 + 2;
+              const tempLastDay = new Date(startYear, tempEndMonth + 1, 0).getDate();
+              endDate = new Date(startYear, tempEndMonth, tempLastDay, 23, 59, 59, 999);
+            }
+            
+            this.selectedValue = {
+              start: this.rangeStart,
+              end: endDate
+            };
+          }
+          
+          // 如果开始和结束是同一季度，使用特殊格式
+          if (this.rangeStart && 
+              this.rangeStart.getFullYear() === endDate.getFullYear() && 
+              Math.floor(this.rangeStart.getMonth() / 3) === Math.floor(endDate.getMonth() / 3)) {
+            const singleYear = this.rangeStart.getFullYear();
+            const singleQuarter = Math.floor(this.rangeStart.getMonth() / 3);
+            const singleStartMonth = singleQuarter * 3;
+            const singleEndMonth = singleStartMonth + 2;
+            const lastDayOfQuarter = new Date(singleYear, singleEndMonth + 1, 0).getDate();
+            
+            this.selectedValue = {
+              start: new Date(singleYear, singleStartMonth, 1),
+              end: new Date(singleYear, singleEndMonth, lastDayOfQuarter, 23, 59, 59, 999)
+            };
+          }
+          
+          // 完成选择
+          this.value = [this.selectedValue.start!, this.selectedValue.end!];
+          this.displayValue = this.formatSelectedValue(this.selectedValue);
+          this._onChange(this.selectedValue);
+          this.valueChange.emit(this.value);
+          this.ok.emit(this.selectedValue);
+          
+          this.closeDropdown();
+        }
+      } else {
+        // 其他模式，一般不会进入这里
+        this.currentPanelMode = 'date';
+        this.generateDateMatrix();
+      }
+    }
+    
+    this.cdr.markForCheck();
   }
 
   onSelectWeek(dates: Date[]): void {
@@ -1643,28 +1828,54 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   }
 
   isWeekInDateRange(week: Date[]): boolean {
-    if (!week || week.length === 0 || this.selectType !== 'range' || !this.isRangeValue(this.selectedValue)) {
+    if (!week || week.length === 0) {
       return false;
     }
     
-    const start = this.selectedValue.start;
-    const end = this.selectedValue.end;
-    
-    if (!start || !end) {
+    // 检查是否有选中的值
+    if (!this.selectedValue) {
       return false;
     }
     
-    // 检查周的任何一天是否在选定的日期范围内
-    for (const day of week) {
-      if (day >= start && day <= end) {
-        return true;
+    // 对于单选模式
+    if (this.selectType === 'single' && this.isSingleDate(this.selectedValue)) {
+      // 检查周是否包含选中的日期
+      const selectedDate = this.selectedValue;
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      // 检查周内是否有选中的日期
+      return week.some(day => {
+        const dayStart = new Date(day);
+        dayStart.setHours(0, 0, 0, 0);
+        return dayStart.getTime() === startOfDay.getTime();
+      });
+    }
+    
+    // 对于范围选择模式
+    if (this.selectType === 'range' && this.isRangeValue(this.selectedValue)) {
+      const start = this.selectedValue.start;
+      const end = this.selectedValue.end;
+      
+      // 如果没有完整的范围，则无法确定
+      if (!start || !end) {
+        return false;
       }
+      
+      // 格式化日期，忽略时间部分
+      const startDate = new Date(start);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(end);
+      endDate.setHours(23, 59, 59, 999);
+      
+      // 检查周内的任何一天是否在选定范围内
+      return week.some(day => {
+        const dayDate = new Date(day);
+        return dayDate >= startDate && dayDate <= endDate;
+      });
     }
     
-    // 检查选定的日期范围是否在这一周内
-    const weekStart = week[0];
-    const weekEnd = week[week.length - 1];
-    return (start >= weekStart && start <= weekEnd) || (end >= weekStart && end <= weekEnd);
+    return false;
   }
 
   // 输入框焦点方法
