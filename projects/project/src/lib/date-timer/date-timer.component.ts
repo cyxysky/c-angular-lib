@@ -1202,7 +1202,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式，更新小时值但不改变当前选择步骤
+      // 单选模式，更新小时值
       this.updateTimeValue('hour', hour);
       this.cdr.markForCheck();
       return;
@@ -1229,7 +1229,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         }
       }
       
-      // 更新小时值但不改变当前选择步骤
+      // 更新小时值
       this.updateTimeRangeValue('hour', hour);
       this.cdr.markForCheck();
     }
@@ -1242,7 +1242,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式，更新分钟值但不改变当前选择步骤
+      // 单选模式，更新分钟值
       this.updateTimeValue('minute', minute);
       this.cdr.markForCheck();
       return;
@@ -1269,7 +1269,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         }
       }
       
-      // 更新分钟值但不改变当前选择步骤
+      // 更新分钟值
       this.updateTimeRangeValue('minute', minute);
       this.cdr.markForCheck();
     }
@@ -1282,7 +1282,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     if (this.selectType === 'single') {
-      // 单选模式，更新秒值但不改变当前选择步骤
+      // 单选模式，更新秒值
       this.updateTimeValue('second', second);
       this.cdr.markForCheck();
       return;
@@ -1299,28 +1299,20 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
           const endDate = new Date(this.selectedValue.end);
           const isSameDay = startDate.getFullYear() === endDate.getFullYear() && 
-                            startDate.getMonth() === endDate.getMonth() && 
-                            startDate.getDate() === endDate.getDate();
+                          startDate.getMonth() === endDate.getMonth() && 
+                          startDate.getDate() === endDate.getDate() &&
+                          endDate.getHours() === startDate.getHours() &&
+                          endDate.getMinutes() === startDate.getMinutes();
           
-          if (isSameDay && 
-              endDate.getHours() === startDate.getHours() && 
-              endDate.getMinutes() === startDate.getMinutes() && 
-              second < startDate.getSeconds()) {
+          if (isSameDay && second < startDate.getSeconds()) {
             // 不允许选择早于开始时间的秒
             return;
           }
         }
       }
       
-      // 更新秒值但不改变当前选择步骤
+      // 更新秒值
       this.updateTimeRangeValue('second', second);
-      
-      // 只有在完成选择开始时间后，才自动切换到结束时间选择
-      if (this.rangePart === 'start' && this.timeSelectStep === 'complete') {
-        this.rangePart = 'end';
-        this.timeSelectStep = 'hour';
-      }
-      
       this.cdr.markForCheck();
     }
   }
@@ -1345,7 +1337,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         this._onChange(this.selectedValue);
         this.cdr.markForCheck();
       } 
-      else if (type === 'minute' && this.timeSelectStep === 'minute') {
+      else if (type === 'minute') {
         // 更新开始时间的分钟
         if (this.rangeStart) {
           const updatedStart = new Date(this.rangeStart);
@@ -1362,7 +1354,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           this.cdr.markForCheck();
         }
       } 
-      else if (type === 'second' && this.timeSelectStep === 'second') {
+      else if (type === 'second') {
         // 更新开始时间的秒钟
         if (this.rangeStart) {
           const updatedStart = new Date(this.rangeStart);
@@ -1392,28 +1384,30 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 如果当前是结束时间选择
     else if (this.rangePart === 'end') {
       // 纯时间模式的结束时间选择逻辑
-      if (type === 'hour' && this.rangeStart) {
+      if (type === 'hour') {
         // 初始化结束时间或更新已有结束时间的小时
-        let end = new Date();
-        
-        // 从rangeStart复制年月日
-        end.setFullYear(this.rangeStart.getFullYear());
-        end.setMonth(this.rangeStart.getMonth());
-        end.setDate(this.rangeStart.getDate());
-        
-        // 设置小时，重置分钟和秒
-        end.setHours(value, 0, 0);
-        
-        // 更新临时结束时间
-        this.selectedValue = { start: this.rangeStart, end };
-        this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(end)} ${this.padZero(value)}:00:00`;
-        
-        // 更新为分钟选择步骤
-        this.timeSelectStep = 'minute';
-        
-        this.cdr.markForCheck();
-      } 
-      else if (type === 'minute' && this.timeSelectStep === 'minute') {
+        if (this.rangeStart) {
+          let end = new Date();
+          
+          // 从rangeStart复制年月日
+          end.setFullYear(this.rangeStart.getFullYear());
+          end.setMonth(this.rangeStart.getMonth());
+          end.setDate(this.rangeStart.getDate());
+          
+          // 设置小时，重置分钟和秒
+          end.setHours(value, 0, 0);
+          
+          // 更新临时结束时间
+          this.selectedValue = { start: this.rangeStart, end };
+          this.displayValue = `${this.formatDate(this.rangeStart)} ${this.formatTime(this.rangeStart)} ~ ${this.formatDate(end)} ${this.padZero(value)}:00:00`;
+          
+          // 更新为分钟选择步骤
+          this.timeSelectStep = 'minute';
+          
+          this.cdr.markForCheck();
+        }
+      }
+      else if (type === 'minute') {
         // 更新结束时间的分钟
         if (this.rangeStart && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
           const updatedEnd = new Date(this.selectedValue.end);
@@ -1428,7 +1422,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           this.cdr.markForCheck();
         }
       } 
-      else if (type === 'second' && this.timeSelectStep === 'second') {
+      else if (type === 'second') {
         // 更新结束时间的秒钟，完成整个选择
         if (this.rangeStart && this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
           const updatedEnd = new Date(this.selectedValue.end);
@@ -2751,7 +2745,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 添加方法：当点击时间列标题时切换到对应的时间选择步骤
   onTimeColumnTitleClick(step: 'hour' | 'minute' | 'second'): void {
-    // 允许随时切换到任何时间单位选择
+    // 允许随时切换到任何时间单位选择，不受之前选择的限制
     this.timeSelectStep = step;
     this.cdr.markForCheck();
   }
