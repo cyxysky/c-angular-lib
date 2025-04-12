@@ -155,15 +155,26 @@
     width: 180px;
   }
   &.date-timer-dropdown-date-time {
-    width: 380px;
-    .date-timer-date-panel, .date-timer-time-panel {
-      display: inline-block;
-      vertical-align: top;
+    width: 480px;
+    
+    .date-timer-panels-container {
+      display: flex;
     }
+    
     .date-timer-date-panel {
+      width: 280px;
       border-right: 1px solid #f0f0f0;
     }
+    
+    .date-timer-time-panel-combined {
+      width: 200px;
+    }
   }
+}
+
+// 面板容器
+.date-timer-panels-container {
+  position: relative;
 }
 
 // 浮层位置样式

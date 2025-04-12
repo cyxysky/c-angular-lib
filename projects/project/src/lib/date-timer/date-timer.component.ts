@@ -106,12 +106,15 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 根据模式设置合适的格式
     if (this.mode === 'time') {
       this.format = 'HH:mm:ss';
+      this.currentPanelMode = 'time';
     } else if (this.showTime && this.mode === 'date') {
       this.format = 'yyyy-MM-dd HH:mm:ss';
     }
     
     // 设置初始面板模式 - 直接对应当前mode
-    this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+    if (this.mode !== 'time') {
+      this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+    }
     
     if (this.autoFocus && this.datePickerInput) {
       setTimeout(() => {
@@ -122,7 +125,12 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['mode']) {
-      this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+      if (this.mode === 'time') {
+        this.currentPanelMode = 'time';
+        this.format = 'HH:mm:ss';
+      } else {
+        this.currentPanelMode = this.mode === 'week' ? 'date' : this.mode;
+      }
     }
   }
     
@@ -186,6 +194,10 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   openDropdown(): void {
     if (!this.disabled && !this.showDropdown) {
       this.showDropdown = true;
+      // 确保mode为time时直接显示时间面板
+      if (this.mode === 'time') {
+        this.currentPanelMode = 'time';
+      }
       this.openChange.emit(true);
       this.createDropdownOverlay();
     }
@@ -230,7 +242,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     this.overlayRef = this.overlayService.createOverlay(
       { 
         minWidth: this.elementRef.nativeElement.getBoundingClientRect().width,
-        panelClass: ['date-timer-dropdown-panel', this.showTime ? 'date-timer-dropdown-panel-time' : '']
+        panelClass: ['date-timer-dropdown-panel', this.showTime || this.mode === 'time' ? 'date-timer-dropdown-panel-time' : '']
       },
       origin,
       positions,
@@ -261,7 +273,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     
     // 在重新定位前，检查面板是否需要特殊处理
-    if (this.showTime && this.currentPanelMode === 'time') {
+    if ((this.showTime || this.mode === 'time') && this.currentPanelMode === 'time') {
       setTimeout(() => {
         this.overlayRef?.updatePosition();
       }, 0);
@@ -568,14 +580,16 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 如果不显示时间，选择后关闭下拉框
       if (!this.showTime) {
         this.closeDropdown();
-      } else {
-        this.currentPanelMode = 'time';
-        // 更新浮层位置以适应时间面板
+      } else if (['date', 'week'].includes(this.mode)) {
+        // 对于日期和周模式，在有时间选择的情况下不关闭面板
         if (this.overlayRef) {
           setTimeout(() => {
             this.overlayRef?.updatePosition();
           }, 0);
         }
+      } else {
+        // 其他模式，关闭下拉框
+        this.closeDropdown();
       }
     } else {
       this.onSelectRangeDate(date);
@@ -632,14 +646,16 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 如果不显示时间，选择后关闭下拉框
       if (!this.showTime) {
         this.closeDropdown();
-      } else {
-        this.currentPanelMode = 'time';
-        // 更新浮层位置以适应时间面板
+      } else if (['date', 'week'].includes(this.mode)) {
+        // 对于日期和周模式，在有时间选择的情况下不关闭面板
         if (this.overlayRef) {
           setTimeout(() => {
             this.overlayRef?.updatePosition();
           }, 0);
         }
+      } else {
+        // 其他模式，关闭下拉框
+        this.closeDropdown();
       }
     }
     
@@ -739,8 +755,36 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   setCurrentTime(): void {
     const now = new Date();
     
+    if (this.mode === 'time') {
+      // 对于时间模式，直接设置时间
+      if (!this.selectedValue) {
+        this.selectedValue = now;
+      } else if (this.isSingleDate(this.selectedValue)) {
+        // 保留年月日，只改变时分秒
+        this.selectedValue = setHours(this.selectedValue, getHours(now));
+        this.selectedValue = setMinutes(this.selectedValue, getMinutes(now));
+        this.selectedValue = setSeconds(this.selectedValue, getSeconds(now));
+      } else if (this.isRangeValue(this.selectedValue)) {
+        // 如果是范围，更新start的时间部分
+        const range = this.selectedValue as RangeValue<Date>;
+        if (!range.start) {
+          range.start = now;
+        } else {
+          range.start = setHours(range.start, getHours(now));
+          range.start = setMinutes(range.start, getMinutes(now));
+          range.start = setSeconds(range.start, getSeconds(now));
+        }
+        this.selectedValue = range;
+      }
+      
+      this.displayValue = this.formatSelectedValue(this.selectedValue);
+      this._onChange(this.selectedValue);
+      this.cdr.markForCheck();
+      return;
+    }
+    
     if (this.selectType === 'single') {
-      if (this.mode === 'date' || this.mode === 'time') {
+      if ((this.mode === 'date') || (this.mode as any === 'time')) {
         // 对于date和time模式，使用单一日期
         let date = this.selectedValue as Date || now;
         date = setHours(date, getHours(now));
