@@ -159,7 +159,7 @@
       </div>
       
       <!-- 日期面板（用于日期和周选择） -->
-      <div *ngIf="currentPanelMode === 'date' || (showTime && ['date', 'week'].includes(mode))" class="date-timer-date-panel"
+      <div *ngIf="currentPanelMode === 'date' || ['date', 'week'].includes(mode)" class="date-timer-date-panel"
            [class.date-timer-date-panel-week-mode]="mode === 'week'">
         <!-- 面板头部 -->
         <div class="date-timer-header">
