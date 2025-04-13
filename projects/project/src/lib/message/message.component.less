@@ -34,19 +34,11 @@
   display: inline-block;
 }
 .lib-message-close {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
   cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.45);
-  padding: 4px;
-  transition: color 0.3s;
-  
+  padding: 2px 4px;
+  border-radius: 4px;
   &:hover {
-    color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.08);
   }
 }
 .lib-message-success .lib-message-icon {
@@ -60,4 +52,30 @@
 }
 .lib-message-info .lib-message-icon {
   color: #1890ff;
+}
+
+// 消息容器样式
+.lib-message-container {
+  pointer-events: none;
+  z-index: 1010;
+}
+
+// 消息Overlay样式
+.message-overlay-panel {
+  pointer-events: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.message-overlay-panel .cdk-overlay-pane {
+  pointer-events: none !important;
+}
+
+// 消息包装容器样式
+.lib-message-wrapper {
+  pointer-events: auto;
+  margin-bottom: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

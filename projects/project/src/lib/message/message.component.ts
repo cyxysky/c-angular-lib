@@ -5,11 +5,12 @@ import { Message } from './message.interface';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AnimationEvent } from '@angular/animations';
 import { messageMotion } from './message.animations';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'lib-message',
   standalone: true,
-  imports: [CommonModule, NzIconModule],
+  imports: [CommonModule, NzIconModule, OverlayModule],
   templateUrl: './message.component.html',
   styleUrl: './message.component.less',
   animations: [messageMotion],

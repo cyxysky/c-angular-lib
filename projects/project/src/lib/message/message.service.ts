@@ -1,28 +1,49 @@
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ApplicationRef, ComponentRef, Injectable, Injector, NgZone, TemplateRef, createComponent, inject } from '@angular/core';
+import { ApplicationRef, ComponentRef, Injectable, Injector, NgZone, OnDestroy, TemplateRef, ViewContainerRef, createComponent, inject } from '@angular/core';
 import { MessageComponent } from './message.component';
 import { Message } from './message.interface';
 import { Subject } from 'rxjs';
+import { OverlayService } from '../overlay/overlay.service';
+import { ElementRef } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MessageService {
+export class MessageService implements OnDestroy {
   private overlay = inject(Overlay);
   private injector = inject(Injector);
   private appRef = inject(ApplicationRef);
   private ngZone = inject(NgZone);
+  private overlayService = inject(OverlayService);
 
   private messageInstances: Map<string, ComponentRef<MessageComponent>> = new Map();
   private messageCounter = 0;
   private messageContainerElement: HTMLElement | null = null;
+  private overlayRef: OverlayRef | null = null;
+  private destroy$ = new Subject<void>();
 
   // 消息事件
   public messageChange = new Subject<{ id: string, status: 'created' | 'removed' }>();
 
   constructor() {
     this.createMessageContainer();
+  }
+
+  ngOnDestroy(): void {
+    // 清理所有消息
+    this.removeAll();
+    
+    // 销毁overlay
+    if (this.overlayRef) {
+      this.overlayRef.dispose();
+      this.overlayRef = null;
+    }
+    
+    // 清理订阅
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -43,13 +64,31 @@ export class MessageService {
       this.messageContainerElement.style.pointerEvents = 'none';
       this.messageContainerElement.style.zIndex = '1010';
 
-      // 移除可能存在的旧容器
-      const existingContainer = document.querySelector('.lib-message-container');
-      if (existingContainer) {
-        document.body.removeChild(existingContainer);
+      // 使用OverlayService创建全局模态
+      if (!this.overlayRef) {
+        // 创建一个全局Overlay配置
+        const overlayConfig = new OverlayConfig({
+          width: '100%',
+          height: '100%',
+          panelClass: 'message-overlay-panel',
+          hasBackdrop: false
+        });
+        
+        // 设置全局定位策略
+        overlayConfig.positionStrategy = this.overlay.position()
+          .global()
+          .top('0')
+          .left('0')
+          .right('0')
+          .bottom('0');
+          
+        // 创建overlay
+        this.overlayRef = this.overlay.create(overlayConfig);
+        const overlayElement = this.overlayRef.overlayElement;
+        overlayElement.style.pointerEvents = 'none';
+        overlayElement.style.backgroundColor = 'transparent';
+        overlayElement.appendChild(this.messageContainerElement);
       }
-
-      document.body.appendChild(this.messageContainerElement);
     }
   }
 
@@ -91,7 +130,7 @@ export class MessageService {
     // 创建消息宿主元素
     const messageElement = document.createElement('div');
     messageElement.className = `lib-message-wrapper lib-message-wrapper-${id}`;
-    messageElement.style.pointerEvents = 'auto';
+    messageElement.style.pointerEvents = 'none';
     messageElement.style.marginBottom = '16px';
     messageElement.style.width = '100%';
     messageElement.style.display = 'flex';
@@ -119,7 +158,7 @@ export class MessageService {
     instance.type = options.type || 'info';
     instance.duration = options.duration !== undefined ? options.duration : 3000;
     instance.data = options.data || null;
-    instance.closeable = options.closeable || false;
+    instance.closeable = options.closeable !== undefined ? options.closeable : true;
     instance.onClose = () => this.remove(id);
 
     // 手动触发变更检测
