@@ -37,6 +37,7 @@ import { ModalComponent } from './modal/modal.component';
 import { TabComponent } from './tabs/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { DateTimerComponent } from './date-timer/date-timer.component';
+import { MessageComponent } from './message/message.component';
 // 服务
 
 export * from './business';
@@ -64,7 +65,7 @@ export * from './select-basic';
 export * from './animation';
 export * from './directive';
 export * from './date-timer';
-
+export * from './message';
 
 
 @NgModule({
@@ -106,6 +107,7 @@ export * from './date-timer';
     TabComponent,
     TabsComponent,
     DateTimerComponent,
+    MessageComponent,
   ],
   exports: [
     CustomerFormComponent,
@@ -143,6 +145,7 @@ export * from './date-timer';
     TabComponent,
     TabsComponent,
     DateTimerComponent,
+    MessageComponent,
   ],
   providers: [
 

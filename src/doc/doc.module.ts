@@ -22,6 +22,7 @@ import { DocTreeSelectComponent } from './doc-tree-select/doc-tree-select.compon
 import { DocModalComponent } from './doc-modal/doc-modal.component';
 import { DocTabsComponent } from './doc-tabs/doc-tabs.component';
 import { DocDateTimerComponent } from './doc-date-timer/doc-date-timer.component';
+import { DocMessageComponent } from './doc-message/doc-message.component';
 @NgModule({
   declarations: [],
   imports: [
@@ -47,7 +48,8 @@ import { DocDateTimerComponent } from './doc-date-timer/doc-date-timer.component
     DocTreeSelectComponent,
     DocModalComponent,
     DocTabsComponent,
-    DocDateTimerComponent
+    DocDateTimerComponent,
+    DocMessageComponent
   ],
   exports: [
     DocButtonComponent,
@@ -71,7 +73,8 @@ import { DocDateTimerComponent } from './doc-date-timer/doc-date-timer.component
     DocTreeSelectComponent,
     DocModalComponent,
     DocTabsComponent,
-    DocDateTimerComponent
+    DocDateTimerComponent,
+    DocMessageComponent
   ]
 })
 export class DocModule { }

@@ -1,0 +1,14 @@
+<div class="lib-message-item" [class]="'lib-message-' + type">
+  <div class="lib-message-content">
+    <span class="lib-message-icon">
+      <i [style.color]="getIconColor()" [class]="getIconType()"></i>
+    </span>
+    <div class="lib-message-text">
+      <ng-container *ngIf="isTemplateRef(content); else textTemplate">
+        <ng-container *ngTemplateOutlet="content; context: { $implicit: data }"></ng-container>
+      </ng-container>
+      <ng-template #textTemplate>{{ content }}</ng-template>
+    </div>
+    <i class="bi-x-lg" (click)="close()" *ngIf="closeable"></i>
+  </div>
+</div>

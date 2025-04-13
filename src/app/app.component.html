@@ -25,6 +25,7 @@
                             <li nz-menu-item (click)="nowComponent.set('modal')">模态框</li>
                             <li nz-menu-item (click)="nowComponent.set('tabs')">标签页</li>
                             <li nz-menu-item (click)="nowComponent.set('date-timer')">日期时间选择器</li>
+                            <li nz-menu-item (click)="nowComponent.set('message')">消息</li>
                         </ul>
                     </li>
                 </ul>
@@ -139,6 +140,9 @@
         }
         @case ('date-timer') {
         <app-doc-date-timer></app-doc-date-timer>
+        }
+        @case ('message') {
+        <app-doc-message></app-doc-message>
         }
     }
     </div>

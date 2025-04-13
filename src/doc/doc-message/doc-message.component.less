@@ -1,0 +1,80 @@
+.doc-title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-section-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 40px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-sub-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 24px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 16px;
+}
+
+// 响应式网格布局
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// 示例按钮样式
+.demo-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.demo-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &.success {
+    background: #52c41a;
+  }
+  
+  &.warning {
+    background: #faad14;
+  }
+  
+  &.error {
+    background: #ff4d4f;
+  }
+}
+
+// API 表格样式
+app-doc-api-table {
+  margin-bottom: 32px;
+}
