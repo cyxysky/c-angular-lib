@@ -16,8 +16,6 @@ export class DrawerService {
 
   // 存储所有抽屉实例及其对应的OverlayRef
   private drawerInstances: Map<DrawerComponent, { overlayRef: OverlayRef, componentRef: ComponentRef<DrawerComponent> }> = new Map();
-  private destroy$ = new Subject<void>();
-
   constructor() {}
 
   /**
@@ -150,7 +148,7 @@ export class DrawerService {
       setTimeout(() => {
         overlayRef.dispose();
         this.drawerInstances.delete(instance);
-      }, 300);
+      }, 150);
     }
   }
 } 

@@ -60,28 +60,28 @@
     top: 0;
     left: 0;
     height: 100%;
-    // width由外部设置
+    max-width: 100%;
   }
   
   &.@{prefix}-right {
     top: 0;
     right: 0;
     height: 100%;
-    // width由外部设置
+    max-width: 100%;
   }
   
   &.@{prefix}-top {
     top: 0;
     left: 0;
     width: 100%;
-    // height由外部设置
+    max-height: 100%;
   }
   
   &.@{prefix}-bottom {
     bottom: 0;
     left: 0;
     width: 100%;
-    // height由外部设置
+    max-height: 100%;
   }
 }
 
@@ -91,7 +91,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-sizing: border-box;
 }
 
 .@{prefix}-header {

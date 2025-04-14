@@ -91,16 +91,11 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private viewContainerRef: ViewContainerRef,
-    private ngZone: NgZone,
-    @Inject(DOCUMENT) document: any
   ) { }
 
   ngOnInit(): void {
     this.updateContentContext();
     this.updateClassMap();
-    this.updateTransformStyle();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -112,7 +107,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
     if (placement) {
       this.updateClassMap();
-      this.updateTransformStyle();
       this.updateAnimationState();
     }
 
@@ -169,14 +163,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
       [`lib-drawer-${this.placement}`]: true
     };
   }
-
-  /**
-   * 更新变换样式
-   */
-  private updateTransformStyle(): void {
-    // 初始位置的变换样式已移除，由动画完全控制
-    this.transformStyle = '';
-  }
   
   /**
    * 关闭抽屉
@@ -184,6 +170,7 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
   close(): void {
     this.visible = false;
     this.visibleChange.emit(false);
+    this.afterClose.emit();
     this.updateAnimationState();
   }
 
@@ -193,11 +180,9 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
   animationDone(event: AnimationEvent): void {
     if (event.toState === 'void') {
       this.isVisible = false;
-      this.afterClose.emit();
     } else if (event.toState.includes('enter-from-')) {
       this.afterOpen.emit();
     }
-    
     this.cdr.markForCheck();
   }
 
