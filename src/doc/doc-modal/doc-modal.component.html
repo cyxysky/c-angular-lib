@@ -47,7 +47,8 @@
       title="服务创建模态框"
       [sourceCode]="serviceSource">
       <div demo>
-        <lib-button (click)="openServiceModal()">服务打开模态框</lib-button>
+        <lib-button (click)="openServiceModal()">服务打开template模态框</lib-button>
+        <lib-button (click)="openComponentModal()" style="margin-left: 10px;">服务打开组件模态框</lib-button>
         
         <!-- 标题模板 -->
         <ng-template #serviceModalHeader>
@@ -63,6 +64,7 @@
         <!-- 底部模板 -->
         <ng-template #serviceModalFooter>
           <div style="display: flex; justify-content: flex-end;">
+            <lib-button style="margin-right: 8px;" (click)="getModalInstance()">获取组件实例</lib-button>
             <lib-button style="margin-right: 8px;" (click)="closeServiceModal()">取消</lib-button>
             <lib-button color="primary" (click)="closeServiceModal()">确定</lib-button>
           </div>
@@ -138,7 +140,7 @@
           </div>
           <div modalFooter>
             <div style="display: flex; justify-content: space-between; width: 100%;">
-              <lib-button color="danger" (click)="isCustomFooterVisible = false">删除</lib-button>
+              <lib-button color="danger" (click)="isCustomFooterVisible = false" style="margin-right: 8px;">删除</lib-button>
               <div>
                 <lib-button style="margin-right: 8px;" (click)="isCustomFooterVisible = false">取消</lib-button>
                 <lib-button color="primary" (click)="isCustomFooterVisible = false">确定</lib-button>

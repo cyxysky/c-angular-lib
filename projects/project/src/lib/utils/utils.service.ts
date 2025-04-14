@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Component, Injectable, Type } from '@angular/core';
 import { TemplateRef } from '@angular/core';
 @Injectable({
   providedIn: 'root'
@@ -155,5 +155,23 @@ export class UtilsService {
       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
       return v.toString(16);
     });
+  }
+
+  /**
+   * 判断是否为组件
+   * @param value 需要判断的值
+   * @returns 是否为组件
+   */
+  isComponent(value: any): boolean {
+    return value instanceof Type;
+  }
+
+  /**
+   * 判断是否为模板
+   * @param value 需要判断的值
+   * @returns 是否为模板
+   */
+  isTemplate(value: any): boolean {
+    return value instanceof TemplateRef;
   }
 }

@@ -100,16 +100,13 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     const { visible, placement, data } = changes;
-
     if (visible) {
       this.handleVisibleChange(this.visible);
     }
-
     if (placement) {
       this.updateClassMap();
       this.updateAnimationState();
     }
-
     if (data) {
       this.updateContentContext();
     }

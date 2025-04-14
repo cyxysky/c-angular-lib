@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { ComponentRef, Injectable } from '@angular/core';
 import { ModalComponent } from './modal.component';
-import { Overlay } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ModalOptions, ModalRefMap } from './modal.interface';
+import { UtilsService } from '../utils/utils.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,6 +13,7 @@ export class ModalService {
 
   constructor(
     private overlay: Overlay,
+    public utils: UtilsService
   ) {
   }
 
@@ -40,46 +42,46 @@ export class ModalService {
         .centerVertically(),
       scrollStrategy: this.overlay.scrollStrategies.block(),
       hasBackdrop: false,
-      backdropClass: 'cdk-overlay-dark-backdrop'
     });
     // 创建并附加模态框组件
     const modalPortal = new ComponentPortal(ModalComponent, null);
     const componentRef = overlayRef.attach(modalPortal);
     // 获取模态框实例
     const modalInstance = componentRef.instance;
-    
-    // 设置模态框属性
-    modalInstance.width = modalOptions.width!;
-    modalInstance.height = modalOptions.height!;
-    modalInstance.zIndex = modalOptions.zIndex!;
-    modalInstance.closable = modalOptions.closable!;
-    modalInstance.centered = modalOptions.centered!;
-    modalInstance.maskClosable = modalOptions.maskClosable!;
-    modalInstance.top = modalOptions.top!;
-    // 设置内容
-    modalInstance.bodyContent = modalOptions.bodyContent || null;
-    modalInstance.headerContent = modalOptions.headerContent || null;
-    modalInstance.footerContent = modalOptions.footerContent || null;
-    modalInstance.contentContext = { $implicit: modalOptions.data };
+    componentRef.setInput('width', modalOptions.width!);
+    componentRef.setInput('height', modalOptions.height!);
+    componentRef.setInput('zIndex', modalOptions.zIndex!);
+    componentRef.setInput('closable', modalOptions.closable!);
+    componentRef.setInput('centered', modalOptions.centered!);
+    componentRef.setInput('maskClosable', modalOptions.maskClosable!);
+    componentRef.setInput('top', modalOptions.top!);
+    componentRef.setInput('headerContent', modalOptions.headerContent!);
+    componentRef.setInput('footerContent', modalOptions.footerContent!);
+    componentRef.setInput('contentContext', { $implicit: modalOptions.data });
+    // 设置组件本身内容
+    // 如果是组件，则设置组件内容
+    if (this.utils.isComponent(modalOptions.bodyContent)) {
+      componentRef.setInput('componentContent', modalOptions.bodyContent!);
+      componentRef.setInput('componentInputs', modalOptions.componentInputs!);
+      componentRef.setInput('componentOutputs', modalOptions.componentOutputs!);
+    } 
+    // 如果是模板，则设置模板内容
+    else if (this.utils.isTemplate(modalOptions.bodyContent)) {
+      componentRef.setInput('bodyContent', modalOptions.bodyContent!);
+    }
     // 设置回调
     modalInstance.afterClose.subscribe(() => {
-      if (modalOptions.afterClose) {
-        modalOptions.afterClose();
-      }
+      modalOptions.afterClose && modalOptions.afterClose();
     });
     modalInstance.afterOpen.subscribe(() => {
-      if (modalOptions.afterOpen) {
-        modalOptions.afterOpen();
-      }
+      modalOptions.afterOpen && modalOptions.afterOpen();
     });
     // 点击背景关闭
-    if (modalOptions.maskClosable) {
-      overlayRef.backdropClick().subscribe(() => {
-        this.closeModal(modalId);
-      });
-    }
+    modalOptions.maskClosable && overlayRef.backdropClick().subscribe(() => {
+      this.closeModal(modalId);
+    });
     // 显示模态框
-    modalInstance.visible = true;
+    componentRef.setInput('visible', true);
     // 存储实例
     this.modalInstances.set(modalId, {
       overlayRef,
@@ -87,7 +89,7 @@ export class ModalService {
     });
     return modalId;
   }
-  
+
   /**
    * 关闭模态框
    * @param modalId 模态框ID
@@ -96,26 +98,34 @@ export class ModalService {
     const instance = this.modalInstances.get(modalId);
     if (instance) {
       const { overlayRef, componentRef } = instance;
-      componentRef.instance.animationState = 'void';
-      console.log(componentRef.instance.animationState);
+      componentRef.setInput('visible', false);
       let timer = setTimeout(() => {
-        componentRef.instance.visible = false;
         overlayRef.dispose();
         this.modalInstances.delete(modalId);
         clearTimeout(timer);
       }, 150);
     }
   }
-  
+
   /**
    * 关闭所有模态框
    */
   closeAllModals(): void {
     this.modalInstances.forEach(({ componentRef }, modalId) => {
-      componentRef.instance.visible = false;
-      setTimeout(() => {
-        this.closeModal(modalId);
-      }, 200);
+      this.closeModal(modalId);
     });
   }
+
+  /**
+   * 获取模态框实例
+   * @param modalId 模态框ID
+   * @returns 模态框实例
+   */
+  getModalInstance(modalId: string): { overlayRef: OverlayRef, componentRef: ComponentRef<ModalComponent> } | undefined {
+    if (this.modalInstances.has(modalId)) {
+      return this.modalInstances.get(modalId);
+    }
+    return undefined;
+  }
+
 }

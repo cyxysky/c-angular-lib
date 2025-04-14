@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef } from '@angular/core';
+import { CommonModule, NgComponentOutlet } from '@angular/common';
+import { maskAnimation, modalAnimation } from '../animation';
 
 @Component({
   selector: 'lib-modal',
@@ -9,31 +9,12 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.less',
   animations: [
-    trigger('modalAnimation', [
-      state('void', style({
-        opacity: 0,
-        transform: 'scale(0.4)'
-      })),
-      state('visible', style({
-        opacity: 1,
-        transform: 'scale(1)'
-      })),
-      transition('void => visible', animate('150ms cubic-bezier(0, 0, 0.2, 1)')),
-      transition('visible => void', animate('150ms cubic-bezier(0.4, 0, 0.2, 1)'))
-    ]),
-    trigger('maskAnimation', [
-      state('void', style({
-        opacity: 0,
-      })),
-      state('visible', style({
-        opacity: 1,
-      })),
-      transition('void => visible', animate('150ms cubic-bezier(0, 0, 0.2, 1)')),
-      transition('visible => void', animate('150ms cubic-bezier(0.4, 0, 0.2, 1)'))
-    ])
-  ]
+    modalAnimation, maskAnimation
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalComponent implements AfterViewInit, OnDestroy {
+  @ViewChild(NgComponentOutlet, { static: false }) componentsRef!: NgComponentOutlet;
   @Input() visible: boolean = false;
   @Input() width: string | number = '520px';
   @Input() height: string | number = 'auto';
@@ -45,6 +26,9 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   @Input() headerContent: TemplateRef<any> | null = null;
   @Input() bodyContent: TemplateRef<any> | null = null;
   @Input() footerContent: TemplateRef<any> | null = null;
+  @Input() componentContent: Type<any> | null = null;
+  @Input() componentInputs: any = null;
+  @Input() componentOutputs: any = null;
   @Input() contentContext: any = null;
   @Input() drag: boolean = false;
 
@@ -56,8 +40,6 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   @ViewChild('modalBody') modalBodyRef!: ElementRef;
   @ViewChild('modalHeader') modalHeaderRef!: ElementRef;
 
-  animationState: 'void' | 'visible' = 'void';
-
   isDragging: boolean = false;
   dragStartX: number = 0;
   dragStartY: number = 0;
@@ -67,15 +49,20 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   initialTransformY: number = 0;
   isVisible: boolean = false;
 
-  constructor(private renderer: Renderer2, private cd: ChangeDetectorRef) { }
+  constructor(public cdr: ChangeDetectorRef) { }
 
   ngAfterViewInit(): void {
-    this.updateAnimationState();
-    this.cd.detectChanges();
+    this.cdr.detectChanges();
+    // 初始化组件
+    let timer = setInterval(() => {
+      if (this.componentsRef) {
+        this.initComponents();
+        clearInterval(timer);
+      }
+    }, 50);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.updateAnimationState();
     if (changes['visible']) {
       if (this.visible) {
         this.isVisible = this.visible;
@@ -88,67 +75,104 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
         this.resetDragPosition();
       }
     }
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
     // 清理工作
   }
 
-  updateAnimationState(): void {
-    this.animationState = this.visible ? 'visible' : 'void';
-  }
-
+  /**
+   * 关闭模态框
+   */
   close(): void {
     this.visible = false;
     this.visibleChange.emit(false);
-    this.updateAnimationState();
+    this.cdr.detectChanges();
     let timer = setTimeout(() => {
-      this.isVisible = false;
+      this.closeModal();
       clearTimeout(timer);
+      this.cdr.detectChanges();
     }, 150);
   }
 
+  /**
+   * 关闭模态框
+   */
+  public closeModal(): void {
+    this.isVisible = false;
+    this.afterClose.emit();
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * 点击背景关闭
+   */
   maskClick(): void {
     if (this.maskClosable) {
       this.close();
     }
   }
 
+  /**
+   * 初始化组件
+   */
+  initComponents(): void {
+    if (this.componentContent && this.componentOutputs && this.componentsRef) {
+      for (const key in this.componentOutputs) {
+        if (this.componentsRef.componentInstance && this.componentsRef.componentInstance[key]) {
+          this.componentsRef.componentInstance[key].subscribe((result: any) => {
+            this.componentOutputs[key](result);
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * 动画结束
+   * @param event 动画事件
+   */
   animationDone(event: any): void {
     if (event.toState === 'visible') {
       this.afterOpen.emit();
-    } else if (event.toState === 'void') {
-      this.afterClose.emit();
     }
+    this.cdr.detectChanges();
   }
 
-  getModalStyle(): object {
-    const style: any = {
-      width: typeof this.width === 'number' ? `${this.width}px` : this.width,
-      height: typeof this.height === 'number' ? `${this.height}px` : this.height,
-      zIndex: this.zIndex
-    };
-    if (this.centered) {
-      style.marginTop = 'auto';
-      style.marginBottom = 'auto';
-    } else {
-      style.marginTop = this.top;
+  /**
+   * 获取字符串
+   * @param value 值
+   * @returns 字符串
+   */
+  getString(value: any): string {
+    if (typeof value === 'string') {
+      return value;
     }
-    if (this.drag) {
-      style.transform = `translate(${this.transformX}px, ${this.transformY}px)`;
+    if (typeof value === 'number') {
+      return value.toString() + 'px';
     }
-    return style;
+    return '';
   }
 
+  /**
+   * 拖拽开始
+   * @param event 鼠标事件
+   */
   onDragStart(event: MouseEvent): void {
     if (this.drag) {
       this.isDragging = true;
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
       event.preventDefault();
+      this.cdr.detectChanges();
     }
   }
 
+  /**
+   * 拖拽移动
+   * @param event 鼠标事件
+   */
   @HostListener('document:mousemove', ['$event'])
   onDragMove(event: MouseEvent): void {
     if (this.isDragging && this.drag) {
@@ -158,19 +182,27 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       this.transformY = this.transformY + deltaY;
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
-      this.cd.detectChanges();
+      this.cdr.detectChanges();
     }
   }
 
+  /**
+   * 拖拽结束
+   */
   @HostListener('document:mouseup')
   onDragEnd(): void {
     this.isDragging = false;
+    this.cdr.detectChanges();
   }
 
+  /**
+   * 重置拖拽位置
+   */
   resetDragPosition(): void {
     this.transformX = 0;
     this.transformY = 0;
     this.initialTransformX = 0;
     this.initialTransformY = 0;
+    this.cdr.detectChanges();
   }
 }

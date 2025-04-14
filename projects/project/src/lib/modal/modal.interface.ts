@@ -29,6 +29,10 @@ export interface ModalOptions {
     bodyContent?: TemplateRef<any> | Component | any;
     /** 模态框顶部位置 */
     top?: string;
+    /** 组件参数 */
+    componentInputs?: any;
+    /** 组件输出 */
+    componentOutputs?: any;
 }
 
 export type ModalRefMap = Map<string, { overlayRef: OverlayRef, componentRef: ComponentRef<ModalComponent> }>

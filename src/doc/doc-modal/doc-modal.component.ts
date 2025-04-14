@@ -1,8 +1,27 @@
-import { Component, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, TemplateRef, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
-import { ButtonComponent, ModalComponent, ModalService } from '@project';
+import { ButtonComponent, ModalComponent, ModalService, InputComponent } from '@project';
+import { FormsModule } from '@angular/forms';
+@Component({
+  selector: 'app-modal-demo',
+  standalone: true,
+  imports: [CommonModule, FormsModule, InputComponent],
+  template: `<div>
+    这是一个测试的内容
+    <lib-input [(ngModel)]="name" (ngModelChange)="nameChangeHandler($event)"></lib-input>
+  </div>`
+})
+export class ModalDemoComponent {
+  @Input() name: string = '';
+  @Output() nameChange = new EventEmitter<any>();
+
+  nameChangeHandler(value: string): void {
+    this.nameChange.emit({ value, type: 'nameChange' });
+  }
+}
+
 
 @Component({
   selector: 'app-doc-modal',
@@ -58,6 +77,31 @@ export class DocModalComponent implements AfterViewInit {
       headerContent: this.serviceModalHeader,
       footerContent: this.serviceModalFooter,
       bodyContent: this.serviceModalBody,
+      afterOpen: () => console.log('Service modal opened'),
+      afterClose: () => console.log('Service modal closed')
+    });
+  }
+
+  getModalInstance(): void {
+    const modalInstance = this.modalService.getModalInstance(this.serviceModalId);
+    console.log(modalInstance?.componentRef.instance.componentsRef);
+  }
+
+  openComponentModal(): void {
+    this.serviceModalId = this.modalService.create({
+      bodyContent: ModalDemoComponent,
+      componentInputs: {
+        name: 'test'
+      },
+      componentOutputs: {
+        nameChange: (value: string) => {
+          console.log('组件输出', value);
+        }
+      },
+      width: '500px',
+      centered: true,
+      headerContent: this.serviceModalHeader,
+      footerContent: this.serviceModalFooter,
       afterOpen: () => console.log('Service modal opened'),
       afterClose: () => console.log('Service modal closed')
     });
