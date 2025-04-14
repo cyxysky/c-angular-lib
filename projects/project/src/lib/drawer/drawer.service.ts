@@ -29,7 +29,9 @@ export class DrawerService {
     // 创建Overlay配置
     const overlayConfig = new OverlayConfig({
       positionStrategy: this.overlay.position().global(),
-      scrollStrategy: this.overlay.scrollStrategies.block(),
+      scrollStrategy: options.mask !== false ? 
+        this.overlay.scrollStrategies.block() : // 有遮罩时阻止滚动
+        this.overlay.scrollStrategies.noop(),   // 无遮罩时允许滚动
       hasBackdrop: false, // 不使用CDK的遮罩，而是使用组件内部的遮罩
       disposeOnNavigation: true,
       panelClass: 'drawer-overlay-panel'
