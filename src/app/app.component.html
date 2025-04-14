@@ -26,6 +26,7 @@
                             <li nz-menu-item (click)="nowComponent.set('tabs')">标签页</li>
                             <li nz-menu-item (click)="nowComponent.set('date-timer')">日期时间选择器</li>
                             <li nz-menu-item (click)="nowComponent.set('message')">消息</li>
+                            <li nz-menu-item (click)="nowComponent.set('drawer')">抽屉</li>
                         </ul>
                     </li>
                 </ul>
@@ -143,6 +144,9 @@
         }
         @case ('message') {
         <app-doc-message></app-doc-message>
+        }
+        @case ('drawer') {
+        <app-doc-drawer></app-doc-drawer>
         }
     }
     </div>

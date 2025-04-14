@@ -219,10 +219,11 @@ export class MessageService implements OnDestroy {
     content: string | TemplateRef<{ $implicit: any }>,
     options: {
       duration?: number,
-      data?: any
+      data?: any,
+      closeable?: boolean
     } = {}
   ): string {
-    return this.create(content, { ...options, type: 'success' });
+    return this.create(content, { ...options, type: 'success', closeable: options.closeable !== undefined ? options.closeable : true });
   }
 
   /**
@@ -232,10 +233,11 @@ export class MessageService implements OnDestroy {
     content: string | TemplateRef<{ $implicit: any }>,
     options: {
       duration?: number,
-      data?: any
+      data?: any,
+      closeable?: boolean
     } = {}
   ): string {
-    return this.create(content, { ...options, type: 'error' });
+    return this.create(content, { ...options, type: 'error', closeable: options.closeable !== undefined ? options.closeable : false });
   }
 
   /**
@@ -245,10 +247,11 @@ export class MessageService implements OnDestroy {
     content: string | TemplateRef<{ $implicit: any }>,
     options: {
       duration?: number,
-      data?: any
+      data?: any,
+      closeable?: boolean
     } = {}
   ): string {
-    return this.create(content, { ...options, type: 'warning' });
+    return this.create(content, { ...options, type: 'warning', closeable: options.closeable !== undefined ? options.closeable : false });
   }
 
   /**
@@ -258,9 +261,10 @@ export class MessageService implements OnDestroy {
     content: string | TemplateRef<{ $implicit: any }>,
     options: {
       duration?: number,
-      data?: any
+      data?: any,
+      closeable?: boolean
     } = {}
   ): string {
-    return this.create(content, { ...options, type: 'info' });
+    return this.create(content, { ...options, type: 'info', closeable: options.closeable !== undefined ? options.closeable : false });
   }
 } 

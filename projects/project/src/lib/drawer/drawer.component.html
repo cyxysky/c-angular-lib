@@ -1,0 +1,54 @@
+<div class="lib-drawer-container" *ngIf="isVisible">
+  <!-- 遮罩层 -->
+  <div 
+    *ngIf="mask && maskVisible" 
+    class="lib-drawer-mask" 
+    [@maskMotion]="visible ? 'enter' : 'void'"
+    [style.zIndex]="zIndex - 1"
+    (click)="maskClosable && close()"></div>
+    
+  <!-- 抽屉内容 -->
+  <div 
+    class="lib-drawer" 
+    [class.no-mask]="!mask"
+    [class.lib-drawer-open]="visible"
+    [style.zIndex]="zIndex"
+    [style.width]="placement === 'left' || placement === 'right' ? width : height"
+    [style.height]="placement === 'top' || placement === 'bottom' ? width : '100%'"
+    [style.top]="placement === 'top' ? top : null"
+    [style.left]="placement === 'left' ? left : null"
+    [ngClass]="drawerClassMap"
+    [@drawerMotion]="animationState"
+    (@drawerMotion.done)="animationDone($event)">
+    
+    <!-- 抽屉内容区域 -->
+    <div class="lib-drawer-content-wrapper">
+      <!-- 抽屉头部 -->
+      <div class="lib-drawer-header" *ngIf="title">
+        <div class="lib-drawer-title">
+          <!-- 标题内容支持字符串或模板 -->
+          <ng-container *ngIf="isTemplateRef(title); else stringTitle">
+            <ng-container *ngTemplateOutlet="title; context: { $implicit: contentContext }"></ng-container>
+          </ng-container>
+          <ng-template #stringTitle>{{ title }}</ng-template>
+        </div>
+        <!-- 关闭按钮 -->
+        <button *ngIf="closable" class="lib-drawer-close" (click)="close()">
+          <span class="lib-drawer-close-x">×</span>
+        </button>
+      </div>
+      
+      <!-- 抽屉主体内容 -->
+      <div class="lib-drawer-body">
+        <!-- 内容支持字符串或模板 -->
+        <ng-container *ngIf="isTemplateRef(content); else stringContent">
+          <ng-container *ngTemplateOutlet="content; context: { $implicit: contentContext }"></ng-container>
+        </ng-container>
+        <ng-template #stringContent>{{ content }}</ng-template>
+        
+        <!-- 支持内容投影 -->
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+</div>

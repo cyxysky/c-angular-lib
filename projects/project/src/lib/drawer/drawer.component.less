@@ -1,0 +1,146 @@
+@prefix: lib-drawer;
+
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.@{prefix}-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: inherit;
+}
+
+:host-context(.cdk-overlay-container) {
+  position: static;
+}
+
+// 自定义遮罩层样式
+:global(.@{prefix}-backdrop) {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  animation: drawerFadeIn 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.@{prefix}-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+@keyframes drawerFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.@{prefix} {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: auto;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  
+  &.@{prefix}-left {
+    top: 0;
+    left: 0;
+    height: 100%;
+    // width由外部设置
+  }
+  
+  &.@{prefix}-right {
+    top: 0;
+    right: 0;
+    height: 100%;
+    // width由外部设置
+  }
+  
+  &.@{prefix}-top {
+    top: 0;
+    left: 0;
+    width: 100%;
+    // height由外部设置
+  }
+  
+  &.@{prefix}-bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    // height由外部设置
+  }
+}
+
+.@{prefix}-content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.@{prefix}-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.@{prefix}-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  line-height: 22px;
+  flex: 1;
+}
+
+.@{prefix}-close {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.45);
+  transition: color 0.3s;
+  
+  &:hover {
+    color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+.@{prefix}-close-x {
+  display: block;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.@{prefix}-body {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+}
+
+// 处理没有遮罩情况
+.@{prefix}.no-mask {
+  pointer-events: auto;
+}

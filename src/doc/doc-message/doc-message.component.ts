@@ -40,14 +40,26 @@ export class DocMessageComponent {
       items: [
         { name: 'type', description: '消息类型', type: "'success' | 'error' | 'warning' | 'info'", default: "'info'" },
         { name: 'duration', description: '自动关闭的延时，单位毫秒。设为 0 则不自动关闭', type: 'number', default: '3000' },
-        { name: 'data', description: '传递给模板的数据', type: 'any', default: 'null' }
+        { name: 'data', description: '传递给模板的数据', type: 'any', default: 'null' },
+        { name: 'closeable', description: '是否显示关闭按钮', type: 'boolean', default: 'true' }
+      ]
+    },
+    {
+      title: '样式',
+      items: [
+        { name: 'lib-message', description: '消息根容器', type: 'class', default: '-' },
+        { name: 'lib-message-item', description: '消息项容器', type: 'class', default: '-' },
+        { name: 'lib-message-content', description: '消息内容区域', type: 'class', default: '-' },
+        { name: 'lib-message-icon', description: '消息图标', type: 'class', default: '-' },
+        { name: 'lib-message-text', description: '消息文本', type: 'class', default: '-' },
+        { name: 'lib-message-close', description: '关闭按钮', type: 'class', default: '-' }
       ]
     }
   ];
 
   // 基础演示代码
   basicSource = `
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MessageService } from '@project';
 
 @Component({
@@ -60,7 +72,7 @@ import { MessageService } from '@project';
   \`
 })
 export class DemoComponent {
-  constructor(private messageService: MessageService) {}
+  private messageService = inject(MessageService);
   
   showInfo(): void {
     this.messageService.info('这是一条信息');
@@ -81,7 +93,7 @@ export class DemoComponent {
 
   // 自定义时长演示代码
   durationSource = `
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MessageService } from '@project';
 
 @Component({
@@ -93,14 +105,20 @@ import { MessageService } from '@project';
   \`
 })
 export class DemoComponent {
-  constructor(private messageService: MessageService) {}
+  private messageService = inject(MessageService);
   
   showLongMessage(): void {
-    this.messageService.info('这条消息将显示10秒钟', { duration: 10000 });
+    this.messageService.info('这条消息将显示10秒钟', { 
+      duration: 10000 
+    });
   }
   
   showPermanentMessage(): void {
-    this.messageService.info('这条消息不会自动关闭', { duration: 0 });
+    this.messageService.create('这条消息不会自动关闭', { 
+      type: 'info',
+      duration: 0,
+      closeable: true // 显示关闭按钮
+    });
   }
   
   removeAllMessages(): void {
@@ -110,16 +128,16 @@ export class DemoComponent {
 
   // 使用模板演示代码
   templateSource = `
-import { Component, TemplateRef } from '@angular/core';
+import { Component, TemplateRef, inject } from '@angular/core';
 import { MessageService } from '@project';
 
 @Component({
   selector: 'app-demo',
   template: \`
     <ng-template #customTpl let-data>
-      <div>
-        <span>您好，{{data.name}}!</span>
-        <p>消息时间: {{data.time | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+      <div class="template-message">
+        <strong>您好，{{data.name}}!</strong>
+        <div>消息时间: {{data.time | date:'yyyy-MM-dd HH:mm:ss'}}</div>
       </div>
     </ng-template>
     
@@ -127,21 +145,22 @@ import { MessageService } from '@project';
   \`
 })
 export class DemoComponent {
-  constructor(private messageService: MessageService) {}
+  private messageService = inject(MessageService);
   
   showTemplateMessage(template: TemplateRef<any>): void {
     this.messageService.info(template, {
       data: {
         name: '张三',
         time: new Date()
-      }
+      },
+      duration: 6000
     });
   }
 }`;
 
   // 手动关闭演示代码
   manualCloseSource = `
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MessageService } from '@project';
 
 @Component({
@@ -153,11 +172,14 @@ import { MessageService } from '@project';
 })
 export class DemoComponent {
   private messageId: string | null = null;
-  
-  constructor(private messageService: MessageService) {}
+  private messageService = inject(MessageService);
   
   showMessage(): void {
-    this.messageId = this.messageService.success('这是一条可手动关闭的消息', { duration: 0 });
+    this.messageId = this.messageService.create('这是一条可手动关闭的消息', { 
+      type: 'success',
+      duration: 0,
+      closeable: true // 显示关闭按钮
+    });
   }
   
   closeMessage(): void {
@@ -190,7 +212,11 @@ export class DemoComponent {
   }
   
   showPermanentMessage(): void {
-    this.messageService.info('这条消息不会自动关闭', { duration: 0 });
+    this.messageService.create('这条消息不会自动关闭', { 
+      type: 'info',
+      duration: 0,
+      closeable: true
+    });
   }
   
   removeAllMessages(): void {
@@ -202,12 +228,17 @@ export class DemoComponent {
       data: {
         name: '张三',
         time: new Date()
-      }
+      },
+      duration: 6000
     });
   }
   
   showMessage(): void {
-    this.messageId = this.messageService.success('这是一条可手动关闭的消息', { duration: 0 });
+    this.messageId = this.messageService.create('这是一条可手动关闭的消息', { 
+      type: 'success',
+      duration: 0,
+      closeable: true
+    });
   }
   
   closeMessage(): void {

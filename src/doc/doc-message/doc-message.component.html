@@ -26,7 +26,7 @@
         </div>
       </div>
       <div description>
-        最简单的用法，四种类型的消息提示。
+        最简单的用法，四种类型的消息提示：信息（info）、成功（success）、警告（warning）和错误（error）。
       </div>
     </app-doc-box>
     
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div description>
-        可以自定义消息显示的时长，当设置为 0 时，消息将不会自动关闭。
+        可以自定义消息显示的时长，当设置为 0 时，消息将不会自动关闭。通过 removeAll 方法可一次性清除所有消息。
       </div>
     </app-doc-box>
     
@@ -52,16 +52,16 @@
       [sourceCode]="templateSource">
       <div demo>
         <ng-template #customTpl let-data>
-          <div>
+          <div class="template-message">
             <strong>您好，{{data?.name}}!</strong>
-            <p>消息时间: {{data?.time | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+            <div>消息时间: {{data?.time | date:'yyyy-MM-dd HH:mm:ss'}}</div>
           </div>
         </ng-template>
         
         <button class="demo-button" (click)="showTemplateMessage(customTpl)">显示模板消息</button>
       </div>
       <div description>
-        使用自定义模板创建复杂内容的消息。通过模板引用和数据传递，可以实现更加丰富的消息展示。
+        使用自定义模板创建复杂内容的消息。通过模板引用和数据传递，可以实现更加丰富的消息展示。模板中可访问传入的data对象。
       </div>
     </app-doc-box>
     
@@ -76,7 +76,7 @@
         </div>
       </div>
       <div description>
-        手动关闭消息。通过调用 MessageService 的 remove 方法并传入消息 ID，可以在任意时刻关闭指定的消息。
+        手动关闭消息。通过调用 MessageService 的 remove 方法并传入消息 ID，可以在任意时刻关闭指定的消息。每次创建消息时会返回唯一ID。
       </div>
     </app-doc-box>
   </div>
