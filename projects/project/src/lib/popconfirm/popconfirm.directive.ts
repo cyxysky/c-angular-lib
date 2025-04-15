@@ -6,6 +6,7 @@ import { PopoverComponent } from '@project';
 import _ from 'lodash';
 import { OverlayService } from '../overlay/overlay.service';
 import { ButtonType, ButtonColor } from '../button/button.interface';
+import { UtilsService } from '../utils/utils.service';
 
 @Directive({
   selector: '[libPopconfirm]'
@@ -19,6 +20,8 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   @Input('popconfirmPlacement') placement: OverlayBasicPosition = 'top';
   /** 提示是否显示 */
   @Input('popconfirmVisible') visible: boolean = false;
+  /** 是否严格由编程控制显示 */
+  @Input('popconfirmStrictVisiable') strictVisiable: boolean = false;
   /** 确认按钮类型 */
   @Input('popconfirmConfirmButtonType') confirmButtonType: ButtonType = 'default';
   /** 确认按钮颜色 */
@@ -33,6 +36,8 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   @Input('popconfirmCancelButtonContent') cancelButtonContent: string | TemplateRef<void> = '取消';
   /** 底部模板 */
   @Input('popconfirmBottomTemplate') bottomTemplate: null | TemplateRef<void> = null;
+  /** 提示显示状态改变事件 */
+  @Output('popconfirmVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** 确认函数 */
   @Output('popconfirmOnConfirm') onConfirm: EventEmitter<void> = new EventEmitter<void>();
   /** 取消函数 */
@@ -42,17 +47,21 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   private enterTimer: any;
   private leaveTimer: any;
   private portal: ComponentPortal<PopoverComponent> | null = null;
-  private popconfirmComponent: PopoverComponent | null = null;
   private popconfirmComponentRef: ComponentRef<PopoverComponent> | null = null;
 
   constructor(
     private elementRef: ElementRef,
     private overlayService: OverlayService,
     public overlay: Overlay,
+    private utilsService: UtilsService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tooltipContent']) {
+    if (changes['popconfirmContent']) {
+      this.updateComponent('content', this.popconfirmContent);
+    }
+    if (changes['popconfirmTitle']) {
+      this.updateComponent('title', this.popconfirmTitle);
     }
     if (changes['visible']) {
       if (this.visible) {
@@ -62,7 +71,6 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       }
     }
   }
-
 
   ngOnInit(): void {
     // 初始化时如果visible为true，则显示tooltip
@@ -79,6 +87,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
 
   @HostListener('click')
   onClick(): void {
+    if (this.strictVisiable) return;
     this.visible ? this.hide() : this.show();
   }
 
@@ -86,8 +95,9 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
-    if (this.visible) return;
+    if (this.visible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
     this.visible = true;
+    this.visibleChange.emit(this.visible);
     this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
@@ -97,14 +107,19 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       },
       this.elementRef,
       positions,
-      (ref) => this.closePopover(),
+      (ref) => {
+        if (this.strictVisiable) return;
+        this.closePopover()
+      },
       (position, isBackupUsed) => {
         if (isBackupUsed) {
           for (const key in OverlayBasicPositionConfigs) {
             if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
-              this.popconfirmComponent!.placement = key as OverlayBasicPosition;
-              this.popconfirmComponent?.getMargin();
-              this.popconfirmComponent!.cdr.detectChanges();
+              if (this.popconfirmComponentRef) {
+                this.popconfirmComponentRef.setInput('placement', key as OverlayBasicPosition);
+                this.popconfirmComponentRef.instance?.getMargin();
+                this.popconfirmComponentRef.instance?.cdr?.detectChanges();
+              }
               break;
             }
           }
@@ -138,14 +153,11 @@ export class PopconfirmDirective implements OverlayBasicDirective {
     });
 
     // 设置tooltip内容和位置
-    this.popconfirmComponent = componentRef.instance;
     this.popconfirmComponentRef = componentRef;
 
     // 设置CSS类以添加动画效果
-    setTimeout(() => {
-      if (componentRef.instance) {
-        componentRef.instance.isVisible = true;
-      }
+    this.utilsService.delayExecution(() => {
+      this.popconfirmComponentRef && this.popconfirmComponentRef.setInput('isVisible', true);
     }, 10);
   }
 
@@ -153,8 +165,6 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 隐藏
    */
   public hide(): void {
-    if (!this.visible) return;
-    this.visible = false;
     this.closePopover();
   }
 
@@ -169,12 +179,11 @@ export class PopconfirmDirective implements OverlayBasicDirective {
 
   /**
    * 更新内容
-   * @param content 
+   * @param key 键
+   * @param value 值
    */
-  public updateContent(content: string | TemplateRef<any>): void {
-    if (this.popconfirmComponent) {
-      this.popconfirmComponent.content = content;
-    }
+  public updateComponent(key: string, value: any): void {
+    this.popconfirmComponentRef && this.popconfirmComponentRef?.setInput(key, value);
   }
 
   /**
@@ -183,6 +192,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   private closePopover(): void {
     if (this.overlayRef) {
       this.visible = false;
+      this.visibleChange.emit(this.visible);
       this.overlayRef.dispose();
       this.overlayRef = null;
     }

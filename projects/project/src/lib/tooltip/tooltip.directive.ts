@@ -1,9 +1,10 @@
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ComponentRef, Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ComponentRef, Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { OverlayService } from '../overlay/overlay.service';
 import { TooltipComponent } from './tooltip.component';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from '../overlay/overlay-basic.directive';
+import { UtilsService } from '../utils/utils.service';
 
 
 @Directive({
@@ -33,6 +34,8 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   @Input('tooltipClass') tooltipClass: string = '';
   /** 提示颜色 */
   @Input('tooltipColor') tooltipColor: string = '#000';
+  /** 提示显示状态改变事件 */
+  @Output('tooltipVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /** 提示 */
   private overlayRef: OverlayRef | null = null;
@@ -42,8 +45,6 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   private leaveTimer: any;
   /** 组件 */
   private portal: ComponentPortal<TooltipComponent> | null = null;
-  /** 提示组件 */
-  private tooltipComponent: TooltipComponent | null = null;
   /** 提示组件引用 */
   private tooltipComponentRef: ComponentRef<TooltipComponent> | null = null;
   /** 组件悬停 */
@@ -53,6 +54,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     private elementRef: ElementRef,
     private overlayService: OverlayService,
     public overlay: Overlay,
+    private utilsService: UtilsService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -60,18 +62,13 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       this.updateContent(this.tooltipContent);
     }
     if (changes['visible']) {
-
-      // 严格由编程控制显示
-      if (this.strictVisiable) {
-        if (this.visible) {
-          this.show();
-        } else {
-          this.hide();
-        }
+      if (this.visible) {
+        this.show();
+      } else {
+        this.hide();
       }
     }
   }
-
 
   ngOnInit(): void {
     // 初始化时如果visible为true，则显示tooltip
@@ -105,6 +102,9 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     }
   }
 
+  /**
+   * 鼠标进入
+   */
   hoverOpen() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
@@ -116,6 +116,9 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     }
   }
 
+  /**
+   * 鼠标离开
+   */
   hoverClose() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
@@ -128,9 +131,13 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     }
   }
 
+  /**
+   * 显示tooltip
+   */
   public show(): void {
     if (!this.strictVisiable && (this.visible || !this.tooltipContent)) return;
     this.visible = true;
+    this.visibleChange.emit(this.visible);
     this.closeTooltip();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
@@ -141,15 +148,16 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       },
       this.elementRef,
       positions,
-      (ref) => this.closeTooltip()
+      (ref) => {
+        if (this.strictVisiable) return;
+        this.closeTooltip();
+      }
     );
 
     // 创建并附加组件
     this.portal = new ComponentPortal(TooltipComponent);
     const componentRef = this.overlayRef.attach(this.portal);
-
     // 设置tooltip内容和位置
-
     componentRef.setInput('content', this.tooltipContent);
     componentRef.setInput('placement', this.placement);
     componentRef.setInput('color', this.tooltipColor);
@@ -160,38 +168,46 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       this.componentHover = false;
       this.hoverClose();
     });
-    this.tooltipComponent = componentRef.instance;
     this.tooltipComponentRef = componentRef;
 
     // 设置CSS类以添加动画效果
-    setTimeout(() => {
-      if (componentRef.instance) {
-        componentRef.instance.isVisible = true;
-      }
+    this.utilsService.delayExecution(() => {
+      this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', true);
     }, 10);
   }
 
+  /**
+   * 隐藏tooltip
+   */
   public hide(): void {
     if (!this.visible || this.componentHover) return;
-    this.visible = false;
     this.closeTooltip();
   }
 
+  /**
+   * 更新tooltip位置
+   */
   public updatePosition(): void {
     if (this.overlayRef) {
       this.overlayRef.updatePosition();
     }
   }
 
+  /**
+   * 更新tooltip内容
+   * @param content 内容
+   */
   public updateContent(content: string | TemplateRef<any>): void {
-    if (this.tooltipComponent) {
-      this.tooltipComponent.content = content;
-    }
+    this.tooltipComponentRef && this.tooltipComponentRef.setInput('content', content);
   }
 
+  /**
+   * 关闭tooltip
+   */
   private closeTooltip(): void {
     if (this.overlayRef) {
       this.visible = false;
+      this.visibleChange.emit(this.visible);
       this.tooltipComponentRef ? this.tooltipComponentRef.destroy() : null;
       this.overlayRef.dispose();
       this.overlayRef = null;

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
 import { UtilsService } from '../utils/utils.service';
@@ -11,7 +11,7 @@ import { UtilsService } from '../utils/utils.service';
   styleUrl: './drop-menu.component.less',
   encapsulation: ViewEncapsulation.None // 确保嵌套样式可以渗透到子组件
 })
-export class DropMenuComponent implements OnInit, OnDestroy {
+export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
   /** 菜单数据 */
   @Input() items: DropMenu[] = [];
   /** 是否可见 */
@@ -28,6 +28,8 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   @Input() isSubMenu: boolean = false;
   /** 是否选中 */
   @Input() selectedItem: DropMenu | null = null;
+  /** 父级是否禁用 */
+  @Input() parentDisabled: boolean = false;
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
   /** 菜单关闭事件 */
@@ -53,6 +55,54 @@ export class DropMenuComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }, 0);
     }
+
+    // 初始时如果有选中项，检查是否在当前菜单层级
+    this.findSelectedPath();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // 当选中项变化时，查找选中路径
+    if (changes['selectedItem']) {
+      this.findSelectedPath();
+    }
+  }
+
+  /**
+   * 查找选中项的路径，初始化时调用
+   */
+  findSelectedPath(): void {
+    if (!this.selectedItem) return;
+
+    // 检查选中项是否在当前菜单或子菜单中
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      // 如果当前项就是选中项
+      if (item === this.selectedItem) {
+        return;
+      }
+
+      // 检查子菜单是否包含选中项
+      if (item.children && item.children.length > 0 && this.containsItem(item.children, this.selectedItem)) {
+        // 将包含选中项的菜单项设为展开状态
+        this.hoveredItemIndex = i;
+        this.cdr.detectChanges();
+        return;
+      }
+    }
+  }
+
+  /**
+   * 检查菜单数组是否包含指定项
+   */
+  private containsItem(items: DropMenu[], targetItem: DropMenu): boolean {
+    if (!targetItem) return false;
+    for (const item of items) {
+      if (item === targetItem) return true;
+      if (item.children && item.children.length > 0) {
+        if (this.containsItem(item.children, targetItem)) return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -63,9 +113,23 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * 检查菜单项是否真正禁用（自身禁用或父级禁用）
+   */
+  isItemDisabled(item: DropMenu): boolean {
+    return this.parentDisabled || !!item.disabled;
+  }
+
+  /**
    * 点击菜单项
    */
   onItemClick(item: DropMenu, event?: MouseEvent): void {
+    // 如果菜单项被禁用，则不执行任何操作
+    if (this.isItemDisabled(item)) {
+      if (event) {
+        event.stopPropagation();
+      }
+      return;
+    }
     // 阻止事件冒泡，防止触发上级菜单的点击事件
     if (event) {
       event.stopPropagation();
@@ -78,10 +142,22 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * 处理子菜单项点击
+   */
+  onSubMenuItemClick(item: DropMenu): void {
+    // 传递子菜单点击事件到父级
+    this.itemClick.emit(item);
+  }
+
+  /**
    * 鼠标进入菜单项
-   * @param index 菜单项索引
    */
   onMouseEnterItem(index: number): void {
+    // 检查对应索引的菜单项是否被禁用
+    if (this.isItemDisabled(this.items[index])) {
+      return;
+    }
+
     // 清除任何现有的离开计时器
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
@@ -111,7 +187,7 @@ export class DropMenuComponent implements OnInit, OnDestroy {
    * @param index 菜单项索引
    */
   shouldShowSubMenu(index: number): boolean {
-    return this.hoveredItemIndex === index;
+    return this.hoveredItemIndex === index && !this.isItemDisabled(this.items[index]);
   }
 
   /**
@@ -128,6 +204,11 @@ export class DropMenuComponent implements OnInit, OnDestroy {
    * @param index 菜单项索引
    */
   onMouseEnterSubmenu(index: number): void {
+    // 如果对应的菜单项被禁用，则不处理
+    if (this.isItemDisabled(this.items[index])) {
+      return;
+    }
+
     // 清除任何现有的离开计时器
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);

@@ -42,7 +42,6 @@ export class DocDropMenuComponent {
     { 
       label: '一级菜单 2', 
       icon: 'icon-folder', 
-      disabled: true,
       children: [
         { label: '二级菜单 2-1', icon: 'icon-file', children: [] },
         { 

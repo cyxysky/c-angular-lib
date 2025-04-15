@@ -299,13 +299,14 @@
             libPopconfirm 
             popconfirmTitle="受控确认框" 
             popconfirmContent="这是一个受控的确认框示例"
+            [popconfirmStrictVisiable]="true"
             popconfirmPlacement="top"
-            [popconfirmVisible]="visible"
+            [(popconfirmVisible)]="visible"
             popconfirmConfirmButtonContent="确认"
             popconfirmCancelButtonContent="取消"
             (popconfirmOnConfirm)="handleConfirm()"
             (popconfirmOnCancel)="handleCancel()">
-            点击显示
+            点击右侧按钮显示
           </lib-button>
           
           <lib-button (click)="toggleVisible()">
@@ -314,7 +315,7 @@
         </div>
       </div>
       <div description>
-        可以通过popconfirmVisible控制确认框的显示和隐藏。
+        可以通过popconfirmVisible严格控制确认框的显示和隐藏。只允许通过设置visiable控制显示隐藏
       </div>
     </app-doc-box>
     

@@ -38,6 +38,10 @@ export class DropMenuDirective implements OverlayBasicDirective {
   @Output('dropMenuVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** 菜单项点击事件 */
   @Output('dropMenuItemClick') itemClick: EventEmitter<DropMenu> = new EventEmitter<DropMenu>();
+  /** 当前选中的菜单项 */
+  @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
+  /** 菜单项选中事件 */
+  @Output('dropMenuSelectedChange') selectedChange: EventEmitter<DropMenu | null> = new EventEmitter<DropMenu | null>();
 
   private overlayRef: OverlayRef | null = null;
   private enterTimer: any;
@@ -80,13 +84,10 @@ export class DropMenuDirective implements OverlayBasicDirective {
       this.dropMenuComponentRef.setInput('items', this.menuItems);
     }
     if (changes['visible']) {
-      // 严格由编程控制显示
-      if (this.strictVisible) {
-        if (this.visible) {
-          this.show();
-        } else {
-          this.hide();
-        }
+      if (this.visible) {
+        this.show();
+      } else {
+        this.hide();
       }
     }
   }
@@ -208,12 +209,22 @@ export class DropMenuDirective implements OverlayBasicDirective {
     componentRef.setInput('width', this.width);
     componentRef.setInput('itemTemplate', this.itemTemplate);
     componentRef.setInput('autoClose', this.autoClose);
+    componentRef.setInput('selectedItem', this.selectedItem);
 
     // 订阅事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((item: DropMenu) => {
       this.itemClick.emit(item);
+      
+      // 更新选中项
+      if (!item.disabled) {
+        this.selectedItem = item;
+        this.selectedChange.emit(this.selectedItem);
+        // 更新组件中的选中项
+        this.updateSelectedItem(this.selectedItem);
+      }
+      
       // 根据autoClose设置和是否有子菜单决定是否关闭菜单
-      if (this.autoClose && (!item.children || item.children.length === 0)) {
+      if (this.autoClose && (!item.children || item.children.length === 0) && !item.disabled) {
         // 关闭根菜单，这样会关闭整个菜单链
         if (this.rootMenuRef && this.rootMenuRef !== this) {
           this.rootMenuRef.hide();
@@ -256,6 +267,14 @@ export class DropMenuDirective implements OverlayBasicDirective {
     this.utilsService.delayExecution(() => {
       if (componentRef) {
         componentRef.setInput('isVisible', true);
+        
+        // 如果有选中项，触发查找选中路径
+        if (this.selectedItem) {
+          // 延迟执行，确保DOM已经渲染完成
+          this.utilsService.delayExecution(() => {
+            componentRef.instance.findSelectedPath();
+          }, 50);
+        }
       }
     }, 0)
   }
@@ -295,6 +314,15 @@ export class DropMenuDirective implements OverlayBasicDirective {
       this.visible = false;
       this.overlayRef.dispose();
       this.overlayRef = null;
+    }
+  }
+
+  /**
+   * 更新所有菜单组件中的选中项
+   */
+  private updateSelectedItem(selectedItem: DropMenu | null): void {
+    if (this.dropMenuComponentRef) {
+      this.dropMenuComponentRef.setInput('selectedItem', selectedItem);
     }
   }
 } 

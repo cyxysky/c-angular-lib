@@ -5,6 +5,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from './popover.component';
 import { OverlayService } from '../overlay/overlay.service';
 import * as _ from 'lodash';
+import { UtilsService } from '../utils/utils.service';
 @Directive({
   selector: '[libPopover]'
 })
@@ -32,7 +33,6 @@ export class PopoverDirective implements OverlayBasicDirective {
   private enterTimer: any;
   private leaveTimer: any;
   private portal: ComponentPortal<PopoverComponent> | null = null;
-  private popoverComponent: PopoverComponent | null = null;
   private popoverComponentRef: ComponentRef<PopoverComponent> | null = null;
   private componentHover: boolean = false;
 
@@ -40,20 +40,21 @@ export class PopoverDirective implements OverlayBasicDirective {
     private elementRef: ElementRef,
     private overlayService: OverlayService,
     public overlay: Overlay,
+    private utilsService: UtilsService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tooltipContent']) {
+    if (changes['popoverTitle']) {
+      this.updateComponent('title', this.popoverTitle);
+    }
+    if (changes['popoverContent']) {
+      this.updateComponent('content', this.popoverContent);
     }
     if (changes['visible']) {
-
-      // 严格由编程控制显示
-      if (this.strictVisiable) {
-        if (this.visible) {
-          this.show();
-        } else {
-          this.hide();
-        }
+      if (this.visible) {
+        this.show();
+      } else {
+        this.hide();
       }
     }
   }
@@ -90,6 +91,9 @@ export class PopoverDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 鼠标进入
+   */
   hoverOpen() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
@@ -101,6 +105,9 @@ export class PopoverDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 鼠标离开
+   */
   hoverClose() {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
@@ -113,6 +120,9 @@ export class PopoverDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 显示
+   */
   public show(): void {
     if (!this.strictVisiable && this.visible) return;
     this.visible = true;
@@ -126,14 +136,19 @@ export class PopoverDirective implements OverlayBasicDirective {
       },
       this.elementRef,
       positions,
-      (ref) => this.closePopover(),
+      (ref) => {
+        if (this.strictVisiable) return;
+        this.closePopover();
+      },
       (position, isBackupUsed) => {
         if (isBackupUsed) {
           for (const key in OverlayBasicPositionConfigs) {
             if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
-              this.popoverComponent!.placement = key as OverlayBasicPosition;
-              this.popoverComponent?.getMargin();
-              this.popoverComponentRef?.changeDetectorRef.detectChanges();
+              if (this.popoverComponentRef) {
+                this.popoverComponentRef.setInput('placement', key as OverlayBasicPosition);
+                this.popoverComponentRef.instance?.getMargin();
+                this.popoverComponentRef.instance?.cdr?.detectChanges();
+              }
               break;
             }
           }
@@ -159,18 +174,16 @@ export class PopoverDirective implements OverlayBasicDirective {
       this.hoverClose();
     });
 
-    // 设置tooltip内容和位置
-    this.popoverComponent = componentRef.instance;
     this.popoverComponentRef = componentRef;
-
     // 设置CSS类以添加动画效果
-    setTimeout(() => {
-      if (componentRef.instance) {
-        componentRef.instance.isVisible = true;
-      }
+    this.utilsService.delayExecution(() => {
+      this.popoverComponentRef && this.popoverComponentRef.setInput('isVisible', true);
     }, 10);
   }
 
+  /**
+   * 隐藏
+   */
   public hide(): void {
     if (!this.visible || this.componentHover) return;
     this.visibleChange.emit(this.visible);
@@ -178,18 +191,27 @@ export class PopoverDirective implements OverlayBasicDirective {
     this.closePopover();
   }
 
+  /**
+   * 更新位置
+   */
   public updatePosition(): void {
     if (this.overlayRef) {
       this.overlayRef.updatePosition();
     }
   }
 
-  public updateContent(content: string | TemplateRef<any>): void {
-    if (this.popoverComponent) {
-      this.popoverComponent.content = content;
-    }
+  /**
+   * 更新内容
+   * @param key 键
+   * @param value 值
+   */
+  public updateComponent(key: string, value: any): void {
+    this.popoverComponentRef?.setInput(key, value);
   }
 
+  /**
+   * 关闭
+   */
   private closePopover(): void {
     if (this.overlayRef) {
       this.visible = false;

@@ -12,11 +12,11 @@
                 <li 
                     class="lib-drop-menu-item"
                     [class.lib-drop-menu-item-has-children]="item.children && item.children.length > 0"
-                    [class.lib-drop-menu-item-disabled]="item.disabled" 
+                    [class.lib-drop-menu-item-disabled]="isItemDisabled(item)" 
                     [class.lib-drop-menu-item-selected]="selectedItem === item"
-                    (mouseenter)="onMouseEnterItem(i)"
-                    (mouseleave)="onMouseLeaveItem()" 
-                    (click)="onItemClick(item, $event)">
+                    (mouseenter)="!isItemDisabled(item) && onMouseEnterItem(i)"
+                    (mouseleave)="!isItemDisabled(item) && onMouseLeaveItem()" 
+                    (click)="!isItemDisabled(item) && onItemClick(item, $event)">
                     <ng-container *ngIf="itemTemplate; else defaultItemTemplate">
                         <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{ $implicit: item, index: i }"></ng-container>
                     </ng-container>
@@ -33,7 +33,7 @@
                     <div 
                         class="lib-drop-menu-submenu" 
                         *ngIf="item.children && item.children.length > 0"
-                        [class.lib-drop-menu-submenu-visible]="hoveredItemIndex === i"
+                        [class.lib-drop-menu-submenu-visible]="hoveredItemIndex === i && !isItemDisabled(item)"
                         (mouseenter)="onMouseEnterSubmenu(i)" 
                         (mouseleave)="onMouseLeaveSubmenu()"
                         (click)="$event.stopPropagation()">
@@ -44,7 +44,9 @@
                             [itemTemplate]="itemTemplate" 
                             [autoClose]="autoClose"
                             [isSubMenu]="true"
-                            (itemClick)="itemClick.emit($event)">
+                            [selectedItem]="selectedItem"
+                            [parentDisabled]="isItemDisabled(item)"
+                            (itemClick)="onSubMenuItemClick($event)">
                         </lib-drop-menu>
                     </div>
                 </li>
