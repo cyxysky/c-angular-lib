@@ -38,7 +38,8 @@ import { TabComponent } from './tabs/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { DateTimerComponent } from './date-timer/date-timer.component';
 import { MessageComponent } from './message/message.component';
-import { DrawerComponent } from './drawer/drawer.component';  
+import { DrawerComponent } from './drawer/drawer.component';
+import { DropMenuComponent } from './drop-menu/drop-menu.component';
 // 服务
 
 export * from './business';
@@ -68,7 +69,7 @@ export * from './directive';
 export * from './date-timer';
 export * from './message';
 export * from './drawer';
-
+export * from './drop-menu';
 @NgModule({
   declarations: [],
   imports: [
@@ -110,6 +111,7 @@ export * from './drawer';
     DateTimerComponent,
     MessageComponent,
     DrawerComponent,
+    DropMenuComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -149,6 +151,7 @@ export * from './drawer';
     DateTimerComponent,
     MessageComponent,
     DrawerComponent,
+    DropMenuComponent
   ],
   providers: [
 

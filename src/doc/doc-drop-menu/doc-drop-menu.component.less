@@ -1,0 +1,95 @@
+.doc-title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-section-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 40px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-sub-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 24px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 16px;
+}
+
+// 响应式网格布局
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// 示例内容样式
+.example-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.example-value {
+  margin-top: 16px;
+  color: #666;
+}
+
+// 演示用按钮样式
+.demo-trigger-button {
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: #e6e6e6;
+    border-color: #c0c0c0;
+  }
+}
+
+// 自定义菜单项样式
+.custom-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #333;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .custom-menu-item-icon {
+    margin-right: 8px;
+  }
+  
+  .custom-menu-item-label {
+    font-weight: 500;
+  }
+}
+
+// API 表格样式
+app-doc-api-table {
+  margin-bottom: 32px;
+}

@@ -7,10 +7,14 @@
      [class.lib-number-input-warning]="status() === 'warning'">
   
   <!-- 前缀 -->
-  <span class="lib-number-input-prefix" *ngIf="prefix() || prefixIcon()">
-    <ng-content select="[prefix]"></ng-content>
-    {{ prefix() }}
-    <i *ngIf="prefixIcon()" [class]="prefixIcon()"></i>
+  <span class="lib-number-input-prefix">
+    <ng-content select="[prefix], prefix"></ng-content>
+    <ng-container *ngIf="prefix()">
+      {{ prefix() }}
+    </ng-container>
+    <ng-container *ngIf="prefixIcon()">
+      <i [class]="prefixIcon()"></i>
+    </ng-container>
   </span>
   
   <div class="lib-number-input-content">
@@ -27,10 +31,14 @@
            (blur)="onBlur()">
   </div>
   <!-- 后缀 -->
-  <span class="lib-number-input-suffix" *ngIf="suffix() || suffixIcon()">
-    <ng-content select="[suffix]"></ng-content>
-    {{ suffix() }}
-    <i *ngIf="suffixIcon()" [class]="suffixIcon()"></i>
+  <span class="lib-number-input-suffix">
+    <ng-content select="[suffix], suffix"></ng-content>
+    <ng-container *ngIf="suffix()">
+      {{ suffix() }}
+    </ng-container>
+    <ng-container *ngIf="suffixIcon()">
+      <i [class]="suffixIcon()"></i>
+    </ng-container>
   </span>
   
   <!-- 控制按钮 -->

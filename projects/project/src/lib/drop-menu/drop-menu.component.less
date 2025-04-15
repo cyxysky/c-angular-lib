@@ -1,0 +1,231 @@
+// 下拉菜单基础变量
+@drop-menu-position: relative;
+@drop-menu-min-width: 160px;
+@drop-menu-border-radius: 4px;
+@drop-menu-background-color: white;
+@drop-menu-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+@drop-menu-transform-hidden: scale(0.1);
+@drop-menu-transform-visible: scale(1);
+@drop-menu-opacity-hidden: 0;
+@drop-menu-opacity-visible: 1;
+@drop-menu-transition: all 0.2s ease;
+@drop-menu-z-index: 1050;
+
+// 下拉菜单箭头变量
+@drop-menu-arrow-width: 0;
+@drop-menu-arrow-height: 0;
+@drop-menu-arrow-size: 8px;
+@drop-menu-arrow-border-transparent: 8px solid transparent;
+@drop-menu-arrow-border-top: 8px solid white;
+@drop-menu-arrow-border-bottom: 8px solid white;
+@drop-menu-arrow-border-left: 8px solid white;
+@drop-menu-arrow-border-right: 8px solid white;
+@drop-menu-arrow-position: absolute;
+
+// 下拉菜单箭头位置变量
+@drop-menu-arrow-position-center: 50%;
+@drop-menu-arrow-position-offset: 12px;
+@drop-menu-arrow-margin-offset: -8px;
+
+// 下拉菜单阴影效果
+@drop-menu-arrow-shadow-top: drop-shadow(0px 3px 2px rgba(0, 0, 0, 0.15));
+@drop-menu-arrow-shadow-bottom: drop-shadow(0px -3px 2px rgba(0, 0, 0, 0.15));
+@drop-menu-arrow-shadow-left: drop-shadow(3px 0 2px rgba(0, 0, 0, 0.15));
+@drop-menu-arrow-shadow-right: drop-shadow(-3px 0 2px rgba(0, 0, 0, 0.15));
+
+// 菜单项变量
+@drop-menu-item-height: 32px;
+@drop-menu-item-padding: 5px 12px;
+@drop-menu-item-font-size: 14px;
+@drop-menu-item-color: rgba(0, 0, 0, 0.65);
+@drop-menu-item-hover-color: rgba(0, 0, 0, 0.85);
+@drop-menu-item-hover-bg: rgba(0, 0, 0, 0.04);
+@drop-menu-item-active-bg: rgba(0, 0, 0, 0.08);
+@drop-menu-item-disabled-color: rgba(0, 0, 0, 0.25);
+@drop-menu-item-disabled-bg: transparent;
+@drop-menu-item-icon-margin-right: 8px;
+@drop-menu-item-icon-font-size: 14px;
+
+// 分割线变量
+@drop-menu-divider-height: 1px;
+@drop-menu-divider-bg: rgba(0, 0, 0, 0.06);
+@drop-menu-divider-margin: 4px 0;
+
+.lib-drop-menu {
+  position: @drop-menu-position;
+  min-width: @drop-menu-min-width;
+  border-radius: @drop-menu-border-radius;
+  box-shadow: @drop-menu-box-shadow;
+  background-color: @drop-menu-background-color;
+  transform: @drop-menu-transform-hidden;
+  opacity: @drop-menu-opacity-hidden;
+  transition: @drop-menu-transition;
+  z-index: @drop-menu-z-index;
+
+  &.lib-drop-menu-visible {
+    opacity: @drop-menu-opacity-visible;
+    transform: @drop-menu-transform-visible;
+  }
+
+  // 子菜单模式
+  &.lib-drop-menu-submenu-mode {
+    transform: none;
+    opacity: 1;
+    overflow: visible;
+    box-shadow: @drop-menu-box-shadow;
+  }
+
+  .lib-drop-menu-arrow {
+    position: @drop-menu-arrow-position;
+    width: @drop-menu-arrow-width;
+    height: @drop-menu-arrow-height;
+  }
+
+  .lib-drop-menu-content {
+    max-height: 250px;
+  }
+
+  .lib-drop-menu-list {
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+  }
+
+  .lib-drop-menu-item {
+    display: flex;
+    align-items: center;
+    height: @drop-menu-item-height;
+    padding: @drop-menu-item-padding;
+    font-size: @drop-menu-item-font-size;
+    color: @drop-menu-item-color;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+
+    &:hover {
+      color: @drop-menu-item-hover-color;
+      background-color: @drop-menu-item-hover-bg;
+    }
+
+    &:active {
+      background-color: @drop-menu-item-active-bg;
+    }
+
+    &.lib-drop-menu-item-disabled {
+      color: @drop-menu-item-disabled-color;
+      background-color: @drop-menu-item-disabled-bg;
+      cursor: not-allowed;
+    }
+
+    .lib-drop-menu-item-icon {
+      margin-right: @drop-menu-item-icon-margin-right;
+      font-size: @drop-menu-item-icon-font-size;
+    }
+
+    .lib-drop-menu-item-label {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lib-drop-menu-item-expand-icon {
+      margin-left: 8px;
+    }
+
+    .arrow-right-icon {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-top: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    // 修复子菜单样式
+    .lib-drop-menu-submenu {
+      position: absolute;
+      top: -5px; // 略微上移，增加可点击区域
+      left: 100%;
+      margin-left: 4px;
+      padding: 5px 0 5px 0; // 增加内边距，扩大可点击区域
+      z-index: @drop-menu-z-index + 1;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.25s, opacity 0.25s; // 增加过渡时间
+      pointer-events: none;
+      
+      // 添加一个扩展区域，确保从父菜单到子菜单之间没有间隙
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -15px; // 增加连接区域宽度
+        width: 15px;
+        height: 100%;
+        background-color: transparent;
+      }
+    }
+
+    .lib-drop-menu-submenu-visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .lib-drop-menu-divider {
+    height: @drop-menu-divider-height;
+    margin: @drop-menu-divider-margin;
+    background-color: @drop-menu-divider-bg;
+  }
+
+  // 基础方向
+  &.lib-drop-menu-top {
+    .lib-drop-menu-arrow {
+      bottom: @drop-menu-arrow-margin-offset;
+      left: @drop-menu-arrow-position-center;
+      margin-left: @drop-menu-arrow-margin-offset;
+      border-left: @drop-menu-arrow-border-transparent;
+      border-right: @drop-menu-arrow-border-transparent;
+      border-top: @drop-menu-arrow-border-top;
+      filter: @drop-menu-arrow-shadow-top;
+    }
+  }
+
+  &.lib-drop-menu-bottom {
+    .lib-drop-menu-arrow {
+      top: @drop-menu-arrow-margin-offset;
+      left: @drop-menu-arrow-position-center;
+      margin-left: @drop-menu-arrow-margin-offset;
+      border-left: @drop-menu-arrow-border-transparent;
+      border-right: @drop-menu-arrow-border-transparent;
+      border-bottom: @drop-menu-arrow-border-bottom;
+      filter: @drop-menu-arrow-shadow-bottom;
+    }
+  }
+
+  &.lib-drop-menu-left {
+    .lib-drop-menu-arrow {
+      top: @drop-menu-arrow-position-center;
+      right: @drop-menu-arrow-margin-offset;
+      margin-top: @drop-menu-arrow-margin-offset;
+      border-top: @drop-menu-arrow-border-transparent;
+      border-bottom: @drop-menu-arrow-border-transparent;
+      border-left: @drop-menu-arrow-border-left;
+      filter: @drop-menu-arrow-shadow-left;
+    }
+  }
+
+  &.lib-drop-menu-right {
+    .lib-drop-menu-arrow {
+      top: @drop-menu-arrow-position-center;
+      left: @drop-menu-arrow-margin-offset;
+      margin-top: @drop-menu-arrow-margin-offset;
+      border-top: @drop-menu-arrow-border-transparent;
+      border-bottom: @drop-menu-arrow-border-transparent;
+      border-right: @drop-menu-arrow-border-right;
+      filter: @drop-menu-arrow-shadow-right;
+    }
+  }
+}

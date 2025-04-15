@@ -25,11 +25,12 @@
 @input-placeholder-color: rgba(0, 0, 0, 0.25);
 
 // 输入框内边距变量
-@input-padding: 4px 11px;
+@input-padding: 4px 0px;
+@input-padding-wrap: 0 11px;
 @input-padding-reduced: 5px;
-@input-lg-padding: 6.5px 11px;
+@input-lg-padding: 6.5px 0px;
 @input-lg-font-size: 16px;
-@input-sm-padding: 0 7px;
+@input-sm-padding: 0 0px;
 @input-sm-font-size: 12px;
 
 // 输入框过渡变量
@@ -127,6 +128,7 @@
 .lib-input-affix-wrapper {
     align-items: @input-affix-align-items-stretch;
     display: @input-display-flex;
+    padding: @input-padding-wrap;
     box-sizing: @input-box-sizing;
     width: @input-width;
     border: @input-border-width @input-border-style @input-border-color;
@@ -136,8 +138,6 @@
     .input-control {
         border: @input-border-none;
         box-shadow: @input-box-shadow-none;
-        padding-left: @input-padding-reduced;
-        padding-right: @input-padding-reduced;
         
         &:hover, &:focus {
             box-shadow: @input-box-shadow-none;
@@ -159,7 +159,6 @@
     margin-right: @input-affix-margin;
     display: @input-display-flex-normal;
     align-items: @input-affix-align-items;
-    padding-left: @input-affix-padding-left;
     color: @input-affix-color;
     
     .input-prefix-icon {
@@ -172,7 +171,6 @@
     margin-left: @input-affix-margin;
     display: @input-display-flex-normal;
     align-items: @input-affix-align-items;
-    padding-right: @input-affix-padding-right;
     color: @input-affix-color;
     
     .input-suffix-icon {

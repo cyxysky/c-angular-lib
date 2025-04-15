@@ -8,10 +8,16 @@
   [class.lib-input-status-warning]="status() === 'warning'"
   [class.lib-input-focused]="hasFocus()">
   <!-- 前缀 -->
-  <span class="input-prefix" *ngIf="prefix() || prefixIcon()">
+  <span class="input-prefix">
+    <!-- 使用ng-content选择器，可以传递prefix和prefixIcon -->
     <ng-content select="[prefix]"></ng-content>
-    <i *ngIf="prefixIcon()" class="input-prefix-icon" [class]="prefixIcon()"></i>
-    <span *ngIf="prefix()">{{ prefix() }}</span>
+    <!-- 使用属性 -->
+    <ng-container *ngIf="prefixIcon()">
+      <i class="input-prefix-icon" [class]="prefixIcon()"></i>
+    </ng-container>
+    <ng-container *ngIf="prefix()">
+      {{ prefix() }}
+    </ng-container>
   </span>
   <!-- 输入框 -->
   <input 
@@ -26,8 +32,6 @@
     [id]="id()"    
     [autofocus]="autofocus() ? 'autofocus' : null"
     [autocomplete]="autocomplete()"
-    [style.padding-left.px]="paddingLeft()"
-    [style.padding-right.px]="paddingRight()"
     (ngModelChange)="changeValue($event)" 
     (focus)="onFocus($event)"
     (blur)="onBlur($event)"
@@ -38,12 +42,16 @@
 
   />
   <!-- 后缀 -->
-  <span class="input-suffix" *ngIf="suffix() || suffixIcon() || (allowClear() && _data) || (showCount() && maxlength())">
-    <!-- 后缀 -->
-    <span *ngIf="suffix()">{{ suffix() }}</span>
+  <span class="input-suffix">
     <ng-content select="[suffix]"></ng-content>
+    <!-- 后缀 -->
+    <ng-container *ngIf="suffix()">
+      {{ suffix() }}
+    </ng-container>
     <!-- 图标 -->
-    <i *ngIf="suffixIcon()" class="input-suffix-icon" [class]="suffixIcon()"></i>
+    <ng-container *ngIf="suffixIcon()">
+      <i class="input-suffix-icon" [class]="suffixIcon()"></i>
+    </ng-container>
     <!-- 字数统计 -->
     <span class="char-count" *ngIf="showCount() && maxlength()">
       {{ getCharCount() }}

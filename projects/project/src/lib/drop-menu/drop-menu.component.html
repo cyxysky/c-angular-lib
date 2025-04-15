@@ -1,0 +1,78 @@
+<div class="lib-drop-menu" 
+     [class.lib-drop-menu-visible]="isVisible"
+     [class]="'lib-drop-menu-' + placement"
+     [class.lib-drop-menu-submenu-mode]="isSubMenu"
+     [ngStyle]="getMenuStyle()">
+  <!-- 箭头 -->
+  <div class="lib-drop-menu-arrow" *ngIf="!isSubMenu"></div>
+  <!-- 内容区域 -->
+  <div class="lib-drop-menu-content">
+    <ul class="lib-drop-menu-list">
+      <ng-container *ngFor="let item of items; let i = index">
+        <!-- 使用自定义模板 -->
+        <ng-container *ngIf="itemTemplate; else defaultItemTemplate">
+          <li class="lib-drop-menu-item" 
+              [class.lib-drop-menu-item-has-children]="item.children && item.children.length > 0"
+              (mouseenter)="onMouseEnterItem(i)"
+              (mouseleave)="onMouseLeaveItem()"
+              (click)="$event.stopPropagation()">
+            <ng-container [ngTemplateOutlet]="itemTemplate" 
+                        [ngTemplateOutletContext]="{ $implicit: item, index: i }">
+            </ng-container>
+            
+            <!-- 子菜单 (即使是自定义模板，也要支持子菜单) -->
+            <div class="lib-drop-menu-submenu" 
+                *ngIf="item.children && item.children.length > 0" 
+                [class.lib-drop-menu-submenu-visible]="hoveredItemIndex === i"
+                (mouseenter)="onMouseEnterSubmenu(i)"
+                (mouseleave)="onMouseLeaveSubmenu()"
+                (click)="$event.stopPropagation()">
+              <lib-drop-menu 
+                [items]="item.children" 
+                [isVisible]="true"
+                [placement]="'right'"
+                [itemTemplate]="itemTemplate"
+                [autoClose]="autoClose"
+                [isSubMenu]="true"
+                (itemClick)="itemClick.emit($event)">
+              </lib-drop-menu>
+            </div>
+          </li>
+        </ng-container>
+        <!-- 默认模板 -->
+        <ng-template #defaultItemTemplate>
+          <li class="lib-drop-menu-item" 
+              [class.lib-drop-menu-item-has-children]="item.children && item.children.length > 0"
+              (mouseenter)="onMouseEnterItem(i)"
+              (mouseleave)="onMouseLeaveItem()"
+              (click)="onItemClick(item, $event)">
+            <span class="lib-drop-menu-item-icon" *ngIf="item.icon">
+              <i [class]="item.icon"></i>
+            </span>
+            <span class="lib-drop-menu-item-label">{{ item.label }}</span>
+            <span class="lib-drop-menu-item-expand-icon" *ngIf="item.children && item.children.length > 0">
+              <i class="arrow-right-icon"></i>
+            </span>
+            <!-- 子菜单 -->
+            <div class="lib-drop-menu-submenu" 
+                 *ngIf="item.children && item.children.length > 0" 
+                 [class.lib-drop-menu-submenu-visible]="hoveredItemIndex === i"
+                 (mouseenter)="onMouseEnterSubmenu(i)"
+                 (mouseleave)="onMouseLeaveSubmenu()"
+                 (click)="$event.stopPropagation()">
+              <lib-drop-menu 
+                [items]="item.children" 
+                [isVisible]="true"
+                [placement]="'right'"
+                [itemTemplate]="itemTemplate"
+                [autoClose]="autoClose"
+                [isSubMenu]="true"
+                (itemClick)="itemClick.emit($event)">
+              </lib-drop-menu>
+            </div>
+          </li>
+        </ng-template>
+      </ng-container>
+    </ul>
+  </div>
+</div>

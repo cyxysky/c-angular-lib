@@ -1,0 +1,250 @@
+<div class="doc-container">
+  <h1 class="doc-title">下拉菜单 DropMenu</h1>
+  
+  <p class="doc-description">
+    向下弹出的列表，用于显示链接、动作或菜单。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    当页面上的操作命令过多时，用此组件可以收纳操作元素。点击或悬停触发子菜单，用于导航、功能切换和展示更多选项。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <button libDropMenu [dropMenuItems]="basicItems" class="demo-trigger-button">
+          点击显示菜单
+        </button>
+      </div>
+      <div description>
+        最简单的下拉菜单，点击按钮弹出。
+      </div>
+    </app-doc-box>
+    
+    <!-- 不同的触发方式 -->
+    <app-doc-box
+      title="触发方式"
+      [sourceCode]="triggerSource">
+      <div demo>
+        <div style="display: flex; gap: 16px;">
+          <button libDropMenu [dropMenuItems]="basicItems" [dropMenuTrigger]="'click'" class="demo-trigger-button">
+            点击触发
+          </button>
+          <button libDropMenu [dropMenuItems]="basicItems" [dropMenuTrigger]="'hover'" class="demo-trigger-button">
+            悬停触发
+          </button>
+        </div>
+      </div>
+      <div description>
+        下拉菜单支持点击和悬停两种触发方式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 位置 -->
+    <app-doc-box
+      title="菜单位置"
+      [sourceCode]="placementSource">
+      <div demo>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+          <button *ngFor="let pos of placements" 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuPlacement]="pos" 
+            class="demo-trigger-button">
+            {{pos}}
+          </button>
+        </div>
+      </div>
+      <div description>
+        菜单可以出现在目标元素的不同位置，通过 dropMenuPlacement 设置。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义宽度 -->
+    <app-doc-box
+      title="自定义宽度"
+      [sourceCode]="widthSource">
+      <div demo>
+        <div style="display: flex; gap: 16px;">
+          <button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuWidth]="200" 
+            class="demo-trigger-button">
+            宽度: 200px
+          </button>
+          <button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuWidth]="'300px'" 
+            class="demo-trigger-button">
+            宽度: 300px
+          </button>
+        </div>
+      </div>
+      <div description>
+        菜单的宽度可以自定义，支持数字（单位为px）或字符串。
+      </div>
+    </app-doc-box>
+    
+    <!-- 嵌套菜单 -->
+    <app-doc-box
+      title="嵌套菜单"
+      [sourceCode]="nestedSource">
+      <div demo>
+        <button 
+          libDropMenu 
+          [dropMenuItems]="nestedItems" 
+          class="demo-trigger-button">
+          嵌套菜单
+        </button>
+      </div>
+      <div description>
+        下拉菜单支持多级嵌套，鼠标悬停在带有子菜单的项目上会显示子菜单。子菜单会继承父菜单的自动关闭设置。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义模板 -->
+    <app-doc-box
+      title="自定义菜单项"
+      [sourceCode]="customTemplateSource">
+      <div demo>
+        <button 
+          libDropMenu 
+          [dropMenuItems]="customItems" 
+          [dropMenuItemTemplate]="customItemTpl" 
+          class="demo-trigger-button">
+          自定义菜单项
+        </button>
+        
+        <ng-template #customItemTpl let-item let-index="index">
+          <li class="custom-menu-item" (click)="onItemClick(item)">
+            <span class="custom-menu-item-icon" *ngIf="item.icon">
+              <i [class]="item.icon" style="margin-right: 8px;"></i>
+            </span>
+            <span class="custom-menu-item-label">
+              {{ index + 1 }}. {{ item.label }}
+            </span>
+          </li>
+        </ng-template>
+      </div>
+      <div description>
+        通过自定义模板，可以完全控制菜单项的渲染方式。
+      </div>
+    </app-doc-box>
+    
+    <!-- 受控模式 -->
+    <app-doc-box
+      title="受控模式"
+      [sourceCode]="controlledSource">
+      <div demo>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button (click)="controlledVisible = !controlledVisible" class="demo-trigger-button">
+            {{ controlledVisible ? '隐藏菜单' : '显示菜单' }}
+          </button>
+          
+          <div style="position: relative; margin-top: 20px;">
+            <button 
+              libDropMenu 
+              [dropMenuItems]="basicItems" 
+              [dropMenuVisible]="controlledVisible"
+              [dropMenuStrictVisible]="true"
+              (dropMenuVisibleChange)="onVisibleChange($event)"
+              class="demo-trigger-button">
+              受控的菜单
+            </button>
+          </div>
+        </div>
+      </div>
+      <div description>
+        当需要完全控制菜单的显示和隐藏时，可以使用受控模式。通过设置 dropMenuStrictVisible=true，菜单将只响应程序控制，不响应用户交互。
+      </div>
+    </app-doc-box>
+    
+    <!-- 监听菜单项点击 -->
+    <app-doc-box
+      title="监听菜单项点击"
+      [sourceCode]="eventSource">
+      <div demo>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            (dropMenuItemClick)="onMenuItemClick($event)"
+            class="demo-trigger-button">
+            点击菜单项
+          </button>
+          
+          <div *ngIf="selectedItem" class="example-value">
+            已选择: {{ selectedItem.label }}
+          </div>
+        </div>
+      </div>
+      <div description>
+        通过 dropMenuItemClick 事件可以监听菜单项的点击。
+      </div>
+    </app-doc-box>
+    
+    <!-- 添加自动关闭模式示例 -->
+    <app-doc-box
+      title="自动关闭模式"
+      [sourceCode]="autoCloseSource">
+      <div demo>
+        <div style="display: flex; gap: 16px;">
+          <button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuAutoClose]="true" 
+            class="demo-trigger-button">
+            自动关闭
+          </button>
+          <button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuAutoClose]="false" 
+            class="demo-trigger-button">
+            点击不关闭
+          </button>
+        </div>
+      </div>
+      <div description>
+        自动关闭模式决定点击菜单项后是否自动关闭菜单。设置 dropMenuAutoClose=false 可以保持菜单打开状态。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+  
+  <!-- 添加问题解决说明部分 -->
+  <h2 class="doc-section-title">常见问题解决</h2>
+  <div class="doc-section">
+    <h3 class="doc-sub-title">1. 嵌套菜单不显示</h3>
+    <p class="doc-description">
+      通过改进CSS样式和添加鼠标事件跟踪，确保子菜单正确显示。子菜单现在会在鼠标悬停在父菜单项上时自动显示，并在鼠标移开时隐藏。
+    </p>
+    
+    <h3 class="doc-sub-title">2. 点击关闭后需要点击两次才能重新打开</h3>
+    <p class="doc-description">
+      修复了点击空白区域关闭后需要点击两次才能重新显示的问题。通过跟踪菜单的关闭状态（disposed标志），确保单击后立即重新打开。
+    </p>
+    
+    <h3 class="doc-sub-title">3. 自动关闭选项</h3>
+    <p class="doc-description">
+      添加了自动关闭选项（dropMenuAutoClose），允许控制点击菜单项后是否自动关闭菜单。对于需要用户连续选择多个菜单项的场景，可以设置为false以保持菜单打开状态。
+    </p>
+  </div>
+</div>
+
+<ng-template #demoCustomItem let-item>
+  <span class="custom-menu-item">
+    <i [class]="item.icon" *ngIf="item.icon"></i>
+    <strong>{{item.label}}</strong>
+  </span>
+</ng-template>
