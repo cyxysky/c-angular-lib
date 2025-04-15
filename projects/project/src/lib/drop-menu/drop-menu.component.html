@@ -13,6 +13,7 @@
         <ng-container *ngIf="itemTemplate; else defaultItemTemplate">
           <li class="lib-drop-menu-item" 
               [class.lib-drop-menu-item-has-children]="item.children && item.children.length > 0"
+              [class.lib-drop-menu-item-disabled]="item.disabled"
               (mouseenter)="onMouseEnterItem(i)"
               (mouseleave)="onMouseLeaveItem()"
               (click)="$event.stopPropagation()">
@@ -43,6 +44,7 @@
         <ng-template #defaultItemTemplate>
           <li class="lib-drop-menu-item" 
               [class.lib-drop-menu-item-has-children]="item.children && item.children.length > 0"
+              [class.lib-drop-menu-item-disabled]="item.disabled"
               (mouseenter)="onMouseEnterItem(i)"
               (mouseleave)="onMouseLeaveItem()"
               (click)="onItemClick(item, $event)">
@@ -73,6 +75,10 @@
           </li>
         </ng-template>
       </ng-container>
+      <!-- 无数据时显示 -->
+      <li class="lib-drop-menu-empty" *ngIf="!items || items.length === 0">
+        <span>暂无数据</span>
+      </li>
     </ul>
   </div>
 </div>
