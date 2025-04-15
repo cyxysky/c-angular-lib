@@ -84,9 +84,10 @@ export class UtilsService {
    * @param delay 延迟时间（毫秒）
    * @returns 定时器标识符
    */
-  delayExecution(callback: () => void, delay: number = 10): any {
-    return setTimeout(() => {
+  delayExecution(callback: () => void, delay: number = 10): void {
+    let timer = setTimeout(() => {
       callback();
+      clearTimeout(timer);
     }, delay);
   }
 
@@ -173,5 +174,20 @@ export class UtilsService {
    */
   isTemplate(value: any): boolean {
     return value instanceof TemplateRef;
+  }
+
+  /**
+   * 获取字符串
+   * @param value 值
+   * @returns 字符串
+   */
+  getString(value: any): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value.toString() + 'px';
+    }
+    return '';
   }
 }

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef } from '@angular/core';
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { maskAnimation, modalAnimation } from '../animation';
+import { UtilsService } from '../utils/utils.service';
 
 @Component({
   selector: 'lib-modal',
@@ -49,7 +50,10 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   initialTransformY: number = 0;
   isVisible: boolean = false;
 
-  constructor(public cdr: ChangeDetectorRef) { }
+  constructor(
+    public cdr: ChangeDetectorRef,
+    private utilsService: UtilsService
+  ) { }
 
   ngAfterViewInit(): void {
     this.cdr.detectChanges();
@@ -89,9 +93,8 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     this.visible = false;
     this.visibleChange.emit(false);
     this.cdr.detectChanges();
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       this.closeModal();
-      clearTimeout(timer);
       this.cdr.detectChanges();
     }, 150);
   }
@@ -146,13 +149,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
    * @returns 字符串
    */
   getString(value: any): string {
-    if (typeof value === 'string') {
-      return value;
-    }
-    if (typeof value === 'number') {
-      return value.toString() + 'px';
-    }
-    return '';
+    return this.utilsService.getString(value);
   }
 
   /**

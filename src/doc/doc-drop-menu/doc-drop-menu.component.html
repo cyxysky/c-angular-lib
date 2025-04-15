@@ -124,10 +124,7 @@
         </button>
         
         <ng-template #customItemTpl let-item let-index="index">
-          <li class="custom-menu-item" (click)="onItemClick(item)">
-            <span class="custom-menu-item-icon" *ngIf="item.icon">
-              <i [class]="item.icon" style="margin-right: 8px;"></i>
-            </span>
+          <li (click)="onItemClick(item)">
             <span class="custom-menu-item-label">
               {{ index + 1 }}. {{ item.label }}
             </span>

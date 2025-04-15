@@ -6,6 +6,7 @@ import { DropMenuComponent } from './drop-menu.component';
 import { OverlayService } from '../overlay/overlay.service';
 import { DropMenu } from './drop-menu.interface';
 import * as _ from 'lodash';
+import { UtilsService } from '../utils/utils.service';
 
 @Directive({
   selector: '[libDropMenu]',
@@ -42,7 +43,6 @@ export class DropMenuDirective implements OverlayBasicDirective {
   private enterTimer: any;
   private leaveTimer: any;
   private portal: ComponentPortal<DropMenuComponent> | null = null;
-  private dropMenuComponent: DropMenuComponent | null = null;
   private dropMenuComponentRef: ComponentRef<DropMenuComponent> | null = null;
   private componentHover: boolean = false;
   private disposed: boolean = false;
@@ -55,7 +55,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
     private elementRef: ElementRef,
     private overlayService: OverlayService,
     private overlay: Overlay,
-    private injector: Injector,
+    private utilsService: UtilsService,
     @Optional() @SkipSelf() private parentMenu?: DropMenuDirective
   ) { 
     // 如果有父菜单，那么这个菜单不是根菜单
@@ -76,10 +76,9 @@ export class DropMenuDirective implements OverlayBasicDirective {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['menuItems'] && this.dropMenuComponent) {
-      this.dropMenuComponent.items = this.menuItems;
+    if (changes['menuItems'] && this.dropMenuComponentRef) {
+      this.dropMenuComponentRef.setInput('items', this.menuItems);
     }
-    
     if (changes['visible']) {
       // 严格由编程控制显示
       if (this.strictVisible) {
@@ -130,6 +129,9 @@ export class DropMenuDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 鼠标悬停打开
+   */
   hoverOpen() {
     // 严格由编程控制显示
     if (this.strictVisible) return;
@@ -141,6 +143,9 @@ export class DropMenuDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 鼠标悬停关闭
+   */ 
   hoverClose() {
     // 严格由编程控制显示
     if (this.strictVisible) return;
@@ -156,35 +161,37 @@ export class DropMenuDirective implements OverlayBasicDirective {
     }
   }
 
+  /**
+   * 显示下拉菜单
+   */
   public show(): void {
     if (!this.strictVisible && this.visible) return;
-    
-    this.visible = true;
-    this.visibleChange.emit(this.visible);
+    this.changeVisible(true);
     this.closeDropMenu();
     this.disposed = false;
-    
     const positions = this.overlayService.getPositions(this.placement);
-    
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
+      // 配置
       {
-        positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false)
+        positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false),
       },
+      // 目标锚点元素
       this.elementRef,
+      // 位置
       positions,
+      // 处理外部点击
       (ref, event) => {
-        // 处理外部点击
+        if (this.strictVisible) return;
         this.disposed = true;
-        this.visible = false;
-        this.visibleChange.emit(this.visible);
-        this.closeDropMenu();
+        this.hide();
       },
+      // 处理位置变化
       (position, isBackupUsed) => {
         if (isBackupUsed) {
           for (const key in OverlayBasicPositionConfigs) {
             if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
-              this.dropMenuComponent!.placement = key as any;
+              this.dropMenuComponentRef?.setInput('placement', key as any);
               this.dropMenuComponentRef?.changeDetectorRef.detectChanges();
               break;
             }
@@ -196,7 +203,6 @@ export class DropMenuDirective implements OverlayBasicDirective {
     // 创建并附加组件
     this.portal = new ComponentPortal(DropMenuComponent);
     const componentRef = this.overlayRef.attach(this.portal);
-
     componentRef.setInput('items', this.menuItems);
     componentRef.setInput('placement', this.placement);
     componentRef.setInput('width', this.width);
@@ -206,7 +212,6 @@ export class DropMenuDirective implements OverlayBasicDirective {
     // 订阅事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((item: DropMenu) => {
       this.itemClick.emit(item);
-      
       // 根据autoClose设置和是否有子菜单决定是否关闭菜单
       if (this.autoClose && (!item.children || item.children.length === 0)) {
         // 关闭根菜单，这样会关闭整个菜单链
@@ -245,32 +250,46 @@ export class DropMenuDirective implements OverlayBasicDirective {
     });
 
     // 保存组件引用
-    this.dropMenuComponent = componentRef.instance;
     this.dropMenuComponentRef = componentRef;
 
     // 设置CSS类以添加动画效果
-    setTimeout(() => {
-      if (componentRef.instance) {
-        componentRef.instance.isVisible = true;
+    this.utilsService.delayExecution(() => {
+      if (componentRef) {
+        componentRef.setInput('isVisible', true);
       }
-    }, 10);
+    }, 0)
   }
 
   public hide(): void {
-    if (!this.visible) return;
     if (this.componentHover && !this.autoClose) return;
-    
-    this.visible = false;
-    this.visibleChange.emit(this.visible);
-    this.closeDropMenu();
+    this.dropMenuComponentRef?.setInput('isVisible', false);
+    this.changeVisible(false);
+    this.utilsService.delayExecution(() => {
+      this.closeDropMenu();
+    }, 150);
   }
 
+  /**
+   * 改变菜单显示状态
+   * @param visible 显示状态
+   */
+  changeVisible(visible: boolean): void {
+    this.visible = visible;
+    this.visibleChange.emit(this.visible);
+  }
+
+  /**
+   * 更新位置
+   */
   public updatePosition(): void {
     if (this.overlayRef) {
       this.overlayRef.updatePosition();
     }
   }
 
+  /**
+   * 关闭下拉菜单
+   */
   private closeDropMenu(): void {
     if (this.overlayRef) {
       this.visible = false;

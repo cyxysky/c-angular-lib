@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
+import { UtilsService } from '../utils/utils.service';
 
 @Component({
   selector: 'lib-drop-menu',
@@ -25,6 +26,8 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   @Input() autoClose: boolean = true;
   /** 是否为子菜单 */
   @Input() isSubMenu: boolean = false;
+  /** 是否选中 */
+  @Input() selectedItem: DropMenu | null = null;
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
   /** 菜单关闭事件 */
@@ -37,12 +40,15 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   /** 鼠标进入计时器 */
   private enterTimer: any = null;
 
-  constructor(private cdr: ChangeDetectorRef, private elementRef: ElementRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private utilsService: UtilsService
+  ) { }
 
   ngOnInit(): void {
     // 子菜单需要立即可见
     if (this.isSubMenu) {
-      setTimeout(() => {
+      this.utilsService.delayExecution(() => {
         this.isVisible = true;
         this.cdr.detectChanges();
       }, 0);
@@ -64,11 +70,9 @@ export class DropMenuComponent implements OnInit, OnDestroy {
     if (event) {
       event.stopPropagation();
     }
-    
     this.itemClick.emit(item);
-    
     // 只在没有子菜单或子菜单为空且启用了自动关闭时才关闭菜单
-    if (this.autoClose && (!item.children || item.children.length === 0)) {
+    if (this.autoClose) {
       this.menuClose.emit();
     }
   }
@@ -83,7 +87,6 @@ export class DropMenuComponent implements OnInit, OnDestroy {
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-    
     // 直接设置索引，不使用延迟
     this.hoveredItemIndex = index;
     this.cdr.detectChanges();
@@ -97,11 +100,10 @@ export class DropMenuComponent implements OnInit, OnDestroy {
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
     }
-    
     this.leaveTimer = setTimeout(() => {
       this.hoveredItemIndex = -1;
       this.cdr.detectChanges();
-    }, 150); // 更长的延迟，给用户足够时间移动到子菜单
+    }, 50); // 更长的延迟，给用户足够时间移动到子菜单
   }
 
   /**
@@ -113,12 +115,12 @@ export class DropMenuComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * 获取菜单样式
+   * 获取字符串
+   * @param value 值
+   * @returns 字符串
    */
-  getMenuStyle(): any {
-    return {
-      width: typeof this.width === 'number' ? `${this.width}px` : this.width
-    };
+  getString(value: any): string {
+    return this.utilsService.getString(value);
   }
 
   /**
@@ -131,7 +133,6 @@ export class DropMenuComponent implements OnInit, OnDestroy {
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-    
     // 确保子菜单保持显示状态
     this.hoveredItemIndex = index;
     this.cdr.detectChanges();
@@ -145,11 +146,10 @@ export class DropMenuComponent implements OnInit, OnDestroy {
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
     }
-    
     this.leaveTimer = setTimeout(() => {
       this.hoveredItemIndex = -1;
       this.cdr.detectChanges();
-    }, 150);
+    }, 50);
   }
 
   ngOnDestroy(): void {

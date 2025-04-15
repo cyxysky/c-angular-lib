@@ -24,7 +24,7 @@ export class DocDropMenuComponent {
   // 基本菜单项
   basicItems: DropMenu[] = [
     { label: '菜单项 1', icon: 'icon-user', children: [] },
-    { label: '菜单项 2', icon: 'icon-setting', children: [] },
+    { label: '菜单项 2', icon: 'icon-setting', children: [], disabled: true },
     { label: '菜单项 3', icon: 'icon-folder', children: [] },
     { label: '菜单项 4', icon: 'icon-file', children: [] }
   ];
@@ -42,6 +42,7 @@ export class DocDropMenuComponent {
     { 
       label: '一级菜单 2', 
       icon: 'icon-folder', 
+      disabled: true,
       children: [
         { label: '二级菜单 2-1', icon: 'icon-file', children: [] },
         { 
