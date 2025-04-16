@@ -60,6 +60,7 @@
         <div style="margin-bottom: 16px;">
           <lib-segmented
             [segmentedOptions]="sizeOptions"
+            
             [(ngModel)]="currentSize">
           </lib-segmented>
         </div>
@@ -67,9 +68,10 @@
           name="sizeTreeSelect"
           [treeData]="basicTreeData"
           [(ngModel)]="basicValue"
+          [treeMultiple]="true"
+          [treeCheckable]="true"
           [treePlaceholder]="'请选择'"
-          [treeSize]="currentSize"
-          [treeMultiple]="false">
+          [treeSize]="currentSize">
         </lib-tree-select>
         <p class="example-value">当前尺寸: {{ currentSize }}</p>
       </div>

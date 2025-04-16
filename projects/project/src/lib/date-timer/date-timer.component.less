@@ -262,7 +262,7 @@
     top: 100%;
     left: 0;
     z-index: 1050;
-    width: 280px;
+    width: 296px;
     margin-top: 4px;
     background-color: #fff;
     border-radius: 2px;
@@ -685,7 +685,7 @@
 // 时间面板
 .date-timer-time-panel {
     width: 180px;
-    padding: 8px 0;
+    padding: 8px 0 0 0;
 }
 
 .date-timer-time-columns {
@@ -702,13 +702,6 @@
     text-align: center;
     list-style: none;
     transition: background 0.3s;
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
-
-    &:hover {
-        overflow-y: auto;
-    }
-
 
     &:not(:last-child) {
         border-right: none;
@@ -724,46 +717,54 @@
     }
 
     ul {
-        width: 100%;
+        height: 204px;
+        overflow-y: auto;
+        scroll-behavior: smooth;
         padding: 0;
         margin: 0;
         list-style: none;
-    }
-}
-
-.date-timer-time-cell {
-    display: block;
-    width: 100%;
-    height: 28px;
-    margin: 0;
-    padding: 0;
-    color: rgba(0, 0, 0, 0.85);
-    line-height: 28px;
-    text-align: center;
-    border-radius: 0;
-    cursor: pointer;
-    transition: background 0.3s;
-
-    &:hover {
-        background-color: #e6f7ff !important;
-        color: #1890ff !important;
+        
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
     }
 
-    &.date-timer-time-cell-disabled {
-        color: rgba(0, 0, 0, 0.25);
-        background: transparent;
-        cursor: not-allowed;
+    .date-timer-time-cell {
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
         
         &:hover {
-            background: transparent;
+            background-color: #f5f5f5;
+        }
+        
+        &.date-timer-time-cell-selected {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            font-weight: 500;
+        }
+        
+        &.date-timer-time-cell-disabled {
             color: rgba(0, 0, 0, 0.25);
+            cursor: not-allowed;
+            background-color: transparent;
         }
     }
 }
 
 // 底部
 .date-timer-footer {
-    width: 100%;
     padding: 8px;
     line-height: 36px;
     text-align: center;

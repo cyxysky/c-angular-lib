@@ -59,6 +59,7 @@
 <ng-template #dropdownTemplate>
   <div 
     class="date-timer-dropdown"
+    [style.width]="mode === 'week' ? '320px' : '296px'"
     [class.date-timer-dropdown-time]="currentPanelMode === 'time' && !showTime"
     [class.date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(mode)"
   >
@@ -320,7 +321,7 @@
 <!-- 小时选择 -->
 <ng-template #hourCell>
   <div class="date-timer-time-column-title">时</div>
-  <ul>
+  <ul #hourList>
     <li *ngFor="let hour of hours" 
         class="date-timer-time-cell"
         [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
@@ -334,7 +335,7 @@
 <!-- 分钟选择 -->
 <ng-template #minuteCell>
   <div class="date-timer-time-column-title">分</div>
-  <ul>
+  <ul #minuteList>
     <li *ngFor="let minute of minutes" 
         class="date-timer-time-cell"
         [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
@@ -348,7 +349,7 @@
 <!-- 秒钟选择 --> 
 <ng-template #secondCell>
   <div class="date-timer-time-column-title">秒</div>
-  <ul>
+  <ul #secondList>
     <li *ngFor="let second of seconds" 
         class="date-timer-time-cell"
         [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"

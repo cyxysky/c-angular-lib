@@ -34,10 +34,6 @@ import { UserSelectComponent } from '@project';
 
 export const routes: Routes = [
     {
-        path: '',
-        component: AppComponent
-    },
-    {
         path: 'popconfirm',
         component: DocPopconfirmComponent
     },

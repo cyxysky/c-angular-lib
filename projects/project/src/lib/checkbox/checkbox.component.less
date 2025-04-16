@@ -96,8 +96,8 @@
 @checkbox-inner-after-width: 6px;
 @checkbox-inner-after-height: 10px;
 @checkbox-inner-after-border: 2px solid #fff;
-@checkbox-indeterminate-left-position: -4px;
-@checkbox-indeterminate-top-position: -4px;
+@checkbox-indeterminate-left-position: -5px;
+@checkbox-indeterminate-top-position: -5px;
 @checkbox-indeterminate-box-width: 8px;
 @checkbox-indeterminate-box-height: 8px;
 @checkbox-indeterminate-box-border: 1px solid var(--before-color);
@@ -216,8 +216,9 @@
     .checkbox-inner {
       position: @checkbox-position;
       display: @checkbox-inner-display;
-      width: @checkbox-inner-width;
-      height: @checkbox-inner-height;
+      left: -2px;
+      width: 6px;
+      height: 6px;
 
       &::after {
         animation: @checkbox-bounce-animation-name @checkbox-animation-duration @checkbox-animation-curve forwards;
