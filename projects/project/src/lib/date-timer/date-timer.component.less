@@ -285,7 +285,7 @@
         }
 
         .date-timer-time-panel-combined {
-            width: 200px;
+            width: 210px;
         }
     }
 }
@@ -698,11 +698,17 @@
     flex: 1;
     position: relative;
     max-height: 224px;
-    overflow: hidden auto;
+    overflow: hidden;
     text-align: center;
     list-style: none;
     transition: background 0.3s;
     scrollbar-width: thin;
+    scrollbar-gutter: stable;
+
+    &:hover {
+        overflow-y: auto;
+    }
+
 
     &:not(:last-child) {
         border-right: none;
