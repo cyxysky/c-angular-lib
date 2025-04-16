@@ -454,7 +454,7 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   /**
-   * 展开节点父级
+   * 展开节点
    * @param nodes 节点
    */
   private expendByNodes(keys: string[], resetExpanded: boolean = true, expandSelf: boolean = true): void {
