@@ -120,7 +120,7 @@ export class UtilsService {
    * @param AllNodes 所有节点
    * @returns 父节点
    */
-  private getParentNodes(node: any, AllNodes: any[]): any[] {
+  public getParentNodes(node: any, AllNodes: any[]): any[] {
     const parents: any[] = [];
     const findParents = (nodes: any[], targetKey: string): boolean => {
       for (const current of nodes) {

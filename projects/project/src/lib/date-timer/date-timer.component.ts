@@ -5,6 +5,7 @@ import { DateTimer, DateTimerMode, DateTimerSize, DateTimerStatus, DateTimerSele
 import { addDays, addMonths, addQuarters, addWeeks, addYears, differenceInDays, endOfDay, endOfMonth, endOfQuarter, endOfWeek, endOfYear, format, getDay, getDate, getHours, getMinutes, getMonth, getSeconds, getYear, isAfter, isBefore, isSameDay, isSameMonth, isSameYear, parse, setDate, setHours, setMinutes, setMonth, setSeconds, setYear, startOfDay, startOfMonth, startOfQuarter, startOfWeek, startOfYear, subMonths, subYears } from 'date-fns';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { OverlayRef, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { UtilsService } from '@project';
 
 @Component({
   selector: 'lib-date-timer',
@@ -98,7 +99,8 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     private cdr: ChangeDetectorRef,
     private overlayService: OverlayService,
     private ngZone: NgZone,
-    private viewContainerRef: ViewContainerRef
+    private viewContainerRef: ViewContainerRef,
+    private utilsService: UtilsService
   ) { }
 
   ngOnInit(): void {
@@ -930,7 +932,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       } else if (['date', 'week'].includes(this.mode)) {
         // 对于日期和周模式，在有时间选择的情况下不关闭面板
         if (this.overlayRef) {
-          setTimeout(() => {
+          this.utilsService.delayExecution(() => {
             this.overlayRef?.updatePosition();
           }, 0);
         }
@@ -1600,7 +1602,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     if (this.disabledTime) {
       const currentDate = this.getCurrentTimeValue() || new Date();
       const disabledTimeConfig = this.disabledTime(currentDate);
-
       if (disabledTimeConfig) {
         if (type === 'hour' && disabledTimeConfig.hour && disabledTimeConfig.hour[value]) {
           return true;
@@ -1615,16 +1616,13 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 范围选择时，确保结束时间不早于开始时间
     if (this.selectType === 'range' && this.rangePart === 'end' && this.rangeStart) {
       const startDate = new Date(this.rangeStart);
-
       // 如果当前正在构建的日期存在
       if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
         const endDate = new Date(this.selectedValue.end);
-
         // 检查日期是否是同一天
         const isSameDay = startDate.getFullYear() === endDate.getFullYear() &&
           startDate.getMonth() === endDate.getMonth() &&
           startDate.getDate() === endDate.getDate();
-
         // 只有同一天才需要检查时间大小
         if (isSameDay) {
           if (type === 'hour') {
@@ -1650,27 +1648,23 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           const isSameDay = startDate.getFullYear() === this.hoverValue.getFullYear() &&
             startDate.getMonth() === this.hoverValue.getMonth() &&
             startDate.getDate() === this.hoverValue.getDate();
-
           if (isSameDay) {
             return value < startDate.getHours();
           }
         }
       }
     }
-
     return false;
   }
 
   getStartDate(): Date | null {
     if (this.selectType !== 'range') return null;
-
     const range = this.selectedValue as RangeValue<Date>;
     return range ? range.start : null;
   }
 
   getEndDate(): Date | null {
     if (this.selectType !== 'range') return null;
-
     const range = this.selectedValue as RangeValue<Date>;
     return range ? range.end : null;
   }
@@ -2150,167 +2144,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  // 修改isInTimeRange方法，增强时间范围的显示效果
-  isInTimeRange(unit: 'hour' | 'minute' | 'second', value: number): boolean {
-    // 单选模式
-    if (this.selectType === 'single') {
-      return false; // 单选模式不需要范围高亮
-    }
-    // 范围选择模式
-    if (this.selectType === 'range') {
-      // 没有hover值或开始值，不高亮
-      if (!this.hoverValue && !this.rangeStart) {
-        return false;
-      }
-      // 开始时间选择阶段
-      if (this.rangePart === 'start') {
-        // 只有在有hover值的情况下才进行高亮
-        if (!this.hoverValue) {
-          return false;
-        }
-        // 对于小时单位
-        if (unit === 'hour') {
-          return value === this.hoverValue.getHours();
-        }
-        // 对于分钟单位
-        else if (unit === 'minute') {
-          // 在小时选择阶段，不高亮分钟
-          if (this.timeSelectStep === 'hour') {
-            return false;
-          }
-          // 只有在选择的小时匹配时，才高亮相应的分钟
-          return this.hoverValue.getHours() === (this.rangeStart?.getHours() || 0) &&
-            value === this.hoverValue.getMinutes();
-        }
-        // 对于秒单位
-        else if (unit === 'second') {
-          // 在小时或分钟选择阶段，不高亮秒
-          if (this.timeSelectStep === 'hour' || this.timeSelectStep === 'minute') {
-            return false;
-          }
-          // 只有在选择的小时和分钟都匹配时，才高亮相应的秒
-          return this.hoverValue.getHours() === (this.rangeStart?.getHours() || 0) &&
-            this.hoverValue.getMinutes() === (this.rangeStart?.getMinutes() || 0) &&
-            value === this.hoverValue.getSeconds();
-        }
-      }
-      // 结束时间选择阶段
-      else if (this.rangePart === 'end') {
-        // 必须有开始时间
-        if (!this.rangeStart) {
-          return false;
-        }
-        // 如果没有hover值，不进行高亮
-        if (!this.hoverValue) {
-          return false;
-        }
-        // 对于小时单位
-        if (unit === 'hour') {
-          const startHour = this.rangeStart.getHours();
-          const hoverHour = this.hoverValue.getHours();
-          // 仅高亮hover的小时
-          return value === hoverHour;
-        }
-        // 对于分钟单位
-        else if (unit === 'minute') {
-          // 在小时选择阶段，不高亮分钟
-          if (this.timeSelectStep === 'hour') {
-            return false;
-          }
-          const isHourMatch = this.hoverValue.getHours() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ?
-            this.selectedValue.end.getHours() : 0);
-          // 只有在选择的小时匹配时，才高亮相应的分钟
-          return isHourMatch && value === this.hoverValue.getMinutes();
-        }
-        // 对于秒单位
-        else if (unit === 'second') {
-          // 在小时或分钟选择阶段，不高亮秒
-          if (this.timeSelectStep === 'hour' || this.timeSelectStep === 'minute') {
-            return false;
-          }
-          const isHourMatch = this.hoverValue.getHours() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ?
-            this.selectedValue.end.getHours() : 0);
-          const isMinuteMatch = this.hoverValue.getMinutes() === (this.isRangeValue(this.selectedValue) && this.selectedValue.end ?
-            this.selectedValue.end.getMinutes() : 0);
-
-          // 只有在选择的小时和分钟都匹配时，才高亮相应的秒
-          return isHourMatch && isMinuteMatch && value === this.hoverValue.getSeconds();
-        }
-      }
-    }
-    return false;
-  }
-
-  // 增强onTimeHover方法，改进悬浮时间的处理
-  onTimeHover(unit: 'hour' | 'minute' | 'second', value: number): void {
-    if (this.selectType === 'single') {
-      // 单选模式下的hover效果处理
-      const currentValue = this.getCurrentTimeValue() || new Date();
-      const hoverDate = new Date(currentValue);
-      if (unit === 'hour') {
-        hoverDate.setHours(value);
-      } else if (unit === 'minute') {
-        hoverDate.setMinutes(value);
-      } else if (unit === 'second') {
-        hoverDate.setSeconds(value);
-      }
-      this.hoverValue = hoverDate;
-    } else if (this.selectType === 'range') {
-      // 范围选择模式下的hover效果处理
-      // 对于开始时间的hover
-      if (this.rangePart === 'start') {
-        const baseDate = this.rangeStart || new Date();
-        const hoverDate = new Date(baseDate);
-        if (unit === 'hour') {
-          hoverDate.setHours(value);
-          if (this.timeSelectStep === 'hour') {
-            hoverDate.setMinutes(0);
-            hoverDate.setSeconds(0);
-          }
-        } else if (unit === 'minute') {
-          hoverDate.setMinutes(value);
-          if (this.timeSelectStep === 'minute') {
-            hoverDate.setSeconds(0);
-          }
-        } else if (unit === 'second') {
-          hoverDate.setSeconds(value);
-        }
-        this.hoverValue = hoverDate;
-      }
-      // 对于结束时间的hover
-      else if (this.rangePart === 'end') {
-        // 确保存在开始时间
-        if (!this.rangeStart) {
-          return;
-        }
-        let baseDate: Date;
-        // 使用已选的结束时间或从开始时间复制一个新的
-        if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
-          baseDate = new Date(this.selectedValue.end);
-        } else {
-          baseDate = new Date(this.rangeStart);
-        }
-        const hoverDate = new Date(baseDate);
-        if (unit === 'hour') {
-          hoverDate.setHours(value);
-          if (this.timeSelectStep === 'hour') {
-            hoverDate.setMinutes(0);
-            hoverDate.setSeconds(0);
-          }
-        } else if (unit === 'minute') {
-          hoverDate.setMinutes(value);
-          if (this.timeSelectStep === 'minute') {
-            hoverDate.setSeconds(0);
-          }
-        } else if (unit === 'second') {
-          hoverDate.setSeconds(value);
-        }
-        this.hoverValue = hoverDate;
-      }
-    }
-    this.cdr.markForCheck();
-  }
-
   // 获取当前正在操作的时间值
   getCurrentTimeValue(): Date | null {
     if (!this.selectedValue) return null;
@@ -2406,13 +2239,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     }
     // 更新onChange
     this._onChange(this.selectedValue);
-    this.cdr.markForCheck();
-  }
-
-  // 添加方法：当点击时间列标题时切换到对应的时间选择步骤
-  onTimeColumnTitleClick(step: 'hour' | 'minute' | 'second'): void {
-    // 允许随时切换到任何时间单位选择，不受之前选择的限制
-    this.timeSelectStep = step;
     this.cdr.markForCheck();
   }
 }

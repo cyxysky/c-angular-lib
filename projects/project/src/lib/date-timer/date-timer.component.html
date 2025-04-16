@@ -1,11 +1,4 @@
-<ng-template #dateTimerIcon>
-  <div class="date-timer-suffix">
-    <span *ngIf="allowClear && displayValue" class="date-timer-clear-btn" (click)="clearValue($event)">
-      <i class="bi-x-lg"></i>
-    </span>
-    <i class="bi-calendar-week"></i>
-  </div>
-</ng-template>
+
 <!-- 基础输入框 -->
 <div class="date-timer-container" [class.date-timer-disabled]="disabled" cdkOverlayOrigin>
   <!-- 单个日期/时间选择 -->
@@ -249,65 +242,18 @@
 
       <!-- 时间选择面板 - 独立模式 -->
       <div *ngIf="mode === 'time' && currentPanelMode === 'time' && !showTime" class="date-timer-time-panel">
-        
-        <!-- 时间选择步骤指示器 -->
-        <div class="date-timer-time-steps" *ngIf="selectType === 'range'">
-          <span class="date-timer-time-step" 
-                [class.date-timer-time-step-active]="timeSelectStep === 'hour'"
-                (click)="onTimeColumnTitleClick('hour')">时</span> → 
-          <span class="date-timer-time-step" 
-                [class.date-timer-time-step-active]="timeSelectStep === 'minute'"
-                (click)="onTimeColumnTitleClick('minute')">分</span> → 
-          <span class="date-timer-time-step" 
-                [class.date-timer-time-step-active]="timeSelectStep === 'second'"
-                (click)="onTimeColumnTitleClick('second')">秒</span>
-        </div>
-        
         <div class="date-timer-time-columns">
           <!-- 小时 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'hour'">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('hour')">时</div>
-            <ul>
-              <li *ngFor="let hour of hours" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="!isTimeDisabled('hour', hour) && onSelectHour(hour)"
-                  (mouseenter)="onTimeHover('hour', hour)">
-                {{ hour < 10 ? '0' + hour : hour }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="hourCell"></ng-container>
           </div>
           <!-- 分钟 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'minute'">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('minute')">分</div>
-            <ul>
-              <li *ngFor="let minute of minutes" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="!isTimeDisabled('minute', minute) && onSelectMinute(minute)"
-                  (mouseenter)="onTimeHover('minute', minute)">
-                {{ minute < 10 ? '0' + minute : minute }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="minuteCell"></ng-container>
           </div>
           <!-- 秒钟 -->
           <div class="date-timer-time-column" [class.date-timer-time-column-active]="timeSelectStep === 'second'">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('second')">秒</div>
-            <ul>
-              <li *ngFor="let second of seconds" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="!isTimeDisabled('second', second) && onSelectSecond(second)"
-                  (mouseenter)="onTimeHover('second', second)">
-                {{ second < 10 ? '0' + second : second }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="secondCell"></ng-container>
           </div>
         </div>
       </div>
@@ -317,48 +263,15 @@
         <div class="date-timer-time-columns">
           <!-- 小时 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('hour')">时</div>
-            <ul>
-              <li *ngFor="let hour of hours" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('hour', hour)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
-                  (click)="!isTimeDisabled('hour', hour) && onSelectHour(hour)"
-                  (mouseenter)="onTimeHover('hour', hour)">
-                {{ hour < 10 ? '0' + hour : hour }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="hourCell"></ng-container>
           </div>
           <!-- 分钟 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('minute')">分</div>
-            <ul>
-              <li *ngFor="let minute of minutes" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('minute', minute)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
-                  (click)="!isTimeDisabled('minute', minute) && onSelectMinute(minute)"
-                  (mouseenter)="onTimeHover('minute', minute)">
-                {{ minute < 10 ? '0' + minute : minute }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="minuteCell"></ng-container>
           </div>
           <!-- 秒钟 -->
           <div class="date-timer-time-column">
-            <div class="date-timer-time-column-title" (click)="onTimeColumnTitleClick('second')">秒</div>
-            <ul>
-              <li *ngFor="let second of seconds" 
-                  class="date-timer-time-cell"
-                  [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
-                  [class.date-timer-time-cell-in-range]="selectType === 'range' && isInTimeRange('second', second)"
-                  [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
-                  (click)="!isTimeDisabled('second', second) && onSelectSecond(second)"
-                  (mouseenter)="onTimeHover('second', second)">
-                {{ second < 10 ? '0' + second : second }}
-              </li>
-            </ul>
+            <ng-container *ngTemplateOutlet="secondCell"></ng-container>
           </div>
         </div>
       </div>
@@ -403,3 +316,55 @@
     </div>
   </div>
 </ng-template> 
+
+<!-- 小时选择 -->
+<ng-template #hourCell>
+  <div class="date-timer-time-column-title">时</div>
+  <ul>
+    <li *ngFor="let hour of hours" 
+        class="date-timer-time-cell"
+        [class.date-timer-time-cell-selected]="isSelectedTimeUnit('hour', hour)"
+        [class.date-timer-time-cell-disabled]="isTimeDisabled('hour', hour)"
+        (click)="!isTimeDisabled('hour', hour) && onSelectHour(hour)">
+      {{ hour < 10 ? '0' + hour : hour }}
+    </li>
+  </ul>
+</ng-template>
+
+<!-- 分钟选择 -->
+<ng-template #minuteCell>
+  <div class="date-timer-time-column-title">分</div>
+  <ul>
+    <li *ngFor="let minute of minutes" 
+        class="date-timer-time-cell"
+        [class.date-timer-time-cell-selected]="isSelectedTimeUnit('minute', minute)"
+        [class.date-timer-time-cell-disabled]="isTimeDisabled('minute', minute)"
+        (click)="!isTimeDisabled('minute', minute) && onSelectMinute(minute)">
+      {{ minute < 10 ? '0' + minute : minute }}
+    </li>
+  </ul>
+</ng-template>
+
+<!-- 秒钟选择 --> 
+<ng-template #secondCell>
+  <div class="date-timer-time-column-title">秒</div>
+  <ul>
+    <li *ngFor="let second of seconds" 
+        class="date-timer-time-cell"
+        [class.date-timer-time-cell-selected]="isSelectedTimeUnit('second', second)"
+        [class.date-timer-time-cell-disabled]="isTimeDisabled('second', second)"
+        (click)="!isTimeDisabled('second', second) && onSelectSecond(second)">
+      {{ second < 10 ? '0' + second : second }}
+    </li>
+  </ul>
+</ng-template>
+
+<!-- 时间选择器图标 -->
+<ng-template #dateTimerIcon>
+  <div class="date-timer-suffix">
+    <span *ngIf="allowClear && displayValue" class="date-timer-clear-btn" (click)="clearValue($event)">
+      <i class="bi-x-lg"></i>
+    </span>
+    <i class="bi-calendar-week"></i>
+  </div>
+</ng-template>

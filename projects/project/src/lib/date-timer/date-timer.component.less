@@ -1,3 +1,5 @@
+@hover-color: #f5f5f5;
+
 .date-timer-range-separator {
     padding: 0 8px;
 }
@@ -131,7 +133,7 @@
 
     &.date-timer-input-disabled {
         color: rgba(0, 0, 0, 0.25);
-        background-color: #f5f5f5;
+        background-color: @hover-color;
         cursor: not-allowed;
         opacity: 1;
     }
@@ -198,7 +200,7 @@
 
     &:disabled {
         color: rgba(0, 0, 0, 0.25);
-        background-color: #f5f5f5;
+        background-color: @hover-color;
         cursor: not-allowed;
         opacity: 1;
     }
@@ -402,7 +404,7 @@
     z-index: 1;
 
     &:hover {
-        background: #f5f5f5;
+        background: @hover-color;
     }
 
     &.date-timer-cell-selected {
@@ -617,7 +619,7 @@
     transition: background 0.3s, border 0.3s;
 
     &:hover:not(.date-timer-cell-disabled) {
-        background: #f5f5f5;
+        background: @hover-color;
     }
 
     &.date-timer-cell-disabled {
@@ -740,15 +742,6 @@
         color: #1890ff !important;
     }
 
-    &.date-timer-time-cell-in-range {
-        background: #e6f7ff;
-        color: rgba(0, 0, 0, 0.85);
-
-        &:hover {
-            background: #cce7ff;
-        }
-    }
-
     &.date-timer-time-cell-disabled {
         color: rgba(0, 0, 0, 0.25);
         background: transparent;
@@ -840,23 +833,6 @@
     }
 }
 
-// 时间单元格在范围内的样式
-.date-timer-time-cell-in-range {
-    background: #e6f7ff !important;
-    color: rgba(0, 0, 0, 0.65) !important;
-
-    &:hover {
-        background: #cce7ff !important;
-    }
-
-    &.date-timer-time-cell-selected {
-        background: #1890ff !important;
-        color: #fff !important;
-        font-weight: 500;
-        z-index: 1;
-    }
-}
-
 /* 恢复原始的时间选择器样式 */
 .date-timer-time-cell.date-timer-time-cell-selected {
     background-color: #e6f7ff !important;
@@ -867,11 +843,6 @@
     &:after {
         display: none;
     }
-}
-
-.date-timer-time-cell.date-timer-time-cell-in-range {
-    background-color: #e6f7ff !important;
-    color: rgba(0, 0, 0, 0.85) !important;
 }
 
 .date-timer-time-cell.date-timer-time-cell-in-range.date-timer-time-cell-selected {
