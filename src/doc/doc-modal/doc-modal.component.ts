@@ -31,7 +31,8 @@ export class ModalDemoComponent {
     DocBoxComponent,
     DocApiTableComponent,
     ButtonComponent,
-    ModalComponent
+    ModalComponent,
+    FormsModule
   ],
   templateUrl: './doc-modal.component.html',
   styleUrl: './doc-modal.component.less'
@@ -139,21 +140,30 @@ export class DocModalComponent implements AfterViewInit {
     {
       title: 'ModalComponent属性',
       items: [
-        { name: 'visible', description: '对话框是否可见', type: 'boolean', default: 'false'},
-        { name: 'width', description: '对话框宽度', type: 'string | number', default: "'520px'"},
-        { name: 'height', description: '对话框高度', type: 'string | number', default: "'auto'"},
-        { name: 'zIndex', description: '设置对话框的 z-index', type: 'number', default: '1000' },
-        { name: 'closable', description: '是否显示右上角的关闭按钮', type: 'boolean', default: 'true' },
-        { name: 'centered', description: '是否垂直居中显示', type: 'boolean', default: 'false' },
-        { name: 'maskClosable', description: '点击蒙层是否允许关闭', type: 'boolean', default: 'true' }
+        { name: 'modalVisible', description: '对话框是否可见', type: 'boolean', default: 'false'},
+        { name: 'modalWidth', description: '对话框宽度', type: 'string | number', default: "'520px'"},
+        { name: 'modalHeight', description: '对话框高度', type: 'string | number', default: "'auto'"},
+        { name: 'modalZIndex', description: '设置对话框的 z-index', type: 'number', default: '1000' },
+        { name: 'modalClosable', description: '是否显示右上角的关闭按钮', type: 'boolean', default: 'true' },
+        { name: 'modalTop', description: '设置对话框距离顶部的距离', type: 'string', default: "'100px'" },
+        { name: 'modalCentered', description: '是否垂直居中显示', type: 'boolean', default: 'false' },
+        { name: 'modalMaskClosable', description: '点击蒙层是否允许关闭', type: 'boolean', default: 'true' },
+        { name: 'modalHeaderContent', description: '对话框头部内容模板', type: 'TemplateRef<any>', default: 'null' },
+        { name: 'modalBodyContent', description: '对话框主体内容模板', type: 'TemplateRef<any>', default: 'null' },
+        { name: 'modalFooterContent', description: '对话框底部内容模板', type: 'TemplateRef<any>', default: 'null' },
+        { name: 'modalComponentContent', description: '对话框组件内容', type: 'Type<any>', default: 'null' },
+        { name: 'modalComponentInputs', description: '对话框组件输入属性', type: 'any', default: 'null' },
+        { name: 'modalComponentOutputs', description: '对话框组件输出事件', type: 'any', default: 'null' },
+        { name: 'modalContentContext', description: '对话框内容上下文', type: 'any', default: 'null' },
+        { name: 'modalDrag', description: '是否允许拖拽对话框', type: 'boolean', default: 'false' }
       ]
     },
     {
       title: '事件',
       items: [
-        { name: 'visibleChange', description: '对话框显示状态改变时的回调', type: 'EventEmitter<boolean>' },
-        { name: 'afterOpen', description: '对话框打开后的回调', type: 'EventEmitter<void>' },
-        { name: 'afterClose', description: '对话框关闭后的回调', type: 'EventEmitter<void>' }
+        { name: 'modalVisibleChange', description: '对话框显示状态改变时的回调', type: 'EventEmitter<boolean>' },
+        { name: 'modalAfterOpen', description: '对话框打开后的回调', type: 'EventEmitter<void>' },
+        { name: 'modalAfterClose', description: '对话框关闭后的回调', type: 'EventEmitter<void>' }
       ]
     },
     {

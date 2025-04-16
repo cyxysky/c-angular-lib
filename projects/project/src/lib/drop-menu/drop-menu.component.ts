@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from '../core/utils/utils.service';
 
 @Component({
   selector: 'lib-drop-menu',

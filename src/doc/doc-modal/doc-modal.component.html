@@ -21,9 +21,9 @@
         <lib-button (click)="isBasicVisible = true">打开模态框</lib-button>
         
         <lib-modal
-          [(visible)]="isBasicVisible"
-          width="500px"
-          [centered]="true">
+          [(modalVisible)]="isBasicVisible"
+          modalWidth="500px"
+          [modalCentered]="true">
           <div modalHeader>
             <div>基本模态框</div>
           </div>
@@ -87,9 +87,9 @@
         </div>
         
         <lib-modal
-          [(visible)]="isSmallVisible"
-          width="400px"
-          height="300px">
+          [(modalVisible)]="isSmallVisible"
+          modalWidth="400px"
+          modalHeight="300px">
           <div modalHeader>小尺寸模态框</div>
           <div modalBody>这是一个小型模态框</div>
           <div modalFooter>
@@ -98,9 +98,9 @@
         </lib-modal>
         
         <lib-modal
-          [(visible)]="isLargeVisible"
-          width="800px"
-          height="600px">
+          [(modalVisible)]="isLargeVisible"
+          modalWidth="800px"
+          modalHeight="600px">
           <div modalHeader>大尺寸模态框</div>
           <div modalBody>这是一个大型模态框</div>
           <div modalFooter>
@@ -109,9 +109,9 @@
         </lib-modal>
         
         <lib-modal
-          [(visible)]="isCenteredVisible"
-          width="500px"
-          [centered]="true">
+          [(modalVisible)]="isCenteredVisible"
+          modalWidth="500px"
+          [modalCentered]="true">
           <div modalHeader>垂直居中模态框</div>
           <div modalBody>这个模态框在垂直方向上居中显示</div>
           <div modalFooter>
@@ -132,8 +132,8 @@
         <lib-button (click)="isCustomFooterVisible = true">自定义页脚模态框</lib-button>
         
         <lib-modal
-          [(visible)]="isCustomFooterVisible"
-          width="500px">
+          [(modalVisible)]="isCustomFooterVisible"
+          modalWidth="500px">
           <div modalHeader>自定义页脚</div>
           <div modalBody>
             <p>这个模态框具有自定义的页脚内容</p>
@@ -162,9 +162,9 @@
         <lib-button (click)="showAsyncModal()">异步关闭模态框</lib-button>
         
         <lib-modal
-          [(visible)]="isAsyncVisible"
-          width="500px"
-          [maskClosable]="false">
+          [(modalVisible)]="isAsyncVisible"
+          modalWidth="500px"
+          [modalMaskClosable]="false">
           <div modalHeader>异步关闭</div>
           <div modalBody>
             <p>点击确定按钮后，将在2秒后关闭模态框</p>

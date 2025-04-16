@@ -44,30 +44,34 @@ export class DocTabsComponent {
     {
       title: 'Tabs 组件属性',
       items: [
-        { name: 'selectedIndex', description: '当前选中的标签页索引', type: 'number', default: '0' },
-        { name: 'tabPosition', description: '标签位置', type: "'top' | 'bottom'", default: "'top'" },
-        { name: 'type', description: '标签页类型', type: "'line' | 'card'", default: "'line'" },
-        { name: 'centered', description: '标签是否居中显示', type: 'boolean', default: 'false' },
-        { name: 'closable', description: '标签是否可关闭', type: 'boolean', default: 'false' },
-        { name: 'closeIcon', description: '关闭图标的类名', type: 'string', default: "'bi-x-lg'" }
+        { name: 'tabsSelectedIndex', description: '当前选中的标签页索引', type: 'number', default: '0' },
+        { name: 'tabsTabPosition', description: '标签位置', type: "'top' | 'bottom'", default: "'top'" },
+        { name: 'tabsTabType', description: '标签页类型', type: "'line' | 'card'", default: "'line'" },
+        { name: 'tabsTabAlign', description: '标签对齐方式', type: "'left' | 'center' | 'right'", default: "'left'" },
+        { name: 'tabsTabSize', description: '标签大小', type: "'default' | 'small' | 'large'", default: "'default'" },
+        { name: 'tabsClosable', description: '标签是否可关闭', type: 'boolean', default: 'false' },
+        { name: 'tabsTabHideAdd', description: '是否隐藏新增按钮', type: 'boolean', default: 'true' },
+        { name: 'tabsAddIcon', description: '新增图标的类名', type: 'string', default: "'bi-plus-circle'" },
+        { name: 'tabsCloseIcon', description: '关闭图标的类名', type: 'string', default: "'bi-x-lg'" }
       ]
     },
     {
       title: 'Tabs 组件事件',
       items: [
-        { name: 'selectedIndexChange', description: '选中的标签页变化时触发', type: 'EventEmitter<number>' },
-        { name: 'tabClick', description: '点击标签时触发', type: 'EventEmitter<{index: number, tab: TabItem}>' },
-        { name: 'close', description: '点击关闭按钮时触发', type: 'EventEmitter<{index: number, tab: TabItem}>' },
-        { name: 'selectChange', description: '选中的标签页变化时触发', type: 'EventEmitter<TabItem>' }
+        { name: 'tabsSelectedIndexChange', description: '选中的标签页变化时触发', type: 'EventEmitter<number>' },
+        { name: 'tabsTabClick', description: '点击标签时触发', type: 'EventEmitter<{ index: number, tab: TabItem }>' },
+        { name: 'tabsClose', description: '点击关闭按钮时触发', type: 'EventEmitter<{ index: number, tab: TabItem }>' },
+        { name: 'tabsAdd', description: '点击新增按钮时触发', type: 'EventEmitter<void>' },
+        { name: 'tabsSelectChange', description: '选中的标签页变化时触发', type: 'EventEmitter<TabItem>' }
       ]
     },
     {
       title: 'Tab 组件属性',
       items: [
-        { name: 'title', description: '标签页标题', type: 'string', default: "''" },
-        { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
-        { name: 'key', description: '标签页唯一标识', type: 'string', default: "''" },
-        { name: 'titleTemplate', description: '自定义标题模板', type: 'TemplateRef<any>', default: 'null' }
+        { name: 'tabTitle', description: '标签页标题', type: 'string', default: "''" },
+        { name: 'tabDisabled', description: '是否禁用', type: 'boolean', default: 'false' },
+        { name: 'tabKey', description: '标签页唯一标识', type: 'string', default: "''" },
+        { name: 'tabTitleTemplate', description: '自定义标题模板', type: 'TemplateRef<any>', default: 'null' }
       ]
     },
     {
@@ -92,10 +96,10 @@ import { TabComponent, TabsComponent } from '@project';
   standalone: true,
   imports: [TabsComponent, TabComponent],
   template: \`
-    <lib-tabs [selectedIndex]="0">
-      <lib-tab title="标签页1">内容1</lib-tab>
-      <lib-tab title="标签页2">内容2</lib-tab>
-      <lib-tab title="标签页3">内容3</lib-tab>
+    <lib-tabs [tabsSelectedIndex]="0">
+      <lib-tab tabTitle="标签页1">内容1</lib-tab>
+      <lib-tab tabTitle="标签页2">内容2</lib-tab>
+      <lib-tab tabTitle="标签页3">内容3</lib-tab>
     </lib-tabs>
   \`
 })
@@ -118,10 +122,10 @@ import { TabComponent, TabsComponent, SegmentedComponent } from '@project';
         [(ngModel)]="tabPosition">
       </lib-segmented>
     </div>
-    <lib-tabs [tabPosition]="tabPosition">
-      <lib-tab title="标签页1">内容1</lib-tab>
-      <lib-tab title="标签页2">内容2</lib-tab>
-      <lib-tab title="标签页3">内容3</lib-tab>
+    <lib-tabs [tabsTabPosition]="tabPosition">
+      <lib-tab tabTitle="标签页1">内容1</lib-tab>
+      <lib-tab tabTitle="标签页2">内容2</lib-tab>
+      <lib-tab tabTitle="标签页3">内容3</lib-tab>
     </lib-tabs>
   \`
 })
@@ -143,10 +147,10 @@ import { TabComponent, TabsComponent } from '@project';
   standalone: true,
   imports: [TabsComponent, TabComponent],
   template: \`
-    <lib-tabs [type]="'card'">
-      <lib-tab title="标签页1">内容1</lib-tab>
-      <lib-tab title="标签页2">内容2</lib-tab>
-      <lib-tab title="标签页3">内容3</lib-tab>
+    <lib-tabs [tabsTabType]="'card'">
+      <lib-tab tabTitle="标签页1">内容1</lib-tab>
+      <lib-tab tabTitle="标签页2">内容2</lib-tab>
+      <lib-tab tabTitle="标签页3">内容3</lib-tab>
     </lib-tabs>
   \`
 })
@@ -163,9 +167,9 @@ import { TabComponent, TabsComponent } from '@project';
   imports: [TabsComponent, TabComponent],
   template: \`
     <lib-tabs>
-      <lib-tab title="标签页1">内容1</lib-tab>
-      <lib-tab title="标签页2" [disabled]="true">内容2</lib-tab>
-      <lib-tab title="标签页3">内容3</lib-tab>
+      <lib-tab tabTitle="标签页1">内容1</lib-tab>
+      <lib-tab tabTitle="标签页2" [tabDisabled]="true">内容2</lib-tab>
+      <lib-tab tabTitle="标签页3">内容3</lib-tab>
     </lib-tabs>
   \`
 })
@@ -181,10 +185,10 @@ import { TabComponent, TabsComponent } from '@project';
   standalone: true,
   imports: [TabsComponent, TabComponent],
   template: \`
-    <lib-tabs [centered]="true">
-      <lib-tab title="标签页1">内容1</lib-tab>
-      <lib-tab title="标签页2">内容2</lib-tab>
-      <lib-tab title="标签页3">内容3</lib-tab>
+    <lib-tabs [tabsTabAlign]="'center'">
+      <lib-tab tabTitle="标签页1">内容1</lib-tab>
+      <lib-tab tabTitle="标签页2">内容2</lib-tab>
+      <lib-tab tabTitle="标签页3">内容3</lib-tab>
     </lib-tabs>
   \`
 })
@@ -201,11 +205,11 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [TabsComponent, TabComponent, CommonModule],
   template: \`
-    <lib-tabs [closable]="true" (close)="closeTab($event)">
+    <lib-tabs [tabsClosable]="true" (tabsClose)="closeTab($event)" [tabsTabHideAdd]="false" (tabsAdd)="addTab()">
       <lib-tab 
         *ngFor="let tab of tabs; let i = index" 
-        [title]="tab.title" 
-        [key]="tab.key">
+        [tabTitle]="tab.title" 
+        [tabKey]="tab.key">
         {{ tab.content }}
       </lib-tab>
     </lib-tabs>
@@ -217,8 +221,17 @@ export class ClosableDemoComponent {
     { key: 'tab2', title: '标签页2', content: '标签页2的内容' }
   ];
 
-  closeTab(event: {index: number}): void {
+  closeTab(event: {index: number, tab: any}): void {
     this.tabs.splice(event.index, 1);
+  }
+
+  addTab(): void {
+    const tabIndex = this.tabs.length + 1;
+    this.tabs.push({
+      key: \`tab\${tabIndex}\`,
+      title: \`标签页\${tabIndex}\`,
+      content: \`这是动态添加的标签页\${tabIndex}的内容\`
+    });
   }
 }
   `;
@@ -233,13 +246,13 @@ import { TabComponent, TabsComponent } from '@project';
   imports: [TabsComponent, TabComponent],
   template: \`
     <lib-tabs>
-      <lib-tab [titleTemplate]="customTitle1">
+      <lib-tab [tabTitleTemplate]="customTitle1">
         自定义标题模板内容1
         <ng-template #customTitle1>
           <span style="color: red">自定义</span>标题1
         </ng-template>
       </lib-tab>
-      <lib-tab [titleTemplate]="customTitle2">
+      <lib-tab [tabTitleTemplate]="customTitle2">
         自定义标题模板内容2
         <ng-template #customTitle2>
           <span style="color: blue">自定义</span>标题2

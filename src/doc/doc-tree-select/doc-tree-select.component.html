@@ -22,8 +22,8 @@
           name="basicTreeSelect"
           [treeData]="basicTreeData"
           [(ngModel)]="basicValue"
-          [placeholder]="'请选择'"
-          [multiple]="false">
+          [treePlaceholder]="'请选择'"
+          [treeMultiple]="false">
         </lib-tree-select>
         <p class="example-value">当前值: {{ basicValue }}</p>
       </div>
@@ -41,8 +41,8 @@
           name="multipleTreeSelect"
           [treeData]="multipleTreeData"
           [(ngModel)]="multipleValue"
-          [placeholder]="'请选择'"
-          [multiple]="true"
+          [treePlaceholder]="'请选择'"
+          [treeMultiple]="true"
           [treeCheckable]="true">
         </lib-tree-select>
         <p class="example-value">当前值: {{ multipleValue | json }}</p>
@@ -67,9 +67,9 @@
           name="sizeTreeSelect"
           [treeData]="basicTreeData"
           [(ngModel)]="basicValue"
-          [placeholder]="'请选择'"
-          [size]="currentSize"
-          [multiple]="false">
+          [treePlaceholder]="'请选择'"
+          [treeSize]="currentSize"
+          [treeMultiple]="false">
         </lib-tree-select>
         <p class="example-value">当前尺寸: {{ currentSize }}</p>
       </div>
@@ -78,29 +78,29 @@
       </div>
     </app-doc-box>
     
-    <!-- 状态节点 -->
+    <!-- 自定义节点 -->
     <app-doc-box
       title="节点自定义"
-      [sourceCode]="stateSource">
+      [sourceCode]="customNodeSource">
       <div demo>
         <lib-tree-select
-          name="stateTreeSelect"
+          name="customNodeTreeSelect"
           [treeData]="stateTreeData"
           [(ngModel)]="stateValue"
-          [treeNodeTemplate]="stateNodeTemplate"
-          [placeholder]="'请选择带状态的节点'"
-          [multiple]="true">
+          [treeNodeTemplate]="customNodeTemplate"
+          [treePlaceholder]="'请选择自定义节点'"
+          [treeMultiple]="true">
         </lib-tree-select>
-        <ng-template #stateNodeTemplate let-node>
-          <span class="state-node">
+        <ng-template #customNodeTemplate let-node>
+          <span class="custom-node">
             自定义节点-
-            <span class="state-node-title">{{ node.title }}</span>
+            <span class="custom-node-title">{{ node.title }}</span>
           </span>
         </ng-template>
         <p class="example-value">当前值: {{ stateValue | json }}</p>
       </div>
       <div description>
-        节点可以具有错误或警告状态，可以通过过滤器只查看特定状态的节点。
+        使用自定义模板可以灵活定制节点的展示样式，实现更丰富的视觉效果。
       </div>
     </app-doc-box>
     
@@ -113,9 +113,9 @@
           name="searchTreeSelect"
           [treeData]="searchTreeData"
           [(ngModel)]="searchValue"
-          [placeholder]="'搜索节点'"
+          [treePlaceholder]="'搜索节点'"
           [treeShowSearch]="true"
-          [multiple]="true">
+          [treeMultiple]="true">
         </lib-tree-select>
         <p class="example-value">当前值: {{ searchValue | json }}</p>
       </div>
@@ -133,15 +133,40 @@
           name="virtualTreeSelect"
           [treeData]="virtualTreeData"
           [(ngModel)]="virtualValue"
-          [placeholder]="'大数据量虚拟滚动'"
+          [treePlaceholder]="'大数据量虚拟滚动'"
           [treeVirtualScroll]="true"
-          [dropdownHeight]="300"
-          [multiple]="true">
+          [treeDropdownHeight]="300"
+          [treeMultiple]="true">
         </lib-tree-select>
-        <p class="example-value">已选择 {{ virtualValue || 0 }} 个节点</p>
+        <p class="example-value">已选择 {{ virtualValue && virtualValue.length || 0 }} 个节点</p>
       </div>
       <div description>
         对于大量数据，虚拟滚动可以提高性能，只渲染可视区域内的节点。
+      </div>
+    </app-doc-box>
+    
+    <!-- 自定义标签内容 -->
+    <app-doc-box
+      title="自定义标签"
+      [sourceCode]="customLabelSource">
+      <div demo>
+        <lib-tree-select
+          name="customLabelTreeSelect"
+          [treeData]="searchTreeData"
+          [(ngModel)]="labelValue"
+          [treePlaceholder]="'自定义标签显示'"
+          [treeLabelTemplate]="customLabelTemplate"
+          [treeMultiple]="true">
+        </lib-tree-select>
+        <ng-template #customLabelTemplate let-node>
+          <span class="custom-label">
+            <i class="bi bi-folder"></i> {{ node.title }}
+          </span>
+        </ng-template>
+        <p class="example-value">当前值: {{ labelValue | json }}</p>
+      </div>
+      <div description>
+        自定义选中后显示的标签内容，可以添加图标或其他样式。
       </div>
     </app-doc-box>
   </div>

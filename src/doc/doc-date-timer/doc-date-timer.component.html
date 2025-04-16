@@ -20,7 +20,7 @@
       <div demo>
         <lib-date-timer
           [(ngModel)]="basicValue"
-          (valueChange)="onBasicValueChange($event)">
+          (ngModelChange)="onBasicValueChange($event)">
         </lib-date-timer>
         <p class="example-value">当前值: {{ getDisplayDate(basicValue) }}</p>
       </div>
@@ -42,7 +42,7 @@
         </div>
         <lib-date-timer
           [(ngModel)]="selectTypeValue"
-          [selectType]="currentSelectType">
+          [dateTimerSelectType]="currentSelectType">
         </lib-date-timer>
         <p class="example-value">当前值: {{ selectTypeValue }}</p>
       </div>
@@ -64,9 +64,8 @@
         </div>
         <lib-date-timer
           [(ngModel)]="modeValue"
-          selectType="range"
-
-          [mode]="currentMode">
+          [dateTimerSelectType]="'range'"
+          [dateTimerMode]="currentMode">
         </lib-date-timer>
         <p class="example-value">当前值: {{ modeValue | json }}</p>
         <p class="example-value">当前模式: {{ currentMode }}</p>
@@ -89,7 +88,7 @@
         </div>
         <lib-date-timer
           [(ngModel)]="sizeValue"
-          [size]="currentSize">
+          [dateTimerSize]="currentSize">
         </lib-date-timer>
       </div>
       <div description>
@@ -104,7 +103,7 @@
       <div demo>
         <lib-date-timer
           [(ngModel)]="rangeValue"
-          selectType="range">
+          [dateTimerSelectType]="'range'">
         </lib-date-timer>
         <p class="example-value" *ngIf="rangeValue && rangeValue.start && rangeValue.end">
           开始日期: {{ rangeValue.start | date }} / 结束日期: {{ rangeValue.end | date }}
@@ -122,10 +121,10 @@
       <div demo>
         <lib-date-timer
           [(ngModel)]="disabledValue"
-          [disabledDate]="disabledDate"
-          selectType="range"
-          [showTime]="true"
-          [disabledTime]="disabledTime">
+          [dateTimerDisabledDate]="disabledDate"
+          [dateTimerSelectType]="'range'"
+          [dateTimerShowTime]="true"
+          [dateTimerDisabledTime]="disabledTime">
         </lib-date-timer>
       </div>
       <div description>
@@ -149,8 +148,8 @@
         </div>
         <lib-date-timer
           [(ngModel)]="statusValue"
-          [status]="currentStatus"
-          [borderless]="borderless">
+          [dateTimerStatus]="currentStatus"
+          [dateTimerBorderless]="borderless">
         </lib-date-timer>
       </div>
       <div description>

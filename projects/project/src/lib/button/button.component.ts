@@ -1,7 +1,7 @@
 import { booleanAttribute, Component, input, numberAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, useAnimation } from '@angular/animations';
-import { rippleAnimation } from '../animation/ripple.animation';
+import { rippleAnimation } from '../core/animation/ripple.animation';
 import * as _ from 'lodash';
 import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.interface';
 @Component({

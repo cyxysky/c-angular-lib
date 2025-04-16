@@ -3,7 +3,7 @@ import { ModalComponent } from './modal.component';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ModalOptions, ModalRefMap } from './modal.interface';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from '../core/utils/utils.service';
 @Injectable({
   providedIn: 'root'
 })

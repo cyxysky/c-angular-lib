@@ -1,11 +1,11 @@
 import { Directive, TemplateRef, Input, ElementRef, HostListener, SimpleChanges, ComponentRef, EventEmitter, Output } from '@angular/core';
-import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../overlay/overlay-basic.directive';
+import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from './popover.component';
-import { OverlayService } from '../overlay/overlay.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 import * as _ from 'lodash';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from '../core/utils/utils.service';
 @Directive({
   selector: '[libPopover]'
 })

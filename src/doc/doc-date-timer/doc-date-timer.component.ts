@@ -83,33 +83,34 @@ export class DocDateTimerComponent {
     {
       title: '属性',
       items: [
-        { name: 'mode', description: '选择器模式', type: "'year' | 'month' | 'quarter' | 'week' | 'date' | 'time'", default: "'date'" },
-        { name: 'format', description: '日期格式，如 yyyy-MM-dd', type: 'string', default: "'yyyy-MM-dd'" },
-        { name: 'size', description: '尺寸大小', type: "'large' | 'default' | 'small'", default: "'default'" },
-        { name: 'status', description: '状态', type: "'' | 'error' | 'warning'", default: "''" },
-        { name: 'placeholder', description: '提示文本', type: 'string | [string, string]', default: "'请选择日期'" },
-        { name: 'rangePlaceholder', description: '范围选择的提示文本', type: 'string[]', default: "['开始日期', '结束日期']" },
-        { name: 'allowClear', description: '是否显示清除按钮', type: 'boolean', default: 'true' },
-        { name: 'autoFocus', description: '是否自动获取焦点', type: 'boolean', default: 'false' },
-        { name: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
-        { name: 'borderless', description: '是否无边框', type: 'boolean', default: 'false' },
-        { name: 'showTime', description: '是否显示时间选择', type: 'boolean', default: 'false' },
-        { name: 'showToday', description: '是否显示今天按钮', type: 'boolean', default: 'true' },
-        { name: 'selectType', description: '选择器类型', type: "'single' | 'range'", default: "'single'" },
-        { name: 'dateRender', description: '自定义日期单元格的内容', type: '(date: Date) => string | TemplateRef<any>', default: 'undefined' },
-        { name: 'disabledDate', description: '禁用日期的回调', type: '(date: Date) => boolean', default: 'undefined' },
-        { name: 'disabledTime', description: '禁用时间的回调', type: '(date: Date) => { hour?: boolean[], minute?: boolean[], second?: boolean[] }', default: 'undefined' },
-        { name: 'extraFooter', description: '在面板中添加额外的页脚', type: 'string | TemplateRef<void>', default: 'undefined' }
+        { name: 'dateTimerMode', description: '选择器模式', type: "'year' | 'month' | 'quarter' | 'week' | 'date' | 'time'", default: "'date'" },
+        { name: 'dateTimerFormat', description: '日期格式，如 yyyy-MM-dd', type: 'string', default: "'yyyy-MM-dd'" },
+        { name: 'dateTimerSize', description: '尺寸大小', type: "'large' | 'default' | 'small'", default: "'default'" },
+        { name: 'dateTimerStatus', description: '状态', type: "'' | 'error' | 'warning'", default: "''" },
+        { name: 'dateTimerPlaceholder', description: '提示文本', type: 'string | [string, string]', default: "'请选择日期'" },
+        { name: 'dateTimerRangePlaceholder', description: '范围选择的提示文本', type: 'string[]', default: "['开始日期', '结束日期']" },
+        { name: 'dateTimerAllowClear', description: '是否显示清除按钮', type: 'boolean', default: 'true' },
+        { name: 'dateTimerAutoFocus', description: '是否自动获取焦点', type: 'boolean', default: 'false' },
+        { name: 'dateTimerDisabled', description: '是否禁用', type: 'boolean', default: 'false' },
+        { name: 'dateTimerBorderless', description: '是否无边框', type: 'boolean', default: 'false' },
+        { name: 'dateTimerShowTime', description: '是否显示时间选择', type: 'boolean', default: 'false' },
+        { name: 'dateTimerShowToday', description: '是否显示今天按钮', type: 'boolean', default: 'true' },
+        { name: 'dateTimerSelectType', description: '选择器类型', type: "'single' | 'range'", default: "'single'" },
+        { name: 'dateTimerDateRender', description: '自定义日期单元格的内容', type: '(date: Date) => string | TemplateRef<any>', default: 'undefined' },
+        { name: 'dateTimerDisabledDate', description: '禁用日期的回调', type: '(date: Date) => boolean', default: 'undefined' },
+        { name: 'dateTimerDisabledTime', description: '禁用时间的回调', type: '(date: Date) => { hour?: boolean[], minute?: boolean[], second?: boolean[] }', default: 'undefined' },
+        { name: 'dateTimerExtraFooter', description: '在面板中添加额外的页脚', type: 'string | TemplateRef<void>', default: 'undefined' },
+        { name: 'dateTimerCustomFormat', description: '自定义格式化显示内容', type: '(value: Date | RangeValue<Date>) => string', default: 'undefined' }
       ]
     },
     {
       title: '事件',
       items: [
         { name: 'valueChange', description: '日期变化时触发', type: 'EventEmitter<Date | [Date, Date] | null>' },
-        { name: 'panelModeChange', description: '面板模式变化时触发', type: 'EventEmitter<DateTimerMode>' },
-        { name: 'calendarChange', description: '日历变化时触发', type: 'EventEmitter<Date[] | null>' },
-        { name: 'openChange', description: '面板打开状态变化时触发', type: 'EventEmitter<boolean>' },
-        { name: 'ok', description: '点击确定按钮时触发', type: 'EventEmitter<Date | RangeValue<Date> | null>' }
+        { name: 'dateTimerPanelModeChange', description: '面板模式变化时触发', type: 'EventEmitter<DateTimerMode>' },
+        { name: 'dateTimerCalendarChange', description: '日历变化时触发', type: 'EventEmitter<Date[] | null>' },
+        { name: 'dateTimerOpenChange', description: '面板打开状态变化时触发', type: 'EventEmitter<boolean>' },
+        { name: 'dateTimerOk', description: '点击确定按钮时触发', type: 'EventEmitter<Date | RangeValue<Date> | null>' }
       ]
     }
   ];
@@ -127,7 +128,7 @@ import { DateTimerComponent } from 'your-lib';
   template: \`
     <lib-date-timer
       [(ngModel)]="value"
-      (valueChange)="onChange($event)">
+      (ngModelChange)="onChange($event)">
     </lib-date-timer>
     <p>当前值: {{ value | date }}</p>
   \`,
@@ -158,7 +159,7 @@ import { DateTimerComponent, SegmentedComponent } from 'your-lib';
     </div>
     <lib-date-timer
       [(ngModel)]="value"
-      [selectType]="currentSelectType">
+      [dateTimerSelectType]="currentSelectType">
     </lib-date-timer>
   \`,
 })
@@ -189,7 +190,7 @@ import { DateTimerComponent, SegmentedComponent } from 'your-lib';
     </div>
     <lib-date-timer
       [(ngModel)]="value"
-      [mode]="currentMode">
+      [dateTimerMode]="currentMode">
     </lib-date-timer>
   \`,
 })
@@ -224,7 +225,7 @@ import { DateTimerComponent, SegmentedComponent } from 'your-lib';
     </div>
     <lib-date-timer
       [(ngModel)]="value"
-      [size]="currentSize">
+      [dateTimerSize]="currentSize">
     </lib-date-timer>
   \`,
 })
@@ -251,7 +252,7 @@ import { RangeValue } from 'your-lib/date-timer.interface';
   template: \`
     <lib-date-timer
       [(ngModel)]="rangeValue"
-      selectType="range">
+      dateTimerSelectType="range">
     </lib-date-timer>
     <p *ngIf="rangeValue && rangeValue.start && rangeValue.end">
       开始日期: {{ rangeValue.start | date }} / 结束日期: {{ rangeValue.end | date }}
@@ -277,9 +278,9 @@ import { DateTimerComponent } from 'your-lib';
   template: \`
     <lib-date-timer
       [(ngModel)]="value"
-      [disabledDate]="disabledDate"
-      [showTime]="true"
-      [disabledTime]="disabledTime">
+      [dateTimerDisabledDate]="disabledDate"
+      [dateTimerShowTime]="true"
+      [dateTimerDisabledTime]="disabledTime">
     </lib-date-timer>
   \`,
 })
@@ -325,8 +326,8 @@ import { DateTimerComponent, SegmentedComponent, SwitchComponent } from 'your-li
     </div>
     <lib-date-timer
       [(ngModel)]="value"
-      [status]="currentStatus"
-      [borderless]="borderless">
+      [dateTimerStatus]="currentStatus"
+      [dateTimerBorderless]="borderless">
     </lib-date-timer>
   \`,
 })

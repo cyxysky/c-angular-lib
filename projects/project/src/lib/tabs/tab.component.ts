@@ -1,4 +1,4 @@
-import { Component, Input, TemplateRef, ViewChild, ContentChild, AfterContentInit, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, TemplateRef, ViewChild, ContentChild, AfterContentInit, OnInit, OnDestroy, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 
@@ -17,10 +17,10 @@ import { Subject } from 'rxjs';
   `
 })
 export class TabComponent implements OnInit, AfterContentInit, OnDestroy {
-  @Input() title: string = '';
-  @Input() disabled: boolean = false;
-  @Input() key: string = '';
-  @Input() titleTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'tabTitle' }) title: string = '';
+  @Input({ alias: 'tabDisabled', transform: booleanAttribute }) disabled: boolean = false;
+  @Input({ alias: 'tabKey' }) key: string = '';
+  @Input({ alias: 'tabTitleTemplate' }) titleTemplate: TemplateRef<any> | null = null;
   
   @ViewChild('contentTemplate', { static: true }) contentTemplate!: TemplateRef<any>;
   @ViewChild('customTemplate', { static: true }) customTemplate!: TemplateRef<any>;

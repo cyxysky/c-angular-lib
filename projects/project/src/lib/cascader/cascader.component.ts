@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { OverlayService } from '../overlay/overlay.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
@@ -37,53 +37,51 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   // 输入属性
   /** 选项数据 */
-  @Input({ alias: 'options' }) options: CascaderOption[] = [];
+  @Input({ alias: 'cascaderOptions' }) options: CascaderOption[] = [];
   /** 展开方式 */
-  @Input({ alias: 'expandTrigger' }) expandTrigger: CascaderExpandTrigger = 'click';
+  @Input({ alias: 'cascaderExpandTrigger' }) expandTrigger: CascaderExpandTrigger = 'click';
   /** 触发方式 */
-  @Input({ alias: 'actionTrigger' }) actionTrigger: CascaderTriggerType = 'click';
+  @Input({ alias: 'cascaderActionTrigger' }) actionTrigger: CascaderTriggerType = 'click';
   /** 是否显示搜索框 */
-  @Input({ alias: 'showSearch', transform: booleanAttribute }) showSearch: boolean = true;
+  @Input({ alias: 'cascaderShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 是否禁用 */
-  @Input({ alias: 'disabled', transform: booleanAttribute }) disabled: boolean = false;
+  @Input({ alias: 'cascaderDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 占位文本 */
-  @Input({ alias: 'placeholder' }) placeholder: string = '请选择';
+  @Input({ alias: 'cascaderPlaceholder' }) placeholder: string = '请选择';
   /** 是否允许清空 */
-  @Input({ alias: 'allowClear', transform: booleanAttribute }) allowClear: boolean = true;
+  @Input({ alias: 'cascaderAllowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 允许选择父级 */
-  @Input({ alias: 'changeOnSelect', transform: booleanAttribute }) changeOnSelect: boolean = false;
+  @Input({ alias: 'cascaderChangeOnSelect', transform: booleanAttribute }) changeOnSelect: boolean = false;
   /** 是否多选 */
-  @Input({ alias: 'isMultiple', transform: booleanAttribute }) isMultiple: boolean = false;
+  @Input({ alias: 'cascaderIsMultiple', transform: booleanAttribute }) isMultiple: boolean = false;
   /** 尺寸 */
-  @Input({ alias: 'size' }) size: CascaderSize = 'default';
+  @Input({ alias: 'cascaderSize' }) size: CascaderSize = 'default';
   /** 自定义节点属性 */
-  @Input({ alias: 'fieldNames' }) fieldNames: { label: string; value: string; children: string; } = { label: 'label', value: 'value', children: 'children' };
+  @Input({ alias: 'cascaderFieldNames' }) fieldNames: { label: string; value: string; children: string; } = { label: 'label', value: 'value', children: 'children' };
   /** 是否无边框 */
-  @Input({ alias: 'borderless', transform: booleanAttribute }) borderless: boolean = false;
+  @Input({ alias: 'cascaderBorderless', transform: booleanAttribute }) borderless: boolean = false;
   /** 状态 */
-  @Input({ alias: 'status' }) status: 'error' | 'warning' | null = null;
+  @Input({ alias: 'cascaderStatus' }) status: 'error' | 'warning' | null = null;
   /** 下拉菜单的宽度 */
-  @Input({ alias: 'menuWidth' }) menuWidth: number = 160;
+  @Input({ alias: 'cascaderMenuWidth' }) menuWidth: number = 160;
   /** 自定义选项模板 */
-  @Input({ alias: 'optionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'cascaderOptionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
   /** 自定义选项标签模板 */
-  @Input({ alias: 'optionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'cascaderOptionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
   /** 是否加载中 */
-  @Input({ alias: 'loading', transform: booleanAttribute }) loading: boolean = false;
+  @Input({ alias: 'cascaderLoading', transform: booleanAttribute }) loading: boolean = false;
   /** 选项过滤函数 */
-  @Input({ alias: 'optionFilterFn' }) optionFilterFn?: (inputValue: string, option: CascaderOption, path: CascaderOption[]) => boolean;
+  @Input({ alias: 'cascaderOptionFilterFn' }) optionFilterFn?: (inputValue: string, option: CascaderOption, path: CascaderOption[]) => boolean;
   /** 选项选择函数，返回 true/false 表示是否可选 */
-  @Input({ alias: 'optionSelectFn' }) optionSelectFn?: (option: CascaderOption) => boolean;
+  @Input({ alias: 'cascaderOptionSelectFn' }) optionSelectFn?: (option: CascaderOption) => boolean;
 
   // 输出事件
-  /** 值变化事件 */
-  @Output() valueChange = new EventEmitter<any[] | any[][]>();
   /** 选项变化事件 */
-  @Output() selectionChange = new EventEmitter<CascaderOption[]>();
+  @Output('cascaderSelectionChange') selectionChange = new EventEmitter<CascaderOption[]>();
   /** 可见性变化事件 */
-  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output('cascaderVisibleChange') visibleChange = new EventEmitter<boolean>();
   /** 搜索事件 */
-  @Output() search = new EventEmitter<string>();
+  @Output('cascaderSearch') search = new EventEmitter<string>();
 
   // 内部状态
   /** 存储选中的选项路径 - 单选模式下的完整选择路径 */
@@ -701,7 +699,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public onSearch(value: string): void {
     this.searchValue = value;
     this.loading = true;
-    this.debouncedSearch(value).then(() => {});
+    this.debouncedSearch(value).then(() => { });
   }
 
   /**
@@ -1178,7 +1176,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   private emitValueChange(): void {
     this.onChange(this.value);
-    this.valueChange.emit(this.value);
     if (this.isMultiple) {
       this.selectionChange.emit(Array.from(this.selectedPathsMap.values()).flat());
     } else {

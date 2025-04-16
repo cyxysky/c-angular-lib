@@ -31,8 +31,6 @@ export class RadioComponent implements ControlValueAccessor {
   @Input({ alias: 'radioColor' }) color: string = '';
   /** 标签模板 */
   @Input({ alias: 'radioLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
-  /** 值变化事件 */
-  @Output() valueChange = new EventEmitter<any>();
 
   value: any;
   disabled: boolean = false;
@@ -66,7 +64,6 @@ export class RadioComponent implements ControlValueAccessor {
     this.value = option.value;
     this.onChange(this.value);
     this.onTouched();
-    this.valueChange.emit(this.value);
   }
 
   // 判断选项是否被选中

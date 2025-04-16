@@ -54,8 +54,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
   @Input({ alias: 'segmentedAdaptParentWidth' }) adaptParentWidth = true;
   /** 模板 */
   @Input({ alias: 'segmentedTemplate' }) template: TemplateRef<any> | null = null;
-  /** 值变化事件 */
-  @Output() valueChange = new EventEmitter<any>();
   //#endregion
 
   //#region 内部状态变量
@@ -184,7 +182,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
       if (firstEnabled) {
         this.value = firstEnabled.value;
         this.onChange(this.value);
-        this.valueChange.emit(this.value);
         this.updateThumbPosition(true);
       }
     }
@@ -272,7 +269,6 @@ export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, 
       this.value = option.value;
       this.onChange(this.value);
       this.onTouched();
-      this.valueChange.emit(this.value);
 
       // 找到对应选项的索引和元素
       const index = this.options.findIndex(o => o.value === option.value);

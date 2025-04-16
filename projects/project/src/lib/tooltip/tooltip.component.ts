@@ -1,7 +1,7 @@
 import { style } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Input, TemplateRef } from '@angular/core';
-import { OverlayBasicPosition } from '../overlay/overlay-basic.directive';
+import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
 @Component({
   selector: 'lib-tooltip',
   standalone: true,

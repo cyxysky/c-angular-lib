@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef, booleanAttribute } from '@angular/core';
 import { CommonModule, NgComponentOutlet } from '@angular/common';
-import { maskAnimation, modalAnimation } from '../animation';
-import { UtilsService } from '../utils/utils.service';
+import { maskAnimation, modalAnimation } from '../core/animation';
+import { UtilsService } from '../core/utils/utils.service';
 
 @Component({
   selector: 'lib-modal',
@@ -16,26 +16,26 @@ import { UtilsService } from '../utils/utils.service';
 })
 export class ModalComponent implements AfterViewInit, OnDestroy {
   @ViewChild(NgComponentOutlet, { static: false }) componentsRef!: NgComponentOutlet;
-  @Input() visible: boolean = false;
-  @Input() width: string | number = '520px';
-  @Input() height: string | number = 'auto';
-  @Input() zIndex: number = 1000;
-  @Input() closable: boolean = true;
-  @Input() top: string = '100px';
-  @Input() centered: boolean = false;
-  @Input() maskClosable: boolean = true;
-  @Input() headerContent: TemplateRef<any> | null = null;
-  @Input() bodyContent: TemplateRef<any> | null = null;
-  @Input() footerContent: TemplateRef<any> | null = null;
-  @Input() componentContent: Type<any> | null = null;
-  @Input() componentInputs: any = null;
-  @Input() componentOutputs: any = null;
-  @Input() contentContext: any = null;
-  @Input() drag: boolean = false;
+  @Input({ alias: 'modalVisible', transform: booleanAttribute }) visible: boolean = false;
+  @Input({ alias: 'modalWidth' }) width: string | number = '520px';
+  @Input({ alias: 'modalHeight' }) height: string | number = 'auto';
+  @Input({ alias: 'modalZIndex' }) zIndex: number = 1000;
+  @Input({ alias: 'modalClosable', transform: booleanAttribute }) closable: boolean = true;
+  @Input({ alias: 'modalTop' }) top: string = '100px';
+  @Input({ alias: 'modalCentered', transform: booleanAttribute }) centered: boolean = false;
+  @Input({ alias: 'modalMaskClosable', transform: booleanAttribute }) maskClosable: boolean = true;
+  @Input({ alias: 'modalHeaderContent' }) headerContent: TemplateRef<any> | null = null;
+  @Input({ alias: 'modalBodyContent' }) bodyContent: TemplateRef<any> | null = null;
+  @Input({ alias: 'modalFooterContent' }) footerContent: TemplateRef<any> | null = null;
+  @Input({ alias: 'modalComponentContent' }) componentContent: Type<any> | null = null;
+  @Input({ alias: 'modalComponentInputs' }) componentInputs: any = null;
+  @Input({ alias: 'modalComponentOutputs' }) componentOutputs: any = null;
+  @Input({ alias: 'modalContentContext' }) contentContext: any = null;
+  @Input({ alias: 'modalDrag', transform: booleanAttribute }) drag: boolean = false;
 
-  @Output() visibleChange = new EventEmitter<boolean>();
-  @Output() afterOpen = new EventEmitter<void>();
-  @Output() afterClose = new EventEmitter<void>();
+  @Output('modalVisibleChange') visibleChange = new EventEmitter<boolean>();
+  @Output('modalAfterOpen') afterOpen = new EventEmitter<void>();
+  @Output('modalAfterClose') afterClose = new EventEmitter<void>();
 
   @ViewChild('modalContent') modalContentRef!: ElementRef;
   @ViewChild('modalBody') modalBodyRef!: ElementRef;

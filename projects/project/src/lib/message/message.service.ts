@@ -4,7 +4,7 @@ import { ApplicationRef, ComponentRef, Injectable, Injector, NgZone, OnDestroy, 
 import { MessageComponent } from './message.component';
 import { Message } from './message.interface';
 import { Subject } from 'rxjs';
-import { OverlayService } from '../overlay/overlay.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 import { ElementRef } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { WidgetSource } from '../../directive/widget.directive';
+import { WidgetSource } from '../../core/directive/widget.directive';
 
 export interface Stage {
   key: string;
@@ -131,7 +131,7 @@ export class MultiDimensionalFlowchartComponent {
       nowStageMap.set(stage.key, stage);
     });
     // 将行的配置填充进map中
-    data.steps.forEach((step: any, index: number) => {
+    data.steps && data.steps.forEach((step: any, index: number) => {
       let colMap: Map<number, any> = new Map([]);
       this.rowKeyAndIndexMap.set(step.key, index + 1);
       this.nodeCoordinatesMap.set(index + 1, colMap);
@@ -139,7 +139,7 @@ export class MultiDimensionalFlowchartComponent {
     let start = 1;
     let alreadyFinish = true;
     // 对原始数据进行处理
-    data.stages.forEach((stage: Stage, index: number) => {
+    data.stages && data.stages.forEach((stage: Stage, index: number) => {
       if (stage.childrenFlow) {
         let childrenFlowLength = 0;
         let nowalreadyFinish = alreadyFinish;

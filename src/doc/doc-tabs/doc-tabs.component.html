@@ -15,10 +15,10 @@
         <!-- 基本用法 -->
         <app-doc-box title="基本用法" [sourceCode]="basicSource">
             <div demo>
-                <lib-tabs [selectedIndex]="0">
-                    <lib-tab title="标签页1">内容1</lib-tab>
-                    <lib-tab title="标签页2">内容2</lib-tab>
-                    <lib-tab title="标签页3">内容3</lib-tab>
+                <lib-tabs [tabsSelectedIndex]="0">
+                    <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                    <lib-tab tabTitle="标签页2">内容2</lib-tab>
+                    <lib-tab tabTitle="标签页3">内容3</lib-tab>
                 </lib-tabs>
             </div>
             <div description>
@@ -33,10 +33,10 @@
                     <lib-segmented [segmentedOptions]="positionOptions" [(ngModel)]="tabPosition">
                     </lib-segmented>
                 </div>
-                <lib-tabs [tabPosition]="tabPosition">
-                    <lib-tab title="标签页1">内容1</lib-tab>
-                    <lib-tab title="标签页2">内容2</lib-tab>
-                    <lib-tab title="标签页3">内容3</lib-tab>
+                <lib-tabs [tabsTabPosition]="tabPosition">
+                    <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                    <lib-tab tabTitle="标签页2">内容2</lib-tab>
+                    <lib-tab tabTitle="标签页3">内容3</lib-tab>
                 </lib-tabs>
             </div>
             <div description>
@@ -47,10 +47,10 @@
         <!-- 卡片式 -->
         <app-doc-box title="卡片式标签页" [sourceCode]="cardSource">
             <div demo>
-                <lib-tabs [type]="'card'">
-                    <lib-tab title="标签页1">内容1</lib-tab>
-                    <lib-tab title="标签页2">内容2</lib-tab>
-                    <lib-tab title="标签页3">内容3</lib-tab>
+                <lib-tabs [tabsTabType]="'card'">
+                    <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                    <lib-tab tabTitle="标签页2">内容2</lib-tab>
+                    <lib-tab tabTitle="标签页3">内容3</lib-tab>
                 </lib-tabs>
             </div>
             <div description>
@@ -62,35 +62,42 @@
         <app-doc-box title="禁用标签页" [sourceCode]="disabledSource">
             <div demo>
                 <lib-tabs>
-                    <lib-tab title="标签页1">内容1</lib-tab>
-                    <lib-tab title="标签页2" [disabled]="true">内容2</lib-tab>
-                    <lib-tab title="标签页3">内容3</lib-tab>
+                    <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                    <lib-tab tabTitle="标签页2" [tabDisabled]="true">内容2</lib-tab>
+                    <lib-tab tabTitle="标签页3">内容3</lib-tab>
                 </lib-tabs>
             </div>
             <div description>
-                可以通过disabled属性禁用某个标签页。
+                可以通过tabDisabled属性禁用某个标签页。
             </div>
         </app-doc-box>
 
-        <!-- 居中显示 -->
-        <app-doc-box title="居中显示标签" [sourceCode]="centeredSource">
+        <!-- 居中,靠右显示标签 -->
+        <app-doc-box title="居中,靠右显示标签" [sourceCode]="centeredSource">
             <div demo>
-                <lib-tabs [centered]="true">
-                    <lib-tab title="标签页1">内容1</lib-tab>
-                    <lib-tab title="标签页2">内容2</lib-tab>
-                    <lib-tab title="标签页3">内容3</lib-tab>
+                <lib-tabs [tabsTabAlign]="'center'">
+                    <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                    <lib-tab tabTitle="标签页2">内容2</lib-tab>
+                    <lib-tab tabTitle="标签页3">内容3</lib-tab>
                 </lib-tabs>
+                <div style="margin-top: 16px;">
+                    <lib-tabs [tabsTabAlign]="'right'">
+                        <lib-tab tabTitle="标签页1">内容1</lib-tab>
+                        <lib-tab tabTitle="标签页2">内容2</lib-tab>
+                        <lib-tab tabTitle="标签页3">内容3</lib-tab>
+                    </lib-tabs>
+                </div>
             </div>
             <div description>
-                可以设置标签页居中显示。
+                可以设置标签页居中,靠右显示。
             </div>
         </app-doc-box>
 
         <!-- 可关闭标签 -->
         <app-doc-box title="可关闭，添加标签" [sourceCode]="closableSource">
             <div demo>
-                <lib-tabs [closable]="true" (close)="closeTab($event)" [hideAdd]="false" (add)="addTab()">
-                    <lib-tab *ngFor="let tab of dynamicTabs; let i = index" [title]="tab.title" [key]="tab.key">
+                <lib-tabs [tabsClosable]="true" (tabsClose)="closeTab($event)" [tabsTabHideAdd]="false" (tabsAdd)="addTab()">
+                    <lib-tab *ngFor="let tab of dynamicTabs; let i = index" [tabTitle]="tab.title" [tabKey]="tab.key">
                         {{ tab.content }}
                     </lib-tab>
                 </lib-tabs>
@@ -104,13 +111,13 @@
         <app-doc-box title="自定义标题模板" [sourceCode]="customSource">
             <div demo>
                 <lib-tabs>
-                    <lib-tab [titleTemplate]="customTitle1">
+                    <lib-tab [tabTitleTemplate]="customTitle1">
                         自定义标题模板内容1
                         <ng-template #customTitle1>
                             <span style="color: red">自定义</span>标题1
                         </ng-template>
                     </lib-tab>
-                    <lib-tab [titleTemplate]="customTitle2">
+                    <lib-tab [tabTitleTemplate]="customTitle2">
                         自定义标题模板内容2
                         <ng-template #customTitle2>
                             <span style="color: blue">自定义</span>标题2

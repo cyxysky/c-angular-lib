@@ -74,8 +74,6 @@ export class InputComponent implements ControlValueAccessor {
   @Output() keypress: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
   /** 输入框鼠标点击事件 */
   @Output() click: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
-  /** 值变更事件 */
-  @Output() valueChange: EventEmitter<any> = new EventEmitter<any>();
 
   /** 焦点状态 */
   public hasFocus = signal<boolean>(false);
@@ -154,7 +152,6 @@ export class InputComponent implements ControlValueAccessor {
     this.error = '';
     this._data = value;
     this.onChange(value);
-    this.valueChange.emit(value);
   }
 
   /**
@@ -171,7 +168,6 @@ export class InputComponent implements ControlValueAccessor {
   setAndSubmitData(value: any): void {
     this._data = value;
     this.onChange(this._data);
-    this.valueChange.emit(this._data);
   }
 
   /**

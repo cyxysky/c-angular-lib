@@ -20,8 +20,8 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="selectedValue"
-            [options]="options"
-            placeholder="请选择">
+            [cascaderOptions]="options"
+            [cascaderPlaceholder]="'请选择'">
           </lib-cascader>
           <div *ngIf="selectedValue && selectedValue.length" class="example-value">
             当前选择: {{ getDisplayText(selectedValue) }}
@@ -39,23 +39,23 @@
         <div demo>
           <div class="size-container">
             <lib-cascader
-              size="large"
+              [cascaderSize]="'large'"
               [(ngModel)]="selectedSizes.large"
-              [options]="options"
-              placeholder="大号级联选择">
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'大号级联选择'">
             </lib-cascader>
             
             <lib-cascader
               [(ngModel)]="selectedSizes.default"
-              [options]="options"
-              placeholder="默认大小">
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'默认大小'">
             </lib-cascader>
             
             <lib-cascader
-              size="small"
+              [cascaderSize]="'small'"
               [(ngModel)]="selectedSizes.small"
-              [options]="options"
-              placeholder="小号级联选择">
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'小号级联选择'">
             </lib-cascader>
           </div>
         </div>
@@ -71,9 +71,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="hoverValue"
-            [options]="options"
-            expandTrigger="hover"
-            placeholder="鼠标移入展开菜单">
+            [cascaderOptions]="options"
+            [cascaderExpandTrigger]="'hover'"
+            [cascaderPlaceholder]="'鼠标移入展开菜单'">
           </lib-cascader>
           <div *ngIf="hoverValue && hoverValue.length" class="example-value">
             当前选择: {{ getDisplayText(hoverValue) }}
@@ -91,9 +91,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="changeOnSelectValue"
-            [options]="options"
-            [changeOnSelect]="true"
-            placeholder="选择即改变">
+            [cascaderOptions]="options"
+            [cascaderChangeOnSelect]="true"
+            [cascaderPlaceholder]="'选择即改变'">
           </lib-cascader>
           <div *ngIf="changeOnSelectValue && changeOnSelectValue.length" class="example-value">
             当前选择: {{ getDisplayText(changeOnSelectValue) }}
@@ -111,9 +111,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="multipleSelected"
-            [options]="options"
-            [isMultiple]="true"
-            placeholder="请选择多个选项">
+            [cascaderOptions]="options"
+            [cascaderIsMultiple]="true"
+            [cascaderPlaceholder]="'请选择多个选项'">
           </lib-cascader>
           <div *ngIf="multipleSelected && multipleSelected.length > 0" class="example-value">
             当前选择: {{ multipleSelected.join(', ') }}
@@ -131,8 +131,8 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="disabledOptionValue"
-            [options]="disabledOptions"
-            placeholder="包含禁用选项">
+            [cascaderOptions]="disabledOptions"
+            [cascaderPlaceholder]="'包含禁用选项'">
           </lib-cascader>
           <div *ngIf="disabledOptionValue && disabledOptionValue.length" class="example-value">
             当前选择: {{ getDisplayText(disabledOptionValue) }}
@@ -150,9 +150,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="searchSelected"
-            [options]="largeOptions"
-            [showSearch]="true"
-            placeholder="支持搜索的级联选择框">
+            [cascaderOptions]="largeOptions"
+            [cascaderShowSearch]="true"
+            [cascaderPlaceholder]="'支持搜索的级联选择框'">
           </lib-cascader>
           <div *ngIf="searchSelected && searchSelected.length" class="example-value">
             当前选择: {{ getDisplayText(searchSelected) }}
@@ -170,9 +170,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="customFieldValue"
-            [options]="customFieldOptions"
-            [fieldNames]="customFields"
-            placeholder="自定义字段名">
+            [cascaderOptions]="customFieldOptions"
+            [cascaderFieldNames]="customFields"
+            [cascaderPlaceholder]="'自定义字段名'">
           </lib-cascader>
           <div *ngIf="customFieldValue && customFieldValue.length" class="example-value">
             当前选择: {{ getDisplayText(customFieldValue) }}
@@ -190,9 +190,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="optionSelectFnValue"
-            [options]="options"
-            [optionSelectFn]="customSelectFunction"
-            placeholder="自定义选择函数">
+            [cascaderOptions]="options"
+            [cascaderOptionSelectFn]="customSelectFunction"
+            [cascaderPlaceholder]="'自定义选择函数'">
           </lib-cascader>
           <div *ngIf="optionSelectFnValue && optionSelectFnValue.length" class="example-value">
             当前选择: {{ getDisplayText(optionSelectFnValue) }}
@@ -211,9 +211,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="disableCheckboxValue"
-            [options]="disableCheckboxOptions"
-            [isMultiple]="true"
-            placeholder="部分选项禁用复选框">
+            [cascaderOptions]="disableCheckboxOptions"
+            [cascaderIsMultiple]="true"
+            [cascaderPlaceholder]="'部分选项禁用复选框'">
           </lib-cascader>
           <div *ngIf="disableCheckboxValue && disableCheckboxValue.length > 0" class="example-value">
             当前选择: {{ disableCheckboxValue.join(', ') }}
@@ -231,10 +231,10 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="customTemplateValue"
-            [options]="customOptions"
-            [optionTemplate]="customOptionTpl"
-            [optionLabelTemplate]="customOptionLabelTpl"
-            placeholder="自定义选项显示内容">
+            [cascaderOptions]="customOptions"
+            [cascaderOptionTemplate]="customOptionTpl"
+            [cascaderOptionLabelTemplate]="customOptionLabelTpl"
+            [cascaderPlaceholder]="'自定义选项显示内容'">
           </lib-cascader>
           
           <ng-template #customOptionTpl let-option>
@@ -267,22 +267,22 @@
           <div class="status-container">
             <lib-cascader
               [(ngModel)]="statusValues.default"
-              [options]="options"
-              placeholder="默认状态">
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'默认状态'">
             </lib-cascader>
             
             <lib-cascader
               [(ngModel)]="statusValues.error"
-              [status]="'error'"
-              [options]="options"
-              placeholder="错误状态">
+              [cascaderStatus]="'error'"
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'错误状态'">
             </lib-cascader>
             
             <lib-cascader
               [(ngModel)]="statusValues.warning"
-              [status]="'warning'"
-              [options]="options"
-              placeholder="警告状态">
+              [cascaderStatus]="'warning'"
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'警告状态'">
             </lib-cascader>
           </div>
         </div>
@@ -298,10 +298,10 @@
         <div demo>
           <div class="borderless-container">
             <lib-cascader
-              [borderless]="true"
+              [cascaderBorderless]="true"
               [(ngModel)]="borderlessValue"
-              [options]="options"
-              placeholder="无边框级联选择框">
+              [cascaderOptions]="options"
+              [cascaderPlaceholder]="'无边框级联选择框'">
             </lib-cascader>
           </div>
         </div>
@@ -317,9 +317,9 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="disabledValue"
-            [options]="options"
-            [disabled]="true"
-            placeholder="禁用状态的级联选择框">
+            [cascaderOptions]="options"
+            [cascaderDisabled]="true"
+            [cascaderPlaceholder]="'禁用状态的级联选择框'">
           </lib-cascader>
         </div>
         <div description>

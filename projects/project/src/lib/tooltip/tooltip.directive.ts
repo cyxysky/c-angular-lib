@@ -1,10 +1,10 @@
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
-import { OverlayService } from '../overlay/overlay.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 import { TooltipComponent } from './tooltip.component';
-import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from '../overlay/overlay-basic.directive';
-import { UtilsService } from '../utils/utils.service';
+import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
+import { UtilsService } from '../core/utils/utils.service';
 
 
 @Directive({

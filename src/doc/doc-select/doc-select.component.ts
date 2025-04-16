@@ -177,8 +177,8 @@ export class DocSelectComponent implements OnInit {
         { name: 'selectDisabled', description: '是否禁用选择框', type: 'boolean', default: 'false' },
         { name: 'selectOptionDisabledKey', description: '选项禁用属性名', type: 'string', default: "'disabled'" },
         { name: 'selectBottomBar', description: '底部操作栏模板', type: 'TemplateRef<any>', default: 'null' },
-        { name: 'optionTemplate', description: '自定义选项模板', type: 'TemplateRef<any>', default: 'null' },
-        { name: 'optionLabelTemplate', description: '自定义选中内容模板', type: 'TemplateRef<any>', default: 'null' }
+        { name: 'selectOptionTemplate', description: '自定义选项模板', type: 'TemplateRef<any>', default: 'null' },
+        { name: 'selectOptionLabelTemplate', description: '自定义选中内容模板', type: 'TemplateRef<any>', default: 'null' }
       ]
     }
   ];

@@ -1,7 +1,7 @@
 import { CdkOverlayOrigin, ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ElementRef, Injectable, TemplateRef, ViewContainerRef } from '@angular/core';
-import { OverlayBasicPositionConfigs } from '../overlay/overlay-basic.directive';
+import { OverlayBasicPositionConfigs } from './overlay-basic.directive';
 
 @Injectable({
   providedIn: 'root'

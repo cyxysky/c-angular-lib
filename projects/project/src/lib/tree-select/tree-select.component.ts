@@ -4,12 +4,13 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
-import { OverlayService } from '../overlay/overlay.service';
-import { UtilsService } from '../utils/utils.service';
-import { TreeComponent, TreeNodeOptions } from '../tree/tree.component';
+import { OverlayService } from '../core/overlay/overlay.service';
+import { UtilsService } from '../core/utils/utils.service';
+import { TreeComponent } from '../tree/tree.component';
+import { TreeNodeOptions } from '../tree/tree.interface';import { TreeSelectSize, TreeSelectTriggerType } from './tree-select.interface';
+``
 
-export type TreeSelectSize = 'large' | 'default' | 'small';
-export type TreeSelectTriggerType = 'click' | 'hover';
+
 
 @Component({
   selector: 'lib-tree-select',
@@ -38,31 +39,31 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /** 是否显示搜索框 */
   @Input({ alias: 'treeShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 是否禁用 */
-  @Input({ alias: 'disabled', transform: booleanAttribute }) disabled: boolean = false;
+  @Input({ alias: 'treeDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 占位文本 */
-  @Input({ alias: 'placeholder' }) placeholder: string = '请选择';
+  @Input({ alias: 'treePlaceholder' }) placeholder: string = '请选择';
   /** 是否允许清空 */
-  @Input({ alias: 'allowClear', transform: booleanAttribute }) allowClear: boolean = true;
+  @Input({ alias: 'treeAllowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 是否多选 */
-  @Input({ alias: 'multiple', transform: booleanAttribute }) multiple: boolean = false;
+  @Input({ alias: 'treeMultiple', transform: booleanAttribute }) multiple: boolean = false;
   /** 尺寸 */
-  @Input({ alias: 'size' }) size: TreeSelectSize = 'default';
+  @Input({ alias: 'treeSize' }) size: TreeSelectSize = 'default';
   /** 是否无边框 */
-  @Input({ alias: 'borderless', transform: booleanAttribute }) borderless: boolean = false;
+  @Input({ alias: 'treeBorderless', transform: booleanAttribute }) borderless: boolean = false;
   /** 状态 */
-  @Input({ alias: 'status' }) status: 'error' | 'warning' | null = null;
+  @Input({ alias: 'treeStatus' }) status: 'error' | 'warning' | null = null;
   /** 下拉菜单的宽度 */
-  @Input({ alias: 'dropdownWidth' }) dropdownWidth: string = '100%';
+  @Input({ alias: 'treeDropdownWidth' }) dropdownWidth: string = '100%';
   /** 下拉菜单的高度 */
-  @Input({ alias: 'dropdownHeight' }) dropdownHeight: number = 400;
+  @Input({ alias: 'treeDropdownHeight' }) dropdownHeight: number = 400;
   /** 自定义选项模板 */
   @Input({ alias: 'treeNodeTemplate' }) treeNodeTemplate: TemplateRef<any> | null = null;
   /** 自定义选项标签模板 */
-  @Input({ alias: 'labelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'treeLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
   /** 是否可勾选 */
   @Input({ alias: 'treeCheckable', transform: booleanAttribute }) treeCheckable: boolean = false;
   /** 是否显示搜索结果父级 */
-  @Input({ alias: 'showSearchParent', transform: booleanAttribute }) showSearchParent: boolean = false;
+  @Input({ alias: 'treeShowSearchParent', transform: booleanAttribute }) showSearchParent: boolean = false;
   /** 是否显示树线条 */
   @Input({ alias: 'treeShowLine', transform: booleanAttribute }) treeShowLine: boolean = false;
   /** 是否显示树图标 */
@@ -70,11 +71,11 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /** 是否异步加载 */
   @Input({ alias: 'treeAsyncData', transform: booleanAttribute }) treeAsyncData: boolean = false;
   /** 触发方式 */
-  @Input({ alias: 'actionTrigger' }) actionTrigger: TreeSelectTriggerType = 'click';
+  @Input({ alias: 'treeActionTrigger' }) actionTrigger: TreeSelectTriggerType = 'click';
   /** 是否加载中 */
-  @Input({ alias: 'loading', transform: booleanAttribute }) loading: boolean = false;
+  @Input({ alias: 'treeLoading', transform: booleanAttribute }) loading: boolean = false;
   /** 选项过滤函数 */
-  @Input({ alias: 'filterTreeNode' }) filterTreeNode?: (inputValue: string, treeNode: TreeNodeOptions) => boolean;
+  @Input({ alias: 'treeFilterTreeNode' }) filterTreeNode?: (inputValue: string, treeNode: TreeNodeOptions) => boolean;
   /** 自定义展开图标 */
   @Input({ alias: 'treeExpandedIcon' }) expandedIcon: TemplateRef<any> | null = null;
   /** 是否虚拟滚动 */
@@ -86,25 +87,21 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /** 虚拟滚动最大缓冲区 */
   @Input({ alias: 'treeVirtualMaxBuffer' }) treeVirtualMaxBuffer: number = 600;
   /** 默认展开的节点 */
-  @Input({ alias: 'defaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
+  @Input({ alias: 'treeDefaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
   /** 选项高度 */
   @Input({ alias: 'treeOptionHeight' }) treeOptionHeight: number = 36;
   /** 树节点缩进 */
   @Input({ alias: 'treeIndent' }) treeIndent: number = 24;
 
   // 输出事件
-  /** 值变化事件 */
-  @Output() valueChange = new EventEmitter<string[] | string>();
   /** 选中节点变化事件 */
-  @Output() treeSelectChange = new EventEmitter<TreeNodeOptions[]>();
-  @Output() selectionChange = new EventEmitter<TreeNodeOptions[]>();
+  @Output('treeSelectChange') selectionChange = new EventEmitter<TreeNodeOptions[]>();
   /** 可见性变化事件 */
-  @Output() openChange = new EventEmitter<boolean>();
-  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output('treeSelectVisibleChange') visibleChange = new EventEmitter<boolean>();
   /** 加载数据事件 */
-  @Output() loadData = new EventEmitter<TreeNodeOptions>();
+  @Output('treeSelectLoadData') loadData = new EventEmitter<TreeNodeOptions>();
   /** 复选框变化事件 */
-  @Output() checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
+  @Output('treeSelectCheckBoxChange') checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
 
   // 内部状态
   /** 选中值 */
@@ -230,7 +227,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (this.disabled || this.isDropdownOpen) return;
     this.isNowDropdownOpen = true;
     this.getExpandedKeys();
-    this.openChange.emit(true);
     this.visibleChange.emit(true);
     this.cdr.detectChanges();
 
@@ -325,7 +321,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.blurSearch();
     this.cdr.detectChanges();
     let timer = setTimeout(() => {
-      this.openChange.emit(false);
       this.visibleChange.emit(false);
       const origin = this.overlayOrigin?.elementRef?.nativeElement;
       if (origin) {
@@ -442,7 +437,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     parentNodes.forEach(parent => {
       const getAllChildrenKeys = (node: TreeNodeOptions): void => {
         if (node.children && node.children.length) {
-          node.children.forEach(child => {
+          node.children.forEach((child: TreeNodeOptions) => {
             childrenOfSelectedParents.add(child.key);
             getAllChildrenKeys(child);
           });
@@ -569,23 +564,23 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     event.stopPropagation();
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
-    
+
     // 更新节点状态和获取所有需要移除的key
     const keysToRemove = this.updateNodeStatus(key, false);
-    
+
     // 更新value和相关数据
     this.updateSelectionState(keysToRemove);
     this.updateDisplayTags();
     this.updateData();
   }
-  
+
   clear(event?: Event): void {
     if (event) event.stopPropagation();
     // 清空所有状态和数据
     this.resetAllState();
     this.updateData();
   }
-  
+
   /**
    * 更新节点选中状态并获取相关的所有key
    * @param key 节点key
@@ -600,7 +595,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     const keysToUpdate = [key];
     // 处理子节点状态
     if (this.treeCheckable && node.children?.length) {
-      node.children.forEach(child => {
+      node.children.forEach((child: TreeNodeOptions) => {
         if (!child.disabled && !child.disableCheckbox) {
           keysToUpdate.push(...this.updateNodeStatus(child.key, checked));
         }
@@ -612,7 +607,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     }
     return keysToUpdate;
   }
-  
+
   /**
    * 更新单个节点状态
    */
@@ -627,7 +622,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       node.selected = checked;
     }
   }
-  
+
   /**
    * 更新所有祖先节点状态
    */
@@ -642,16 +637,16 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     // 递归处理上级节点
     this.updateAncestorNodesStatus(parent);
   }
-  
+
   /**
    * 计算父节点状态
    */
   private calculateParentNodeStatus(parent: TreeNodeOptions): void {
     if (!parent.children) return;
     const children = parent.children;
-    const checkedCount = children.filter(child => child.checked && !child.disabled && !child.disableCheckbox).length;
-    const indeterminateCount = children.filter(child => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
-    const enabledCount = children.filter(child => !child.disabled && !child.disableCheckbox).length;
+    const checkedCount = children.filter((child: TreeNodeOptions) => child.checked && !child.disabled && !child.disableCheckbox).length;
+    const indeterminateCount = children.filter((child: TreeNodeOptions) => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
+    const enabledCount = children.filter((child: TreeNodeOptions) => !child.disabled && !child.disableCheckbox).length;
     if (checkedCount === 0 && indeterminateCount === 0) {
       parent.checked = false;
       parent.indeterminate = false;
@@ -663,37 +658,37 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       parent.indeterminate = true;
     }
   }
-  
+
   /**
    * 查找节点的父节点key
    */
   private findParentKey(key: string): string | undefined {
     for (let [nodeKey, node] of this.nodeMap.entries()) {
-      if (node.children?.some(child => child.key === key)) {
+      if (node.children?.some((child: TreeNodeOptions) => child.key === key)) {
         return nodeKey;
       }
     }
     return undefined;
   }
-  
+
   /**
    * 更新选中状态相关数据
    */
   private updateSelectionState(keysToRemove: string[]): void {
     // 更新value
     this.value = (this.value as string[]).filter(k => !keysToRemove.includes(k));
-    
+
     // 更新defaultCheckedKeys和defaultSelectedKeys
     if (this.treeCheckable) {
       this.defaultCheckedKeys = this.defaultCheckedKeys.filter(k => !keysToRemove.includes(k));
     } else {
       this.defaultSelectedKeys = this.defaultSelectedKeys.filter(k => !keysToRemove.includes(k));
     }
-    
+
     // 更新展开节点状态
     this.defaultExpandedKeys = this.defaultExpandedKeys.filter(k => !keysToRemove.includes(k));
   }
-  
+
   /**
    * 重置所有状态
    */
@@ -701,7 +696,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.value = this.multiple ? [] : '';
     this.displayTags = [];
     this.parentNodeKeys.clear();
-    
+
     // 重置所有节点状态
     this.nodeMap.forEach(node => {
       if (this.treeCheckable) {
@@ -711,7 +706,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         node.selected = false;
       }
     });
-    
+
     // 重置defaultCheckedKeys和defaultSelectedKeys
     this.defaultCheckedKeys = [];
     this.defaultSelectedKeys = [];
@@ -731,7 +726,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 更新数据
    */
   updateData() {
-    this.valueChange.emit(this.value);
     // 将value转换为节点列表
     const selectedNodes: TreeNodeOptions[] = [];
     const keys = Array.isArray(this.value) ? this.value : [this.value];
@@ -742,7 +736,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       }
     });
 
-    this.treeSelectChange.emit(selectedNodes);
     this.selectionChange.emit(selectedNodes);
     this.onChange(this.value);
     this.focusSearch();

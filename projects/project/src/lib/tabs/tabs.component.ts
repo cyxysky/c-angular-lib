@@ -46,23 +46,21 @@ export interface TabConfig extends Omit<TabItem, 'key'> {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit, OnDestroy {
-  @Input() selectedIndex = 0;
-  @Input() tabPosition: 'top' | 'bottom' = 'top';
-  @Input() size: 'default' | 'small' | 'large' = 'default';
-  @Input() type: 'line' | 'card' = 'line';
-  @Input() animated = true;
-  @Input() centered = true;
-  @Input() align: 'left' | 'center' | 'right' = 'left';
-  @Input() hideAdd = true;
-  @Input() addIcon = 'bi-plus-circle';
-  @Input() closeIcon = 'bi-x-lg';
-  @Input() closable = false;
+  @Input({ alias: 'tabsSelectedIndex' }) selectedIndex = 0;
+  @Input({ alias: 'tabsTabPosition' }) tabPosition: 'top' | 'bottom' = 'top';
+  @Input({ alias: 'tabsTabSize' }) size: 'default' | 'small' | 'large' = 'default';
+  @Input({ alias: 'tabsTabType' }) type: 'line' | 'card' = 'line';
+  @Input({ alias: 'tabsTabAlign' }) align: 'left' | 'center' | 'right' = 'left';
+  @Input({ alias: 'tabsTabHideAdd' }) hideAdd = true;
+  @Input({ alias: 'tabsAddIcon' }) addIcon = 'bi-plus-circle';
+  @Input({ alias: 'tabsCloseIcon' }) closeIcon = 'bi-x-lg';
+  @Input({ alias: 'tabsClosable' }) closable = false;
 
-  @Output() selectedIndexChange = new EventEmitter<number>();
-  @Output() tabClick = new EventEmitter<{ index: number, tab: TabItem }>();
-  @Output() add = new EventEmitter<void>();
-  @Output() close = new EventEmitter<{ index: number, tab: TabItem }>();
-  @Output() selectChange = new EventEmitter<TabItem>();
+  @Output('tabsSelectedIndexChange') selectedIndexChange = new EventEmitter<number>();
+  @Output('tabsTabClick') tabClick = new EventEmitter<{ index: number, tab: TabItem }>();
+  @Output('tabsAdd') add = new EventEmitter<void>();
+  @Output('tabsClose') close = new EventEmitter<{ index: number, tab: TabItem }>();
+  @Output('tabsSelectChange') selectChange = new EventEmitter<TabItem>();
 
   @ContentChildren(TabComponent) tabComponents!: QueryList<TabComponent>;
   @ViewChildren('tabItem') tabElements!: QueryList<ElementRef>;
@@ -84,7 +82,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   constructor(
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private renderer: Renderer2
   ) {
     // 设置滚动防抖
     this.scrollDebounce$.pipe(

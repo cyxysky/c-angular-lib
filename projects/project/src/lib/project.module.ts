@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // 指令
-import { WidgetDirective } from './directive/widget.directive';
+import { WidgetDirective } from './core/directive/widget.directive';
 import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.directive';
 import { PopoverDirective } from './popover/popover.directive';
 import { PopconfirmDirective } from './popconfirm/popconfirm.directive';
@@ -42,6 +42,7 @@ import { DrawerComponent } from './drawer/drawer.component';
 import { DropMenuComponent } from './drop-menu/drop-menu.component';
 // 服务
 
+export * from './core';
 export * from './business';
 export * from './input';
 export * from './select';
@@ -61,15 +62,16 @@ export * from './popover';
 export * from './cascader';
 export * from './modal';
 export * from './tabs';
-export * from './overlay';
+export * from './core/overlay';
 export * from './popconfirm';
 export * from './select-basic';
-export * from './animation';
-export * from './directive';
+export * from './core/animation';
+export * from './core/directive';
 export * from './date-timer';
 export * from './message';
 export * from './drawer';
 export * from './drop-menu';
+
 @NgModule({
   declarations: [],
   imports: [

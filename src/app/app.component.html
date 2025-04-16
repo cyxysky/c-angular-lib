@@ -5,29 +5,7 @@
                 <ul>
                     <li nz-menu-group>
                         <ul>
-                            <li nz-menu-item nzSelected (click)="nowComponent.set('button')">按钮</li>
-                            <li nz-menu-item (click)="nowComponent.set('select')">选择器</li>
-                            <li nz-menu-item (click)="nowComponent.set('cascader')">级联选择器</li>
-                            <li nz-menu-item (click)="nowComponent.set('input')">输入</li>
-                            <li nz-menu-item (click)="nowComponent.set('tag')">标签</li>
-                            <li nz-menu-item (click)="nowComponent.set('switch')">开关</li>
-                            <li nz-menu-item (click)="nowComponent.set('number-input')">数字输入</li>
-                            <li nz-menu-item (click)="nowComponent.set('segmented')">分段控制器</li>
-                            <li nz-menu-item (click)="nowComponent.set('water-mark')">水印</li>
-                            <li nz-menu-item (click)="nowComponent.set('tooltip')">提示</li>
-                            <li nz-menu-item (click)="nowComponent.set('popover')">气泡</li>
-                            <li nz-menu-item (click)="nowComponent.set('popconfirm')">气泡确认</li>
-                            <li nz-menu-item (click)="nowComponent.set('checkbox')">复选框</li>
-                            <li nz-menu-item (click)="nowComponent.set('radio')">单选框</li>
-                            <li nz-menu-item (click)="nowComponent.set('slider')">滑块</li>
-                            <li nz-menu-item (click)="nowComponent.set('tree')">树</li>
-                            <li nz-menu-item (click)="nowComponent.set('tree-select')">树选择器</li>
-                            <li nz-menu-item (click)="nowComponent.set('modal')">模态框</li>
-                            <li nz-menu-item (click)="nowComponent.set('tabs')">标签页</li>
-                            <li nz-menu-item (click)="nowComponent.set('date-timer')">日期时间选择器</li>
-                            <li nz-menu-item (click)="nowComponent.set('message')">消息</li>
-                            <li nz-menu-item (click)="nowComponent.set('drawer')">抽屉</li>
-                            <li nz-menu-item (click)="nowComponent.set('drop-menu')">下拉菜单</li>
+                            <li nz-menu-item *ngFor="let component of components" (click)="nav(component.path)">{{component.name}}</li>
                         </ul>
                     </li>
                 </ul>
@@ -36,13 +14,12 @@
                 <ul>
                     <li nz-menu-group>
                         <ul>
-                            <li nz-menu-item (click)="nowComponent.set('multi-dimensional-flowchart')">多维流程图</li>
-                            <li nz-menu-item (click)="nowComponent.set('customer-form')">拖拽生成表单</li>
-                            <li nz-menu-item (click)="nowComponent.set('process-tree')">流程树</li>
-                            <li nz-menu-item (click)="nowComponent.set('generate-png')">svg生成</li>
-                            <li nz-menu-item (click)="nowComponent.set('dynamic-table')">动态表格</li>
-                            <li nz-menu-item (click)="nowComponent.set('user-select')">用户选择</li>
-                            <li nz-menu-item (click)="nowComponent.set('structure-tree')">结构树</li>
+                            <li 
+                                nz-menu-item 
+                                *ngFor="let component of businessComponents" 
+                                (click)="nav(component.path)">
+                                {{component.name}}
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -50,108 +27,6 @@
         </ul>
     </div>
     <div style="height: 100%;flex-grow: 1;padding: 20px;" cdkScrollable>
-        @switch (nowComponent()) {
-        @case ('customer-form') {
-        <lib-customer-form></lib-customer-form>
-        }
-        @case ('process-tree') {
-        <lib-process-tree></lib-process-tree>
-        }
-        @case ('multi-dimensional-flowchart') {
-        <app-doc-flowchart></app-doc-flowchart>
-        }
-        @case ('generate-png') {
-        <lib-generate-png></lib-generate-png>
-        }
-        @case ('dynamic-table') {
-        <lib-dynamic-table></lib-dynamic-table>
-        }
-        @case ('user-select') {
-        <div style="display: flex;flex-direction: row;align-items: center;gap: 16px;">
-            <div>
-                选择模式:
-            </div>
-            <div>
-                <lib-switch [(ngModel)]="checked" [switchCheckedChildren]="'单选'" [switchUnCheckedChildren]="'多选'">
-                </lib-switch>
-            </div>
-        </div>
-        <div style="padding-top: 16px;">
-            <lib-user-select style="width: 400px;" [selectMode]="checked() ? 'single' : 'multiple'"></lib-user-select>
-        </div>
-        }
-        @case ('button') {
-        <app-doc-button></app-doc-button>
-        }
-        @case ('input') {
-        <app-doc-input></app-doc-input>
-        }
-        @case ('tag') {
-        <app-doc-tag></app-doc-tag>
-        }
-        @case ('switch') {
-        <app-doc-switch></app-doc-switch>
-        }
-        @case ('number-input') {
-        <app-doc-number-input></app-doc-number-input>
-        }
-        @case ('segmented') {
-        <app-doc-segmented></app-doc-segmented>
-        }
-        @case ('water-mark') {
-        <app-doc-water-mark></app-doc-water-mark>
-        }
-        @case ('tooltip') {
-        <app-doc-tooltip></app-doc-tooltip>
-        }
-        @case ('checkbox') {
-        <app-doc-checkbox></app-doc-checkbox>
-        }
-        @case ('radio') {
-        <app-doc-radio></app-doc-radio>
-        }
-        @case ('slider') {
-        <app-doc-slider></app-doc-slider>
-        }
-        @case ('popover') {
-        <app-doc-popover></app-doc-popover>
-        }
-        @case ('popconfirm') {
-        <app-doc-popconfirm></app-doc-popconfirm>
-        }
-        @case ('select') {
-        <app-doc-select></app-doc-select>
-        }
-        @case ('cascader') {
-        <app-doc-cascader></app-doc-cascader>
-        }
-        @case ('tree') {
-        <app-doc-tree></app-doc-tree>
-        }
-        @case ('structure-tree') {
-        <app-doc-structure-tree></app-doc-structure-tree>
-        }
-        @case ('tree-select') {
-        <app-doc-tree-select></app-doc-tree-select>
-        }
-        @case ('modal') {
-        <app-doc-modal></app-doc-modal>
-        }
-        @case ('tabs') {
-        <app-doc-tabs></app-doc-tabs>
-        }
-        @case ('date-timer') {
-        <app-doc-date-timer></app-doc-date-timer>
-        }
-        @case ('message') {
-        <app-doc-message></app-doc-message>
-        }
-        @case ('drawer') {
-        <app-doc-drawer></app-doc-drawer>
-        }
-        @case ('drop-menu') {
-        <app-doc-drop-menu></app-doc-drop-menu>
-        }
-    }
+        <router-outlet></router-outlet>
     </div>
 </div>

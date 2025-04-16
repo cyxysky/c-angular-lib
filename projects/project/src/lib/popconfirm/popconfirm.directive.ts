@@ -1,12 +1,12 @@
 import { ComponentRef, Directive, ElementRef, EventEmitter, HostListener, Input, Output, SimpleChanges, TemplateRef } from '@angular/core';
-import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../overlay/overlay-basic.directive';
+import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { PopoverComponent } from '@project';
 import _ from 'lodash';
-import { OverlayService } from '../overlay/overlay.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 import { ButtonType, ButtonColor } from '../button/button.interface';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from '../core/utils/utils.service';
 
 @Directive({
   selector: '[libPopconfirm]'

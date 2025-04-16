@@ -3,27 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
 import { trigger, state, style, transition, animate, AnimationEvent } from '@angular/animations';
-import { expandCollapse } from '../animation/expandCollapse.animation';
-import { rotate } from '../animation/rotate.animation';
-import { UtilsService } from '../utils/utils.service';
+import { expandCollapse } from '../core/animation/expandCollapse.animation';
+import { rotate } from '../core/animation/rotate.animation';
+import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
-export interface TreeNodeOptions {
-  key: string;
-  title: string;
-  icon?: string;
-  isLeaf?: boolean;
-  expanded?: boolean;
-  selected?: boolean;
-  checked?: boolean;
-  indeterminate?: boolean;
-  selectable?: boolean;
-  disabled?: boolean;
-  disableCheckbox?: boolean;
-  children?: TreeNodeOptions[];
-  changeChildren?: (children: TreeNodeOptions[]) => void;
-  asyncLoading?: boolean;
-  [key: string]: any;
-}
+import { TreeNodeOptions } from './tree.interface';
+
 
 @Component({
   selector: 'lib-tree',
@@ -90,8 +75,6 @@ export class TreeComponent implements OnInit, OnChanges {
   @Input({ alias: 'treeKeyName' }) keyName: string = 'key';
   /** 节点模板 */
   @Input({ alias: 'treeTemplate' }) treeTemplate: TemplateRef<{ $implicit: TreeNodeOptions, isLast: boolean, level: number }> | null = null;
-  /** 是否展示动画 */
-  @Input() showAnimation: boolean = true;
   //#endregion
 
   //#region 输出事件 (Outputs)

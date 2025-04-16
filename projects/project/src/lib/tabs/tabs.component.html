@@ -18,7 +18,7 @@
       <div 
         #tabsNav
         class="lib-tabs-nav-view"
-        [class.lib-tabs-nav-centered]="(centered || align === 'center') && !showScrollNav"
+        [class.lib-tabs-nav-centered]="align === 'center' && !showScrollNav"
         [class.lib-tabs-nav-right]="align === 'right' && !showScrollNav">
         <div class="lib-tabs-nav-list" #tabsNavList>
           <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab" 

@@ -5,8 +5,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import _ from 'lodash';
 import { CommonModule, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OverlayService } from '../overlay/overlay.service';
-import { UtilsService } from '../utils/utils.service';
+import { OverlayService } from '../core/overlay/overlay.service';
+import { UtilsService } from '../core/utils/utils.service';
 import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
 import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
 @Component({
@@ -67,9 +67,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 远程搜索方法 */
   @Input({ alias: 'selectSearchFn' }) searchFn: ((value: string) => Promise<any[]>) | null = null;
   /** 选项自定义模板 */
-  @Input() optionTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'selectOptionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
   /** 选择内容自定义模板 */
-  @Input() optionLabelTemplate: TemplateRef<any> | null = null;
+  @Input({ alias: 'selectOptionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
   /** 选项禁用属性名，默认为 disabled */
   @Input({ alias: 'selectOptionDisabledKey' }) optionDisabledKey: string = 'disabled';
   /** 是否禁用 */
