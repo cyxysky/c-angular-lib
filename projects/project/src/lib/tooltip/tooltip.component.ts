@@ -1,4 +1,3 @@
-import { style } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Input, TemplateRef } from '@angular/core';
 import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
@@ -13,15 +12,28 @@ import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
   }
 })
 export class TooltipComponent {
+  /** 提示内容 */
   @Input() content: string | TemplateRef<any> = '';
+  /** 提示位置 */
   @Input() placement: OverlayBasicPosition = 'top';
+  /** 是否显示 */
   @Input() isVisible: boolean = false;
+  /** 提示颜色 */
   @Input() color: string = '#000';
 
+  /**
+   * 判断是否为模板引用
+   * @param value 值
+   * @returns 是否为模板引用
+   */
   isTemplateRef(value: any): value is TemplateRef<any> {
     return value instanceof TemplateRef;
   }
 
+  /**
+   * 获取提示框的margin
+   * @returns 提示框的margin
+   */
   getMargin(): string {
     switch (this.placement) {
       case 'top':
@@ -31,7 +43,7 @@ export class TooltipComponent {
       case 'bottom-left':
       case 'bottom-right':
         return 'margin: 8px 0';
-      
+
       case 'left':
       case 'right':
       case 'left-top':
@@ -39,7 +51,7 @@ export class TooltipComponent {
       case 'right-top':
       case 'right-bottom':
         return 'margin: 0 8px';
-      
+
       default:
         return 'margin: 0';
     }

@@ -34,13 +34,13 @@ export class MessageService implements OnDestroy {
   ngOnDestroy(): void {
     // 清理所有消息
     this.removeAll();
-    
+
     // 销毁overlay
     if (this.overlayRef) {
       this.overlayRef.dispose();
       this.overlayRef = null;
     }
-    
+
     // 清理订阅
     this.destroy$.next();
     this.destroy$.complete();
@@ -73,7 +73,7 @@ export class MessageService implements OnDestroy {
           panelClass: 'message-overlay-panel',
           hasBackdrop: false
         });
-        
+
         // 设置全局定位策略
         overlayConfig.positionStrategy = this.overlay.position()
           .global()
@@ -81,7 +81,7 @@ export class MessageService implements OnDestroy {
           .left('0')
           .right('0')
           .bottom('0');
-          
+
         // 创建overlay
         this.overlayRef = this.overlay.create(overlayConfig);
         const overlayElement = this.overlayRef.overlayElement;
@@ -223,7 +223,7 @@ export class MessageService implements OnDestroy {
       closeable?: boolean
     } = {}
   ): string {
-    return this.create(content, { ...options, type: 'success', closeable: options.closeable !== undefined ? options.closeable : true });
+    return this.create(content, { ...options, type: 'success', closeable: options.closeable !== undefined ? options.closeable : false });
   }
 
   /**

@@ -1,31 +1,31 @@
 <div 
     (click)="createRipple($event)"
     class="botton"
-    [class.large]="size() === 'large'"
-    [class.small]="size() === 'small'"
+    [class.large]="size === 'large'"
+    [class.small]="size === 'small'"
 
-    [class.circle]="shape() === 'circle'"
-    [class.round]="shape() === 'round'"
+    [class.circle]="shape === 'circle'"
+    [class.round]="shape === 'round'"
 
-    [class.disabled]="disabled()"
+    [class.disabled]="disabled"
 
-    [class.dashed]="type() === 'dashed'"
-    [class.link]="type() === 'link'"
-    [class.text]="type() === 'text'"
+    [class.dashed]="type === 'dashed'"
+    [class.link]="type === 'link'"
+    [class.text]="type === 'text'"
 
-    [class.primary]="color() === 'primary'"
-    [class.secondary]="color() === 'secondary'"
-    [class.success]="color() === 'success'"
-    [class.warning]="color() === 'warning'"
-    [class.danger]="color() === 'danger'"
-    [class.ghost]="color() === 'ghost'"
-    [class.light]="color() === 'light'"
-    [class.medium]="color() === 'medium'"
-    [class.dark]="color() === 'dark'"
+    [class.primary]="color === 'primary'"
+    [class.secondary]="color === 'secondary'"
+    [class.success]="color === 'success'"
+    [class.warning]="color === 'warning'"
+    [class.danger]="color === 'danger'"
+    [class.ghost]="color === 'ghost'"
+    [class.light]="color === 'light'"
+    [class.medium]="color === 'medium'"
+    [class.dark]="color === 'dark'"
 
-    [class.block]="block()"
+    [class.block]="block"
     >
-    {{ content() }}
+    {{ content }}
     <ng-content></ng-content>
     @if(ripple.x){
         <span 

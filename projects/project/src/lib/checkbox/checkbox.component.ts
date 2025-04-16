@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CheckboxOption, CheckboxDirection } from './checkbox.interface';
 
-
-
 @Component({
   selector: 'lib-checkbox',
   standalone: true,
@@ -86,6 +84,9 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
     this.cdr.detectChanges();
   }
 
+  /**
+   * 切换单选状态
+   */
   checkSingle(): void {
     this.singleValue = !this.singleValue;
     this.onChange(this.singleValue);

@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, input, InputSignal, OnChanges, OnInit, Output, SimpleChanges, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, input, InputSignal, OnChanges, OnInit, Output, SimpleChanges, effect, signal, Input, booleanAttribute } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,45 +22,45 @@ import { InputSize, InputStatus } from './input.interface';
 })
 export class InputComponent implements ControlValueAccessor {
   /** 输入框大小 */
-  size = input<InputSize>('default', { alias: 'inputSize' });
+  @Input({ alias: 'inputSize' }) size: InputSize = 'default';
   /** 输入框前缀 */
-  prefix = input<string>('', { alias: 'inputPrefix' });
+  @Input({ alias: 'inputPrefix' }) prefix: string = '';
   /** 输入框后缀 */
-  suffix = input<string>('', { alias: 'inputSuffix' });
+  @Input({ alias: 'inputSuffix' }) suffix: string = '';
   /** 前缀图标 */
-  prefixIcon = input<string>('', { alias: 'inputPrefixIcon' });
+  @Input({ alias: 'inputPrefixIcon' }) prefixIcon: string = '';
   /** 后缀图标 */
-  suffixIcon = input<string>('', { alias: 'inputSuffixIcon' });
+  @Input({ alias: 'inputSuffixIcon' }) suffixIcon: string = '';
   /** 输入框提示 */
-  placeholder = input<string>('', { alias: 'inputPlaceholder' });
+  @Input({ alias: 'inputPlaceholder' }) placeholder: string = '';
   /** 输入框禁用 */
-  disabled = input(false, { transform: coerceBooleanProperty, alias: 'inputDisabled' });
+  @Input({ alias: 'inputDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 输入框只读 */
-  readonly = input(false, { transform: coerceBooleanProperty, alias: 'inputReadonly' });
+  @Input({ alias: 'inputReadonly', transform: booleanAttribute }) readonly: boolean = false;
   /** 允许清除 */
-  allowClear = input(true, { transform: coerceBooleanProperty, alias: 'inputAllowClear' });
+  @Input({ alias: 'inputAllowClear', transform: booleanAttribute }) allowClear: boolean = true;
   /** 输入框最大长度 */
-  maxlength = input<number | null>(null, { alias: 'inputMaxlength' });
+  @Input({ alias: 'inputMaxlength' }) maxlength: number | null = null;
   /** 输入框最小长度 */
-  minlength = input<number | null>(null, { alias: 'inputMinlength' });
+  @Input({ alias: 'inputMinlength' }) minlength: number | null = null;
   /** 输入框类型 */
-  type = input<string>('text', { alias: 'inputType' });
+  @Input({ alias: 'inputType' }) type: string = 'text';
   /** 输入框状态 */
-  status = input<InputStatus>('default', { alias: 'inputStatus' });
+  @Input({ alias: 'inputStatus' }) status: InputStatus = 'default';
   /** 边框 */
-  bordered = input(true, { transform: coerceBooleanProperty, alias: 'inputBordered' });
+  @Input({ alias: 'inputBordered', transform: booleanAttribute }) bordered: boolean = true;
   /** 是否显示字数统计 */
-  showCount = input(false, { transform: coerceBooleanProperty, alias: 'inputShowCount' });
+  @Input({ alias: 'inputShowCount', transform: booleanAttribute }) showCount: boolean = false;
   /** 自动获取焦点 */
-  autofocus = input(false, { transform: coerceBooleanProperty, alias: 'inputAutofocus' });
+  @Input({ alias: 'inputAutofocus', transform: booleanAttribute }) autofocus: boolean = false;
   /** 是否自动调整大小 */
-  autosize = input<boolean | { minRows: number; maxRows: number }>(false, { alias: 'inputAutosize' });
+  @Input({ alias: 'inputAutosize' }) autosize: boolean | { minRows: number; maxRows: number } = false;
   /** 输入框id */
-  id = input<string>('', { alias: 'inputId' });
+  @Input({ alias: 'inputId' }) id: string = '';
   /** 输入框校验规则 */
-  pattern = input<((value: string) => boolean) | RegExp | null>(null, { alias: 'inputPattern' });
+  @Input({ alias: 'inputPattern' }) pattern: ((value: string) => boolean) | RegExp | null = null;
   /** 输入框自动完成 */
-  autocomplete = input<string>('off', { alias: 'inputAutocomplete' });
+  @Input({ alias: 'inputAutocomplete' }) autocomplete: string = 'off';
 
   /** 输入框获得焦点事件 */
   @Output() focus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
@@ -136,8 +136,8 @@ export class InputComponent implements ControlValueAccessor {
    */
   changeValue(value: any): void {
     // 验证输入值
-    if (this.pattern()) {
-      const pattern = this.pattern();
+    if (this.pattern) {
+      const pattern = this.pattern;
       if (typeof pattern === 'function' && !pattern(value)) {
         // 自定义验证函数失败
         this.error = '输入不符合规则';
@@ -175,8 +175,8 @@ export class InputComponent implements ControlValueAccessor {
    */
   getCharCount(): string {
     const count = this._data?.length || 0;
-    if (this.maxlength()) {
-      return `${count}/${this.maxlength()}`;
+    if (this.maxlength) {
+      return `${count}/${this.maxlength}`;
     }
     return `${count}`;
   }

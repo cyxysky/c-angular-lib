@@ -269,6 +269,7 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   onNodeExpand(node: TreeNodeOptions): void {
     if (this.asyncData && (!node.children || node.children.length === 0) && !node.isLeaf) {
+      // 异步加载数据
       node.changeChildren = (children: TreeNodeOptions[]) => {
         node.children = children;
         node.asyncLoading = false;
@@ -278,7 +279,6 @@ export class TreeComponent implements OnInit, OnChanges {
       node.asyncLoading = true;
       this.cdr.detectChanges();
     }
-
     if (node.expanded) {
       // 收起：先更新状态，保持DOM渲染直到动画结束
       node.expanded = false;
@@ -452,7 +452,6 @@ export class TreeComponent implements OnInit, OnChanges {
       node.expanded = false;
     });
   }
-
 
   /**
    * 展开节点父级

@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, input, numberAttribute } from '@angular/core';
+import { booleanAttribute, Component, Input, input, numberAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { rippleAnimation } from '../core/animation/ripple.animation';
@@ -15,28 +15,30 @@ import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.inter
 		]),
 	],
 	host: {
-		'[class]': 'disabled() ? "disabled" : ""',
-		'[style.pointer-events]': 'disabled() ? "none" : "auto"',
-		'[style.display]': 'block() ? "block" : "inline-block"',
+		'[class]': 'disabled ? "disabled" : ""',
+		'[style.pointer-events]': 'disabled ? "none" : "auto"',
+		'[style.display]': 'block ? "block" : "inline-block"',
 	}
 })
 export class ButtonComponent {
 	/** 按钮大小 */
-	size = input<ButtonSize>('middle', { alias: 'buttonSize' });
+	@Input({ alias: 'buttonSize' }) size: ButtonSize = 'middle';
 	/** 按钮类型 */
-	type = input<ButtonType>('default', { alias: 'buttonType' });
+	@Input({ alias: 'buttonType' }) type: ButtonType = 'default';
 	/** 按钮形状 */
-	shape = input<ButtonShape>('default', { alias: 'buttonShape' });
+	@Input({ alias: 'buttonShape' }) shape: ButtonShape = 'default';
 	/** 是否禁用 */
-	disabled = input(false, { transform: booleanAttribute, alias: 'buttonDisabled' });
+	@Input({ alias: 'buttonDisabled', transform: booleanAttribute }) disabled: boolean = false;
 	/** 按钮颜色 */
-	color = input<ButtonColor>('primary', { alias: 'buttonColor' });
+	@Input({ alias: 'buttonColor' }) color: ButtonColor = 'primary';
 	/** 内容 */
-	content = input<string>(undefined, { alias: 'buttonContent' });
+	@Input({ alias: 'buttonContent' }) content: string | undefined;
 	/** 是否撑满父元素 */
-	block = input(false, { transform: booleanAttribute, alias: 'buttonBlock' });
+	@Input({ alias: 'buttonBlock', transform: booleanAttribute }) block: boolean = false;
+	
 	/** 波纹 */
 	public ripple: { x?: number; y?: number; size?: number } = {};
+
 	/**
 	 * 创建波纹
 	 * @param event 事件

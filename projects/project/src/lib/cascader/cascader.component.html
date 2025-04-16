@@ -36,7 +36,7 @@
             #searchInput
             *ngIf="showSearch"
             [disabled]="disabled"
-            (inputWidthChange)="updateDropdownPosition()"
+            (inputWidthChange)="asyncUpdateDropdownPosition()"
             (compositionChange)="onCompositionChange($event)"
             (search)="onSearch($event)">
         </lib-select-search>

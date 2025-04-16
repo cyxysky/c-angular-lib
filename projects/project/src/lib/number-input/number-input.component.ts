@@ -1,4 +1,4 @@
-import { Component, forwardRef, signal, computed, input } from '@angular/core';
+import { Component, forwardRef, signal, computed, input, Input, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
@@ -18,33 +18,33 @@ import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/f
 })
 export class NumberInputComponent implements ControlValueAccessor {
   /** 最小值 */
-  min = input<number | null>(null, { alias: 'numberInputMin' });
+  @Input({ alias: 'numberInputMin' }) min: number | null = null;
   /** 最大值 */
-  max = input<number | null>(null, { alias: 'numberInputMax' });
+  @Input({ alias: 'numberInputMax' }) max: number | null = null;
   /** 步长 */
-  step = input<number>(1, { alias: 'numberInputStep' });
+  @Input({ alias: 'numberInputStep' }) step: number = 1;
   /** 小数精度 */
-  precision = input<number>(0, { alias: 'numberInputPrecision' });
+  @Input({ alias: 'numberInputPrecision' }) precision: number = 0;
   /** 占位符 */
-  placeholder = input<string>('', { alias: 'numberInputPlaceholder' });
+  @Input({ alias: 'numberInputPlaceholder' }) placeholder: string = '';
   /** 是否禁用 */
-  disabled = input<boolean>(false, { alias: 'numberInputDisabled' });
+  @Input({ alias: 'numberInputDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 是否只读 */
-  readonly = input<boolean>(false, { alias: 'numberInputReadonly' });
+  @Input({ alias: 'numberInputReadonly', transform: booleanAttribute }) readonly: boolean = false;
   /** 颜色 */
-  color = input<string>('black', { alias: 'numberInputColor' });
+  @Input({ alias: 'numberInputColor' }) color: string = 'black';
   /** 前缀 */
-  prefix = input<string>('', { alias: 'numberInputPrefix' });
+  @Input({ alias: 'numberInputPrefix' }) prefix: string = '';
   /** 后缀 */
-  suffix = input<string>('', { alias: 'numberInputSuffix' });
+  @Input({ alias: 'numberInputSuffix' }) suffix: string = '';
   /** 前缀图标 */
-  prefixIcon = input<string>('', { alias: 'numberInputPrefixIcon' });
+  @Input({ alias: 'numberInputPrefixIcon' }) prefixIcon: string = '';
   /** 后缀图标 */
-  suffixIcon = input<string>('', { alias: 'numberInputSuffixIcon' });
+  @Input({ alias: 'numberInputSuffixIcon' }) suffixIcon: string = '';
   /** 状态 */
-  status = input<'normal' | 'error' | 'warning'>('normal', { alias: 'numberInputStatus' });
+  @Input({ alias: 'numberInputStatus' }) status: 'normal' | 'error' | 'warning' = 'normal';
   /** 格式化函数 */
-  formatter = input<(value: number) => any>(value => value, { alias: 'numberInputFormatter' });
+  @Input({ alias: 'numberInputFormatter' }) formatter: (value: number) => any = (value) => value;
 
   /** 当前值 */
   public value = signal<number | null>(null);
@@ -66,7 +66,7 @@ export class NumberInputComponent implements ControlValueAccessor {
   increase(): void {
     if (this.isDisabled()) return;
     const currentValue = this.value() ?? 0;
-    const newValue = currentValue + this.step();
+    const newValue = currentValue + this.step;
     if (this.isValueInRange(newValue)) {
       this.updateValue(newValue);
     }
@@ -78,7 +78,7 @@ export class NumberInputComponent implements ControlValueAccessor {
   decrease(): void {
     if (this.isDisabled()) return;
     const currentValue = this.value() ?? 0;
-    const newValue = currentValue - this.step();
+    const newValue = currentValue - this.step;
     if (this.isValueInRange(newValue)) {
       this.updateValue(newValue);
     }
@@ -126,7 +126,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 是否禁用
    */
   private isDisabled(): boolean {
-    return this.disabled() || this.readonly();
+    return this.disabled || this.readonly;
   }
 
   /**
@@ -135,8 +135,8 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 是否在范围内
    */
   private isValueInRange(value: number): boolean {
-    const minVal = this.min();
-    const maxVal = this.max();
+    const minVal = this.min;
+    const maxVal = this.max;
     return (minVal === null || value >= minVal) && (maxVal === null || value <= maxVal);
   }
 
@@ -146,8 +146,8 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 范围限制后的值
    */
   private applyBounds(value: number): number {
-    const minVal = this.min();
-    const maxVal = this.max();
+    const minVal = this.min;
+    const maxVal = this.max;
     if (minVal !== null && value < minVal) return minVal;
     if (maxVal !== null && value > maxVal) return maxVal;
     return value;
@@ -159,7 +159,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 精度处理后的值
    */
   private applyPrecision(value: number): number {
-    const precisionVal = this.precision();
+    const precisionVal = this.precision;
     if (precisionVal >= 0) {
       return parseFloat(value.toFixed(precisionVal));
     }
@@ -172,7 +172,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 格式化后的值
    */
   private formatWithPrecision(value: number): string {
-    return value.toFixed(this.precision());
+    return value.toFixed(this.precision);
   }
 
   /**
@@ -181,7 +181,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @returns 格式化后的值
    */
   private applyFormatter(value: number): any {
-    return this.formatter()(value);
+    return this.formatter(value);
   }
   
   /**

@@ -1,3 +1,11 @@
+<ng-template #dateTimerIcon>
+  <div class="date-timer-suffix">
+    <span *ngIf="allowClear && displayValue" class="date-timer-clear-btn" (click)="clearValue($event)">
+      <i class="bi-x-lg"></i>
+    </span>
+    <i class="bi-calendar-week"></i>
+  </div>
+</ng-template>
 <!-- 基础输入框 -->
 <div class="date-timer-container" [class.date-timer-disabled]="disabled" cdkOverlayOrigin>
   <!-- 单个日期/时间选择 -->
@@ -20,10 +28,7 @@
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
       />
-      <div class="date-timer-suffix">
-        <span *ngIf="allowClear && displayValue" class="date-timer-clear-btn" (click)="clearValue($event)">×</span>
-        <span class="date-timer-icon">📅</span>
-      </div>
+      <ng-container *ngTemplateOutlet="dateTimerIcon"></ng-container>
     </div>
   </div>
 
@@ -52,10 +57,7 @@
         [value]="getEndDate() ? formatDate(getEndDate()!) : ''"
         readonly
       />
-      <div class="date-timer-suffix">
-        <span *ngIf="allowClear && displayValue" class="date-timer-clear-btn" (click)="clearValue($event)">×</span>
-        <span class="date-timer-icon">📅</span>
-      </div>
+      <ng-container *ngTemplateOutlet="dateTimerIcon"></ng-container>
     </div>
   </div>
 </div>

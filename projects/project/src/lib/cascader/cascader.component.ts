@@ -294,7 +294,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.isDropdownOpen = true;
     // 设置键盘导航索引
     this.keyboardNavIndex = -1;
-
   }
 
   /**
@@ -407,15 +406,14 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   }
 
   /**
-   * 更新下拉菜单位置
+   * 异步更新下拉菜单位置
    */
-  public updateDropdownPosition(): void {
+  public asyncUpdateDropdownPosition(): void {
     if (!this.overlayRef) return;
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       if (this.overlayRef && this.isDropdownOpen) {
         this.overlayRef.updatePosition();
       }
-      clearTimeout(timer);
     }, 0);
   }
 
@@ -480,7 +478,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.columns.push(this.getChildren(option));
     }
     // 更新下拉位置和UI
-    this.updateDropdownPosition();
+    this.asyncUpdateDropdownPosition();
     this.cdr.markForCheck();
   }
 
@@ -944,7 +942,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     }
   }
 
-
   /**
    * 获取选项值
    * @param option 选项
@@ -1251,7 +1248,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
           this.activatedOptions.pop();
           this.tempSelectedOptions.pop();
           this.columns.pop();
-          this.updateDropdownPosition();
+          this.asyncUpdateDropdownPosition();
           this.cdr.markForCheck();
         }
         break;

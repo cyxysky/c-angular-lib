@@ -17,9 +17,13 @@ import { Subject } from 'rxjs';
   `
 })
 export class TabComponent implements OnInit, AfterContentInit, OnDestroy {
+  /** 标题 */
   @Input({ alias: 'tabTitle' }) title: string = '';
+  /** 是否禁用 */
   @Input({ alias: 'tabDisabled', transform: booleanAttribute }) disabled: boolean = false;
+  /** 唯一标识 */
   @Input({ alias: 'tabKey' }) key: string = '';
+  /** 标题模板 */
   @Input({ alias: 'tabTitleTemplate' }) titleTemplate: TemplateRef<any> | null = null;
   
   @ViewChild('contentTemplate', { static: true }) contentTemplate!: TemplateRef<any>;

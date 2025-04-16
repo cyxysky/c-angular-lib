@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, ElementRef, forwardRef, input, model, output, signal, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, forwardRef, Input, input, model, output, signal, TemplateRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -18,17 +18,16 @@ import { CommonModule } from '@angular/common';
 })
 export class SwitchComponent implements ControlValueAccessor {
   @ViewChild('switchButton') switchButton!: ElementRef;
-
   /** 是否禁用 */
-  disabled = input(false, { transform: booleanAttribute, alias: 'switchDisabled' });
+  @Input({ alias: 'switchDisabled', transform: booleanAttribute }) disabled = false;
   /** 是否加载中 */
-  loading = input(false, { transform: booleanAttribute, alias: 'switchLoading' });
+  @Input({ alias: 'switchLoading', transform: booleanAttribute }) loading = false;
   /** 选中时的内容 */
-  checkedChildren = input<any>('', { alias: 'switchCheckedChildren' });
+  @Input({ alias: 'switchCheckedChildren' }) checkedChildren: string | TemplateRef<any> | any = null;
   /** 未选中时的内容 */
-  unCheckedChildren = input<any>('', { alias: 'switchUnCheckedChildren' });
+  @Input({ alias: 'switchUnCheckedChildren' }) unCheckedChildren: string | TemplateRef<any> | any = null;
   /** 大小 */
-  size = input<'default' | 'small'>('default', { alias: 'switchSize' });
+  @Input({ alias: 'switchSize' }) size: 'default' | 'small' = 'default';
   // 使用model()函数创建双向绑定
   checked = signal(false);
 
@@ -41,7 +40,7 @@ export class SwitchComponent implements ControlValueAccessor {
   private onTouched: () => void = () => { };
 
   toggle(): void {
-    if (this.disabled() || this.loading()) {
+    if (this.disabled || this.loading) {
       return;
     }
     const newValue = !this.checked();

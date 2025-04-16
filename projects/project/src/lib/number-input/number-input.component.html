@@ -1,57 +1,57 @@
 <div class="lib-number-input-container" 
      [class.focused]="focused()" 
-     [class.disabled]="disabled()"
-     [class.readonly]="readonly()"
-     [class.lib-number-input-normal]="status() === 'normal'"
-     [class.lib-number-input-error]="status() === 'error'"
-     [class.lib-number-input-warning]="status() === 'warning'">
+     [class.disabled]="disabled"
+     [class.readonly]="readonly"
+     [class.lib-number-input-normal]="status === 'normal'"
+     [class.lib-number-input-error]="status === 'error'"
+     [class.lib-number-input-warning]="status === 'warning'">
   
   <!-- 前缀 -->
   <span class="lib-number-input-prefix">
     <ng-content select="[prefix], prefix"></ng-content>
-    <ng-container *ngIf="prefix()">
-      {{ prefix() }}
+    <ng-container *ngIf="prefix">
+      {{ prefix }}
     </ng-container>
-    <ng-container *ngIf="prefixIcon()">
-      <i [class]="prefixIcon()"></i>
+    <ng-container *ngIf="prefixIcon">
+      <i [class]="prefixIcon"></i>
     </ng-container>
   </span>
   
   <div class="lib-number-input-content">
     <!-- 输入框 -->
     <input type="number"
-           [style.color]="color()"
+           [style.color]="color"
            class="lib-number-input"
            [(ngModel)]="value"
            (ngModelChange)="onInputChange($event)"
-           [placeholder]="placeholder()"
-           [disabled]="disabled()"
-           [readonly]="readonly()"
+           [placeholder]="placeholder"
+           [disabled]="disabled"
+           [readonly]="readonly"
            (focus)="onFocus()"
            (blur)="onBlur()">
   </div>
   <!-- 后缀 -->
   <span class="lib-number-input-suffix">
     <ng-content select="[suffix], suffix"></ng-content>
-    <ng-container *ngIf="suffix()">
-      {{ suffix() }}
+    <ng-container *ngIf="suffix">
+      {{ suffix }}
     </ng-container>
-    <ng-container *ngIf="suffixIcon()">
-      <i [class]="suffixIcon()"></i>
+    <ng-container *ngIf="suffixIcon">
+      <i [class]="suffixIcon"></i>
     </ng-container>
   </span>
   
   <!-- 控制按钮 -->
-  <div class="lib-number-input-handler-wrap" *ngIf="!readonly()">
+  <div class="lib-number-input-handler-wrap" *ngIf="!readonly">
     <button type="button"
             class="lib-number-input-handler lib-number-input-handler-up"
-            [disabled]="disabled() || (max() !== null && value() !== null && value()! >= max()!)"
+            [disabled]="disabled || (max !== null && value() !== null && value()! >= max!)"
             (click)="increase()">
       <span class="lib-number-input-handler-up-inner"></span>
     </button>
     <button type="button"
             class="lib-number-input-handler lib-number-input-handler-down"
-            [disabled]="disabled() || (min() !== null && value() !== null && value()! <= min()!)"
+            [disabled]="disabled || (min !== null && value() !== null && value()! <= min!)"
             (click)="decrease()">
       <span class="lib-number-input-handler-down-inner"></span>
     </button>
