@@ -488,14 +488,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         if (this.customFormat) {
           return this.customFormat(value);
         }
-
         let dateStr = this.formatDate(value);
-
-        // 如果有时间显示，加上时间
-        if (this.showTime) {
-          dateStr += ' ' + this.formatTime(value);
-        }
-
         return dateStr;
       }
     }
@@ -504,9 +497,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     if (this.isRangeValue(value)) {
       const start = value.start;
       const end = value.end;
-
       if (!start) return '';
-
       // 范围的结束时间不存在时，只显示开始时间
       if (!end) {
         if (this.mode === 'year') {
@@ -1371,93 +1362,22 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   // 特殊功能
   setCurrentTime(): void {
     const now = new Date();
-
-    if (this.mode === 'time') {
-      // 对于时间模式，直接设置时间
-      if (!this.selectedValue) {
-        this.selectedValue = now;
-      } else if (this.isSingleDate(this.selectedValue)) {
-        // 保留年月日，只改变时分秒
-        this.selectedValue = setHours(this.selectedValue, getHours(now));
-        this.selectedValue = setMinutes(this.selectedValue, getMinutes(now));
-        this.selectedValue = setSeconds(this.selectedValue, getSeconds(now));
-      } else if (this.isRangeValue(this.selectedValue)) {
-        // 如果是范围，更新start的时间部分
-        const range = this.selectedValue as RangeValue<Date>;
-        if (!range.start) {
-          range.start = now;
-        } else {
-          range.start = setHours(range.start, getHours(now));
-          range.start = setMinutes(range.start, getMinutes(now));
-          range.start = setSeconds(range.start, getSeconds(now));
-        }
-        this.selectedValue = range;
-      }
-
-      this.displayValue = this.formatSelectedValue(this.selectedValue);
-      this._onChange(this.selectedValue);
-      this.cdr.markForCheck();
-      return;
+    // 对于时间模式，直接设置时间
+    if (!this.selectedValue) {
+      this.selectedValue = now;
+    } else if (this.isSingleDate(this.selectedValue)) {
+      // 保留年月日，只改变时分秒
+      this.selectedValue = setHours(this.selectedValue, getHours(now));
+      this.selectedValue = setMinutes(this.selectedValue, getMinutes(now));
+      this.selectedValue = setSeconds(this.selectedValue, getSeconds(now));
     }
-
-    if (this.selectType === 'single') {
-      if ((this.mode === 'date') || (this.mode as any === 'time')) {
-        // 对于date和time模式，使用单一日期
-        let date = this.selectedValue as Date || now;
-        date = setHours(date, getHours(now));
-        date = setMinutes(date, getMinutes(now));
-        date = setSeconds(date, getSeconds(now));
-
-        this.selectedValue = date;
-        this.displayValue = this.formatSelectedValue(date);
-        this._onChange(this.selectedValue);
-      } else if (this.isRangeValue(this.selectedValue)) {
-        // 处理其他模式下的范围对象
-        const range = this.selectedValue as RangeValue<Date>;
-        if (!range) return;
-
-        if (range.start) {
-          range.start = setHours(range.start, getHours(now));
-          range.start = setMinutes(range.start, getMinutes(now));
-          range.start = setSeconds(range.start, getSeconds(now));
-
-          if (range.end) {
-            range.end = setHours(range.end, getHours(now));
-            range.end = setMinutes(range.end, getMinutes(now));
-            range.end = setSeconds(range.end, getSeconds(now));
-          }
-        }
-
-        this.selectedValue = range;
-        this.displayValue = this.formatSelectedValue(range);
-        this._onChange(this.selectedValue);
-      }
-    } else {
-      // 范围选择模式
-      const range = this.selectedValue as RangeValue<Date>;
-      if (!range) return;
-
-      if (this.rangePart === 'start' && range.start) {
-        range.start = setHours(range.start, getHours(now));
-        range.start = setMinutes(range.start, getMinutes(now));
-        range.start = setSeconds(range.start, getSeconds(now));
-      } else if (this.rangePart === 'end' && range.end) {
-        range.end = setHours(range.end, getHours(now));
-        range.end = setMinutes(range.end, getMinutes(now));
-        range.end = setSeconds(range.end, getSeconds(now));
-      }
-
-      this.selectedValue = range;
-      this.displayValue = this.formatSelectedValue(range);
-      this._onChange(range);
-    }
-
+    this.displayValue = this.formatSelectedValue(this.selectedValue);
+    this._onChange(this.selectedValue);
     this.cdr.markForCheck();
   }
 
   today(): void {
     const today = new Date();
-
     if (this.selectType === 'single') {
       if (this.mode === 'date' || this.mode === 'time') {
         // 对于date和time模式，使用单一日期
@@ -1466,7 +1386,6 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       } else {
         // 对于其他模式，选择合适的范围
         let start: Date, end: Date;
-
         switch (this.mode) {
           case 'year':
             start = new Date(getYear(today), 0, 1, 0, 0, 0);
@@ -1493,18 +1412,12 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
             start = startOfDay(today);
             end = endOfDay(today);
         }
-
         this.selectedValue = { start, end };
         this.displayValue = this.formatSelectedValue(this.selectedValue);
       }
-
       this._onChange(this.selectedValue);
-    } else {
-      // 范围选择模式
-      this.onSelectDate(today);
     }
-
-    this.closeDropdown();
+    !this.showTime && this.closeDropdown();
   }
 
   confirm(): void {
@@ -1597,6 +1510,24 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     return this.disabledDate ? this.disabledDate(date) : false;
   }
 
+  getTimeDisabled(type: 'hour' | 'minute' | 'second', value: number, startDate: Date, endDate: Date): boolean {
+    if (type === 'hour') {
+      // 禁用小于开始时间的小时
+      return value < startDate.getHours();
+    } else if (type === 'minute') {
+      // 如果是同一小时，禁用小于开始时间的分钟
+      if (endDate && endDate.getHours() === startDate.getHours()) {
+        return value < startDate.getMinutes();
+      }
+    } else if (type === 'second') {
+      // 如果是同一小时和分钟，禁用小于开始时间的秒钟
+      if (endDate && endDate.getHours() === startDate.getHours() && endDate.getMinutes() === startDate.getMinutes()) {
+        return value < startDate.getSeconds();
+      }
+    }
+    return false;
+  }
+
   isTimeDisabled(type: 'hour' | 'minute' | 'second', value: number): boolean {
     // 如果有自定义禁用规则
     if (this.disabledTime) {
@@ -1613,33 +1544,22 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       }
     }
 
-    // 范围选择时，确保结束时间不早于开始时间
-    if (this.selectType === 'range' && this.rangePart === 'end' && this.rangeStart) {
+    if (this.mode === 'time' && this.selectType === 'range' && this.rangePart === 'end' && this.rangeStart) {
+      const startDate = new Date(this.rangeStart);
+      const endDate = new Date((this.selectedValue as any).end);
+      return this.getTimeDisabled(type, value, startDate, endDate);
+    }
+
+    if (this.selectType === 'range' && this.rangePart === 'end' && this.rangeStart && this.mode !== 'time') {
       const startDate = new Date(this.rangeStart);
       // 如果当前正在构建的日期存在
       if (this.isRangeValue(this.selectedValue) && this.selectedValue.end) {
         const endDate = new Date(this.selectedValue.end);
         // 检查日期是否是同一天
-        const isSameDay = startDate.getFullYear() === endDate.getFullYear() &&
-          startDate.getMonth() === endDate.getMonth() &&
-          startDate.getDate() === endDate.getDate();
+        const isSameDay = startDate.getFullYear() === endDate.getFullYear() && startDate.getMonth() === endDate.getMonth() && startDate.getDate() === endDate.getDate();
         // 只有同一天才需要检查时间大小
         if (isSameDay) {
-          if (type === 'hour') {
-            // 禁用小于开始时间的小时
-            return value < startDate.getHours();
-          } else if (type === 'minute') {
-            // 如果是同一小时，禁用小于开始时间的分钟
-            if (endDate.getHours() === startDate.getHours()) {
-              return value < startDate.getMinutes();
-            }
-          } else if (type === 'second') {
-            // 如果是同一小时和分钟，禁用小于开始时间的秒钟
-            if (endDate.getHours() === startDate.getHours() &&
-              endDate.getMinutes() === startDate.getMinutes()) {
-              return value < startDate.getSeconds();
-            }
-          }
+          return this.getTimeDisabled(type, value, startDate, endDate);
         }
       } else if (type === 'hour' && this.timeSelectStep === 'hour') {
         // 正在选择结束时间的小时，但还没有选择日期的情况

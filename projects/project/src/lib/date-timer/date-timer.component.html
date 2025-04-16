@@ -309,8 +309,8 @@
         </ng-container>
       </div>
       <div class="date-timer-footer-buttons">
-        <button *ngIf="showToday && currentPanelMode !== 'time'" class="date-timer-now-btn" (click)="today()">今天</button>
-        <button *ngIf="showTime || mode === 'time'" class="date-timer-now-btn" (click)="setCurrentTime()">此刻</button>
+        <button *ngIf="showToday && currentPanelMode !== 'time' && selectType === 'single'" class="date-timer-now-btn" (click)="today()">今天</button>
+        <button *ngIf="mode === 'time' && selectType === 'single'" class="date-timer-now-btn" (click)="setCurrentTime()">此刻</button>
         <button class="date-timer-ok-btn" (click)="confirm()">确定</button>
       </div>
     </div>
