@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // 指令
 import { WidgetDirective } from './core/directive/widget.directive';
+import { SearchInElementDirective } from './core/directive/search-in-element.directive';
 import { WaterMarkDirectiveDirective } from './water-mark/water-mark-directive.directive';
 import { PopoverDirective } from './popover/popover.directive';
 import { PopconfirmDirective } from './popconfirm/popconfirm.directive';
@@ -84,6 +85,7 @@ export * from './drop-menu';
     MultiDimensionalFlowchartComponent,
     ProcessTreeNodeComponent,
     WidgetDirective,
+    SearchInElementDirective,
     UserSelectComponent,
     InputComponent,
     SelectComponent,
@@ -124,6 +126,7 @@ export * from './drop-menu';
     MultiDimensionalFlowchartComponent,
     ProcessTreeNodeComponent,
     WidgetDirective,
+    SearchInElementDirective,
     UserSelectComponent,
     InputComponent,
     SelectComponent,

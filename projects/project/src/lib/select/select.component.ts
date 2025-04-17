@@ -7,11 +7,10 @@ import { CommonModule, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { UtilsService } from '../core/utils/utils.service';
-import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
-import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
+import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
 @Component({
   selector: 'lib-select',
-  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectTagComponent, SelectSearchComponent],
+  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectBoxComponent],
   templateUrl: './select.component.html',
   styleUrl: './select.component.less',
   providers: [
@@ -24,16 +23,13 @@ import { SelectSearchComponent } from '../select-basic/select-search/select-sear
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit {
-  //#region ViewChild 引用
   /** 浮层初始位置 */
   @ViewChild(CdkOverlayOrigin, { static: false }) _overlayOrigin!: CdkOverlayOrigin;
   /** 浮层tamplet对象 */
   @ViewChild('overlay', { static: false }) overlayTemplate!: TemplateRef<any>;
   /** 搜索盒子 */
-  @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;
-  //#endregion
+  @ViewChild('searchInput', { static: false }) searchInput!: SelectBoxComponent;
 
-  //#region 输入属性
   /** 弹出浮层最大高度 */
   @Input({ alias: 'selectPanelMaxHeight' }) optionPanelMaxHeight: number = 400;
   /** 数据为空占位符 */
@@ -76,9 +72,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   @Input({ alias: 'selectDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 底部操作栏 */
   @Input({ alias: 'selectBottomBar' }) bottomBar: TemplateRef<any> | null = null;
-  //#endregion
 
-  //#region 内部状态变量
   /** 组件内部数据 */
   public _data: any = [];
   /** 浮层引用 */
@@ -111,9 +105,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public hoverKey: string = '';
   /** 当前激活选项的索引 */
   public activeOptionIndex: number = -1;
-  //#endregion
 
-  //#region 构造函数
   constructor(
     public overlay: Overlay,
     public viewContainerRef: ViewContainerRef,
@@ -126,9 +118,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.debouncedSearch = this.utilsService.debounce(this.searchFn);
     }
   }
-  //#endregion
 
-  //#region 生命周期钩子
   ngOnInit() {
     this.initializeOptions();
     this.checkMaxCount();
@@ -170,9 +160,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.flattenedGroupOptions = [];
     this.optionsGroups = {};
   }
-  //#endregion
 
-  //#region 数据初始化与处理
   /**
    * 初始化选项相关数据
    */
@@ -249,13 +237,11 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.filteredOptions = [...this.optionList];
     this.cdr.detectChanges();
   }
-  //#endregion
 
-  //#region 选项操作方法
   /**
    * 根据值获取标签
    */
-  public getLabel(value: any): string {
+  public getLabel = (value?: any): string => {
     return this.optionMap.get(value) || value;
   }
 
@@ -313,9 +299,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 移除用户
    */
-  public removeUser(event: Event, userId: any): void {
-    event.stopImmediatePropagation();
-    event.stopPropagation();
+  public removeUser(userId: any): void {
     this.handleSelectionChange(userId, 'remove');
   }
 
@@ -333,8 +317,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 清空数据
    */
-  public clear(event: Event): void {
-    event.stopPropagation();
+  public clear(): void {
     this.updateData(this.selectMode === 'single' ? '' : []);
     this.reachedMaxCount = false;
   }
@@ -346,16 +329,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public isOptionDisabled(option: any): boolean {
     return option[this.optionDisabledKey] === true;
   }
-  //#endregion
 
-  //#region 搜索相关方法
   /**
    * 搜索
    * @param value 搜索值
    */
   public onSearch(value: any): void {
     this.searchOnCompositionValue = value;
-
     // 执行搜索
     if (!this.searchFn) {
       this.executeLocalSearch(value);
@@ -413,27 +393,22 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 重置搜索状态
    */
   private resetSearchState(): void {
-    this.searchInput.clear();
     this.searchValue = '';
-    this.searchOnCompositionValue = '';
+    this.searchInput.clearSearchValue();
     this.filteredOptions = [...this.optionList];
     this.processGroupedOptions();
   }
-  //#endregion
 
-  //#region 搜索输入框操作
 
   /**
    * 聚焦搜索输入
    */
   public focusSearchInput(): void {
     if (this.search && this.searchInput) {
-      this.searchInput.focus();
+      this.searchInput.focusSearchInput();
     }
   }
-  //#endregion
 
-  //#region 自定义标签相关
   /**
    * 创建自定义标签
    */
@@ -466,9 +441,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.optionMap.set(tags[0], tags[0]);
     }
   }
-  //#endregion
 
-  //#region 键盘与粘贴事件处理
   /**
    * 粘贴处理
    * @param event 粘贴事件
@@ -484,8 +457,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     }
   }
 
-  //#endregion
-  //#region 浮层操作
   /**
    * 打开弹窗
    */
@@ -585,9 +556,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       clearTimeout(timer);
     }, 0);
   }
-  //#endregion
 
-  //#region 工具方法
   /**
    * 跟踪选项
    * @param index 索引
@@ -609,9 +578,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       $implicit: option,
     };
   }
-  //#endregion
 
-  //#region ControlValueAccessor 实现
   /** ngModel实现接口 */
   public onTouch = (): void => { };
   public onChange = (value: any): void => { }
@@ -627,9 +594,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public registerOnTouched(fn: any): void {
     this.onTouch = fn;
   }
-  //#endregion
 
-  //#region 键盘导航方法
   /**
    * 添加键盘导航方法
    */
@@ -751,5 +716,5 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this.selectUser(activeItem[this.optionValue], this.isOptionDisabled(activeItem));
     }
   }
-  //#endregion
+
 }

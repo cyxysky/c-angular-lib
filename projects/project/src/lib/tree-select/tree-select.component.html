@@ -1,68 +1,29 @@
-<div class="tree-select-box" 
-    [class.tree-select-sm]="size === 'small'" 
-    [class.tree-select-lg]="size === 'large'"
-    [class.tree-select-borderless]="borderless" 
-    [class.tree-select-error]="status === 'error'"
-    [class.tree-select-warning]="status === 'warning'" 
-    [class.tree-select-disabled]="disabled"
-    [class.tree-select-open]="isDropdownOpen"
+<lib-select-box 
     (click)="openDropdown()" 
-    [style.min-width]="'200px'" 
-    cdkOverlayOrigin>
-    <!-- 内容 -->
-    <div class="tree-select-content">
-        <!-- 占位符 -->
-        <div class="placeholder" *ngIf="showPlaceHolder()">
-            {{ placeholder }}
-        </div>
-        <!-- 单选数据 -->
-        <div class="tree-select-label" *ngIf="showSingleData()">
-            <ng-container *ngTemplateOutlet="labelTemplate || defaultSingleLabelTemplate; context: {$implicit: getSingleNodeTitle(), node: getSingleNode()}"></ng-container>
-            <ng-template #defaultSingleLabelTemplate let-title>
-                <span class="label-text" [ngClass]="{'dropdown-open-text': isNowDropdownOpen}">{{ title }}</span>
-            </ng-template>
-        </div>
-        <!-- 多选数据 -->
-        <ng-container *ngIf="showMultipleData()">
-            <lib-select-tag *ngFor="let tag of displayTags" (remove)="removeItem($event, tag.value)" [size]="size" [closable]="true">
-                <ng-container *ngTemplateOutlet="labelTemplate || defaultMultipleLabelTemplate; context: {$implicit: tag.node, node: tag.node}"></ng-container>
-                <ng-template #defaultMultipleLabelTemplate let-node>
-                    {{ node.title }}
-                </ng-template>
-            </lib-select-tag>
-        </ng-container>
-        <!-- 搜索框 -->
-        <lib-select-search
-            #searchInput
-            *ngIf="showSearch"
-            [disabled]="disabled"
-            (inputWidthChange)="updateDropdownPosition()"
-            (compositionChange)="onCompositionChange($event)"
-            (search)="onSearch($event)">
-        </lib-select-search>
-    </div>
-    <!-- 后缀 -->
-    <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
-</div>
+    cdkOverlayOrigin
 
-<!-- 后缀模板 -->
-<ng-template #suffixTemplate>
-    <!-- 后缀图标 -->
-    <div class="suffix-box">
-        <!-- 加载图标 -->
-        <div *ngIf="loading" class="loading-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="loading-svg" color="rgba(23, 184, 199, 0.6)" fill="currentColor">
-                <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
-            </svg>
-        </div>
-        <!-- 搜索图标 -->
-        <i class="bi bi-search" *ngIf="!loading && showSearch && isDropdownOpen"></i>
-        <!-- 下拉图标 -->
-        <i class="bi bi-caret-down-fill tree-select-icon" *ngIf="!loading && !showSearch" [style.transform]="isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
-        <!-- 清除图标 -->
-        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isDropdownOpen" (click)="clear($event)"></i>
-    </div>
-</ng-template>
+    [selectMode]="multiple ? 'multiple' : 'single'"
+    [loading]="loading"
+    [size]="size"
+    [borderless]="borderless"
+    [disabled]="disabled"
+    [placeholder]="placeholder"
+    [status]="status"
+    [isActive]="isDropdownOpen"
+
+    [optionLabelTemplate]="labelTemplate"
+    [getLabel]="getLabel"
+
+    [(searchValue)]="searchValue"
+    [data]="!multiple ? getSingleNodeTitle() : displayTags"
+    #searchInput
+
+    (clear)="clear()"
+    (remove)="removeItem($event.value)"
+    (search)="onSearch($event)"
+    (inputWidthChange)="updateDropdownPosition()"
+    >
+</lib-select-box>
 
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>

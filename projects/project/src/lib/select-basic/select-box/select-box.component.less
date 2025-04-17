@@ -126,6 +126,10 @@
 @select-empty-color: @select-empty-text-color;
 @select-empty-padding: @select-empty-container-padding;
 
+:host {
+    display: block;
+}
+
 .hover-options, .option-active {
     background-color: @select-hover-bg-color;
 }
@@ -197,6 +201,7 @@
     overflow: hidden;
     min-width: @select-min-width;
     box-shadow: @select-box-shadow;
+    box-sizing: border-box;
 
     &:hover {
         border: @select-hover-border;
@@ -230,6 +235,7 @@
         
         .select-content {
             min-height: @select-content-min-height-sm;
+            padding: 0 4px;
         }
         
         .placeHolder, .singal-data {
@@ -335,148 +341,13 @@
     &:hover {
         .suffix-box {
             .clear-icon {
-                display: block;
+                display: flex;
             }
 
             .select-icon-clear {
                 display: none;
             }
         }
-    }
-}
-
-.overlay-select-option-box {
-    background: @select-bg-color;
-    box-shadow: @select-dropdown-box-shadow;
-    width: @select-width-full;
-    margin: @select-dropdown-margin;
-    border-radius: @select-dropdown-border-radius;
-    overflow: hidden;
-    transform-origin: 0 0;
-    transition: all 0.2s ;
-    
-    // 添加开关状态样式
-    &.closed {
-        opacity: 0;
-        transform: scaleY(0.2);
-        pointer-events: none;
-    }
-    
-    &.open {
-        opacity: 1;
-        transform: scaleY(1);
-    }
-
-    .option-list-container{
-    }
-    
-    // 空状态
-    .empty-options {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: @select-width-full;
-        color: @select-empty-text-color;
-        font-size: @select-empty-text-size;
-    }
-
-    .empty-container {
-        .empty-container-base();
-    }
-}
-
-.option-list {
-    flex-grow: 1;
-    overflow: auto;
-    max-height: @select-dropdown-max-height;
-
-    // 选项样式
-    .option-option {
-        .option {
-            .option-base();
-        }
-        .select-option {
-            .select-option-base();
-        }
-    }
-}
-
-// 分组样式
-.option-group {
-    .option {
-        .option-base();
-    }
-    .select-option {
-        .select-option-base();
-    }
-}
-
-.group-title {
-    padding: @select-group-title-padding;
-    font-size: @select-group-title-font-size;
-    color: @select-group-title-color;
-    background-color: @select-group-title-bg;
-    font-weight: @select-group-title-font-weight;
-}
-
-// 虚拟滚动容器
-.virtual-scroll-container {
-    height: @select-width-full;
-    width: @select-width-full;
-}
-
-.cdk-virtual-scroll-content-wrapper{
-    max-width: 100%;
-}
-
-.virtual-scroll-viewport {
-    height: @select-width-full;
-    width: @select-width-full;
-    overflow-x: hidden;
-    will-change: scroll-position;
-    
-    .option {
-        padding: @select-virtual-option-padding;
-        display: grid;
-        align-items: center;
-        max-width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        height: @select-option-height;
-        cursor: pointer;
-        font-size: @select-font-size-base;
-        color: @select-text-color;
-        border-radius: @select-option-border-radius;
-        transition: @select-transition;
-
-        .option-text {
-            max-width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-
-        &:hover {
-            background-color: @select-hover-bg-color;
-        }
-        
-        &.disabled {
-            color: @select-disabled-color;
-            cursor: not-allowed;
-            
-            &:hover {
-                background-color: transparent;
-            }
-        }
-        
-        &.hidden {
-            display: none !important;
-        }
-    }
-
-    .select-option {
-        .select-option-base();
     }
 }
 
@@ -490,6 +361,19 @@
     padding-left: @select-placeholder-padding-left;
     color: @select-placeholder-color;
     position: absolute;
+    height: 100%;
+    line-height: normal;
+    max-width: calc(100% - 8px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .placeHolder-text{
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .search-box {
@@ -523,6 +407,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    line-height: normal;
 }
 
 .singal-data-gray {

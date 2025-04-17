@@ -1,6 +1,8 @@
 <div [class]="['tag', size]">
-    <div class="text">
-        <ng-content></ng-content>
+    <div class="text-box">
+        <div class="text">
+            <ng-content></ng-content>
+        </div>
     </div>
     <div class="close-icon" (click)="removeSelf($event)" *ngIf="closable">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x"

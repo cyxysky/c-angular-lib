@@ -1,12 +1,17 @@
 <div style="display: flex;flex-direction: row;height: 100%;">
-    <div>
-        <div *ngFor="let component of components" (click)="nav(component.path)" class="component-item">{{component.name}}
+    <div style="height: 100%;overflow: hidden;position: fixed;">
+        <!-- <div *ngFor="let component of components" (click)="nav(component.path)" class="component-item">{{component.name}}
         </div>
         <div *ngFor="let component of businessComponents" (click)="nav(component.path)" class="component-item">
             {{component.name}}
-        </div>
+        </div> -->
+        <div (click)="next()">下一个</div>
+        <div (click)="previous()">上一个</div>
+        <div (click)="clear()">清除</div>
+        <div>目前 {{ current() }}</div>
     </div>
-    <div style="height: 100%;flex-grow: 1;padding: 20px;" cdkScrollable>
+
+    <div style="height: 100%;flex-grow: 1;padding: 20px;" cdkScrollable libSearchInElement searchText="标签" [highlightStyle]="{color: 'red'}" [currentMatchStyle]="{color: 'blue'}">
         <router-outlet></router-outlet>
     </div>
 </div>

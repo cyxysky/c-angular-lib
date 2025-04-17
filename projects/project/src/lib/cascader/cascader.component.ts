@@ -5,15 +5,13 @@ import { OverlayService } from '../core/overlay/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
-import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
-import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
 import { CascaderExpandTrigger, CascaderOption, CascaderSize, CascaderTriggerType } from './cascader.interface';
-
+import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
 
 @Component({
   selector: 'lib-cascader',
   standalone: true,
-  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectSearchComponent, SelectTagComponent],
+  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectBoxComponent],
   templateUrl: './cascader.component.html',
   styleUrl: './cascader.component.less',
   providers: [
@@ -33,7 +31,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   // 视图引用
   @ViewChild(CdkOverlayOrigin, { static: false }) overlayOrigin!: CdkOverlayOrigin;
   @ViewChild('dropdownTemplate', { static: false }) dropdownTemplate!: TemplateRef<any>;
-  @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;
+  @ViewChild('searchInput', { static: false }) searchInput!: SelectBoxComponent;
 
   // 输入属性
   /** 选项数据 */
@@ -349,6 +347,10 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     }, 300)
   }
 
+  public blurSearch() {
+    this.searchInput && this.searchInput.blurSearchInput();
+  }
+
   // 列和选项管理
   private prepareColumnsFromSelection(): void {
     // 始终从第一列开始
@@ -653,7 +655,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 更新多选值和显示标签
    */
   private updateMultipleValues(): void {
-    console.log(this.selectedPathsMap)
     if (this.selectedPathsMap.size === 0) {
       this.value = [];
       this.displayTags = [];
@@ -664,6 +665,13 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       path => path.map(opt => this.getOptionValue(opt))
     );
     this.updateDisplayTags();
+  }
+
+  getLabel = (option: any): string => {
+    if (!this.isMultiple) {
+      return option.join(' / ');
+    }
+    return option[this.labelProperty];
   }
 
   /**
@@ -705,7 +713,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public resetSearch(): void {
     this.searchValue = '';
-    this.searchInput && this.searchInput.clear();
+    this.searchInput && this.searchInput.clearSearchValue();
     this.filteredOptions = [];
     this.cdr.detectChanges();
   }
@@ -1039,8 +1047,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param event 事件
    * @param value 值
    */
-  public removeItem(event: Event, value: any): void {
-    event.stopPropagation();
+  public removeItem(value: any): void {
     if (!this.isMultiple) {
       this.clear();
       return;
@@ -1286,15 +1293,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 聚焦搜索
    */
   public focusSearch(): void {
-    this.searchInput && this.searchInput.focus();
+    this.searchInput && this.searchInput.focusSearchInput();
   }
 
-  /**
-   * 失去焦点
-   */
-  public blurSearch(): void {
-    this.searchInput && this.searchInput.blur();
-  }
 
   /**
    * 是否显示占位符

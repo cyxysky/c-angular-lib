@@ -1,21 +1,21 @@
-import { Component, effect, resource, signal } from '@angular/core';
+import { Component, effect, resource, signal, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ProjectModule } from '../../projects/project/src/public-api';
 import { of, delay, interval } from 'rxjs';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule } from '@angular/forms';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 import { DocModule } from '../doc/doc.module';
 import { CommonModule } from '@angular/common';
+import { SearchInElementDirective } from '@project';
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, NzInputModule, NzButtonModule, DocModule, RouterOutlet, CommonModule],
+  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, DocModule, RouterOutlet, CommonModule, SearchInElementDirective],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
 export class AppComponent {
+  @ViewChild(SearchInElementDirective, {static: false}) searchInElement!: SearchInElementDirective;
   title = 'project';
   show = signal(false);
   text = signal('hellossssssss');
@@ -36,6 +36,23 @@ export class AppComponent {
       ok: 'true'
     })
   }
+
+  next() {
+    this.searchInElement.next();
+  }
+
+  previous() {
+    this.searchInElement.previous();
+  } 
+
+  clear() {
+    this.searchInElement.clearHighlight();
+  } 
+
+  current() {
+    return this.searchInElement?.nowSearchIndex || 0;
+  }
+  
 
   constructor(private router: Router) {
     effect(() => {

@@ -2,20 +2,18 @@ import { CommonModule } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkOverlayOrigin, ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { SelectSearchComponent } from '../select-basic/select-search/select-search.component';
-import { SelectTagComponent } from '../select-basic/select-tag/select-tag.component';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { UtilsService } from '../core/utils/utils.service';
 import { TreeComponent } from '../tree/tree.component';
-import { TreeNodeOptions } from '../tree/tree.interface';import { TreeSelectSize, TreeSelectTriggerType } from './tree-select.interface';
-``
+import { TreeNodeOptions } from '../tree/tree.interface'; import { TreeSelectSize, TreeSelectTriggerType } from './tree-select.interface';
+import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
 
 
 
 @Component({
   selector: 'lib-tree-select',
   standalone: true,
-  imports: [CommonModule, FormsModule, CdkOverlayOrigin, TreeComponent, SelectSearchComponent, SelectTagComponent],
+  imports: [CommonModule, FormsModule, CdkOverlayOrigin, TreeComponent, SelectBoxComponent],
   templateUrl: './tree-select.component.html',
   styleUrls: ['./tree-select.component.less'],
   providers: [
@@ -30,7 +28,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   // 视图引用
   @ViewChild(CdkOverlayOrigin, { static: false }) overlayOrigin!: CdkOverlayOrigin;
   @ViewChild('dropdownTemplate', { static: false }) dropdownTemplate!: TemplateRef<any>;
-  @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;
+  @ViewChild('searchInput', { static: false }) searchInput!: SelectBoxComponent;
   @ViewChild(TreeComponent, { static: false }) treeComponent!: TreeComponent;
 
   // 输入属性
@@ -544,24 +542,23 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   resetSearch(): void {
     this.searchValue = '';
-    this.searchInput && this.searchInput.clear();
+    this.searchInput && this.searchInput.clearSearchValue();
     this.cdr.detectChanges();
   }
 
   focusSearch(): void {
-    this.searchInput && this.searchInput.focus();
+    this.searchInput && this.searchInput.focusSearchInput();
   }
 
   blurSearch(): void {
-    this.searchInput && this.searchInput.blur();
+    this.searchInput && this.searchInput.blurSearchInput();
   }
 
   onCompositionChange(event: string): void {
     this.compositionValue = event;
   }
 
-  removeItem(event: Event, key: string): void {
-    event.stopPropagation();
+  removeItem(key: string): void {
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
 
@@ -579,6 +576,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     // 清空所有状态和数据
     this.resetAllState();
     this.updateData();
+  }
+
+  getLabel = (node: any): string => {
+    if (this.multiple) {
+      return node.node.title;
+    } else {
+      return node;
+    }
   }
 
   /**
