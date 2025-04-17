@@ -7,15 +7,13 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormsModule } from '@angular/forms';
 import { DocModule } from '../doc/doc.module';
 import { CommonModule } from '@angular/common';
-import { SearchInElementDirective } from '@project';
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, DocModule, RouterOutlet, CommonModule, SearchInElementDirective],
+  imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, DocModule, RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
 export class AppComponent {
-  @ViewChild(SearchInElementDirective, {static: false}) searchInElement!: SearchInElementDirective;
   title = 'project';
   show = signal(false);
   text = signal('hellossssssss');
@@ -36,24 +34,6 @@ export class AppComponent {
       ok: 'true'
     })
   }
-
-  next() {
-    this.searchInElement.next();
-  }
-
-  previous() {
-    this.searchInElement.previous();
-  } 
-
-  clear() {
-    this.searchInElement.clearHighlight();
-  } 
-
-  current() {
-    return this.searchInElement?.nowSearchIndex || 0;
-  }
-  
-
   constructor(private router: Router) {
     effect(() => {
       console.log('change')
@@ -84,7 +64,7 @@ export class AppComponent {
 
   }
 
-  cons(any:any){
+  cons(any: any) {
     console.log(any)
   }
 
@@ -104,7 +84,7 @@ export class AppComponent {
     { name: '水印', path: 'water-mark' },
     { name: '输入框', path: 'input' },
     { name: '提示框', path: 'tooltip' },
-    { name: '复选框', path: 'checkbox' }, 
+    { name: '复选框', path: 'checkbox' },
     { name: '单选框', path: 'radio' },
     { name: '滑块', path: 'slider' },
     { name: '模态框', path: 'modal' },

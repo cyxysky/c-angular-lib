@@ -7,8 +7,7 @@ import { UtilsService } from '../core/utils/utils.service';
 import { TreeComponent } from '../tree/tree.component';
 import { TreeNodeOptions } from '../tree/tree.interface'; import { TreeSelectSize, TreeSelectTriggerType } from './tree-select.interface';
 import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
-
-
+import * as _ from 'lodash';
 
 @Component({
   selector: 'lib-tree-select',
@@ -33,7 +32,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   // 输入属性
   /** 树节点数据 */
-  @Input({ alias: 'treeData' }) treeData: TreeNodeOptions[] = [];
+  @Input({ alias: 'treeData' }) originTreeData: TreeNodeOptions[] = [];
   /** 是否显示搜索框 */
   @Input({ alias: 'treeShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 是否禁用 */
@@ -126,8 +125,12 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   private isInitialized: boolean = false;
   /** 树组件是否已准备好 */
   private isTreeReady: boolean = false;
+  /** 默认选中节点 */
   public defaultCheckedKeys: string[] = [];
+  /** 默认选中节点 */
   public defaultSelectedKeys: string[] = [];
+  /** 选项数据 */
+  public treeData: TreeNodeOptions[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -154,13 +157,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['treeData']) {
+    if (changes['originTreeData']) {
+      this.treeData = _.cloneDeep(this.originTreeData);
       // 当树数据变化时，重新初始化节点映射
       this.initNodeMap();
 
       // 如果不是首次变更，还需要更新选中状态
-      if (!changes['treeData'].firstChange) {
-        setTimeout(() => {
+      if (!changes['originTreeData'].firstChange) {
+        this.utilsService.delayExecution(() => {
           this.initSelectedState();
           if (this.value && this.isDropdownOpen && this.treeComponent) {
             this.expandSelectedPaths();
@@ -275,7 +279,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (this.overlayRef) {
       this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
       this.focusSearch();
-      setTimeout(() => {
+      this.utilsService.delayExecution(() => {
         if (this.treeComponent && this.value) {
           this.expandSelectedPaths();
         }
@@ -318,7 +322,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       this.visibleChange.emit(false);
       const origin = this.overlayOrigin?.elementRef?.nativeElement;
       if (origin) {
@@ -330,17 +334,15 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-      clearTimeout(timer);
     }, 300)
   }
 
   public updateDropdownPosition(): void {
     if (!this.overlayRef) return;
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       if (this.overlayRef && this.isDropdownOpen) {
         this.overlayRef.updatePosition();
       }
-      clearTimeout(timer);
     }, 0);
   }
 
@@ -536,41 +538,64 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     }));
   }
 
+  /**
+   * 搜索
+   * @param value 搜索值
+   */
   onSearch(value: string): void {
     this.searchValue = value;
   }
 
+  /**
+   * 重置搜索
+   */
   resetSearch(): void {
     this.searchValue = '';
     this.searchInput && this.searchInput.clearSearchValue();
     this.cdr.detectChanges();
   }
 
+  /**
+   * 聚焦搜索
+   */
   focusSearch(): void {
     this.searchInput && this.searchInput.focusSearchInput();
   }
 
+  /**
+   * 失去焦点
+   */
   blurSearch(): void {
     this.searchInput && this.searchInput.blurSearchInput();
   }
 
+  /**
+   * 输入法输入
+   * @param event 输入事件
+   */
   onCompositionChange(event: string): void {
     this.compositionValue = event;
   }
 
+  /**
+   * 移除节点
+   * @param key 节点key
+   */
   removeItem(key: string): void {
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
-
     // 更新节点状态和获取所有需要移除的key
     const keysToRemove = this.updateNodeStatus(key, false);
-
     // 更新value和相关数据
     this.updateSelectionState(keysToRemove);
     this.updateDisplayTags();
     this.updateData();
   }
 
+  /**
+   * 清空所有状态和数据
+   * @param event 事件
+   */
   clear(event?: Event): void {
     if (event) event.stopPropagation();
     // 清空所有状态和数据
@@ -578,9 +603,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.updateData();
   }
 
+  /**
+   * 获取节点标签
+   * @param node 节点
+   * @returns 节点标签
+   */
   getLabel = (node: any): string => {
     if (this.multiple) {
-      return node.node.title;
+      return node?.node?.title;
     } else {
       return node;
     }

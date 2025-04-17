@@ -248,8 +248,8 @@
             </div>
           </ng-template>
 
-          <ng-template #customOptionLabelTpl let-value let-labels="labels">
-            <span>自定义-{{ labels }}-自定义</span>
+          <ng-template #customOptionLabelTpl let-value let-label="label">
+            <span>自定义-{{ label }}-自定义</span>
           </ng-template>
           
           <div *ngIf="customTemplateValue && customTemplateValue.length" class="example-value">

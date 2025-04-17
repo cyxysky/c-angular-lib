@@ -1,6 +1,7 @@
 <div #searchBox class="search-box">
     <input 
-        class="search-input" 
+        class="search-input"
+        [style.fontSize]="fontSize"
         #searchInput 
         [(ngModel)]="searchValue" 
         (ngModelChange)="onSearch($event)"

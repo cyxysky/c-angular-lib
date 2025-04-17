@@ -7,7 +7,7 @@ import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { CascaderExpandTrigger, CascaderOption, CascaderSize, CascaderTriggerType } from './cascader.interface';
 import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
-
+import * as _ from 'lodash';
 @Component({
   selector: 'lib-cascader',
   standalone: true,
@@ -35,7 +35,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   // 输入属性
   /** 选项数据 */
-  @Input({ alias: 'cascaderOptions' }) options: CascaderOption[] = [];
+  @Input({ alias: 'cascaderOptions' }) optionOrigin: CascaderOption[] = [];
   /** 展开方式 */
   @Input({ alias: 'cascaderExpandTrigger' }) expandTrigger: CascaderExpandTrigger = 'click';
   /** 触发方式 */
@@ -127,6 +127,8 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   tempSelectedOptions: CascaderOption[] = [];
   /** 目前浮层是否打开 */
   public isNowDropdownOpen: boolean = false;
+  /** 选项数据 */
+  public options: CascaderOption[] = [];
   // getter/setter
   /** 标签属性 */
   get labelProperty(): string {
@@ -174,7 +176,8 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['options']) {
+    if (changes['optionOrigin']) {
+      this.options = _.cloneDeep(this.optionOrigin);
       this.initOptionMaps(this.options);
       this.initOptionStates();
       this.cdr.detectChanges();
@@ -1026,11 +1029,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 清除方法
    * @param event 事件
    */
-  public clear(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+  public clear(): void {
     if (this.isMultiple) {
+      this.resetAllCheckedStates(this.options);
       this.selectedPathsMap.clear();
       this.indeterminateSet.clear();
       this.value = [];
@@ -1420,8 +1421,4 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.onTouched = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-    this.cdr.markForCheck();
-  }
 }

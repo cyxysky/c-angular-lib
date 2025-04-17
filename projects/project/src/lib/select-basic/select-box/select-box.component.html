@@ -3,27 +3,28 @@
     [class.select-lg]="size === 'large'"
     [class.select-borderless]="borderless" 
     [class.select-error]="status === 'error'"
+    [class.active]="isActive"
     [class.select-warning]="status === 'warning'" 
     [class.select-disabled]="disabled">
     <div class="select-content">
-        <div class="placeHolder" *ngIf="(!data || (data && data.length === 0)) && !searchOnCompositionValue">
+        <div class="placeHolder" *ngIf="showPlaceholder()">
             <div class="placeHolder-text">
                 {{ placeholder }}
             </div>
         </div>
         <div 
-            *ngIf="selectMode === 'single' && searchOnCompositionValue === ''"
+            *ngIf="showSingalData()"
             class="singal-data" 
             [ngClass]="{'singal-data-gray': isActive}">
             <!-- 使用自定义模板 -->
-            <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultSingalLabelTemplate; context: { $implicit: data }"></ng-container>
+            <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultSingalLabelTemplate; context: { $implicit: data, label: getDisplayTags(data) }"></ng-container>
             <ng-template #defaultSingalLabelTemplate let-data>
                 {{ getDisplayTags(data) }}
             </ng-template>
         </div>
-        <ng-container *ngIf="selectMode === 'multiple'">
+        <ng-container *ngIf="showMultipleData()">
             <lib-select-tag *ngFor="let tag of data;index as i" [size]="size" [closable]="true" (remove)="removeTag($event, tag)" [size]="size">
-                <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultMultipleLabelTemplate; context: { $implicit: tag }"></ng-container>
+                <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultMultipleLabelTemplate; context: { $implicit: tag, label: getDisplayTags(data) }"></ng-container>
                 <ng-template #defaultMultipleLabelTemplate let-tag>
                     {{ getDisplayTags(tag) }}
                 </ng-template>
@@ -33,6 +34,7 @@
         <lib-select-search
             #searchInput
             *ngIf="search"
+            [fontSize]="size === 'small' ? '12px' : size === 'large' ? '18px' : '14px'"
             [disabled]="disabled"
             (inputWidthChange)="handleInputWidthChange()"
             (compositionChange)="handleCompositionChange($event)"
@@ -43,7 +45,7 @@
     <!-- 后缀 -->
     <div class="suffix-box">
         <!-- 加载图标 -->
-        <div *ngIf="loading" class="loading-icon">
+        <div *ngIf="loading && !disabled" class="loading-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
                 class="loading-svg">
                 <path
@@ -53,10 +55,10 @@
             </svg>
         </div>
         <!-- 搜索图标 -->
-        <i class="bi bi-search" *ngIf="!loading && search && isActive"></i>
+        <i class="bi bi-search" *ngIf="!loading && search && isActive && !disabled"></i>
         <!-- 下拉图标 -->
-        <i class="bi bi-caret-down-fill select-icon" *ngIf="!loading && !search && data" [ngClass]="{'select-icon-clear': allowClear}" [style.transform]="isActive ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
+        <i class="bi bi-caret-down-fill select-icon" *ngIf="!loading && !search && data && !disabled" [ngClass]="{'select-icon-clear': allowClear}" [style.transform]="isActive ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
         <!-- 清除图标 -->
-        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isActive" (click)="clearValue($event)"></i>
+        <i class="bi-x-circle-fill clear-icon" *ngIf="allowClear && !loading && !isActive && !disabled" (click)="clearValue($event)"></i>
     </div>
 </div>

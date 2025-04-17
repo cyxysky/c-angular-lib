@@ -11,6 +11,7 @@ export class SelectSearchComponent {
   @ViewChild('searchText', { static: false }) searchText!: ElementRef;
 
   @Input({ alias: 'disabled' }) disabled: boolean = false;
+  @Input({ alias: 'fontSize' }) fontSize: string = '14px';
   @Output() search = new EventEmitter<string>();
   @Output() compositionChange = new EventEmitter<string>();
   @Output() inputWidthChange = new EventEmitter<number>();

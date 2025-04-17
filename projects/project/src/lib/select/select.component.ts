@@ -584,9 +584,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public onChange = (value: any): void => { }
   public writeValue(obj: any): void {
     if (!obj) return;
-
+    
     this._data = this.selectMode === 'multiple' ? [...obj] : _.isArray(obj) ? obj[0] : obj;
     this.cdr.detectChanges();
+    this.updateOverlayRefPosition();
   }
   public registerOnChange(fn: any): void {
     this.onChange = fn;

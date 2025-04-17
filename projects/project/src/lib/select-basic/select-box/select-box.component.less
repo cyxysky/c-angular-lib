@@ -13,7 +13,7 @@
 @select-gap: 0px;
 
 // 选择框内容间距
-@select-content-padding-base: 1px 4px;
+@select-content-padding-base: 2px 4px;
 @select-content-min-height-base: 28px;
 @select-content-min-height-lg: 36px;
 @select-content-min-height-sm: 20px;
@@ -30,7 +30,7 @@
 
 // 图标尺寸变量
 @select-icon-size-base: 16px;
-@select-icon-size-lg: 18px; 
+@select-icon-size-lg: 18px;
 @select-icon-size-sm: 14px;
 @select-icon-inner-size-base: 12px;
 @select-icon-inner-size-lg: 14px;
@@ -130,7 +130,8 @@
     display: block;
 }
 
-.hover-options, .option-active {
+.hover-options,
+.option-active {
     background-color: @select-hover-bg-color;
 }
 
@@ -145,18 +146,24 @@
     color: @select-text-color;
     border-radius: @select-option-border-radius;
     transition: @select-transition;
-    &:hover, &.option-active {
+
+    &:hover,
+    &.option-active {
         background-color: @select-hover-bg-color;
     }
+
     &.disabled {
         color: @select-disabled-color;
         cursor: not-allowed;
         pointer-events: all;
         background-color: transparent;
-        &:hover, &.option-active {
+
+        &:hover,
+        &.option-active {
             background-color: transparent;
         }
     }
+
     &.hidden {
         display: none !important;
     }
@@ -177,10 +184,12 @@
     justify-content: center;
     text-align: center;
     padding: @select-empty-container-padding;
+
     .empty-icon {
         margin-bottom: @select-empty-icon-margin;
         color: @select-empty-icon-color;
     }
+
     .empty-text {
         color: @select-group-title-color;
         font-size: @select-empty-text-size;
@@ -207,77 +216,85 @@
         border: @select-hover-border;
     }
 
-    &:focus, &:active, &.active {
+    &:focus,
+    &:active,
+    &.active {
         border: @select-focus-border;
         box-shadow: @select-focus-box-shadow;
         outline: none;
     }
-    
+
     // 大中小尺寸
     &.select-lg {
         min-height: @select-height-lg;
         font-size: @select-font-size-lg;
-        
+
         .select-content {
             min-height: @select-content-min-height-lg;
         }
 
-        
-        .placeHolder, .singal-data {
+
+        .placeHolder,
+        .singal-data {
             font-size: @select-font-size-lg;
             padding-left: @select-placeholder-padding-left-lg;
         }
     }
-    
+
     &.select-sm {
         min-height: @select-height-sm;
         font-size: @select-font-size-sm;
-        
+
         .select-content {
             min-height: @select-content-min-height-sm;
             padding: 0 4px;
         }
-        
-        .placeHolder, .singal-data {
+
+        .placeHolder,
+        .singal-data {
             font-size: @select-font-size-sm;
             padding-left: @select-placeholder-padding-left-sm;
         }
-        
+
         .suffix-box {
             min-width: @select-suffix-min-width-sm;
             max-width: @select-suffix-min-width-sm;
             height: @select-width-full;
         }
-        
+
         .search-box {
             margin-left: @select-search-margin-left-sm;
-            
+
             .search-input {
                 height: @select-search-input-height-sm;
             }
         }
     }
-    
+
     // 无边框样式
     &.select-borderless {
         border: none;
         box-shadow: none;
     }
-    
+
     // 状态样式
     &.select-error {
         border: @select-error-border;
-        
-        &:focus, &:active, &.active {
+
+        &:focus,
+        &:active,
+        &.active {
             border: @select-error-border;
             box-shadow: @select-error-box-shadow;
         }
     }
-    
+
     &.select-warning {
         border: @select-warning-border;
-        
-        &:focus, &:active, &.active {
+
+        &:focus,
+        &:active,
+        &.active {
             border: @select-warning-border;
             box-shadow: @select-warning-box-shadow;
         }
@@ -311,7 +328,7 @@
             display: none;
             color: @select-placeholder-color;
             transition: @select-transition;
-            
+
             &:hover {
                 color: @select-icon-hover-color;
             }
@@ -325,12 +342,12 @@
         .select-icon-clear {
             display: block;
         }
-        
+
         .loading-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            
+
             .loading-svg {
                 animation: rotate @select-rotate-duration linear infinite;
                 color: @select-active-color;
@@ -368,7 +385,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    .placeHolder-text{
+    .placeHolder-text {
 
         white-space: nowrap;
         overflow: hidden;
@@ -380,6 +397,7 @@
     margin-left: @select-search-margin-left-base;
     max-width: @select-search-max-width;
     position: relative;
+
     .search-text {
         visibility: hidden;
         position: absolute;
@@ -420,7 +438,7 @@
     justify-content: center;
     align-items: center;
     height: @select-remote-loading-height;
-    
+
     .loading-text {
         color: @select-group-title-color;
     }
@@ -440,6 +458,7 @@
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -449,9 +468,11 @@
     0% {
         opacity: @select-pulse-opacity-min;
     }
+
     50% {
         opacity: @select-pulse-opacity-max;
     }
+
     100% {
         opacity: @select-pulse-opacity-min;
     }
@@ -462,8 +483,9 @@
     background-color: #f5f5f5;
     color: rgba(0, 0, 0, 0.25);
     border-color: #d9d9d9;
-    
-    .select-content, .suffix-box {
-      pointer-events: none;
+
+    .select-content,
+    .suffix-box {
+        pointer-events: none;
     }
 }

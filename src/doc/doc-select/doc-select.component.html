@@ -403,10 +403,9 @@
           selectPlaceHolder="自定义选中内容显示">
         </lib-select>
         
-        <ng-template #customLabelTpl let-option>
+        <ng-template #customLabelTpl let-option let-label="label">
           <div class="custom-label">
-            <i class="bi" [ngClass]="option.icon"></i>
-            <span>{{option.label}}</span>
+            <span>自定义选中-{{ label }}</span>
           </div>
         </ng-template>
         
