@@ -1,11 +1,18 @@
 <div style="height: 100%;">
   <div class="app-container">
     <div class="menu-container">
+      <div class="menu-actions">
+        <button class="collapse-btn" (click)="toggleMenuCollapse()">
+          <i class="fas" [class.fa-indent]="menuCollapsed()" [class.fa-outdent]="!menuCollapsed()"></i>
+        </button>
+      </div>
       <lib-menu 
         [mode]="'inline'" 
         [theme]="'light'" 
         [items]="menuItems" 
-        [selectedKeys]="[nowComponent()]" 
+        [selectedKeys]="[nowComponent()]"
+        [inlineIndent]="16"
+        [inlineCollapsed]="menuCollapsed()"
         (menuItemClick)="handleMenuClick($event)">
       </lib-menu>
     </div>

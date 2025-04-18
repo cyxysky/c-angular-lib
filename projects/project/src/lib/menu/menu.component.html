@@ -20,8 +20,7 @@
                     (mouseenter)="(mode !== 'inline' || inlineCollapsed) && onMouseEnterSubmenu(item)"
                     (mouseleave)="(mode !== 'inline' || inlineCollapsed) && onMouseLeaveSubmenu(item)">
                     <i *ngIf="item.icon" class="menu-icon" [class]="item.icon"></i>
-                    <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title
-                        }}</span>
+                    <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title }}</span>
                     <!-- 只在非水平模式下显示箭头 -->
                     <i class="lib-menu-submenu-arrow"
                         *ngIf="(mode !== 'horizontal') && (!inlineCollapsed || mode !== 'inline')"></i>
@@ -121,8 +120,7 @@
                 [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
                 (click)="onMenuItemClick(item)">
                 <i *ngIf="item.icon" class="menu-icon" [class]="item.icon"></i>
-                <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title
-                    }}</span>
+                <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title }}</span>
             </li>
         </ng-container>
     </ul>

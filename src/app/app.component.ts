@@ -24,6 +24,7 @@ export class AppComponent {
   });
   nowComponent = signal('popconfirm');
   checked = signal(false);
+  menuCollapsed = signal(false);  // 菜单折叠状态
 
   // 菜单项数据
   menuItems: MenuItem[] = [];
@@ -56,33 +57,39 @@ export class AppComponent {
 
   // 初始化菜单数据方法
   private initMenuItems(): void {
-    // 将组件列表转换为MenuItem类型
+    // 将组件列表转换为MenuItem类型，每个组件菜单项设置为默认展开
     const componentMenuItems: MenuItem[] = this.components.map(item => ({
       key: item.path,
       title: item.name,
-      link: item.path
+      link: item.path,
+      isOpen: true,
+      icon: 'fas fa-cube' // 添加图标
     }));
 
-    // 将业务组件列表转换为MenuItem类型
+    // 将业务组件列表转换为MenuItem类型，每个业务组件菜单项设置为默认展开
     const businessMenuItems: MenuItem[] = this.businessComponents.map(item => ({
       key: item.path,
       title: item.name,
-      link: item.path
+      link: item.path,
+      isOpen: true,
+      icon: 'fas fa-cogs' // 添加图标
     }));
 
-    // 构建完整的菜单结构
+    // 构建完整的菜单结构，所有菜单和子菜单都默认展开
     this.menuItems = [
       {
         key: 'components',
         title: '基础组件',
         children: componentMenuItems,
-        isOpen: true
+        isOpen: true,
+        icon: 'fas fa-th'
       },
       {
         key: 'business',
         title: '业务组件',
         children: businessMenuItems,
-        isOpen: true
+        isOpen: true,
+        icon: 'fas fa-project-diagram'
       }
     ];
   }
@@ -121,6 +128,10 @@ export class AppComponent {
     this.router.navigate([path]);
   }
 
+  // 切换菜单折叠状态
+  toggleMenuCollapse(): void {
+    this.menuCollapsed.update(value => !value);
+  }
 
   components = [
     { name: '气泡确认框', path: 'popconfirm' },

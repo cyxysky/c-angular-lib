@@ -2,7 +2,7 @@
 @menu-prefix-cls: lib-menu;
 @menu-item-height: 40px;
 @menu-horizontal-line-height: 46px;
-@menu-item-active-bg: #e6f7ff;
+@menu-item-active-bg: rgba(24, 144, 255, 0.1);
 @menu-item-active-border-width: 3px;
 @menu-dark-bg: #001529;
 @menu-dark-submenu-bg: #000c17;
@@ -14,13 +14,12 @@
 @menu-item-font-size: 14px;
 @menu-icon-margin-right: 10px;
 @menu-icon-size: 14px;
-@menu-transition-time: 0.3s;
 @menu-width: 240px;
 @menu-collapsed-width: 80px;
 @menu-item-padding: 0 16px;
 @menu-item-bg: transparent;
 @menu-item-hover-color: #1890ff;
-@menu-item-hover-bg: #e6f7ff;
+@menu-item-hover-bg: rgba(24, 144, 255, 0.1);
 @menu-item-active-color: #1890ff;
 @menu-item-disabled-color: rgba(0, 0, 0, 0.25);
 
@@ -45,7 +44,8 @@
   font-feature-settings: 'tnum';
   color: @menu-item-color;
   width: @menu-width;
-  transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+  background-color: #f0f2f5;
+  transition: background-color 0.3s, width 0.3s;
 
   ul, li {
     list-style: none;
@@ -60,14 +60,15 @@
   // 基本项样式（通用于菜单项和子菜单标题）
   &-item, &-submenu-title {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
     padding: @menu-item-padding;
     height: @menu-item-height;
     line-height: @menu-item-height;
     margin-bottom: 4px;
     cursor: pointer;
-    transition: color 0.3s, background 0.3s, border-color 0.3s;
     white-space: nowrap;
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
     
     &:hover {
       color: @menu-item-hover-color;
@@ -78,7 +79,14 @@
       display: inline-block;
       margin-right: @menu-icon-margin-right;
       font-size: @menu-icon-size;
-      vertical-align: middle;
+      transition: color 0.3s, margin 0.3s;
+    }
+
+    .lib-menu-title-content {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.3s;
     }
   }
   
@@ -93,6 +101,10 @@
       transform: translateY(-50%);
       width: 10px;
       height: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s;
       
       &:before, &:after {
         content: '';
@@ -101,7 +113,7 @@
         width: 6px;
         height: 1.5px;
         border-radius: 2px;
-        transition: transform 0.3s;
+        transition: transform 0.3s, background-color 0.3s;
       }
       
       &:before {
@@ -126,6 +138,7 @@
     // 子菜单内容
     .@{menu-prefix-cls}-sub {
       padding: 0;
+      transition: background-color 0.3s;
     }
   }
 
@@ -145,6 +158,18 @@
       padding: 0;
       background: transparent;
       border-radius: 0;
+    }
+
+    // 子菜单项样式
+    .@{menu-prefix-cls}-item {
+      padding-left: 48px;
+      
+      &-selected {
+        background-color: @menu-item-active-bg;
+        color: @menu-item-active-color;
+        border-right: @menu-item-active-border-width solid @menu-highlight-color;
+        border-left: none;
+      }
     }
   }
   
@@ -314,22 +339,14 @@
   
   // 亮色主题
   &-light {
-    background: #fff;
+    background: #f0f2f5;
     
     .@{menu-prefix-cls}-item-selected {
       color: @menu-highlight-color;
       background-color: @menu-item-active-bg;
       font-weight: 500;
-      
-      &:after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: @menu-item-active-border-width;
-        background: @menu-highlight-color;
-      }
+      border-right: @menu-item-active-border-width solid @menu-highlight-color;
+      border-left: none;
     }
     
     // 选中父级菜单项样式
@@ -366,19 +383,31 @@
       
       &:hover {
         color: @menu-dark-item-hover-color;
-        background-color: @menu-dark-item-hover-bg;
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
     
-    .@{menu-prefix-cls}-item-selected {
-      color: @menu-dark-highlight-color;
-      background-color: @menu-dark-item-active-bg;
+    // 提高选中项的选择器权重，确保优先级高于hover
+    .@{menu-prefix-cls}-item.@{menu-prefix-cls}-item-selected {
+      color: @menu-dark-highlight-color !important;
+      background-color: @menu-dark-item-active-bg !important;
       font-weight: 500;
+      border-right: @menu-item-active-border-width solid @menu-dark-highlight-color;
+      border-left: none;
+      
+      &:hover {
+        color: @menu-dark-highlight-color !important;
+        background-color: @menu-dark-item-active-bg !important;
+      }
     }
     
-    // 选中父级菜单项样式
+    // 选中父级菜单项样式也提高优先级
     .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
-      color: @menu-dark-highlight-color;
+      color: @menu-dark-highlight-color !important;
+      
+      &:hover {
+        color: @menu-dark-highlight-color !important;
+      }
     }
     
     .@{menu-prefix-cls}-sub {
@@ -387,22 +416,35 @@
     
     &.@{menu-prefix-cls}-horizontal {
       .@{menu-prefix-cls}-item-selected {
-        color: @menu-dark-highlight-color;
-        background-color: transparent;
+        color: @menu-dark-highlight-color !important;
+        background-color: transparent !important;
         border-bottom-color: @menu-dark-highlight-color;
+        
+        &:hover {
+          color: @menu-dark-highlight-color !important;
+        }
       }
       
       .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
-        color: @menu-dark-highlight-color;
+        color: @menu-dark-highlight-color !important;
         border-bottom-color: @menu-dark-highlight-color;
+        
+        &:hover {
+          color: @menu-dark-highlight-color !important;
+        }
       }
       
       .@{menu-prefix-cls}-sub {
         background: @menu-dark-submenu-bg;
         
         .@{menu-prefix-cls}-item:hover {
-          background-color: @menu-dark-item-active-bg;
+          background-color: rgba(255, 255, 255, 0.1);
           color: @menu-dark-highlight-color;
+        }
+        
+        .@{menu-prefix-cls}-item-selected {
+          background-color: @menu-dark-item-active-bg !important;
+          color: @menu-dark-highlight-color !important;
         }
       }
     }
@@ -415,6 +457,7 @@
     .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu > .@{menu-prefix-cls}-submenu-title {
       padding: 0 32px !important;
       text-align: center;
+      justify-content: center;
       
       .menu-icon {
         margin-right: 0;
@@ -454,6 +497,7 @@
         .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
           padding: 0 16px !important;
           text-align: left;
+          justify-content: flex-start;
           margin: 0;
           
           .menu-icon {
@@ -482,6 +526,8 @@
     // 折叠模式下的选中样式
     .@{menu-prefix-cls}-item-selected {
       background-color: @menu-item-active-bg;
+      border-right: @menu-item-active-border-width solid @menu-highlight-color;
+      border-left: none;
     }
     
     &.@{menu-prefix-cls}-dark {
@@ -493,14 +539,26 @@
           
           &:hover {
             color: @menu-dark-item-hover-color;
-            background-color: @menu-dark-item-hover-bg;
+            background-color: rgba(255, 255, 255, 0.1);
           }
         }
         
-        .@{menu-prefix-cls}-item-selected {
-          background-color: @menu-dark-item-active-bg;
-          color: @menu-dark-highlight-color;
+        .@{menu-prefix-cls}-item.@{menu-prefix-cls}-item-selected {
+          background-color: @menu-dark-item-active-bg !important;
+          color: @menu-dark-highlight-color !important;
+          
+          &:hover {
+            background-color: @menu-dark-item-active-bg !important;
+            color: @menu-dark-highlight-color !important;
+          }
         }
+      }
+      
+      // 折叠状态下顶级菜单项的选中样式
+      .@{menu-prefix-cls}-item.@{menu-prefix-cls}-item-selected {
+        background-color: @menu-dark-item-active-bg !important;
+        color: @menu-dark-highlight-color !important;
+        border-right: @menu-item-active-border-width solid @menu-dark-highlight-color;
       }
     }
   }
