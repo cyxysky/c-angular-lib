@@ -7,6 +7,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormsModule } from '@angular/forms';
 import { DocModule } from '../doc/doc.module';
 import { CommonModule } from '@angular/common';
+import { MenuItem } from '../../projects/project/src/lib/menu/menu.component';
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule, ProjectModule, NzMenuModule, ScrollingModule, DocModule, RouterOutlet, CommonModule],
@@ -22,6 +24,9 @@ export class AppComponent {
   });
   nowComponent = signal('popconfirm');
   checked = signal(false);
+
+  // 菜单项数据
+  menuItems: MenuItem[] = [];
 
   onCheckedChange(checked: boolean) {
     this.checked.set(checked);
@@ -44,6 +49,50 @@ export class AppComponent {
     //     console.log(id);
     //   }
     // })
+
+    // 初始化菜单数据
+    this.initMenuItems();
+  }
+
+  // 初始化菜单数据方法
+  private initMenuItems(): void {
+    // 将组件列表转换为MenuItem类型
+    const componentMenuItems: MenuItem[] = this.components.map(item => ({
+      key: item.path,
+      title: item.name,
+      link: item.path
+    }));
+
+    // 将业务组件列表转换为MenuItem类型
+    const businessMenuItems: MenuItem[] = this.businessComponents.map(item => ({
+      key: item.path,
+      title: item.name,
+      link: item.path
+    }));
+
+    // 构建完整的菜单结构
+    this.menuItems = [
+      {
+        key: 'components',
+        title: '基础组件',
+        children: componentMenuItems,
+        isOpen: true
+      },
+      {
+        key: 'business',
+        title: '业务组件',
+        children: businessMenuItems,
+        isOpen: true
+      }
+    ];
+  }
+
+  // 菜单点击处理
+  handleMenuClick(item: MenuItem): void {
+    if (item.link) {
+      this.nowComponent.set(item.key);
+      this.nav(item.link);
+    }
   }
 
   test(value: any) {
@@ -97,6 +146,7 @@ export class AppComponent {
     { name: '选择器', path: 'select' },
     { name: '树选择器', path: 'tree-select' },
     { name: '级联选择器', path: 'cascader' },
+    { name: '菜单', path: 'menu' },
   ]
 
   businessComponents = [

@@ -25,6 +25,7 @@ import { DocDateTimerComponent } from './doc-date-timer/doc-date-timer.component
 import { DocMessageComponent } from './doc-message/doc-message.component';
 import { DocDrawerComponent } from './doc-drawer/doc-drawer.component';
 import { DocDropMenuComponent } from './doc-drop-menu/doc-drop-menu.component';
+import { DocMenuComponent } from './doc-menu/doc-menu.component';
 
 @NgModule({
   declarations: [],
@@ -54,7 +55,8 @@ import { DocDropMenuComponent } from './doc-drop-menu/doc-drop-menu.component';
     DocDateTimerComponent,
     DocMessageComponent,
     DocDrawerComponent,
-    DocDropMenuComponent
+    DocDropMenuComponent,
+    DocMenuComponent
   ],
   exports: [
     DocButtonComponent,
@@ -81,7 +83,8 @@ import { DocDropMenuComponent } from './doc-drop-menu/doc-drop-menu.component';
     DocDateTimerComponent,
     DocMessageComponent,
     DocDrawerComponent,
-    DocDropMenuComponent
+    DocDropMenuComponent,
+    DocMenuComponent
   ]
 })
 export class DocModule { }

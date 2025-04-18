@@ -1,4 +1,3 @@
-@prefix: lib-drawer;
 
 :host {
   position: fixed;
@@ -10,7 +9,7 @@
   z-index: 1000;
 }
 
-.@{prefix}-container {
+.lib-drawer-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -24,19 +23,14 @@
   position: static;
 }
 
-// 自定义遮罩层样式
-:global(.@{prefix}-backdrop) {
-  background-color: rgba(0, 0, 0, 0.45) !important;
-  animation: drawerFadeIn 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
 
-.@{prefix}-mask {
+
+.lib-drawer-mask {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.45);
   pointer-events: auto;
 }
 
@@ -49,35 +43,35 @@
   }
 }
 
-.@{prefix} {
+.lib-drawer {
   position: fixed;
   z-index: 1000;
   pointer-events: auto;
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   
-  &.@{prefix}-left {
+  &.lib-drawer-left {
     top: 0;
     left: 0;
     height: 100%;
     max-width: 100%;
   }
   
-  &.@{prefix}-right {
+  &.lib-drawer-right {
     top: 0;
     right: 0;
     height: 100%;
     max-width: 100%;
   }
   
-  &.@{prefix}-top {
+  &.lib-drawer-top {
     top: 0;
     left: 0;
     width: 100%;
     max-height: 100%;
   }
   
-  &.@{prefix}-bottom {
+  &.lib-drawer-bottom {
     bottom: 0;
     left: 0;
     width: 100%;
@@ -85,7 +79,7 @@
   }
 }
 
-.@{prefix}-content-wrapper {
+.lib-drawer-content-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -93,7 +87,7 @@
   overflow: hidden;
 }
 
-.@{prefix}-header {
+.lib-drawer-header {
   padding: 16px 24px;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
@@ -102,7 +96,7 @@
   flex-shrink: 0;
 }
 
-.@{prefix}-title {
+.lib-drawer-title {
   margin: 0;
   font-size: 16px;
   font-weight: 500;
@@ -111,7 +105,7 @@
   flex: 1;
 }
 
-.@{prefix}-close {
+.lib-drawer-close {
   background: transparent;
   border: none;
   padding: 0;
@@ -126,20 +120,20 @@
   }
 }
 
-.@{prefix}-close-x {
+.lib-drawer-close-x {
   display: block;
   font-style: normal;
   font-size: 18px;
   line-height: 1;
 }
 
-.@{prefix}-body {
+.lib-drawer-body {
   flex: 1;
   padding: 24px;
   overflow: auto;
 }
 
 // 处理没有遮罩情况
-.@{prefix}.no-mask {
+.lib-drawer.no-mask {
   pointer-events: auto;
 }

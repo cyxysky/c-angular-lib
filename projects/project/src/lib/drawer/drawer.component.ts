@@ -17,12 +17,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnimationEvent } from '@angular/animations';
-import { DOCUMENT } from '@angular/common';
-import { Inject } from '@angular/core';
 import { drawerAnimations } from './drawer.animations';
-import { DrawerOptions } from './drawer.interface';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-drawer',

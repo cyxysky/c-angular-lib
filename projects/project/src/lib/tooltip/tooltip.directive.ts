@@ -180,7 +180,6 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 隐藏tooltip
    */
   public hide(): void {
-    if (!this.visible || this.componentHover) return;
     this.closeTooltip();
   }
 

@@ -8,3 +8,51 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.app-container {
+  display: flex;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.menu-container {
+  width: 220px;
+  height: 100%;
+  background-color: #fff;
+  border-right: 1px solid #e8e8e8;
+  overflow: auto;
+}
+
+.content-container {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+  background-color: #fff;
+  margin: 0 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+// 修改组件样式
+:host ::ng-deep {
+  .lib-menu {
+    height: 100%;
+    
+    // 选中项样式增强
+    .lib-menu-item-selected {
+      font-weight: 500;
+    }
+    
+    // 菜单图标间距
+    .menu-icon {
+      margin-right: 8px;
+    }
+    
+    // 菜单项hover效果
+    .lib-menu-item, .lib-menu-submenu-title {
+      &:hover {
+        color: #1890ff;
+      }
+    }
+  }
+}

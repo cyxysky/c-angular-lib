@@ -41,6 +41,7 @@ import { DateTimerComponent } from './date-timer/date-timer.component';
 import { MessageComponent } from './message/message.component';
 import { DrawerComponent } from './drawer/drawer.component';
 import { DropMenuComponent } from './drop-menu/drop-menu.component';
+import { MenuComponent } from './menu/menu.component';
 // 服务
 
 export * from './core';
@@ -72,7 +73,7 @@ export * from './date-timer';
 export * from './message';
 export * from './drawer';
 export * from './drop-menu';
-
+export * from './menu';
 @NgModule({
   declarations: [],
   imports: [
@@ -115,7 +116,8 @@ export * from './drop-menu';
     DateTimerComponent,
     MessageComponent,
     DrawerComponent,
-    DropMenuComponent
+    DropMenuComponent,
+    MenuComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -156,7 +158,8 @@ export * from './drop-menu';
     DateTimerComponent,
     MessageComponent,
     DrawerComponent,
-    DropMenuComponent
+    DropMenuComponent,
+    MenuComponent
   ],
   providers: [
 

@@ -25,12 +25,12 @@ import { DocTreeSelectComponent } from '../doc/doc-tree-select/doc-tree-select.c
 import { DocCascaderComponent } from '../doc/doc-cascader/doc-cascader.component';
 import { DocStructureTreeComponent } from '../doc/doc-structure-tree/doc-structure-tree.component';
 import { DocSelectComponent } from '../doc/doc-select/doc-select.component';
-import { MultiDimensionalFlowchartComponent } from '@project';
 import { CustomerFormComponent } from '@project';
 import { ProcessTreeComponent } from '@project';
 import { GeneratePngComponent } from '@project';
 import { DynamicTableComponent } from '@project';
 import { UserSelectComponent } from '@project';
+import { DocMenuComponent } from '../doc/doc-menu/doc-menu.component';
 
 export const routes: Routes = [
     {
@@ -156,5 +156,9 @@ export const routes: Routes = [
     {
         path: 'user-select',
         component: UserSelectComponent
+    },
+    {
+        path: 'menu',
+        component: DocMenuComponent
     }
 ];

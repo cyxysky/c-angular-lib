@@ -1,7 +1,7 @@
 import { Component, ElementRef, forwardRef, HostListener, Input, OnInit, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TooltipDirective } from '@project';
+import { TooltipDirective, UtilsService } from '@project';
 import * as _ from 'lodash';
 
 interface Mark {
@@ -80,7 +80,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   //#endregion
 
   //#region 构造函数
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef, private utilsService: UtilsService) { }
   //#endregion
 
   //#region 生命周期钩子
@@ -178,13 +178,13 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
    */
   private onMouseUp = (): void => {
     this.isDragging = false;
+    console.log('onMouseUp');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
-    
-    // 重置手柄可见状态
     this.singalSliderHandleVisible = false;
     this.rangeLeftSliderHandleVisible = false;
     this.rangeRightSliderHandleVisible = false;
+
   };
   //#endregion
 

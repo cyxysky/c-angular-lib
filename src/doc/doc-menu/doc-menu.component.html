@@ -1,0 +1,119 @@
+<div class="doc-container">
+  <h1 class="doc-title">菜单 Menu</h1>
+  
+  <p class="doc-description">
+    为页面和功能提供导航的菜单列表。
+  </p>
+  
+  <h2 class="doc-section-title">何时使用</h2>
+  <p class="doc-description">
+    导航菜单是一个网站的灵魂，用户依赖导航在各个页面中进行跳转。一般分为顶部导航和侧边导航，顶部导航提供全局性的类目和功能，侧边导航提供多级结构来收纳和排列网站架构。
+  </p>
+  
+  <h2 class="doc-section-title">代码演示</h2>
+  
+  <div class="doc-grid">
+    <!-- 基本用法 -->
+    <app-doc-box
+      title="基本用法"
+      [sourceCode]="basicSource">
+      <div demo>
+        <lib-menu
+          [items]="basicMenuItems"
+          (menuItemClick)="onMenuItemClick($event)">
+        </lib-menu>
+        <p class="example-value" *ngIf="selectedItem">当前选中: {{ selectedItem.title }}</p>
+      </div>
+      <div description>
+        基本的菜单布局，内联模式，子菜单内嵌在菜单区域。
+      </div>
+    </app-doc-box>
+    
+    <!-- 深色主题 -->
+    <app-doc-box
+      title="深色主题"
+      [sourceCode]="darkThemeSource">
+      <div demo>
+        <lib-menu
+          [theme]="'dark'"
+          [items]="darkThemeItems"
+          (menuItemClick)="onMenuItemClick($event)">
+        </lib-menu>
+      </div>
+      <div description>
+        深色主题，适合深色背景下使用。
+      </div>
+    </app-doc-box>
+    
+    <!-- 垂直模式 -->
+    <app-doc-box
+      title="垂直模式"
+      [sourceCode]="verticalSource">
+      <div demo>
+        <lib-menu
+          [mode]="'vertical'"
+          [items]="verticalMenuItems"
+          (menuItemClick)="onMenuItemClick($event)">
+        </lib-menu>
+      </div>
+      <div description>
+        垂直菜单，子菜单在鼠标悬浮时弹出。
+      </div>
+    </app-doc-box>
+    
+    <!-- 水平模式 -->
+    <app-doc-box
+      title="水平模式"
+      [sourceCode]="horizontalSource">
+      <div demo>
+        <lib-menu
+          [mode]="'horizontal'"
+          [items]="horizontalMenuItems"
+          (menuItemClick)="onMenuItemClick($event)">
+        </lib-menu>
+      </div>
+      <div description>
+        水平菜单，适合顶部导航栏。
+      </div>
+    </app-doc-box>
+    
+    <!-- 折叠菜单 -->
+    <app-doc-box
+      title="可折叠菜单"
+      [sourceCode]="collapsedSource">
+      <div demo>
+        <button (click)="toggleCollapsed()" class="collapse-button">
+          {{ isCollapsed ? '展开' : '折叠' }}
+        </button>
+        <div class="menu-container">
+          <lib-menu
+            [inlineCollapsed]="isCollapsed"
+            [items]="collapsedMenuItems"
+            (menuItemClick)="onMenuItemClick($event)">
+          </lib-menu>
+        </div>
+      </div>
+      <div description>
+        内联菜单可以被缩起/展开。
+      </div>
+    </app-doc-box>
+    
+    <!-- 禁用菜单项 -->
+    <app-doc-box
+      title="禁用菜单项"
+      [sourceCode]="disabledSource">
+      <div demo>
+        <lib-menu
+          [items]="disabledMenuItems"
+          (menuItemClick)="onMenuItemClick($event)">
+        </lib-menu>
+      </div>
+      <div description>
+        可以禁用菜单中的某些选项。
+      </div>
+    </app-doc-box>
+  </div>
+  
+  <h2 class="doc-section-title">API</h2>
+  <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+</div>

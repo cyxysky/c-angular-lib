@@ -1,0 +1,79 @@
+.doc-title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-section-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 40px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-sub-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 24px 0 16px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.doc-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 16px;
+}
+
+// 响应式网格布局
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// 示例内容样式
+.example-value {
+  margin-top: 16px;
+  color: #666;
+}
+
+// 菜单演示相关样式
+.menu-container {
+  width: 240px;
+  min-height: 300px;
+  border-right: 1px solid #f0f0f0;
+}
+
+.collapse-button {
+  margin-bottom: 16px;
+  padding: 4px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.collapse-button:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+// 自定义标签样式
+.custom-label {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+// API 表格样式
+app-doc-api-table {
+  margin-bottom: 32px;
+}

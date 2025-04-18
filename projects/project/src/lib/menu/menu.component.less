@@ -1,0 +1,527 @@
+// 变量定义
+@menu-prefix-cls: lib-menu;
+@menu-item-height: 40px;
+@menu-horizontal-line-height: 46px;
+@menu-item-active-bg: #e6f7ff;
+@menu-item-active-border-width: 3px;
+@menu-dark-bg: #001529;
+@menu-dark-submenu-bg: #000c17;
+@menu-dark-highlight-color: #fff;
+@menu-dark-item-active-bg: #1890ff;
+@menu-item-color: rgba(0, 0, 0, 0.85);
+@menu-highlight-color: #1890ff;
+@menu-item-vertical-margin: 4px;
+@menu-item-font-size: 14px;
+@menu-icon-margin-right: 10px;
+@menu-icon-size: 14px;
+@menu-transition-time: 0.3s;
+@menu-width: 240px;
+@menu-collapsed-width: 80px;
+@menu-item-padding: 0 16px;
+@menu-item-bg: transparent;
+@menu-item-hover-color: #1890ff;
+@menu-item-hover-bg: #e6f7ff;
+@menu-item-active-color: #1890ff;
+@menu-item-disabled-color: rgba(0, 0, 0, 0.25);
+
+// 暗色主题变量
+@menu-dark-item-color: rgba(255, 255, 255, 0.65);
+@menu-dark-item-hover-color: #fff;
+@menu-dark-item-hover-bg: transparent;
+@menu-dark-item-active-color: #fff;
+
+// 通用重置
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// 菜单主体样式
+.@{menu-prefix-cls} {
+  font-size: @menu-item-font-size;
+  font-variant: tabular-nums;
+  line-height: 1.5;
+  font-feature-settings: 'tnum';
+  color: @menu-item-color;
+  width: @menu-width;
+  transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+
+  ul, li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &-root {
+    width: 100%;
+  }
+  
+  // 基本项样式（通用于菜单项和子菜单标题）
+  &-item, &-submenu-title {
+    position: relative;
+    display: block;
+    padding: @menu-item-padding;
+    height: @menu-item-height;
+    line-height: @menu-item-height;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: color 0.3s, background 0.3s, border-color 0.3s;
+    white-space: nowrap;
+    
+    &:hover {
+      color: @menu-item-hover-color;
+      background-color: @menu-item-hover-bg;
+    }
+    
+    .menu-icon {
+      display: inline-block;
+      margin-right: @menu-icon-margin-right;
+      font-size: @menu-icon-size;
+      vertical-align: middle;
+    }
+  }
+  
+  // 子菜单
+  &-submenu {
+    position: relative;
+    
+    &-arrow {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      
+      &:before, &:after {
+        content: '';
+        position: absolute;
+        background-color: currentColor;
+        width: 6px;
+        height: 1.5px;
+        border-radius: 2px;
+        transition: transform 0.3s;
+      }
+      
+      &:before {
+        transform: rotate(45deg) translateX(2.5px);
+      }
+      
+      &:after {
+        transform: rotate(-45deg) translateX(-2.5px);
+      }
+    }
+    
+    &-open > &-title > &-arrow {
+      &:before {
+        transform: rotate(-45deg) translateX(2.5px);
+      }
+      
+      &:after {
+        transform: rotate(45deg) translateX(-2.5px);
+      }
+    }
+    
+    // 子菜单内容
+    .@{menu-prefix-cls}-sub {
+      padding: 0;
+    }
+  }
+
+  // 内联模式
+  &-inline {
+    width: @menu-width;
+    
+    .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+      width: 100%;
+    }
+    
+    .@{menu-prefix-cls}-submenu-title {
+      padding-right: 40px;
+    }
+    
+    .@{menu-prefix-cls}-sub {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+    }
+  }
+  
+  // 垂直模式
+  &-vertical {
+    width: @menu-width;
+    border-right: 1px solid #f0f0f0;
+    
+    .@{menu-prefix-cls}-submenu {
+      .@{menu-prefix-cls}-sub {
+        position: absolute;
+        left: 100%;
+        top: 0;
+        margin-left: 4px;
+        min-width: 160px;
+        z-index: 1050;
+        border-radius: 4px;
+        box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+        background-color: #fff;
+        padding: 8px 0;
+      }
+
+      // 垂直模式下子菜单项样式
+      &-title {
+        .@{menu-prefix-cls}-submenu-arrow {
+          transform: rotate(-90deg);
+        }
+      }
+
+      &-open > .@{menu-prefix-cls}-submenu-title {
+        .@{menu-prefix-cls}-submenu-arrow {
+          transform: rotate(-90deg);
+        }
+      }
+    }
+
+    .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+      height: @menu-item-height;
+      line-height: @menu-item-height;
+      margin: 4px 0;
+      padding: 0 16px 0 24px;
+    }
+
+    // 垂直子菜单特定样式
+    .@{menu-prefix-cls}-vertical-sub {
+      .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+        padding: 0 16px;
+      }
+    }
+  }
+  
+  // 水平模式
+  &-horizontal {
+    display: flex;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: @menu-horizontal-line-height;
+    width: 100%; // 水平模式应该允许占满容器宽度
+    
+    & > .@{menu-prefix-cls}-root {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+    
+    .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu {
+      margin-top: 0;
+      margin-bottom: 0;
+      border-bottom: 2px solid transparent;
+      display: inline-block;
+      vertical-align: middle;
+      height: @menu-horizontal-line-height;
+      line-height: @menu-horizontal-line-height;
+      position: relative;
+      
+      &:hover {
+        color: @menu-highlight-color;
+        border-bottom-color: @menu-highlight-color;
+      }
+    }
+    
+    .@{menu-prefix-cls}-item {
+      height: @menu-horizontal-line-height;
+      line-height: @menu-horizontal-line-height;
+      padding: 0 20px;
+      
+      // 水平模式选中项
+      &-selected {
+        color: @menu-highlight-color;
+        border-bottom: 2px solid @menu-highlight-color;
+      }
+    }
+    
+    .@{menu-prefix-cls}-submenu {
+      &-title {
+        height: @menu-horizontal-line-height;
+        line-height: @menu-horizontal-line-height;
+        padding: 0 20px;
+      }
+      
+      // 水平模式下选中的子菜单
+      &-selected > .@{menu-prefix-cls}-submenu-title {
+        color: @menu-highlight-color;
+        border-bottom: 2px solid @menu-highlight-color;
+      }
+      
+      .@{menu-prefix-cls}-sub {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 180px;
+        margin-top: 4px;
+        z-index: 1050;
+        border-radius: 4px;
+        box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+        background-color: #fff;
+        padding: 8px 0;
+        
+        .@{menu-prefix-cls}-item {
+          height: @menu-item-height;
+          line-height: @menu-item-height;
+          display: block;
+          border-bottom: none;
+          margin: 0;
+          padding: 0 16px;
+          white-space: nowrap;
+          
+          &:hover {
+            border-bottom: none;
+            background-color: @menu-item-active-bg;
+          }
+          
+          // 下拉菜单中的选中项
+          &-selected {
+            color: @menu-highlight-color;
+            background-color: @menu-item-active-bg;
+            border-bottom: none;
+          }
+        }
+        
+        .@{menu-prefix-cls}-submenu-title {
+          padding: 0 16px;
+          height: @menu-item-height;
+          line-height: @menu-item-height;
+        }
+        
+        .@{menu-prefix-cls}-submenu {
+          width: 100%;
+          display: block;
+          border-bottom: none;
+          
+          .@{menu-prefix-cls}-sub {
+            top: 0;
+            left: 100%;
+            margin-top: 0;
+            margin-left: 4px;
+          }
+          
+          // 嵌套子菜单中的选中项
+          &-selected > .@{menu-prefix-cls}-submenu-title {
+            color: @menu-highlight-color;
+            background-color: @menu-item-active-bg;
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+  
+  // 亮色主题
+  &-light {
+    background: #fff;
+    
+    .@{menu-prefix-cls}-item-selected {
+      color: @menu-highlight-color;
+      background-color: @menu-item-active-bg;
+      font-weight: 500;
+      
+      &:after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: @menu-item-active-border-width;
+        background: @menu-highlight-color;
+      }
+    }
+    
+    // 选中父级菜单项样式
+    .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
+      color: @menu-highlight-color;
+      font-weight: 500;
+    }
+    
+    &.@{menu-prefix-cls}-horizontal {
+      .@{menu-prefix-cls}-item-selected {
+        color: @menu-highlight-color;
+        background-color: transparent;
+        border-bottom-color: @menu-highlight-color;
+        
+        &:after {
+          display: none;
+        }
+      }
+      
+      .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
+        color: @menu-highlight-color;
+        border-bottom-color: @menu-highlight-color;
+      }
+    }
+  }
+  
+  // 暗色主题
+  &-dark {
+    background: @menu-dark-bg;
+    color: @menu-dark-item-color;
+    
+    .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+      color: @menu-dark-item-color;
+      
+      &:hover {
+        color: @menu-dark-item-hover-color;
+        background-color: @menu-dark-item-hover-bg;
+      }
+    }
+    
+    .@{menu-prefix-cls}-item-selected {
+      color: @menu-dark-highlight-color;
+      background-color: @menu-dark-item-active-bg;
+      font-weight: 500;
+    }
+    
+    // 选中父级菜单项样式
+    .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
+      color: @menu-dark-highlight-color;
+    }
+    
+    .@{menu-prefix-cls}-sub {
+      background: @menu-dark-submenu-bg;
+    }
+    
+    &.@{menu-prefix-cls}-horizontal {
+      .@{menu-prefix-cls}-item-selected {
+        color: @menu-dark-highlight-color;
+        background-color: transparent;
+        border-bottom-color: @menu-dark-highlight-color;
+      }
+      
+      .@{menu-prefix-cls}-submenu-selected > .@{menu-prefix-cls}-submenu-title {
+        color: @menu-dark-highlight-color;
+        border-bottom-color: @menu-dark-highlight-color;
+      }
+      
+      .@{menu-prefix-cls}-sub {
+        background: @menu-dark-submenu-bg;
+        
+        .@{menu-prefix-cls}-item:hover {
+          background-color: @menu-dark-item-active-bg;
+          color: @menu-dark-highlight-color;
+        }
+      }
+    }
+  }
+  
+  // 折叠菜单样式
+  &-collapsed {
+    width: @menu-collapsed-width;
+    
+    .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu > .@{menu-prefix-cls}-submenu-title {
+      padding: 0 32px !important;
+      text-align: center;
+      
+      .menu-icon {
+        margin-right: 0;
+        font-size: 16px;
+      }
+      
+      .@{menu-prefix-cls}-title-content {
+        display: none;
+      }
+
+      .@{menu-prefix-cls}-submenu-arrow {
+        display: none;
+      }
+    }
+    
+    .@{menu-prefix-cls}-submenu {
+      position: relative;
+      
+      // 折叠模式下子菜单的样式调整
+      .@{menu-prefix-cls}-sub {
+        position: absolute;
+        left: 100%;
+        top: 0;
+        margin-left: 4px;
+        min-width: 160px;
+        z-index: 1050;
+        border-radius: 4px;
+        box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+        background-color: #fff;
+        padding: 8px 0;
+        
+        // 子菜单内的所有项都显示文字内容
+        .@{menu-prefix-cls}-title-content {
+          display: inline-block;
+        }
+        
+        .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+          padding: 0 16px !important;
+          text-align: left;
+          margin: 0;
+          
+          .menu-icon {
+            margin-right: @menu-icon-margin-right;
+          }
+
+          .@{menu-prefix-cls}-submenu-arrow {
+            display: inline-block;
+            transform: rotate(-90deg);
+          }
+        }
+        
+        // 折叠模式子菜单中的子菜单
+        .@{menu-prefix-cls}-sub {
+          left: 100%;
+          top: 0;
+          margin-left: 4px;
+          
+          .@{menu-prefix-cls}-item {
+            padding: 0 16px !important;
+          }
+        }
+      }
+    }
+    
+    // 折叠模式下的选中样式
+    .@{menu-prefix-cls}-item-selected {
+      background-color: @menu-item-active-bg;
+    }
+    
+    &.@{menu-prefix-cls}-dark {
+      .@{menu-prefix-cls}-sub {
+        background: @menu-dark-submenu-bg;
+        
+        .@{menu-prefix-cls}-item, .@{menu-prefix-cls}-submenu-title {
+          color: @menu-dark-item-color;
+          
+          &:hover {
+            color: @menu-dark-item-hover-color;
+            background-color: @menu-dark-item-hover-bg;
+          }
+        }
+        
+        .@{menu-prefix-cls}-item-selected {
+          background-color: @menu-dark-item-active-bg;
+          color: @menu-dark-highlight-color;
+        }
+      }
+    }
+  }
+  
+  // 禁用状态
+  &-item-disabled, &-submenu-disabled > .@{menu-prefix-cls}-submenu-title {
+    color: @menu-item-disabled-color !important;
+    background: none !important;
+    cursor: not-allowed !important;
+    
+    &:after {
+      border-color: @menu-item-disabled-color !important;
+    }
+  }
+  
+  &-dark &-item-disabled, &-dark &-submenu-disabled > .@{menu-prefix-cls}-submenu-title {
+    color: rgba(255, 255, 255, 0.35) !important;
+  }
+  
+  // 水平和垂直子菜单的特殊样式
+  &-horizontal-sub, &-vertical-sub {
+    // 子菜单通过Angular控制显示和隐藏
+  }
+}

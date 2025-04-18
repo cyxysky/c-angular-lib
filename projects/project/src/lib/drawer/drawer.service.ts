@@ -3,8 +3,6 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { Injectable, TemplateRef, Injector, EnvironmentInjector, inject, ComponentRef } from '@angular/core';
 import { DrawerComponent } from './drawer.component';
 import { DrawerOptions } from './drawer.interface';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -47,10 +45,10 @@ export class DrawerService {
     componentRef.setInput('data', options.data);
     componentRef.setInput('width', options.width);
     componentRef.setInput('height', options.height);
-    componentRef.setInput('placement', options.placement);
-    componentRef.setInput('mask', options.mask);
-    componentRef.setInput('maskClosable', options.maskClosable);
-    componentRef.setInput('closable', options.closable);
+    componentRef.setInput('placement', options.placement ?? 'right');
+    componentRef.setInput('mask', options.mask !== undefined ? options.mask : true);
+    componentRef.setInput('maskClosable', options.maskClosable !== undefined ? options.maskClosable : true);
+    componentRef.setInput('closable', options.closable !== undefined ? options.closable : true);
     componentRef.setInput('zIndex', options.zIndex);
     // 设置关闭回调
     if (options.onClose) {
