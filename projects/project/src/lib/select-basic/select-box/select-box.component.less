@@ -9,11 +9,11 @@
 @select-height-base: 32px;
 @select-font-size-base: 14px;
 @select-min-width: 200px;
-@select-line-height: 1.5;
+@select-line-height: normal;
 @select-gap: 0px;
 
 // 选择框内容间距
-@select-content-padding-base: 2px 4px;
+@select-content-padding-base: 1px 4px;
 @select-content-min-height-base: 28px;
 @select-content-min-height-lg: 36px;
 @select-content-min-height-sm: 20px;
@@ -25,7 +25,7 @@
 
 // 小尺寸变量
 @select-height-sm: 24px;
-@select-font-size-sm: 12px;
+@select-font-size-sm: 14px;
 @select-placeholder-padding-left-sm: 4px;
 
 // 图标尺寸变量
@@ -247,7 +247,6 @@
 
         .select-content {
             min-height: @select-content-min-height-sm;
-            padding: 0 4px;
         }
 
         .placeHolder,

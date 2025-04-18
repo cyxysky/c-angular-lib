@@ -16,8 +16,8 @@
 
                 <div class="lib-menu-submenu-title"
                     [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
-                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item) : onMenuItemClick(item.children[0])"
-                    (mouseenter)="(mode !== 'inline' || inlineCollapsed) && onMouseEnterSubmenu(item)"
+                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item, $event) : onMenuItemClick(item.children[0], $event)"
+                    (mouseenter)="(mode !== 'inline' || inlineCollapsed) && onMouseEnterSubmenu(item, $event)"
                     (mouseleave)="(mode !== 'inline' || inlineCollapsed) && onMouseLeaveSubmenu(item)">
                     <i *ngIf="item.icon" class="menu-icon" [class]="item.icon"></i>
                     <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title }}</span>
@@ -37,7 +37,7 @@
                                 [class.lib-menu-submenu-disabled]="child.disabled">
 
                                 <div class="lib-menu-submenu-title" [style.paddingLeft.px]="inlineIndent * 2"
-                                    (click)="toggleSubMenu(child)">
+                                    (click)="toggleSubMenu(child, $event)">
                                     <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
                                     <span class="lib-menu-title-content">{{ child.title }}</span>
                                     <i class="lib-menu-submenu-arrow"></i>
@@ -49,7 +49,7 @@
                                             [class.lib-menu-item-selected]="subChild.selected"
                                             [class.lib-menu-item-disabled]="subChild.disabled"
                                             [style.paddingLeft.px]="inlineIndent * 3"
-                                            (click)="onMenuItemClick(subChild)">
+                                            (click)="onMenuItemClick(subChild, $event)">
                                             <i *ngIf="subChild.icon" class="menu-icon" [class]="subChild.icon"></i>
                                             <span class="lib-menu-title-content">{{ subChild.title }}</span>
                                         </li>
@@ -61,67 +61,59 @@
                             <li *ngIf="!child.children || child.children.length === 0" class="lib-menu-item"
                                 [class.lib-menu-item-selected]="child.selected"
                                 [class.lib-menu-item-disabled]="child.disabled"
-                                [style.paddingLeft.px]="inlineIndent * 2" (click)="onMenuItemClick(child)">
+                                [style.paddingLeft.px]="inlineIndent * 2" (click)="onMenuItemClick(child, $event)">
                                 <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
                                 <span class="lib-menu-title-content">{{ child.title }}</span>
                             </li>
                         </ng-container>
                     </ul>
                 </div>
-
-                <!-- 垂直模式或水平模式或折叠状态下的子菜单 -->
-                <ul class="lib-menu-sub"
-                    *ngIf="(mode === 'vertical' || mode === 'horizontal' || (mode === 'inline' && inlineCollapsed)) && item.isOpen"
-                    [class.lib-menu-vertical-sub]="mode === 'vertical' || (mode === 'inline' && inlineCollapsed)"
-                    [class.lib-menu-horizontal-sub]="mode === 'horizontal'" (mouseenter)="onMouseEnterSubMenu(item)"
-                    (mouseleave)="onMouseLeaveSubMenu(item)">
-                    <ng-container *ngFor="let child of item.children">
-                        <!-- 递归处理子菜单 -->
-                        <li *ngIf="child.children && child.children.length > 0" class="lib-menu-submenu"
-                            [class.lib-menu-submenu-open]="child.isOpen"
-                            [class.lib-menu-submenu-selected]="hasSelectedChild(child)"
-                            [class.lib-menu-submenu-disabled]="child.disabled">
-
-                            <div class="lib-menu-submenu-title" (click)="toggleSubMenu(child)"
-                                (mouseenter)="onMouseEnterSubmenu(child)" (mouseleave)="onMouseLeaveSubmenu(child)">
-                                <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
-                                <span class="lib-menu-title-content">{{ child.title }}</span>
-                                <!-- 子级子菜单箭头显示 -->
-                                <i class="lib-menu-submenu-arrow"></i>
-                            </div>
-
-                            <ul class="lib-menu-sub" *ngIf="child.isOpen"
-                                [class.lib-menu-vertical-sub]="mode === 'vertical' || (mode === 'inline' && inlineCollapsed)"
-                                (mouseenter)="onMouseEnterSubMenu(child)" (mouseleave)="onMouseLeaveSubMenu(child)">
-                                <li *ngFor="let subChild of child.children" class="lib-menu-item"
-                                    [class.lib-menu-item-selected]="subChild.selected"
-                                    [class.lib-menu-item-disabled]="subChild.disabled"
-                                    (click)="onMenuItemClick(subChild)">
-                                    <i *ngIf="subChild.icon" class="menu-icon" [class]="subChild.icon"></i>
-                                    <span class="lib-menu-title-content">{{ subChild.title }}</span>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <!-- 没有子菜单的项 -->
-                        <li *ngIf="!child.children || child.children.length === 0" class="lib-menu-item"
-                            [class.lib-menu-item-selected]="child.selected"
-                            [class.lib-menu-item-disabled]="child.disabled" (click)="onMenuItemClick(child)">
-                            <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
-                            <span class="lib-menu-title-content">{{ child.title }}</span>
-                        </li>
-                    </ng-container>
-                </ul>
             </li>
 
             <!-- 没有子菜单的项 -->
             <li *ngIf="!item.children || item.children.length === 0" class="lib-menu-item"
                 [class.lib-menu-item-selected]="item.selected" [class.lib-menu-item-disabled]="item.disabled"
                 [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
-                (click)="onMenuItemClick(item)">
+                (click)="onMenuItemClick(item, $event)">
                 <i *ngIf="item.icon" class="menu-icon" [class]="item.icon"></i>
                 <span class="lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title }}</span>
             </li>
         </ng-container>
     </ul>
 </div>
+
+<!-- 子菜单的Overlay模板 -->
+<ng-template #menuItemTpl>
+    <div class="lib-menu-overlay-container"
+         [class.lib-menu-light]="theme === 'light'"
+         [class.lib-menu-dark]="theme === 'dark'">
+        <ul class="lib-menu-sub" [class.lib-menu-vertical-sub]="true">
+            <ng-container *ngFor="let child of getCurrentSubmenuItems()">
+                <!-- 递归处理子菜单 -->
+                <li *ngIf="child.children && child.children.length > 0" class="lib-menu-submenu"
+                    [class.lib-menu-submenu-open]="child.isOpen"
+                    [class.lib-menu-submenu-selected]="hasSelectedChild(child)"
+                    [class.lib-menu-submenu-disabled]="child.disabled">
+
+                    <div class="lib-menu-submenu-title"
+                        (mouseenter)="onMouseEnterSubmenu(child, $event)" 
+                        (click)="onMenuItemClick(child.children[0], $event)">
+                        <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
+                        <span class="lib-menu-title-content">{{ child.title }}</span>
+                        <!-- 子级子菜单箭头显示 -->
+                        <i class="lib-menu-submenu-arrow"></i>
+                    </div>
+                </li>
+
+                <!-- 没有子菜单的项 -->
+                <li *ngIf="!child.children || child.children.length === 0" class="lib-menu-item"
+                    [class.lib-menu-item-selected]="child.selected"
+                    [class.lib-menu-item-disabled]="child.disabled" 
+                    (click)="onMenuItemClick(child, $event)">
+                    <i *ngIf="child.icon" class="menu-icon" [class]="child.icon"></i>
+                    <span class="lib-menu-title-content">{{ child.title }}</span>
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+</ng-template>

@@ -271,7 +271,6 @@
       // 水平模式下选中的子菜单
       &-selected > .@{menu-prefix-cls}-submenu-title {
         color: @menu-highlight-color;
-        border-bottom: 2px solid @menu-highlight-color;
       }
       
       .@{menu-prefix-cls}-sub {
@@ -345,8 +344,6 @@
       color: @menu-highlight-color;
       background-color: @menu-item-active-bg;
       font-weight: 500;
-      border-right: @menu-item-active-border-width solid @menu-highlight-color;
-      border-left: none;
     }
     
     // 选中父级菜单项样式
@@ -581,5 +578,168 @@
   // 水平和垂直子菜单的特殊样式
   &-horizontal-sub, &-vertical-sub {
     // 子菜单通过Angular控制显示和隐藏
+  }
+}
+
+// Overlay子菜单样式
+.lib-menu-overlay-container {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+  padding: 4px 0;
+  min-width: 160px;
+  position: relative;
+  max-height: calc(100vh - 60px); // 限制最大高度，防止超出屏幕
+  overflow-y: auto; // 添加垂直滚动条
+  overflow-x: hidden;
+  // 添加最大宽度限制，避免在小屏幕上超出
+  max-width: min(300px, calc(100vw - 32px));
+  
+  // 滚动条样式
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  &.lib-menu-dark {
+    background-color: @menu-dark-submenu-bg;
+    
+    .lib-menu-item, .lib-menu-submenu-title {
+      color: @menu-dark-item-color;
+      
+      &:hover {
+        color: @menu-dark-item-hover-color;
+        background-color: @menu-dark-item-hover-bg;
+      }
+    }
+    
+    .lib-menu-item-selected {
+      color: @menu-dark-item-active-color;
+      background-color: @menu-dark-item-active-bg;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  
+  .lib-menu-sub {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+  }
+  
+  .lib-menu-item, .lib-menu-submenu-title {
+    padding: 0 20px;
+    height: @menu-item-height;
+    line-height: @menu-item-height;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin: 1px 4px;
+    border-radius: 4px;
+    // 处理文字过长的情况
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    &:hover {
+      color: @menu-item-hover-color;
+      background-color: @menu-item-hover-bg;
+    }
+    
+    .menu-icon {
+      margin-right: @menu-icon-margin-right;
+      flex-shrink: 0; // 防止图标被压缩
+    }
+    
+    .lib-menu-title-content {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  
+  .lib-menu-item-selected {
+    color: @menu-item-active-color;
+    background-color: @menu-item-active-bg;
+  }
+  
+  .lib-menu-submenu {
+    position: relative;
+    
+    .lib-menu-submenu-title {
+      padding-right: 36px;
+      position: relative;
+      
+      .lib-menu-submenu-arrow {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%) rotate(-90deg);
+        width: 10px;
+        height: 10px;
+        flex-shrink: 0; // 防止箭头被压缩
+        
+        &:before, &:after {
+          content: '';
+          position: absolute;
+          background-color: currentColor;
+          width: 6px;
+          height: 1.5px;
+          border-radius: 2px;
+        }
+        
+        &:before {
+          transform: rotate(45deg) translateX(2.5px);
+        }
+        
+        &:after {
+          transform: rotate(-45deg) translateX(-2.5px);
+        }
+      }
+    }
+  }
+}
+
+// CDK Overlay样式重置
+.cdk-overlay-container {
+  .cdk-overlay-connected-position-bounding-box {
+    .cdk-overlay-pane {
+      .lib-menu-overlay-container {
+        // 不需要额外设置max-height，因为已经在上面设置了
+        transform-origin: top left;
+        animation: menuFadeIn 0.1s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+    }
+  }
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

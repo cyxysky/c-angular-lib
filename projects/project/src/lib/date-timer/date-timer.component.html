@@ -59,7 +59,6 @@
 <ng-template #dropdownTemplate>
   <div 
     class="date-timer-dropdown"
-    [style.width]="mode === 'week' ? '320px' : '296px'"
     [class.date-timer-dropdown-time]="currentPanelMode === 'time' && !showTime"
     [class.date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(mode)"
   >

@@ -1,8 +1,9 @@
 export interface DropMenu {
   label: string;
-  icon: string;
-  children: DropMenu[];
+  icon?: string;
+  children?: DropMenu[];
   disabled?: boolean;
+  data?: any;
 }
 
 

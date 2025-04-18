@@ -11,14 +11,14 @@
 
 .app-container {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: calc(100vh - 16px);
+  width: calc(100vw - 8px);
   overflow: hidden;
   background-color: #f0f2f5;
 }
 
 .menu-container {
-  width: 250px;
+  flex-grow: 0;
   height: 100%;
   background-color: #f0f2f5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -59,9 +59,16 @@
 .content-container {
   flex: 1;
   padding: 24px;
-  overflow: auto;
   background-color: #fff;
   margin: 16px;
   border-radius: 8px;
+  overflow: auto;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+::ng-deep {
+  * {
+    box-sizing: border-box;
+  }
 }
