@@ -7,19 +7,11 @@
   [class.lib-input-status-error]="status === 'error' || error"
   [class.lib-input-status-warning]="status === 'warning'"
   [class.lib-input-focused]="hasFocus()">
-  <!-- 前缀 -->
-  <span class="input-prefix">
-    <!-- 使用ng-content选择器，可以传递prefix和prefixIcon -->
+  <span class="input-prefix" *ngIf="prefix || prefixIcon">
     <ng-content select="[prefix]"></ng-content>
-    <!-- 使用属性 -->
-    <ng-container *ngIf="prefixIcon">
-      <i class="input-prefix-icon" [class]="prefixIcon"></i>
-    </ng-container>
-    <ng-container *ngIf="prefix">
-      {{ prefix }}
-    </ng-container>
+    <i class="input-prefix-icon" *ngIf="prefixIcon" [class]="prefixIcon"></i>
+    <ng-container *ngIf="prefix">{{ prefix }}</ng-container>
   </span>
-  <!-- 输入框 -->
   <input 
     class="input-control"
     [ngModel]="_data"
@@ -40,26 +32,14 @@
     (keypress)="onKeyPress($event)"
     (click)="onClick($event)"
   />
-  <!-- 后缀 -->
-  <span class="input-suffix">
+  <span class="input-suffix" *ngIf="suffix || suffixIcon || (showCount && maxlength) || (allowClear && _data && !disabled && !readonly)">
     <ng-content select="[suffix]"></ng-content>
-    <!-- 后缀 -->
-    <ng-container *ngIf="suffix">
-      {{ suffix }}
-    </ng-container>
-    <!-- 图标 -->
-    <ng-container *ngIf="suffixIcon">
-      <i class="input-suffix-icon" [class]="suffixIcon"></i>
-    </ng-container>
-    <!-- 字数统计 -->
-    <span class="char-count" *ngIf="showCount && maxlength">
-      {{ getCharCount() }}
-    </span>
-    <!-- 清除 -->
+    <ng-container *ngIf="suffix">{{ suffix }}</ng-container>
+    <i class="input-suffix-icon" *ngIf="suffixIcon" [class]="suffixIcon"></i>
+    <span class="char-count" *ngIf="showCount && maxlength">{{ getCharCount() }}</span>
     <span class="clear-icon" (click)="clear($event)" *ngIf="allowClear && _data && !disabled && !readonly">
       <i class="bi-x-circle-fill"></i>
     </span>
   </span>
-  <!-- 错误信息 -->
 </div>
 <div class="input-error" *ngIf="error">{{ error }}</div>

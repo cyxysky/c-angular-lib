@@ -1,30 +1,10 @@
-// 主题变量
-@primary-color: #1890ff;
-@heading-color: rgba(0, 0, 0, 0.85);
-@text-color: rgba(0, 0, 0, 0.65);
-@text-color-secondary: rgba(0, 0, 0, 0.45);
-@disabled-color: rgba(0, 0, 0, 0.25);
-@border-color-base: #d9d9d9;
-@border-color-split: #f0f0f0;
-@border-radius-base: 2px;
-@box-shadow-base: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-// 动画
-@ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
-@animation-duration-slow: 0.3s;
-
-// Tabs基础样式
 .lib-tabs {
   display: flex;
   overflow: hidden;
-
-  // 布局方向
   &-top,
   &-bottom {
     flex-direction: column;
   }
-
-  // 导航栏外部包装器
   &-nav-wrapper {
     position: relative;
     display: inline-flex;
@@ -32,41 +12,31 @@
     margin: 0 0 16px 0;
     gap: 8px;
   }
-
-  // 底部tabs样式
   &-bottom {
     .lib-tabs-nav-wrapper {
       order: 1;
       margin-top: 16px;
       margin-bottom: 0;
     }
-
     .lib-tabs-nav {
-      border-top: 1px solid @border-color-base;
+      border-top: 1px solid #d9d9d9;
       border-bottom: none;
     }
-
     .lib-tabs-ink-bar {
       top: 0;
       bottom: auto;
     }
   }
-
-  // 顶部tabs样式
   &-top {
     .lib-tabs-nav {
-      border-bottom: 1px solid @border-color-base;
+      border-bottom: 1px solid #d9d9d9;
     }
   }
-
-  // 导航区域
   &-nav {
     position: relative;
     display: flex;
     flex: 1 1 auto;
     min-width: 0;
-
-    // 滚动视图容器
     &-view {
       flex: 1;
       width: 100%;
@@ -76,20 +46,16 @@
       /* Firefox */
       -ms-overflow-style: none;
       /* IE 和 Edge */
-
       &::-webkit-scrollbar {
         display: none;
         /* Chrome, Safari, Opera */
       }
-      
-      // 确保居中和靠右模式下的滚动效果
       &.lib-tabs-nav-centered,
       &.lib-tabs-nav-right {
         display: flex;
         min-width: 0;
       }
     }
-
     &-list {
       display: flex;
       flex: none;
@@ -99,8 +65,6 @@
       white-space: nowrap;
       width: fit-content;
     }
-
-    // 滚动箭头按钮
     &-arrow {
       flex: 0 0 32px;
       min-width: 32px;
@@ -116,23 +80,20 @@
       border: 0;
       outline: none;
       cursor: pointer;
-      color: @text-color-secondary;
+      color: rgba(0, 0, 0, 0.45);
       transition: color 0.3s;
       z-index: 10;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       border-radius: 50%;
-
       &:hover {
-        color: @text-color;
+        color: rgba(0, 0, 0, 0.65);
       }
-
       &-disabled {
-        color: @disabled-color;
+        color: rgba(0, 0, 0, 0.25);
         cursor: not-allowed;
         pointer-events: none;
         opacity: 0.5;
       }
-
       &-icon {
         width: 0;
         height: 0;
@@ -140,27 +101,21 @@
         display: inline-block;
       }
     }
-
     &-prev {
       margin-right: 8px;
-
       .lib-tabs-nav-arrow-icon {
         border-width: 6px 8px 6px 0;
         border-color: transparent currentColor transparent transparent;
       }
     }
-
     &-next {
       margin-left: 8px;
-
       .lib-tabs-nav-arrow-icon {
         border-width: 6px 0 6px 8px;
         border-color: transparent transparent transparent currentColor;
       }
     }
   }
-
-  // 标签页
   &-tab {
     position: relative;
     display: flex;
@@ -173,44 +128,35 @@
     border: 0;
     outline: none;
     cursor: pointer;
-    transition: color 0.3s @ease-in-out;
-
+    transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     &:last-of-type {
       margin-right: 0;
     }
-
     &-btn {
       display: flex;
       align-items: center;
       outline: none;
       transition: all 0.3s;
     }
-
     &-icon {
       margin-right: 8px;
       font-size: 14px;
-
       i {
         display: inline-block;
       }
     }
-
     &-text {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     &-active &-btn {
-      color: @primary-color;
+      color: #1890ff;
     }
-
     &-disabled {
-      color: @disabled-color;
+      color: rgba(0, 0, 0, 0.25);
       cursor: not-allowed;
     }
-
-    // 关闭按钮
     &-close {
       margin-left: 8px;
       padding: 0;
@@ -220,34 +166,27 @@
       outline: none;
       cursor: pointer;
       transition: all 0.3s;
-
       &:hover {
-        color: @heading-color;
+        color: rgba(0, 0, 0, 0.85);
       }
     }
-
-    // 添加按钮
     &-add {
       padding: 0 8px;
       background: #fff;
       z-index: 10;
-
       &:hover {
-        color: @primary-color;
-        border-color: @primary-color;
+        color: #1890ff;
+        border-color: #1890ff;
       }
-
       &-icon {
         font-size: 12px;
       }
-      
-      // 固定在右侧的添加按钮（当出现滚动按钮时）
       &-fixed {
         position: relative;
         margin-left: 8px;
         flex-shrink: 0;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border-radius: @border-radius-base;
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -256,109 +195,86 @@
       }
     }
   }
-
-  // 下划线指示器
   &-ink-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     height: 2px;
-    background-color: @primary-color;
+    background-color: #1890ff;
     z-index: 1;
-    transition: transform @animation-duration-slow @ease-in-out,
-      width @animation-duration-slow @ease-in-out,
-      left @animation-duration-slow @ease-in-out;
+    transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+      width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+      left 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
-
-  // 卡片样式
   &-card {
     .lib-tabs-tab {
       margin-right: 2px;
       padding: 8px 16px;
       background: #fafafa;
-      border: 1px solid @border-color-base;
-      border-radius: @border-radius-base @border-radius-base 0 0;
-      transition: all 0.3s @ease-in-out;
-
+      border: 1px solid #d9d9d9;
+      border-radius: 2px 2px 0 0;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
       &-active {
         background: #fff;
       }
-
       &-close {
         margin-left: 8px;
       }
     }
-
     .lib-tabs-ink-bar {
       display: none;
     }
   }
-
-  // 尺寸变体
   &-small {
     .lib-tabs-tab {
       padding: 8px 0;
       font-size: 12px;
-
       &-icon {
         font-size: 12px;
       }
-
       &-close {
         font-size: 10px;
       }
     }
-
     .lib-tabs-nav-arrow {
       width: 24px;
       height: 24px;
-
       &-icon {
         border-width: 4px 6px 4px 0;
       }
-
       &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
         border-width: 4px 0 4px 6px;
       }
     }
   }
-
   &-large {
     .lib-tabs-tab {
       padding: 16px 0;
       font-size: 16px;
-
       &-icon {
         font-size: 16px;
       }
     }
-
     .lib-tabs-nav-arrow {
       width: 36px;
       height: 36px;
-
       &-icon {
         border-width: 7px 9px 7px 0;
       }
-
       &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
         border-width: 7px 0 7px 9px;
       }
     }
   }
-
-  // 内容区域
   &-content {
     position: relative;
     flex: 1;
     width: 100%;
   }
-
   &-tabpane {
     position: relative;
     width: 100%;
     height: 100%;
-
     &-active {
       z-index: 1;
     }
@@ -368,12 +284,9 @@
 .lib-tabs-nav-centered {
   display: flex;
   justify-content: center !important;
-  
   .lib-tabs-nav-list {
     flex: 0 0 auto;
   }
-  
-  // 当出现滚动按钮时取消居中
   &.lib-tabs-nav-view {
     justify-content: flex-start;
   }
@@ -382,12 +295,9 @@
 .lib-tabs-nav-right {
   display: flex;
   justify-content: flex-end !important;
-  
   .lib-tabs-nav-list {
     flex: 0 0 auto;
   }
-  
-  // 当出现滚动按钮时取消靠右
   &.lib-tabs-nav-view {
     justify-content: flex-start;
   }

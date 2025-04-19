@@ -1,311 +1,218 @@
-// 输入框基础变量
-@input-width: 100%;
-@input-display: inline-block;
-@input-display-flex: inline-flex;
-@input-display-flex-normal: flex;
-@input-box-sizing: border-box;
-@input-background-color: #fff;
-@input-margin: 0;
-@input-outline: none;
-@input-outline-focus: 0;
-@disabled-color: rgba(0, 0, 0, 0.25);
-@border-radius-base: 2px;
-@border-base-color: #d9d9d9;
-// 输入框边框变量
-@input-border-width: 1px;
-@input-border-style: solid;
-@input-border-color: #d9d9d9;
-@input-border-none: none;
-@input-border-radius: @border-radius-base;
-
-// 输入框文本变量
-@input-font-size: 14px;
-@input-line-height: 1.5715;
-@input-color: rgba(0, 0, 0, 0.85);
-@input-placeholder-color: rgba(0, 0, 0, 0.25);
-
-// 输入框内边距变量
-@input-padding: 4px 0px;
-@input-padding-wrap: 0 11px;
-@input-padding-reduced: 5px;
-@input-lg-padding: 6.5px 0px;
-@input-lg-font-size: 16px;
-@input-sm-padding: 0 0px;
-@input-sm-font-size: 12px;
-
-// 输入框过渡变量
-@input-transition: all 0.3s;
-@input-transition-color: color 0.3s;
-
-// 输入框前后缀变量
-@input-affix-color: rgba(0, 0, 0, 0.65);
-@input-affix-padding-left: 11px;
-@input-affix-padding-right: 11px;
-@input-affix-margin: 4px;
-@input-affix-align-items: center;
-@input-affix-align-items-stretch: stretch;
-
-// 清除图标变量
-@input-clear-icon-color: rgba(0, 0, 0, 0.25);
-@input-clear-icon-hover-color: rgba(0, 0, 0, 0.45);
-@input-clear-icon-margin: 4px;
-@input-clear-icon-cursor: pointer;
-
-// 字数统计变量
-@input-count-color: rgba(0, 0, 0, 0.45);
-@input-count-font-size: 12px;
-@input-count-margin: 8px;
-
-// 状态变量
-@input-default-color: #1890ff;
-@input-error-color: #ff4d4f;
-@input-warning-color: #faad14;
-@input-disabled-color: #f5f5f5;
-@input-disabled-cursor: not-allowed;
-
-// 阴影变量
-@input-box-shadow-none: none;
-@input-focus-box-shadow: 0 0 0 2px rgba(@input-default-color, 0.2);
-@input-error-box-shadow: 0 0 0 2px rgba(@input-error-color, 0.2);
-@input-warning-box-shadow: 0 0 0 2px rgba(@input-warning-color, 0.2);
-
-// 位置变量
-@input-position-relative: relative;
-
-// 错误信息变量
-@input-error-font-size: 12px;
-@input-error-line-height: 1.5;
-@input-error-margin-top: 3px;
-@input-error-display: block;
-
 :host {
-    display: @input-display;
-    width: @input-width;
+    display: inline-block;
+    width: 100%;
 }
 
-// 输入框容器
 .input-container {
-    position: @input-position-relative;
-    display: @input-display-flex;
-    align-items: @input-affix-align-items;
-    width: @input-width;
-    box-sizing: @input-box-sizing;
-    font-size: @input-font-size;
-    line-height: @input-line-height;
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.5715;
 }
 
-// 基础输入框样式
 .input-control {
     height: 32px;
-    box-sizing: @input-box-sizing;
-    margin: @input-margin;
-    padding: @input-padding;
-    color: @input-color;
-    font-size: @input-font-size;
-    line-height: @input-line-height;
-    background-color: @input-background-color;
-    border: @input-border-width @input-border-style @input-border-color;
-    border-radius: @input-border-radius;
-    transition: @input-transition;
-    width: @input-width;
-    outline: @input-outline;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 4px 0px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    line-height: 1.5715;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+    width: 100%;
+    outline: none;
 
     &:hover {
-        border-color: @input-default-color;
+        border-color: #1890ff;
     }
 
     &:focus {
-        border-color: @input-default-color;
-        box-shadow: @input-focus-box-shadow;
-        outline: @input-outline-focus;
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        outline: 0;
     }
 
     &::placeholder {
-        color: @input-placeholder-color;
+        color: rgba(0, 0, 0, 0.25);
     }
 }
 
-// 带前缀和后缀的输入框
 .lib-input-affix-wrapper {
-    align-items: @input-affix-align-items-stretch;
-    display: @input-display-flex;
-    padding: @input-padding-wrap;
-    box-sizing: @input-box-sizing;
-    width: @input-width;
-    border: @input-border-width @input-border-style @input-border-color;
-    border-radius: @input-border-radius;
-    transition: @input-transition;
+    display: inline-flex;
+    padding: 0 11px;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
     
     .input-control {
-        border: @input-border-none;
-        box-shadow: @input-box-shadow-none;
+        border: none;
+        box-shadow: none;
         
         &:hover, &:focus {
-            box-shadow: @input-box-shadow-none;
+            box-shadow: none;
         }
     }
     
     &:hover {
-        border-color: @input-default-color;
+        border-color: #1890ff;
     }
     
     &.lib-input-focused {
-        border-color: @input-default-color;
-        box-shadow: @input-focus-box-shadow;
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
     }
 }
 
-// 前缀样式
 .input-prefix {
-    margin-right: @input-affix-margin;
-    display: @input-display-flex-normal;
-    align-items: @input-affix-align-items;
-    color: @input-affix-color;
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.65);
     
     .input-prefix-icon {
-        margin-right: @input-affix-margin;
+        margin-right: 4px;
     }
 }
 
-// 后缀样式
 .input-suffix {
-    margin-left: @input-affix-margin;
-    display: @input-display-flex-normal;
-    align-items: @input-affix-align-items;
-    color: @input-affix-color;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.65);
     
     .input-suffix-icon {
-        margin-left: @input-affix-margin;
+        margin-left: 4px;
     }
 }
 
-// 清除图标
 .clear-icon {
-    cursor: @input-clear-icon-cursor;
-    color: @input-clear-icon-color;
-    transition: @input-transition-color;
-    margin-left: @input-clear-icon-margin;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.25);
+    transition: color 0.3s;
+    margin-left: 4px;
     
     &:hover {
-        color: @input-clear-icon-hover-color;
+        color: rgba(0, 0, 0, 0.45);
     }
 }
 
-// 字数统计
 .char-count {
-    color: @input-count-color;
-    font-size: @input-count-font-size;
-    margin-left: @input-count-margin;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    margin-left: 8px;
 }
 
-// 尺寸变体
 .lib-input-lg {
     .input-control {
         height: 40px;
-        padding: @input-lg-padding;
-        font-size: @input-lg-font-size;
+        padding: 6.5px 0px;
+        font-size: 16px;
     }
 }
 
 .lib-input-sm {
     .input-control {
         height: 24px;
-        padding: @input-sm-padding;
-        font-size: @input-sm-font-size;
+        padding: 0 0px;
+        font-size: 12px;
     }
 }
 
-// 状态样式
 .lib-input-status-error {
-    border-color: @input-error-color;
+    border-color: #ff4d4f;
     
     .input-control {
         &:hover {
-            border-color: @input-error-color;
+            border-color: #ff4d4f;
         }
         
         &:focus {
-            border-color: @input-error-color;
+            border-color: #ff4d4f;
         }
     }
     
     &:hover {
-        border-color: @input-error-color;
+        border-color: #ff4d4f;
     }
     
     &.lib-input-focused {
-        border-color: @input-error-color;
-        box-shadow: @input-error-box-shadow;
+        border-color: #ff4d4f;
+        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
     }
 }
 
 .lib-input-status-warning {
-    border-color: @input-warning-color;
+    border-color: #faad14;
     
     .input-control {
         &:hover {
-            border-color: @input-warning-color;
+            border-color: #faad14;
         }
         
         &:focus {
-            border-color: @input-warning-color;
+            border-color: #faad14;
         }
     }
     
     &:hover {
-        border-color: @input-warning-color;
+        border-color: #faad14;
     }
     
     &.lib-input-focused {
-        border-color: @input-warning-color;
-        box-shadow: @input-warning-box-shadow;
+        border-color: #faad14;
+        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
     }
 }
 
-// 禁用状态
 .lib-input-disabled {
-    background-color: @input-disabled-color;
-    border-color: @input-border-color;
-    color: @disabled-color;
-    cursor: @input-disabled-cursor;
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    color: rgba(0, 0, 0, 0.25);
+    cursor: not-allowed;
     
     .input-control {
-        background-color: @input-disabled-color;
-        color: @disabled-color;
-        cursor: @input-disabled-cursor;
+        background-color: #f5f5f5;
+        color: rgba(0, 0, 0, 0.25);
+        cursor: not-allowed;
         
         &:hover {
-            border-color: @input-border-color;
+            border-color: #d9d9d9;
         }
     }
     
     .input-prefix, .input-suffix {
-        color: @disabled-color;
+        color: rgba(0, 0, 0, 0.25);
     }
 }
 
-// 无边框样式
 .lib-input-borderless {
-    border: @input-border-none;
-    box-shadow: @input-box-shadow-none;
-    background-color: @input-background-color;
+    border: none;
+    box-shadow: none;
+    background-color: #fff;
     
     .input-control {
-        border: @input-border-none;
-        box-shadow: @input-box-shadow-none;
+        border: none;
+        box-shadow: none;
         
         &:hover, &:focus {
-            border: @input-border-none;
-            box-shadow: @input-box-shadow-none;
+            border: none;
+            box-shadow: none;
         }
     }
 }
 
-// 错误信息
 .input-error {
-    color: @input-error-color;
-    font-size: @input-error-font-size;
-    line-height: @input-error-line-height;
-    margin-top: @input-error-margin-top;
-    display: @input-error-display;
+    color: #ff4d4f;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 3px;
+    display: block;
 }

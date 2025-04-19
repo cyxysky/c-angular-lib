@@ -1,140 +1,85 @@
-// 下拉菜单基础变量
-@drop-menu-position: relative;
-@drop-menu-min-width: 160px;
-@drop-menu-border-radius: 8px;
-@drop-menu-background-color: white;
-@drop-menu-box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
-@drop-menu-transform-hidden: scale(0.1);
-@drop-menu-transform-visible: scale(1);
-@drop-menu-opacity-hidden: 0;
-@drop-menu-opacity-visible: 1;
-@drop-menu-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 @drop-menu-z-index: 1050;
-
-
-// 菜单项变量
-@drop-menu-item-height: 38px;
-@drop-menu-item-padding: 4px 8px;
-@drop-menu-item-font-size: 14px;
-@drop-menu-item-color: rgba(0, 0, 0, 0.65);
-@drop-menu-item-hover-color: rgba(0, 0, 0, 0.85);
-@drop-menu-item-hover-bg: rgba(0, 0, 0, 0.04);
-@drop-menu-item-active-bg: rgba(0, 0, 0, 0.08);
-@drop-menu-item-disabled-color: rgba(0, 0, 0, 0.25);
-@drop-menu-item-disabled-bg: transparent;
-@drop-menu-item-icon-margin-right: 10px;
-@drop-menu-item-icon-font-size: 16px;
-
-// 分割线变量
-@drop-menu-divider-height: 1px;
-@drop-menu-divider-bg: rgba(0, 0, 0, 0.06);
-@drop-menu-divider-margin: 6px 0;
-
 .lib-drop-menu {
-  position: @drop-menu-position;
-  min-width: @drop-menu-min-width;
-  border-radius: @drop-menu-border-radius;
-  box-shadow: @drop-menu-box-shadow;
-  background-color: @drop-menu-background-color;
-  transform: @drop-menu-transform-hidden;
-  opacity: @drop-menu-opacity-hidden;
-  transition: @drop-menu-transition;
+  position: relative;
+  min-width: 160px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
+  background-color: white;
+  transform: scale(0.1);
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: @drop-menu-z-index;
   border: 1px solid rgba(0, 0, 0, 0.06);
-
   &.lib-drop-menu-visible {
-    opacity: @drop-menu-opacity-visible;
-    transform: @drop-menu-transform-visible;
+    opacity: 1;
+    transform: scale(1);
   }
-
-  // 子菜单模式
   &.lib-drop-menu-submenu-mode {
     transform: none;
     opacity: 1;
     overflow: visible;
-    box-shadow: @drop-menu-box-shadow;
   }
-
-
-  .lib-drop-menu-content {
+  .lib-drop-menu-list {
+    margin: 0;
+    padding: 6px 0;
+    list-style: none;
     max-height: 300px;
-    
+    overflow-y: auto;
     &::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-    
     &::-webkit-scrollbar-thumb {
       background-color: rgba(0, 0, 0, 0.1);
       border-radius: 3px;
-      
       &:hover {
         background-color: rgba(0, 0, 0, 0.2);
       }
     }
   }
-
-  .lib-drop-menu-list {
-    margin: 0;
-    padding: 6px 0;
-    list-style: none;
-  }
-
   .lib-drop-menu-item {
     display: flex;
     align-items: center;
-    height: @drop-menu-item-height;
-    padding: @drop-menu-item-padding;
-    font-size: @drop-menu-item-font-size;
-    color: @drop-menu-item-color;
+    height: 38px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.65);
     cursor: pointer;
     position: relative;
     transition: all 0.2s;
     margin: 1px 4px;
     border-radius: 4px;
-
     &:hover {
-      color: @drop-menu-item-hover-color;
-      background-color: @drop-menu-item-hover-bg;
+      color: rgba(0, 0, 0, 0.85);
+      background-color: rgba(0, 0, 0, 0.04);
     }
-
     &:active {
-      background-color: @drop-menu-item-active-bg;
+      background-color: rgba(0, 0, 0, 0.08);
     }
-
     &.lib-drop-menu-item-disabled {
-      color: @drop-menu-item-disabled-color;
-      background-color: @drop-menu-item-disabled-bg;
+      color: rgba(0, 0, 0, 0.25);
       cursor: not-allowed;
       opacity: 0.7;
     }
-
+    &.lib-drop-menu-item-selected {
+      background-color: rgba(30, 137, 200, 0.06);
+    }
     .lib-drop-menu-item-icon {
-      margin-right: @drop-menu-item-icon-margin-right;
-      font-size: @drop-menu-item-icon-font-size;
+      margin-right: 10px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
     .lib-drop-menu-item-label {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-weight: 400;
     }
-
     .lib-drop-menu-item-expand-icon {
       margin-left: 8px;
-      transition: transform 0.2s;
     }
-
-
     .arrow-right-icon {
       display: inline-block;
       width: 6px;
@@ -143,19 +88,17 @@
       border-right: 1.5px solid currentColor;
       transform: rotate(45deg);
     }
-
     .lib-drop-menu-submenu {
       position: absolute;
       top: -8px;
       left: 100%;
       margin-left: 4px;
-      padding: 5px 0 5px 0;
+      padding: 5px 0;
       z-index: @drop-menu-z-index + 1;
       visibility: hidden;
       opacity: 0;
       transition: visibility 0.3s, opacity 0.3s;
       pointer-events: none;
-      
       &:before {
         content: '';
         position: absolute;
@@ -163,24 +106,14 @@
         left: -20px;
         width: 20px;
         height: 100%;
-        background-color: transparent;
       }
     }
-
     .lib-drop-menu-submenu-visible {
       visibility: visible;
       opacity: 1;
       pointer-events: auto;
     }
   }
-
-  .lib-drop-menu-divider {
-    height: @drop-menu-divider-height;
-    margin: @drop-menu-divider-margin;
-    background-color: @drop-menu-divider-bg;
-  }
-
-  // 无数据提示样式
   .lib-drop-menu-empty {
     display: flex;
     align-items: center;
@@ -190,8 +123,4 @@
     font-size: 14px;
     text-align: center;
   }
-}
-
-.lib-drop-menu-item-selected {
-  background-color: rgba(30, 137, 200, 0.06);
 }

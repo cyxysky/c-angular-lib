@@ -5,16 +5,13 @@
      [class.lib-tabs-small]="size === 'small'" 
      [class.lib-tabs-large]="size === 'large'">
   <div class="lib-tabs-nav-wrapper">
-    <!-- 左侧滚动按钮 -->
     <button *ngIf="showScrollNav && isHorizontal" 
             class="lib-tabs-nav-arrow lib-tabs-nav-prev" 
             [class.lib-tabs-nav-arrow-disabled]="!canScrollLeft"
             (click)="scrollPrev()">
       <i class="lib-tabs-nav-arrow-icon"></i>
     </button>
-    <!-- 导航栏 -->
     <div class="lib-tabs-nav">
-      <!-- 主内容区 -->
       <div 
         #tabsNav
         class="lib-tabs-nav-view"
@@ -28,24 +25,19 @@
                [class.lib-tabs-tab-disabled]="tab.disabled"
                #tabItem>
             <div class="lib-tabs-tab-btn">
-              <!-- 自定义标题 -->
               <ng-container *ngIf="tab.customTitle; else defaultTitle">
                 <div style="width: 100%;overflow: hidden;text-overflow: ellipsis;">
                   <ng-container [ngTemplateOutlet]="tab.customTitle"></ng-container>
                 </div>
               </ng-container>
-              <!-- 默认标题 -->
               <ng-template #defaultTitle>
                 <span class="lib-tabs-tab-text">{{tab.title}}</span>
               </ng-template>
-              <!-- 关闭按钮 -->
               <span *ngIf="closable && !tab.disabled" class="lib-tabs-tab-close" (click)="onCloseTab(i, $event)">
                 <i [class]="closeIcon"></i>
               </span>
             </div>
           </div>
-          
-          <!-- 无滚动按钮时的添加按钮 -->
           <div *ngIf="!hideAdd && !showScrollNav" 
                class="lib-tabs-tab lib-tabs-tab-add" 
                (click)="onAddTab()">
@@ -55,25 +47,17 @@
               </span>
             </div>
           </div>
-          
-          <!-- 选中下划线 -->
           <div *ngIf="type === 'line'" class="lib-tabs-ink-bar" [ngStyle]="inkBarStyle"></div>
         </div>
       </div>
     </div>
-    
-    <!-- 右侧滚动按钮 -->
     <button *ngIf="showScrollNav && isHorizontal" 
             class="lib-tabs-nav-arrow lib-tabs-nav-next" 
             [class.lib-tabs-nav-arrow-disabled]="!canScrollRight"
             (click)="scrollNext()">
       <i class="lib-tabs-nav-arrow-icon"></i>
     </button>
-    
-    <!-- 添加标签按钮 -->
-    <!-- 当showScrollNav为true时，固定在最右侧；否则显示在常规位置 -->
     <ng-container *ngIf="!hideAdd">
-      <!-- 当有滚动按钮时，固定在右侧显示 -->
       <div *ngIf="showScrollNav" 
            class="lib-tabs-tab lib-tabs-tab-add lib-tabs-tab-add-fixed"
            (click)="onAddTab()">
@@ -85,7 +69,6 @@
       </div>
     </ng-container>
   </div>
-  
   <div class="lib-tabs-content">
     <div *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab"
          class="lib-tabs-tabpane"

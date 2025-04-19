@@ -10,6 +10,7 @@ export class SelectTagComponent {
   @Input() closable = true;
   @Input() size: 'default' | 'small' | 'large' = 'default';
   @Output() remove = new EventEmitter<MouseEvent>();
+  
   public removeSelf($event: MouseEvent): void {
     this.remove.emit($event);
   }

@@ -1,159 +1,27 @@
-@primary: #000000;
-
-// 分段控制器基础变量
-@segmented-display: inline-block;
-@segmented-width: 100%;
-@segmented-position-relative: relative;
-@segmented-box-sizing: border-box;
-@segmented-background-color: #f0f0f0;
-@segmented-border-radius: 6px;
-@segmented-padding: 2px;
-@segmented-max-width: 100%;
-@segmented-gap: 4px;
-
-// 分段控制器容器变量
-@segmented-container-flex: 1;
-@segmented-container-min-width: 0;
-@segmented-container-padding: 0;
-@segmented-container-margin: 0;
-@segmented-container-overflow-x: auto;
-@segmented-container-overflow-y: hidden;
-
-// 分段控制器组变量
-@segmented-group-display: flex;
-@segmented-group-flex-wrap: nowrap;
-@segmented-group-width-fit: fit-content;
-@segmented-group-min-width: 100%;
-@segmented-group-padding: 0;
-@segmented-group-margin: 0;
-
-// 分段控制器项目变量
-@segmented-item-position: relative;
-@segmented-item-color: rgba(0, 0, 0, 0.65);
-@segmented-item-color-selected: rgba(0, 0, 0, 0.85);
-@segmented-item-color-disabled: rgba(0, 0, 0, 0.25);
-@segmented-item-height: 28px;
-@segmented-item-padding: 0 12px;
-@segmented-item-margin: 0;
-@segmented-item-display: flex;
-@segmented-item-align-items: center;
-@segmented-item-justify-content: center;
-@segmented-item-cursor: pointer;
-@segmented-item-cursor-disabled: not-allowed;
-@segmented-item-transition: color 0.3s;
-@segmented-item-flex: 0 0 auto;
-@segmented-item-z-index: 2;
-@segmented-item-icon-margin-right: 6px;
-
-// 分段控制器标签变量
-@segmented-label-display: flex;
-@segmented-label-align-items: center;
-@segmented-label-white-space: nowrap;
-@segmented-label-padding: 0;
-@segmented-label-margin: 0;
-
-// 分段控制器滑块变量
-@segmented-thumb-position: absolute;
-@segmented-thumb-background-color: #fff;
-@segmented-thumb-background-color-disabled: rgba(0, 0, 0, 0.04);
-@segmented-thumb-border-radius: 4px;
-@segmented-thumb-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-@segmented-thumb-box-shadow-disabled: none;
-@segmented-thumb-transition-transform: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-@segmented-thumb-transition-width: width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-@segmented-thumb-height: 28px;
-@segmented-thumb-top: 0;
-@segmented-thumb-left: 0;
-@segmented-thumb-z-index: 1;
-@segmented-thumb-margin: 0;
-@segmented-thumb-padding: 0;
-@segmented-thumb-width: 0;
-
-// 分段控制器导航按钮变量
-@segmented-nav-flex: 0 0 28px;
-@segmented-nav-height: 28px;
-@segmented-nav-display: flex;
-@segmented-nav-align-items: center;
-@segmented-nav-justify-content: center;
-@segmented-nav-background-color: #fff;
-@segmented-nav-background-hover: #fafafa;
-@segmented-nav-background-disabled: #fff;
-@segmented-nav-background-disabled-hover: rgba(0, 0, 0, 0.04);
-@segmented-nav-border-radius: 4px;
-@segmented-nav-cursor: pointer;
-@segmented-nav-cursor-disabled: not-allowed;
-@segmented-nav-z-index: 3;
-@segmented-nav-transition: all 0.3s;
-@segmented-nav-color: rgba(0, 0, 0, 0.45);
-@segmented-nav-color-hover: rgba(0, 0, 0, 0.85);
-@segmented-nav-color-disabled: rgba(0, 0, 0, 0.25);
-@segmented-nav-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-@segmented-nav-box-shadow-disabled: none;
-
-// 分段控制器导航图标变量
-@segmented-nav-icon-width: 0;
-@segmented-nav-icon-height: 0;
-@segmented-nav-icon-border-style: solid;
-@segmented-nav-icon-padding: 0;
-@segmented-nav-icon-margin: 0;
-@segmented-nav-prev-border-width: 4px 6px 4px 0;
-@segmented-nav-prev-border-color: transparent currentColor transparent transparent;
-@segmented-nav-next-border-width: 4px 0 4px 6px;
-@segmented-nav-next-border-color: transparent transparent transparent currentColor;
-
-// 分段控制器大小变量
-@segmented-lg-padding: 3px;
-@segmented-lg-item-height: 40px;
-@segmented-lg-item-font-size: 16px;
-@segmented-lg-nav-height: 40px;
-@segmented-lg-nav-flex-basis: 32px;
-@segmented-lg-nav-icon-border-width-prev: 5px 7px 5px 0;
-@segmented-lg-nav-icon-border-width-next: 5px 0 5px 7px;
-@segmented-lg-thumb-height: 40px;
-
-@segmented-sm-padding: 1px;
-@segmented-sm-item-height: 24px;
-@segmented-sm-item-font-size: 12px;
-@segmented-sm-nav-height: 24px;
-@segmented-sm-nav-flex-basis: 24px;
-@segmented-sm-nav-icon-border-width-prev: 3px 5px 3px 0;
-@segmented-sm-nav-icon-border-width-next: 3px 0 3px 5px;
-@segmented-sm-thumb-height: 24px;
-
-// 分段控制器块级变量
-@segmented-block-display: flex;
-@segmented-block-width: 100%;
-@segmented-block-group-justify-content: space-between;
-@segmented-block-item-flex: 1 1 0%;
-
-// 交互状态颜色
-@segmented-hover-color: @primary;
-@segmented-active-color: @primary;
-
 :host {
-  display: @segmented-display;
-  width: @segmented-width;
+  display: inline-block;
+  width: 100%;
 }
 
 .segmented {
-  box-sizing: @segmented-box-sizing;
-  position: @segmented-position-relative;
+  box-sizing: border-box;
+  position: relative;
   display: inline-flex;
-  align-items: @segmented-item-align-items;
-  background-color: @segmented-background-color;
-  border-radius: @segmented-border-radius;
-  padding: @segmented-padding;
-  max-width: @segmented-max-width;
-  gap: @segmented-gap;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  padding: 2px;
+  max-width: 100%;
+  gap: 4px;
   
   &-container {
-    position: @segmented-position-relative;
-    flex: @segmented-container-flex;
-    min-width: @segmented-container-min-width;
-    overflow-x: @segmented-container-overflow-x;
-    overflow-y: @segmented-container-overflow-y;
-    padding: @segmented-container-padding;
-    margin: @segmented-container-margin;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0;
+    margin: 0;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
     
@@ -163,214 +31,214 @@
   }
   
   &-group {
-    position: @segmented-position-relative;
-    display: @segmented-group-display;
-    flex-wrap: @segmented-group-flex-wrap;
-    width: @segmented-group-width-fit;
-    min-width: @segmented-group-min-width;
-    padding: @segmented-group-padding;
-    margin: @segmented-group-margin;
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    width: fit-content;
+    min-width: 100%;
+    padding: 0;
+    margin: 0;
   }
   
   &-item {
-    position: @segmented-item-position;
-    color: @segmented-item-color;
-    height: @segmented-item-height;
-    padding: @segmented-item-padding;
-    margin: @segmented-item-margin;
-    display: @segmented-item-display;
-    align-items: @segmented-item-align-items;
-    justify-content: @segmented-item-justify-content;
-    cursor: @segmented-item-cursor;
-    transition: @segmented-item-transition;
-    flex: @segmented-item-flex;
-    z-index: @segmented-item-z-index;
+    position: relative;
+    color: rgba(0, 0, 0, 0.65);
+    height: 28px;
+    padding: 0 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.3s;
+    flex: 0 0 auto;
+    z-index: 2;
     
     &-label {
-      display: @segmented-label-display;
-      align-items: @segmented-label-align-items;
-      white-space: @segmented-label-white-space;
-      padding: @segmented-label-padding;
-      margin: @segmented-label-margin;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      padding: 0;
+      margin: 0;
     }
     
     &-icon {
-      margin-right: @segmented-item-icon-margin-right;
+      margin-right: 6px;
     }
     
     &-selected {
-      color: @segmented-item-color-selected;
+      color: rgba(0, 0, 0, 0.85);
     }
     
     &-disabled {
-      color: @segmented-item-color-disabled;
-      cursor: @segmented-item-cursor-disabled;
+      color: rgba(0, 0, 0, 0.25);
+      cursor: not-allowed;
     }
   }
   
   &-thumb {
-    position: @segmented-thumb-position;
-    background-color: @segmented-thumb-background-color;
-    border-radius: @segmented-thumb-border-radius;
-    box-shadow: @segmented-thumb-box-shadow;
-    transition: @segmented-thumb-transition-transform,
-                @segmented-thumb-transition-width;
-    height: @segmented-thumb-height;
-    top: @segmented-thumb-top;
-    left: @segmented-thumb-left;
-    z-index: @segmented-thumb-z-index;
-    margin: @segmented-thumb-margin;
-    padding: @segmented-thumb-padding;
-    width: @segmented-thumb-width;
+    position: absolute;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+                width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    height: 28px;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    width: 0;
   }
   
   &-nav {
-    flex: @segmented-nav-flex;
-    height: @segmented-nav-height;
-    display: @segmented-nav-display;
-    align-items: @segmented-nav-align-items;
-    justify-content: @segmented-nav-justify-content;
-    background-color: @segmented-nav-background-color;
-    border-radius: @segmented-nav-border-radius;
-    cursor: @segmented-nav-cursor;
-    z-index: @segmented-nav-z-index;
-    transition: @segmented-nav-transition;
-    color: @segmented-nav-color;
-    box-shadow: @segmented-nav-box-shadow;
+    flex: 0 0 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.3s;
+    color: rgba(0, 0, 0, 0.45);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     
     &:hover {
-      background-color: @segmented-nav-background-hover;
-      color: @segmented-nav-color-hover;
+      background-color: #fafafa;
+      color: rgba(0, 0, 0, 0.85);
     }
     
     &-disabled {
-      cursor: @segmented-nav-cursor-disabled;
-      color: @segmented-nav-color-disabled;
-      box-shadow: @segmented-nav-box-shadow-disabled;
+      cursor: not-allowed;
+      color: rgba(0, 0, 0, 0.25);
+      box-shadow: none;
       
       &:hover {
-        background-color: @segmented-nav-background-color;
-        color: @segmented-nav-color-disabled;
+        background-color: #fff;
+        color: rgba(0, 0, 0, 0.25);
       }
     }
     
     &-icon {
-      width: @segmented-nav-icon-width;
-      height: @segmented-nav-icon-height;
-      border-style: @segmented-nav-icon-border-style;
-      padding: @segmented-nav-icon-padding;
-      margin: @segmented-nav-icon-margin;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      padding: 0;
+      margin: 0;
     }
   }
   
   &-prev {
     .segmented-nav-icon {
-      border-width: @segmented-nav-prev-border-width;
-      border-color: @segmented-nav-prev-border-color;
+      border-width: 4px 6px 4px 0;
+      border-color: transparent currentColor transparent transparent;
     }
   }
   
   &-next {
     .segmented-nav-icon {
-      border-width: @segmented-nav-next-border-width;
-      border-color: @segmented-nav-next-border-color;
+      border-width: 4px 0 4px 6px;
+      border-color: transparent transparent transparent currentColor;
     }
   }
   
   &-block {
-    display: @segmented-block-display;
-    width: @segmented-block-width;
+    display: flex;
+    width: 100%;
     
     .segmented-group {
-      justify-content: @segmented-block-group-justify-content;
+      justify-content: space-between;
     }
     
     .segmented-item {
-      flex: @segmented-block-item-flex;
+      flex: 1 1 0%;
     }
   }
   
   &-lg {
-    padding: @segmented-lg-padding;
+    padding: 3px;
     
     .segmented-item {
-      height: @segmented-lg-item-height;
-      font-size: @segmented-lg-item-font-size;
+      height: 40px;
+      font-size: 16px;
     }
     
     .segmented-nav {
-      height: @segmented-lg-nav-height;
-      flex-basis: @segmented-lg-nav-flex-basis;
+      height: 40px;
+      flex-basis: 32px;
       
       &-icon {
-        border-width: @segmented-lg-nav-icon-border-width-prev;
+        border-width: 5px 7px 5px 0;
       }
     }
     
     .segmented-next .segmented-nav-icon {
-      border-width: @segmented-lg-nav-icon-border-width-next;
+      border-width: 5px 0 5px 7px;
     }
     
     .segmented-thumb {
-      height: @segmented-lg-thumb-height;
+      height: 40px;
     }
   }
   
   &-sm {
-    padding: @segmented-sm-padding;
+    padding: 1px;
     
     .segmented-item {
-      height: @segmented-sm-item-height;
-      font-size: @segmented-sm-item-font-size;
+      height: 24px;
+      font-size: 12px;
     }
     
     .segmented-nav {
-      height: @segmented-sm-nav-height;
-      flex-basis: @segmented-sm-nav-flex-basis;
+      height: 24px;
+      flex-basis: 24px;
       
       &-icon {
-        border-width: @segmented-sm-nav-icon-border-width-prev;
+        border-width: 3px 5px 3px 0;
       }
     }
     
     .segmented-next .segmented-nav-icon {
-      border-width: @segmented-sm-nav-icon-border-width-next;
+      border-width: 3px 0 3px 5px;
     }
     
     .segmented-thumb {
-      height: @segmented-sm-thumb-height;
+      height: 24px;
     }
   }
   
   &-disabled {
-    cursor: @segmented-item-cursor-disabled;
+    cursor: not-allowed;
     
     .segmented-item {
-      color: @segmented-item-color-disabled;
-      cursor: @segmented-item-cursor-disabled;
+      color: rgba(0, 0, 0, 0.25);
+      cursor: not-allowed;
     }
     
     .segmented-thumb {
-      background-color: @segmented-thumb-background-color-disabled;
-      box-shadow: @segmented-thumb-box-shadow-disabled;
+      background-color: rgba(0, 0, 0, 0.04);
+      box-shadow: none;
     }
     
     .segmented-nav {
-      cursor: @segmented-nav-cursor-disabled;
-      color: @segmented-nav-color-disabled;
+      cursor: not-allowed;
+      color: rgba(0, 0, 0, 0.25);
       
       &:hover {
-        color: @segmented-nav-color-disabled;
-        background-color: @segmented-nav-background-disabled-hover;
+        color: rgba(0, 0, 0, 0.25);
+        background-color: rgba(0, 0, 0, 0.04);
       }
     }
   }
 }
 
 .segmented-item:not(.segmented-item-disabled):hover {
-  color: @segmented-hover-color;
+  color: #000000;
 }
 
 .segmented-item:not(.segmented-item-disabled):active {
-  color: @segmented-active-color;
+  color: #000000;
 }

@@ -1,88 +1,11 @@
-// 树组件前缀
-@tree-prefix: lib-tree;
-
-// 颜色变量
-@tree-text-color: rgba(0, 0, 0, 0.85);
-@tree-text-disabled-color: rgba(0, 0, 0, 0.25);
-@tree-border-color: #d9d9d9;
-@tree-primary-color: #1890ff;
-@tree-hover-color: #f5f5f5;
-@tree-selected-color: rgba(30, 137, 200, 0.06);
-@tree-focus-shadow-color: rgba(24, 144, 255, 0.2);
-@tree-background-color: #fff;
-@tree-disabled-background: #f5f5f5;
-
-// 尺寸变量
-@tree-font-size: 14px;
-@tree-line-height: 1.5;
-@tree-node-height: 24px;
-@tree-icon-size: 14px;
-@tree-switcher-size: 24px;
-@tree-checkbox-size: 16px;
-@tree-checkbox-inner-size: 8px;
-@tree-title-padding: 2px 0px;
-@tree-node-padding: 0 4px;
-@tree-search-padding: 8px;
-@tree-search-margin-bottom: 8px;
-@tree-search-input-padding: 4px 8px;
-@tree-switcher-margin-right: 2px;
-@tree-checkbox-margin-right: 8px;
-@tree-icon-margin-right: 4px;
-@tree-border-radius: 2px;
-@tree-line-width: 1px;
-
-// 过渡变量
-@tree-transition-duration: 0.3s;
-@tree-transition: all @tree-transition-duration;
-
-// 图标变量
-@tree-file-icon: '\1F4C4';
-@tree-folder-icon: '\1F4C1';
-@tree-folder-open-icon: '\1F4C2';
-@tree-switcher-icon-width: 10px;
-@tree-switcher-icon-height: 10px;
-@tree-loading-icon-width: 16px;
-@tree-loading-icon-height: 16px;
-
-// 箭头变量
-@tree-arrow-width: 6px;
-@tree-arrow-height: 5px;
-@tree-arrow-left-position: 3px;
-
-// 复选框变量
-@tree-checkbox-inner-left: 1px;
-@tree-checkbox-inner-top: -2px;
-@tree-checkbox-tick-width: 6px;
-@tree-checkbox-tick-height: 10px;
-@tree-checkbox-indeterminate-left: -4px;
-@tree-checkbox-indeterminate-top: -4px;
-
-// 空状态变量
-@tree-empty-padding: 50px;
-@tree-empty-font-weight: 600;
-
-// 复合变量
-@tree-default-border: @tree-line-width solid @tree-border-color;
-@tree-primary-border: @tree-line-width solid @tree-primary-color;
-@tree-focus-box-shadow: 0 0 0 2px @tree-focus-shadow-color;
-@tree-arrow-border: @tree-arrow-height 0 @tree-arrow-height @tree-arrow-width;
-@tree-arrow-transparent-color: transparent transparent transparent currentColor;
-@tree-checkbox-tick-border: 2px solid @tree-background-color;
-@tree-vertical-line: @tree-line-width solid @tree-border-color;
-
-// 旋转动画
-@tree-rotate-duration: 1.2s;
-@tree-rotate-animation: rotate @tree-rotate-duration linear infinite;
-@tree-loading-color: @tree-primary-color;
-
 .lib-tree {
   &-container {
     width: 100%;
     max-height: 100%;
     overflow: hidden;
-    font-size: @tree-font-size;
-    line-height: @tree-line-height;
-    color: @tree-text-color;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, 0.85);
   }
 
   &-hidden {
@@ -90,19 +13,19 @@
   }
 
   &-search {
-    padding: @tree-search-padding;
-    margin-bottom: @tree-search-margin-bottom;
+    padding: 8px;
+    margin-bottom: 8px;
 
     &-input {
       width: 100%;
-      padding: @tree-search-input-padding;
-      border: @tree-default-border;
-      border-radius: @tree-border-radius;
-      transition: @tree-transition;
+      padding: 4px 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      transition: all 0.3s;
 
       &:focus {
-        border-color: @tree-primary-color;
-        box-shadow: @tree-focus-box-shadow;
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
         outline: none;
       }
     }
@@ -110,7 +33,7 @@
 
   &-node {
     &-container {
-      padding: @tree-node-padding;
+      padding: 0 4px;
     }
 
     &-hidden {
@@ -128,14 +51,14 @@
       position: relative;
       display: flex;
       align-items: center;
-      padding: @tree-node-padding;
-      height: @tree-node-height;
-      border-radius: @tree-border-radius;
+      padding: 0 4px;
+      height: 24px;
+      border-radius: 2px;
       cursor: pointer;
-      transition: @tree-transition;
+      transition: all 0.3s;
 
       &-disabled {
-        color: @tree-text-disabled-color;
+        color: rgba(0, 0, 0, 0.25);
         cursor: not-allowed;
 
         &:hover {
@@ -152,7 +75,7 @@
 
   &-indent {
     display: inline-block;
-    height: @tree-node-height;
+    height: 24px;
     position: relative;
   }
 
@@ -160,12 +83,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: @tree-switcher-size;
-    height: @tree-node-height;
-    margin-right: @tree-switcher-margin-right;
+    width: 24px;
+    height: 24px;
+    margin-right: 2px;
     cursor: pointer;
     z-index: 1;
-    transition: @tree-transition;
+    transition: all 0.3s;
 
     &-expanded {
       .tree-switcher-icon {
@@ -178,26 +101,26 @@
     }
 
     &-disabled {
-      color: @tree-text-disabled-color;
+      color: rgba(0, 0, 0, 0.25);
       cursor: not-allowed;
     }
 
     .tree-switcher-icon {
       position: relative;
       display: inline-block;
-      width: @tree-switcher-icon-width;
-      height: @tree-switcher-icon-height;
+      width: 10px;
+      height: 10px;
       
       &::before {
         content: '';
         position: absolute;
         top: 0;
-        left: @tree-arrow-left-position;
+        left: 3px;
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: @tree-arrow-border;
-        border-color: @tree-arrow-transparent-color;
+        border-width: 5px 0 5px 6px;
+        border-color: transparent transparent transparent currentColor;
       }
     }
   }
@@ -207,33 +130,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: @tree-checkbox-size;
-    height: @tree-checkbox-size;
-    margin-right: @tree-checkbox-margin-right;
-    border: @tree-default-border;
-    border-radius: @tree-border-radius;
-    background-color: @tree-background-color;
-    transition: @tree-transition;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    background-color: #fff;
+    transition: all 0.3s;
     cursor: pointer;
 
     &-checked {
-      background-color: @tree-primary-color;
-      border-color: @tree-primary-color;
+      background-color: #1890ff;
+      border-color: #1890ff;
 
       .lib-tree-checkbox-inner {
         position: relative;
         display: inline-block;
-        width: @tree-checkbox-inner-size;
-        height: @tree-checkbox-inner-size;
+        width: 8px;
+        height: 8px;
 
         &::after {
           content: '';
           position: absolute;
-          left: @tree-checkbox-inner-left;
-          top: @tree-checkbox-inner-top;
-          width: @tree-checkbox-tick-width;
-          height: @tree-checkbox-tick-height;
-          border: @tree-checkbox-tick-border;
+          left: 1px;
+          top: -2px;
+          width: 6px;
+          height: 10px;
+          border: 2px solid #fff;
           border-left: 0;
           border-top: 0;
           transform: rotate(45deg);
@@ -242,8 +165,8 @@
     }
 
     &-indeterminate {
-      background-color: @tree-background-color;
-      border-color: @tree-primary-color;
+      background-color: #fff;
+      border-color: #1890ff;
 
       .lib-tree-checkbox-inner {
         position: relative;
@@ -252,44 +175,44 @@
         &::after {
           content: '';
           position: absolute;
-          left: @tree-checkbox-indeterminate-left;
-          top: @tree-checkbox-indeterminate-top;
-          width: @tree-checkbox-inner-size;
-          height: @tree-checkbox-inner-size;
-          border-radius: @tree-border-radius;
-          background-color: @tree-primary-color;
+          left: -4px;
+          top: -4px;
+          width: 8px;
+          height: 8px;
+          border-radius: 2px;
+          background-color: #1890ff;
         }
       }
     }
 
     &-disabled {
-      background-color: @tree-disabled-background;
-      border-color: @tree-border-color;
+      background-color: #f5f5f5;
+      border-color: #d9d9d9;
       cursor: not-allowed;
 
       .lib-tree-checkbox-inner {
         &::after {
-          border-color: @tree-text-disabled-color;
+          border-color: rgba(0, 0, 0, 0.25);
         }
       }
     }
   }
 
   &-icon {
-    margin-right: @tree-icon-margin-right;
-    font-size: @tree-icon-size;
+    margin-right: 4px;
+    font-size: 14px;
     
     .tree-icon {
       &.file-icon::before {
-        content: @tree-file-icon; // 文件图标
+        content: '\1F4C4'; // 文件图标
       }
       
       &.folder-icon::before {
-        content: @tree-folder-icon; // 文件夹图标
+        content: '\1F4C1'; // 文件夹图标
       }
       
       &.folder-open-icon::before {
-        content: @tree-folder-open-icon; // 打开文件夹图标
+        content: '\1F4C2'; // 打开文件夹图标
       }
     }
   }
@@ -302,21 +225,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: @tree-title-padding;
-    transition: @tree-transition;
+    padding: 2px 0px;
+    transition: all 0.3s;
     &:not(.lib-tree-title-disabled):hover {
-        background-color: @tree-hover-color;
+        background-color: #f5f5f5;
     }
 
     &-selected {
-        background-color: @tree-selected-color !important;
+        background-color: rgba(30, 137, 200, 0.06) !important;
     }
   }
 
   &-empty-state {
     text-align: center;
-    padding: @tree-empty-padding;
-    font-weight: @tree-empty-font-weight;
+    padding: 50px;
+    font-weight: 600;
   }
 }
 .lib-tree-vertical-line{
@@ -326,9 +249,9 @@
       position: absolute;
       top: -50%;
       left: 50%;
-      width: @tree-line-width;
+      width: 1px;
       height: 150%;
-      background-color: @tree-border-color;
+      background-color: #d9d9d9;
   }
 }
 
@@ -339,9 +262,9 @@
       position: absolute;
       top: -50%;
       left: 50%;
-      width: @tree-line-width;
+      width: 1px;
       height: 100%;
-      background-color: @tree-border-color;
+      background-color: #d9d9d9;
   }
 }
 
@@ -354,8 +277,8 @@
         top: 50%;
         left: -50%;
         width: 100%;
-        height: @tree-line-width;
-        background-color: @tree-border-color;
+        height: 1px;
+        background-color: #d9d9d9;
     }
 }
 
@@ -369,15 +292,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: @tree-switcher-size;
-  height: @tree-node-height;
-  margin-right: @tree-switcher-margin-right;
+  width: 24px;
+  height: 24px;
+  margin-right: 2px;
 
   .loading-svg {
-    animation: @tree-rotate-animation;
-    color: @tree-loading-color;
-    width: @tree-loading-icon-width;
-    height: @tree-loading-icon-height;
+    animation: rotate 1.2s linear infinite;
+    color: #1890ff;
+    width: 16px;
+    height: 16px;
   }
 }
 

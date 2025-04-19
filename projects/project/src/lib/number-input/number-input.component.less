@@ -1,186 +1,95 @@
-@disabled-color: rgba(0, 0, 0, 0.25);
-@border-radius-base: 2px;
-@border-base-color: #d9d9d9;
-@default: #1890ff;
-@default-contrast: #fff;
-@default-shade: #096dd9;
-@warning: #ffc409;
-@danger: #c5000f;
-@default-tint: #40a9ff;
-// 数字输入框基础变量
-@number-input-display: inline-flex;
-@number-input-position-relative: relative;
-@number-input-min-width: 144px;
-@number-input-width-full: 100%;
-@number-input-width-calc: calc(100% - 16px);
-@number-input-padding: 4px 11px;
-@number-input-background-transparent: transparent;
-@number-input-background-hover: rgba(0, 0, 0, 0.03);
-
-// 数字输入框边框变量
-@number-input-border-none: none;
-@number-input-border-width: 1px;
-@number-input-border-style: solid;
-@number-input-border-color: #d9d9d9;
-@number-input-border-radius: @border-radius-base;
-@number-input-outline: none;
-
-// 数字输入框阴影变量
-@number-input-default-color-box-shadow: rgba(24, 144, 255, 0.2);
-@number-input-warning-color-box-shadow: rgba(250, 173, 20, 0.2) !important;
-@number-input-error-color-box-shadow: rgba(255, 77, 79, 0.2) !important;
-@number-input-box-shadow-size: 0 0 0 2px;
-
-// 数字输入框状态颜色
-@number-input-color-disabled: @disabled-color;
-@number-input-disabled-bg: #f5f5f5;
-@number-input-color-default: @default;
-@number-input-color-warning: @warning !important;
-@number-input-color-error: @danger !important;
-@number-input-text-color: rgba(0, 0, 0, 0.65);
-@number-input-arrow-color: rgba(0, 0, 0, 0.45);
-
-// 数字输入框过渡变量
-@number-input-transition: all 0.3s;
-
-// 数字输入框前后缀变量
-@number-input-affix-margin: 4px;
-@number-input-suffix-margin-right: 16px;
-
-// 数字输入框控制器变量
-@number-input-handler-width: 22px;
-@number-input-handler-height-half: 50%;
-@number-input-handler-cursor: pointer;
-@number-input-handler-cursor-disabled: not-allowed;
-
-// 数字输入框箭头变量
-@number-input-arrow-width: 0;
-@number-input-arrow-height: 0;
-@number-input-arrow-border-size: 4px;
-@number-input-arrow-border-transparent: 4px solid transparent;
-@number-input-arrow-border-bottom: 4px solid rgba(0, 0, 0, 0.45);
-@number-input-arrow-border-top: 4px solid rgba(0, 0, 0, 0.45);
-@number-input-arrow-border-none: 0;
-@number-input-arrow-display: inline-block;
-
-// 数字输入框布局变量
-@number-input-display-flex: flex;
-@number-input-display-none: none;
-@number-input-flex-none: none;
-@number-input-flex-direction-column: column;
-@number-input-align-items: center;
-@number-input-justify-content: center;
-@number-input-overflow: hidden;
-@number-input-box-sizing: border-box;
 :host {
-    display: @number-input-display;
+    display: inline-flex;
 }
 
 .lib-number-input-error {
-    border-color: @number-input-color-error ;
-
+    border-color: #c5000f !important;
     &:active {
-        box-shadow: @number-input-box-shadow-size @number-input-error-color-box-shadow ;
+        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
     }
-
     &.focused {
-        box-shadow: @number-input-box-shadow-size @number-input-error-color-box-shadow ;
+        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
     }
-
     .lib-number-input-handler {
         &:hover {
             .lib-number-input-handler-up-inner {
-                border-bottom-color: @number-input-color-error ;
+                border-bottom-color: #c5000f !important;
             }
-
             .lib-number-input-handler-down-inner {
-                border-top-color: @number-input-color-error ;
+                border-top-color: #c5000f !important;
             }
         }
     }
-
     .lib-number-input-container:hover & {
-        border-color: @number-input-color-error ;
+        border-color: #c5000f !important;
     }
 }
 
 .lib-number-input-warning {
-    border-color: @number-input-color-warning ;
-
+    border-color: #ffc409 !important;
     &:active {
-        box-shadow: @number-input-box-shadow-size @number-input-warning-color-box-shadow ;
+        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2) !important;
     }
-
     &.focused {
-        box-shadow: @number-input-box-shadow-size @number-input-warning-color-box-shadow ;
+        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2) !important;
     }
-
     .lib-number-input-handler {
         &:hover {
             .lib-number-input-handler-up-inner {
-                border-bottom-color: @number-input-color-warning ;
+                border-bottom-color: #ffc409 !important;
             }
-
             .lib-number-input-handler-down-inner {
-                border-top-color: @number-input-color-warning ;
+                border-top-color: #ffc409 !important;
             }
         }
     }
-
     .lib-number-input-container:hover & {
-        border-color: @number-input-color-warning ;
+        border-color: #ffc409 !important;
     }
 }
 
 .lib-number-input-container {
-    position: @number-input-position-relative;
-    width: @number-input-min-width;
-    /* 默认宽度 */
-    display: @number-input-display-flex;
-    align-items: @number-input-align-items;
-    padding: @number-input-padding;
-    border: @number-input-border-width @number-input-border-style @number-input-border-color;
-    border-radius: @number-input-border-radius;
-    transition: @number-input-transition;
-    box-sizing: @number-input-box-sizing;
+    position: relative;
+    width: 144px;
+    display: flex;
+    align-items: center;
+    padding: 4px 11px;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+    box-sizing: border-box;
     height: 32px;
-
     &:hover {
-        border-color: @number-input-color-default;
+        border-color: #1890ff;
     }
-
     &.focused {
-        border-color: @number-input-color-default;
-        box-shadow: @number-input-box-shadow-size @number-input-default-color-box-shadow;
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
     }
-
     &.disabled {
-        background-color: @number-input-disabled-bg;
-        border-color: @number-input-border-color;
-        color: @number-input-color-disabled;
-        cursor: @number-input-handler-cursor-disabled;
-
+        background-color: #f5f5f5;
+        border-color: #d9d9d9;
+        color: rgba(0, 0, 0, 0.25);
+        cursor: not-allowed;
         input {
-            background-color: @number-input-disabled-bg;
-            color: @number-input-color-disabled;
-            cursor: @number-input-handler-cursor-disabled;
+            background-color: #f5f5f5;
+            color: rgba(0, 0, 0, 0.25);
+            cursor: not-allowed;
         }
     }
-
     &.readonly {
         .lib-number-input-handler-wrap {
-            display: @number-input-display-none;
+            display: none;
         }
     }
 }
 
 .lib-number-input {
-    width: @number-input-width-full;
-    border: @number-input-border-none;
-    outline: @number-input-outline;
+    width: 100%;
+    border: none;
+    outline: none;
     padding: 0;
-    background: @number-input-background-transparent;
-
+    background: transparent;
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
         -webkit-appearance: none;
@@ -190,99 +99,92 @@
 
 .lib-number-input-prefix,
 .lib-number-input-suffix {
-    display: @number-input-display-flex;
-    flex: @number-input-flex-none;
-    align-items: @number-input-align-items;
-    color: @number-input-text-color;
+    display: flex;
+    flex: none;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.65);
 }
 
 .lib-number-input-prefix {
-    margin-right: @number-input-affix-margin;
+    margin-right: 4px;
 }
 
 .lib-number-input-suffix {
-    margin-left: @number-input-affix-margin;
-    margin-right: @number-input-suffix-margin-right;
-    /* 为步进按钮留出空间 */
+    margin-left: 4px;
+    margin-right: 16px;
 }
 
 .lib-number-input-content {
-    width: @number-input-width-calc;
-    display: @number-input-display-flex;
-    align-items: @number-input-align-items;
-    overflow: @number-input-overflow;
+    width: calc(100% - 16px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
 .lib-number-input-handler-wrap {
     position: absolute;
     top: 0;
     right: 0;
-    width: @number-input-handler-width;
-    height: @number-input-width-full;
-    border-left: @number-input-border-width @number-input-border-style @number-input-border-color;
-    display: @number-input-display-flex;
-    flex-direction: @number-input-flex-direction-column;
+    width: 22px;
+    height: 100%;
+    border-left: 1px solid #d9d9d9;
+    display: flex;
+    flex-direction: column;
 }
 
 .lib-number-input-handler {
-    display: @number-input-display-flex;
-    align-items: @number-input-align-items;
-    justify-content: @number-input-justify-content;
-    height: @number-input-handler-height-half;
-    width: @number-input-width-full;
-    border: @number-input-border-none;
-    background: @number-input-background-transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    width: 100%;
+    border: none;
+    background: transparent;
     padding: 0;
-    cursor: @number-input-handler-cursor;
-    transition: @number-input-transition;
-    outline: @number-input-outline;
-
+    cursor: pointer;
+    transition: all 0.3s;
+    outline: none;
     &:hover {
-        background-color: @number-input-background-hover;
-
+        background-color: rgba(0, 0, 0, 0.03);
         .lib-number-input-handler-up-inner {
-            border-bottom-color: @number-input-color-default;
+            border-bottom-color: #1890ff;
         }
-
         .lib-number-input-handler-down-inner {
-            border-top-color: @number-input-color-default;
+            border-top-color: #1890ff;
         }
     }
-
     &:disabled {
-        cursor: @number-input-handler-cursor-disabled;
-
+        cursor: not-allowed;
         .lib-number-input-handler-up-inner {
-            border-bottom-color: @number-input-color-disabled;
+            border-bottom-color: rgba(0, 0, 0, 0.25);
         }
-
         .lib-number-input-handler-down-inner {
-            border-top-color: @number-input-color-disabled;
+            border-top-color: rgba(0, 0, 0, 0.25);
         }
     }
 }
 
 .lib-number-input-handler-up {
-    border-bottom: @number-input-border-width @number-input-border-style @number-input-border-color;
+    border-bottom: 1px solid #d9d9d9;
 }
 
 /* 正确的三角形方向 */
 .lib-number-input-handler-up-inner {
-    width: @number-input-arrow-width;
-    height: @number-input-arrow-height;
-    border-left: @number-input-arrow-border-transparent;
-    border-right: @number-input-arrow-border-transparent;
-    border-top: @number-input-arrow-border-none;
-    border-bottom: @number-input-arrow-border-bottom;
-    display: @number-input-arrow-display;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 0;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.45);
+    display: inline-block;
 }
 
 .lib-number-input-handler-down-inner {
-    width: @number-input-arrow-width;
-    height: @number-input-arrow-height;
-    border-left: @number-input-arrow-border-transparent;
-    border-right: @number-input-arrow-border-transparent;
-    border-bottom: @number-input-arrow-border-none;
-    border-top: @number-input-arrow-border-top;
-    display: @number-input-arrow-display;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 0;
+    border-top: 4px solid rgba(0, 0, 0, 0.45);
+    display: inline-block;
 }

@@ -1,132 +1,72 @@
-// 单选框颜色变量
-@radio-color: #1890ff;
-@radio-active-color: #40a9ff;
-@radio-border-color: #d9d9d9;
-@radio-background-color: #fff;
-
-// 单选框尺寸变量
-@radio-size: 16px;
-@radio-inner-size: 8px;
-@radio-inner-margin: -4px;
-@radio-border-width: 1px;
-@radio-border-radius: 50%;
-
-// 布局变量
-@radio-group-gap: 8px;
-@radio-margin-right: 16px;
-@radio-label-padding: 0 8px;
-@radio-inner-margin-right: 8px;
-
-// 禁用状态变量
-@radio-disabled-opacity: 0.5;
-@radio-disabled-cursor: not-allowed;
-
-// 过渡效果变量
-@radio-transition: all 0.3s;
-@radio-inner-transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-
-// 透明度变量
-@radio-input-opacity: 0;
-@radio-inner-opacity-hidden: 0;
-@radio-inner-opacity-visible: 1;
-
-// 变换变量
-@radio-inner-transform-hidden: scale(0);
-@radio-inner-transform-visible: scale(1);
-
-// 布局变量
-@radio-display-flex: flex;
-@radio-display-inline-block: inline-block;
-@radio-display-block: block;
-@radio-flex-direction-column: column;
-@radio-flex-wrap: wrap;
-@radio-align-items: center;
-@radio-position-relative: relative;
-@radio-position-absolute: absolute;
-@radio-white-space: nowrap;
-@radio-outline: none;
-@radio-cursor-pointer: pointer;
-@radio-z-index: 1;
-
 .radio-group {
-    display: @radio-display-flex;
-    flex-wrap: @radio-flex-wrap;
-    gap: @radio-group-gap;
-
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     &.radio-group-vertical {
-        flex-direction: @radio-flex-direction-column;
+        flex-direction: column;
     }
-
     .radio-wrapper {
-        display: @radio-display-flex;
-        align-items: @radio-align-items;
-        cursor: @radio-cursor-pointer;
-        margin-right: @radio-margin-right;
-
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        margin-right: 16px;
         &.radio-disabled {
-            cursor: @radio-disabled-cursor;
-            opacity: @radio-disabled-opacity;
+            cursor: not-allowed;
+            opacity: 0.5;
         }
-
         .radio {
-            position: @radio-position-relative;
-            display: @radio-display-inline-block;
-            margin-right: @radio-inner-margin-right;
-            white-space: @radio-white-space;
-            outline: @radio-outline;
-
+            position: relative;
+            display: inline-block;
+            margin-right: 8px;
+            white-space: nowrap;
+            outline: none;
             input {
-                position: @radio-position-absolute;
+                position: absolute;
                 top: 0;
                 right: 0;
                 bottom: 0;
                 left: 0;
-                z-index: @radio-z-index;
-                cursor: @radio-cursor-pointer;
-                opacity: @radio-input-opacity;
+                z-index: 1;
+                cursor: pointer;
+                opacity: 0;
             }
-
             .radio-inner {
-                position: @radio-position-relative;
-                display: @radio-display-block;
-                width: @radio-size;
-                height: @radio-size;
-                background-color: @radio-background-color;
-                border: @radio-border-width solid @radio-border-color;
-                color: @radio-color;
-                border-radius: @radio-border-radius;
-                transition: @radio-transition;
-
+                position: relative;
+                display: block;
+                width: 16px;
+                height: 16px;
+                background-color: #fff;
+                border: 1px solid #d9d9d9;
+                color: #1890ff;
+                border-radius: 50%;
+                transition: all 0.3s;
                 &::after {
-                    position: @radio-position-absolute;
+                    position: absolute;
                     top: 50%;
                     left: 50%;
-                    display: @radio-display-block;
-                    width: @radio-inner-size;
-                    height: @radio-inner-size;
-                    margin-top: @radio-inner-margin;
-                    margin-left: @radio-inner-margin;
+                    display: block;
+                    width: 8px;
+                    height: 8px;
+                    margin-top: -4px;
+                    margin-left: -4px;
                     background-color: currentColor;
-                    border-radius: @radio-border-radius;
-                    transform: @radio-inner-transform-hidden;
-                    opacity: @radio-inner-opacity-hidden;
-                    transition: @radio-inner-transition;
+                    border-radius: 50%;
+                    transform: scale(0);
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
                     content: '';
                 }
             }
-
             input:checked+.radio-inner {
                 border-color: inherit;
-
                 &::after {
-                    transform: @radio-inner-transform-visible;
-                    opacity: @radio-inner-opacity-visible;
+                    transform: scale(1);
+                    opacity: 1;
                 }
             }
         }
-
         .radio-label {
-            padding: @radio-label-padding;
+            padding: 0 8px;
         }
     }
 }

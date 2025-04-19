@@ -1,9 +1,7 @@
 <div class="lib-Popover" 
      [class.lib-Popover-visible]="isVisible"
      [class]="'lib-Popover-' + placement">
-  <!-- 箭头 -->
   <div class="lib-Popover-arrow"></div>
-  <!-- 内容 -->
   <div class="lib-Popover-content-box">
     <div class="lib-Popover-title">
       <ng-container *ngIf="isTemplateRef(title); else titleTemplate">

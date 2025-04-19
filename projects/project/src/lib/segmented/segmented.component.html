@@ -4,21 +4,16 @@
        [class.segmented-lg]="size === 'large'"
        [class.segmented-sm]="size === 'small'"
        [class.segmented-disabled]="disabled">
-       
-    <!-- 左侧滚动按钮 - 仅在需要时显示 -->
     <div class="segmented-nav segmented-prev"
          *ngIf="showScrollButtons"
          [class.segmented-nav-disabled]="!canScrollLeft || disabled"
          (click)="scrollLeft()">
       <div class="segmented-nav-icon"></div>
     </div>
-    
-    <!-- 主容器 -->
     <div class="segmented-container" 
          #segmentContainer
          (scroll)="onScroll()">
       <div class="segmented-group" #segmentGroup>
-        <!-- 选项区域 -->
         <div *ngFor="let option of options; let i = index"
              class="segmented-item" 
              [class.segmented-item-disabled]="disabled || option.disabled"
@@ -28,16 +23,9 @@
             <ng-container *ngTemplateOutlet="template || defaultLabel; context: { $implicit: option }"></ng-container>
           </div>
         </div>
-        
-        <!-- 滑块 -->
-        <div class="segmented-thumb" 
-             [style.display]="'block'"
-             #thumb>
-        </div>
+        <div class="segmented-thumb" [style.display]="'block'" #thumb></div>
       </div>
     </div>
-    
-    <!-- 右侧滚动按钮 - 仅在需要时显示 -->
     <div class="segmented-nav segmented-next"
          *ngIf="showScrollButtons"
          [class.segmented-nav-disabled]="!canScrollRight || disabled"

@@ -1,7 +1,6 @@
 <lib-select-box 
     (click)="openDropdown()" 
     cdkOverlayOrigin
-
     [selectMode]="isMultiple ? 'multiple' : 'single'"
     [loading]="loading"
     [size]="size"
@@ -10,19 +9,15 @@
     [placeholder]="placeholder"
     [status]="status"
     [isActive]="isDropdownOpen"
-
     [optionLabelTemplate]="optionLabelTemplate"
     [getLabel]="getLabel"
-
     [(searchValue)]="searchValue"
     [data]="!isMultiple ? displayLabels : displayTags"
     #searchInput
-
     (clear)="clear()"
     (remove)="removeItem($event.value)"
     (search)="onSearch($event)"
-    (inputWidthChange)="asyncUpdateDropdownPosition()"
-    >
+    (inputWidthChange)="asyncUpdateDropdownPosition()">
 </lib-select-box>
 
 <!-- 下拉菜单 -->

@@ -1,7 +1,6 @@
 <lib-select-box 
     (click)="openModal()" 
     cdkOverlayOrigin
-
     [selectMode]="selectMode"
     [loading]="loading"
     [size]="size"
@@ -10,33 +9,27 @@
     [placeholder]="placeHolder"
     [status]="status"
     [isActive]="modalState === 'open'"
-
     [optionLabelTemplate]="optionLabelTemplate"
-
     [(searchValue)]="searchValue"
     [data]="_data"
     [getLabel]="getLabel"
     #searchInput
-
     (clear)="clear()"
     (remove)="removeUser($event)"
     (search)="onSearch($event)"
     (paste)="handlePaste($event)"
-    (inputWidthChange)="updateOverlayRefPosition()"
-    >
+    (inputWidthChange)="updateOverlayRefPosition()">
 </lib-select-box>
 
 <ng-template #overlay>
     <div class="overlay-select-option-box" [class.open]="modalState === 'open'" [class.closed]="modalState === 'closed'">
         <div [style.max-height]="optionPanelMaxHeight" class="option-list-container" id="option-list-container">
-            <!-- 搜索状态提示 -->
             <div *ngIf="remoteLoading" class="remote-loading">
                 <div class="loading-text">搜索中...</div>
             </div>
-            <!-- 没有选项时显示空状态 -->
             <div *ngIf="filteredOptions.length === 0 && !remoteLoading" class="empty-options">
                 <div class="empty-container">
-                    <div >
+                    <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -48,7 +41,6 @@
                     <div class="empty-text">暂无匹配数据</div>
                 </div>
             </div>
-            <!-- 虚拟滚动选项列表 -->
             <div *ngIf="filteredOptions.length > 0 && !remoteLoading" class="virtual-scroll-container">
                 <cdk-virtual-scroll-viewport 
                     [ngStyle]="{'contain': 'unset', 'max-height': optionPanelMaxHeight + 'px'}"
@@ -56,7 +48,6 @@
                     [maxBufferPx]="optionPanelMaxHeight * 2" 
                     [itemSize]="itemSize" 
                     class="virtual-scroll-viewport">
-                    <!-- 无分组数据 -->
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length === 0">
                         <div 
                             *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn; let i = index"
@@ -68,23 +59,18 @@
                             [class.hidden]="hideSelected && _data.includes(option[optionValue])"
                             [class.select-option]="_data.includes(option[optionValue])">
                             <div class="option-text">
-                                <!-- 使用自定义模板 -->
                                 <ng-container *ngIf="optionTemplate">
                                     <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(option)"></ng-container>
                                 </ng-container>
-                                <!-- 默认显示 -->
                                 <ng-container *ngIf="!optionTemplate">
                                     {{ option[optionKey] }}
                                 </ng-container>
                             </div>
                         </div>
                     </ng-container>
-                    <!-- 有分组数据 -->
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length > 0">
                         <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn; let i = index" class="option-group">
-                            <!-- 分组标题 -->
                             <div *ngIf="item.type === 'group'" class="group-title">{{ item.label }}</div>
-                            <!-- 分组选项 -->
                             <div 
                                 *ngIf="item.type === 'option'"
                                 (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
@@ -95,11 +81,9 @@
                                 [class.disabled]="isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))"
                                 [class.select-option]="_data.includes(item.option[optionValue])">
                                 <div class="option-text">
-                                    <!-- 使用自定义模板 -->
                                     <ng-container *ngIf="optionTemplate">
                                         <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(item.option)"></ng-container>
                                     </ng-container>
-                                    <!-- 默认显示 -->
                                     <ng-container *ngIf="!optionTemplate">
                                         {{ item.option[optionKey] }}
                                     </ng-container>
@@ -110,7 +94,6 @@
                 </cdk-virtual-scroll-viewport>
             </div>
         </div>
-        <!-- 底部操作栏 -->
         <ng-container *ngIf="bottomBar">
             <ng-container *ngTemplateOutlet="bottomBar"></ng-container>
         </ng-container>

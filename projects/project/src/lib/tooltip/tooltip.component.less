@@ -1,166 +1,115 @@
-// 工具提示基础变量
-@tooltip-position: relative;
-@tooltip-max-width: 300px;
-@tooltip-padding: 6px 8px;
-@tooltip-color: #fff;
-@tooltip-background-color: rgba(0, 0, 0, 0.75);
-@tooltip-border-radius: 4px;
-@tooltip-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-@tooltip-pointer-events: none;
-@tooltip-opacity-hidden: 0;
-@tooltip-opacity-visible: 1;
-@tooltip-transform-hidden: scale(0.8);
-@tooltip-transform-visible: scale(1);
-@tooltip-transition: opacity 0.3s;
-@tooltip-word-wrap: break-word;
-
-// 工具提示箭头变量
-@tooltip-arrow-position: absolute;
-@tooltip-arrow-width: 8px;
-@tooltip-arrow-height: 8px;
-@tooltip-arrow-background: rgba(0, 0, 0, 0.75);
-@tooltip-arrow-transform: rotate(45deg);
-@tooltip-arrow-offset: 4px;
-@tooltip-arrow-margin-offset: -4px;
-@tooltip-arrow-position-offset: 12px;
-
-// 方向位置变量
-@tooltip-top-arrow-bottom: -4px;
-@tooltip-bottom-arrow-top: -4px;
-@tooltip-left-arrow-right: -4px;
-@tooltip-right-arrow-left: -4px;
-
-// 其他布局变量
-@tooltip-panel-pointer-events: none;
-
 .lib-tooltip {
-    position: @tooltip-position;
-    max-width: @tooltip-max-width;
-    padding: @tooltip-padding;
-    color: @tooltip-color;
-    background-color: @tooltip-background-color;
-    border-radius: @tooltip-border-radius;
-    box-shadow: @tooltip-box-shadow;
-    pointer-events: @tooltip-pointer-events;
-    opacity: @tooltip-opacity-hidden;
-    transform: @tooltip-transform-hidden;
-    transition: @tooltip-transition;
-
+    position: relative;
+    max-width: 300px;
+    padding: 6px 8px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s;
     &.lib-tooltip-visible {
-        opacity: @tooltip-opacity-visible;
-        transform: @tooltip-transform-visible;
+        opacity: 1;
+        transform: scale(1);
     }
-
     .lib-tooltip-content {
-        overflow-wrap: @tooltip-word-wrap;
-        word-wrap: @tooltip-word-wrap;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
     }
-
     .lib-tooltip-arrow {
-        position: @tooltip-arrow-position;
-        width: @tooltip-arrow-width;
-        height: @tooltip-arrow-height;
-        background: @tooltip-arrow-background;
-        transform: @tooltip-arrow-transform;
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.75);
+        transform: rotate(45deg);
     }
-
     // 基础方向
     &.lib-tooltip-top {
         .lib-tooltip-arrow {
-            bottom: @tooltip-top-arrow-bottom;
+            bottom: -4px;
             left: 50%;
-            margin-left: @tooltip-arrow-margin-offset;
+            margin-left: -4px;
         }
     }
-
     &.lib-tooltip-bottom {
         .lib-tooltip-arrow {
-            top: @tooltip-bottom-arrow-top;
+            top: -4px;
             left: 50%;
-            margin-left: @tooltip-arrow-margin-offset;
+            margin-left: -4px;
         }
     }
-
     &.lib-tooltip-left {
         .lib-tooltip-arrow {
             top: 50%;
-            right: @tooltip-left-arrow-right;
-            margin-top: @tooltip-arrow-margin-offset;
+            right: -4px;
+            margin-top: -4px;
         }
     }
-
     &.lib-tooltip-right {
         .lib-tooltip-arrow {
             top: 50%;
-            left: @tooltip-right-arrow-left;
-            margin-top: @tooltip-arrow-margin-offset;
+            left: -4px;
+            margin-top: -4px;
         }
     }
-
     // 左侧系列
     &.lib-tooltip-left-top {
         .lib-tooltip-arrow {
-            top: @tooltip-arrow-offset;
-            right: @tooltip-left-arrow-right;
+            top: 4px;
+            right: -4px;
         }
     }
-
     &.lib-tooltip-left-bottom {
         .lib-tooltip-arrow {
-            bottom: @tooltip-arrow-offset;
-            right: @tooltip-left-arrow-right;
+            bottom: 4px;
+            right: -4px;
         }
     }
-
     // 右侧系列
     &.lib-tooltip-right-top {
         .lib-tooltip-arrow {
-            top: @tooltip-arrow-offset;
-            left: @tooltip-right-arrow-left;
+            top: 4px;
+            left: -4px;
         }
     }
-
     &.lib-tooltip-right-bottom {
         .lib-tooltip-arrow {
-            bottom: @tooltip-arrow-offset;
-            left: @tooltip-right-arrow-left;
+            bottom: 4px;
+            left: -4px;
         }
     }
-
     // 顶部系列
     &.lib-tooltip-top-left {
         .lib-tooltip-arrow {
-            bottom: @tooltip-top-arrow-bottom;
-            left: @tooltip-arrow-position-offset;
+            bottom: -4px;
+            left: 12px;
         }
     }
-
     &.lib-tooltip-top-right {
         .lib-tooltip-arrow {
-            bottom: @tooltip-top-arrow-bottom;
-            right: @tooltip-arrow-position-offset;
+            bottom: -4px;
+            right: 12px;
         }
     }
-
     // 底部系列
     &.lib-tooltip-bottom-left {
         .lib-tooltip-arrow {
-            top: @tooltip-bottom-arrow-top;
-            left: @tooltip-arrow-position-offset;
+            top: -4px;
+            left: 12px;
         }
     }
-
     &.lib-tooltip-bottom-right {
         .lib-tooltip-arrow {
-            top: @tooltip-bottom-arrow-top;
-            right: @tooltip-arrow-position-offset;
+            top: -4px;
+            right: 12px;
         }
     }
 }
-
 // 面板样式
 :host-context(.cdk-overlay-container) {
     .lib-tooltip-panel {
-        pointer-events: @tooltip-panel-pointer-events;
+        pointer-events: none;
     }
 }

@@ -2,11 +2,50 @@
   <div class="checkbox-options">
     <ng-container *ngIf="!single">
       <label class="checkbox-wrapper" *ngFor="let option of options" [class.checkbox-disabled]="disabled || option.disabled">
-        <ng-container *ngTemplateOutlet="checkboxOption; context: { $implicit: option }"></ng-container>
+        <span class="checkbox-input">
+          <input 
+            type="checkbox" 
+            [checked]="isChecked[getOptionKey(option.value)]" 
+            [indeterminate]="option.indeterminate"
+            [disabled]="disabled || option.disabled"
+            (change)="toggleOption(option)"
+          />
+          <span 
+            class="checkbox-box" 
+            [class.checked]="!option.indeterminate && isChecked[getOptionKey(option.value)]"
+            [class.indeterminate]="option.indeterminate"
+            [class.disabled]="disabled || option.disabled"
+            [style.backgroundColor]="isChecked[getOptionKey(option.value)] ? checkboxColor : ''"
+            [style.borderColor]="isChecked[getOptionKey(option.value)] ? checkboxColor : ''"
+          >
+            <span class="checkbox-inner" [style.--before-color]="indeterminateColor ? indeterminateColor : '#1890ff'"></span>
+          </span>
+        </span>
+        <span class="checkbox-label">{{ option.label }}</span>
       </label>
     </ng-container>
     <label class="checkbox-wrapper" *ngIf="single" [class.checkbox-disabled]="disabled">
-      <ng-container *ngTemplateOutlet="singleLabel"></ng-container>
+      <span class="checkbox-input">
+        <input 
+          type="checkbox" 
+          [checked]="singleValue" 
+          [indeterminate]="indeterminate"
+          [disabled]="disabled"
+          (change)="checkSingle()"
+        />
+        <span 
+          class="checkbox-box" 
+          [class.checked]="!indeterminate && singleValue"
+          [class.indeterminate]="indeterminate"
+          [class.disabled]="disabled"
+          [style.backgroundColor]="singleValue ? checkboxColor : ''"
+          [style.borderColor]="singleValue ? checkboxColor : ''"
+        >
+          <span class="checkbox-inner" [style.--before-color]="indeterminateColor ? indeterminateColor : '#1890ff'"></span>
+        </span>
+      </span>
+      <span class="checkbox-label" *ngIf="!isTemplate(singleLabelContent)">{{ singleLabelContent }}</span>
+      <ng-container *ngIf="isTemplate(singleLabelContent)" [ngTemplateOutlet]="singleLabelContent"></ng-container>
     </label>
   </div>
 </div>

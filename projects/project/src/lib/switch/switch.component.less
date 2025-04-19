@@ -1,171 +1,92 @@
-// 开关基础尺寸变量
-@switch-height: 22px;
-@switch-sm-height: 16px;
-@switch-min-width: 44px;
-@switch-sm-min-width: 28px;
-@switch-handle-size: @switch-height - 4px;
-@switch-sm-handle-size: @switch-sm-height - 4px;
-@switch-border-radius: 100px;
-@switch-handle-border-radius: 100%;
-@switch-handle-offset: 2px;
-
-// 开关过渡动画变量
-@switch-duration: 0.2s;
-@switch-transition: all @switch-duration;
-@switch-inner-transition: margin @switch-duration;
-@switch-loading-animation: loadingCircle 1s infinite linear;
-
-// 开关颜色变量
-@switch-default-color: #1890ff;
-@switch-unchecked-color: rgba(0, 0, 0, 0.25);
-@switch-handle-color: #fff;
-@switch-inner-color: #fff;
-@switch-loading-color: rgba(0, 0, 0, 0.65);
-@switch-disabled-opacity: 0.4;
-@switch-focus-shadow-color: rgba(24, 144, 255, 0.2);
-@switch-handle-shadow-color: rgba(0, 35, 11, 0.2);
-
-// 开关内边距和间距变量
-@switch-inner-margin-left: @switch-height + 2px;
-@switch-inner-margin-right: 7px;
-@switch-inner-checked-margin-left: 7px;
-@switch-inner-checked-margin-right: @switch-height + 2px;
-@switch-sm-inner-margin-left: @switch-sm-height + 2px;
-@switch-sm-inner-margin-right: 5px;
-@switch-sm-inner-checked-margin-left: 5px;
-@switch-sm-inner-checked-margin-right: @switch-sm-height + 2px;
-
-// 开关文本变量
-@switch-inner-font-size: 12px;
-@switch-sm-inner-font-size: 12px;
-
-// 开关其他样式变量
-@switch-outline: none;
-@switch-border: 0;
-@switch-box-shadow-focus: 0 0 0 2px @switch-focus-shadow-color;
-@switch-handle-box-shadow: 0 2px 4px 0 @switch-handle-shadow-color;
-@switch-cursor: pointer;
-@switch-cursor-disabled: not-allowed;
-@switch-vertical-align: middle;
-@switch-user-select: none;
-@switch-box-sizing: border-box;
-@switch-padding: 0;
-
-// 开关布局变量
-@switch-display: inline-block;
-@switch-position: relative;
-@switch-handle-position: absolute;
-@switch-handle-top: 2px;
-@switch-handle-left: 2px;
-@switch-handle-checked-left: calc(100% - @switch-height + 2px);
-@switch-sm-handle-checked-left: calc(100% - @switch-sm-height + 2px);
-@switch-inner-display: block;
-
 :host {
-  display: @switch-display;
+  display: inline-block;
 }
-
 .lib-switch {
-  position: @switch-position;
-  display: @switch-display;
-  box-sizing: @switch-box-sizing;
-  min-width: @switch-min-width;
-  height: @switch-height;
-  line-height: @switch-height;
-  vertical-align: @switch-vertical-align;
-  background-color: @switch-unchecked-color;
-  border: @switch-border;
-  border-radius: @switch-border-radius;
-  cursor: @switch-cursor;
-  transition: @switch-transition;
-  user-select: @switch-user-select;
-  padding: @switch-padding;
-  outline: @switch-outline;
-
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 44px;
+  height: 22px;
+  line-height: 22px;
+  vertical-align: middle;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 0;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  padding: 0;
+  outline: none;
   &:focus {
-    outline: @switch-outline;
+    outline: none;
   }
-
   &-focused {
-    box-shadow: @switch-box-shadow-focus;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
-
   &-checked {
-    background-color: @switch-default-color;
+    background-color: #1890ff;
   }
-
   &-disabled {
-    cursor: @switch-cursor-disabled;
-    opacity: @switch-disabled-opacity;
+    cursor: not-allowed;
+    opacity: 0.4;
   }
-
   &-handle {
-    position: @switch-handle-position;
-    top: @switch-handle-top;
-    left: @switch-handle-left;
-    width: @switch-handle-size;
-    height: @switch-handle-size;
-    transition: @switch-transition;
-    border-radius: @switch-handle-border-radius;
-    background-color: @switch-handle-color;
-    box-shadow: @switch-handle-box-shadow;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    transition: all 0.2s;
+    border-radius: 100%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
   }
-
   &-checked &-handle {
-    left: @switch-handle-checked-left;
+    left: calc(100% - 22px + 2px);
   }
-
   &-loading-icon {
-    position: @switch-position;
-    display: @switch-display;
+    position: relative;
+    display: inline-block;
     width: 100%;
     height: 100%;
-    animation: @switch-loading-animation;
+    animation: loadingCircle 1s infinite linear;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: @switch-loading-color;
+    color: rgba(0, 0, 0, 0.65);
   }
-
   &-inner {
-    margin: 0 @switch-inner-margin-right 0 @switch-inner-margin-left;
-    color: @switch-inner-color;
-    font-size: @switch-inner-font-size;
-    transition: @switch-inner-transition;
+    margin: 0 7px 0 24px;
+    color: #fff;
+    font-size: 12px;
+    transition: margin 0.2s;
   }
-
   &-checked &-inner {
-    margin-left: @switch-inner-checked-margin-left;
-    margin-right: @switch-inner-checked-margin-right;
+    margin-left: 7px;
+    margin-right: 24px;
   }
-
   &-small {
-    min-width: @switch-sm-min-width;
-    height: @switch-sm-height;
-    line-height: @switch-sm-height;
-
+    min-width: 28px;
+    height: 16px;
+    line-height: 16px;
     .lib-switch-handle {
-      width: @switch-sm-handle-size;
-      height: @switch-sm-handle-size;
+      width: 12px;
+      height: 12px;
     }
-
     &.lib-switch-checked .lib-switch-handle {
-      left: @switch-sm-handle-checked-left;
+      left: calc(100% - 16px + 2px);
     }
-
     .lib-switch-inner {
-      margin-left: @switch-sm-inner-margin-left;
-      margin-right: @switch-sm-inner-margin-right;
-      font-size: @switch-sm-inner-font-size;
+      margin-left: 18px;
+      margin-right: 5px;
+      font-size: 12px;
     }
-
     &.lib-switch-checked .lib-switch-inner {
-      margin-left: @switch-sm-inner-checked-margin-left;
-      margin-right: @switch-sm-inner-checked-margin-right;
+      margin-left: 5px;
+      margin-right: 18px;
     }
   }
 }
-
 @keyframes loadingCircle {
   100% {
     transform: rotate(360deg);
