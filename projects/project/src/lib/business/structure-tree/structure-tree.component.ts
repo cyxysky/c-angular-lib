@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UtilsService } from '../../core/utils/utils.service';
 import * as _ from 'lodash';
+import { DomSanitizer } from '@angular/platform-browser';
 // 组织结构节点接口
 export interface StructureNode {
   id: string;       // 节点唯一标识
@@ -31,6 +32,7 @@ export interface StructureNode {
   ],
   templateUrl: './structure-tree.component.html',
   styleUrl: './structure-tree.component.less',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StructureTreeComponent implements OnInit {
   // 输入属性
@@ -61,13 +63,14 @@ export class StructureTreeComponent implements OnInit {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private utilsService: UtilsService
+    private utilsService: UtilsService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
     setInterval(() => {
       this.initNodeLineWidthMap();
-    }, 50);
+    }, 10);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -116,6 +119,7 @@ export class StructureTreeComponent implements OnInit {
     this.data && this.data.length && this.data.forEach(item => {
       this.getNodePointPosition(item);
     });
+    this.cdr.detectChanges();
   }
 
   /**
@@ -196,17 +200,49 @@ export class StructureTreeComponent implements OnInit {
       let parentBottomPoint = this.nodeBottomPointMap.get(parentKey);
       let width = Math.round(Math.abs(parentBottomPoint.x - topPoint.getBoundingClientRect().x));
       let height = Math.round(Math.abs(parentBottomPoint.y - topPoint.getBoundingClientRect().y));
-      this.lineMap.set(node[this.nodeKey], {
-        width: width / this.scaleSize + 2,
-        height: height / this.scaleSize,
-        direction: parentBottomPoint.x - topPoint.getBoundingClientRect().x < 0 ? 'L' : 'R'
-      })
+      if (width !== this.lineMap.get(node[this.nodeKey])?.width && height !== this.lineMap.get(node[this.nodeKey])?.height) {
+        let svg = this.createLine( height / this.scaleSize, width / this.scaleSize, parentBottomPoint.x - topPoint.getBoundingClientRect().x < 0 ? 'L' : 'R');
+        this.lineMap.set(node[this.nodeKey], {
+          direction: parentBottomPoint.x - topPoint.getBoundingClientRect().x < 0 ? 'L' : 'R',
+          width,
+          height,
+          svg
+        })
+      }
     }
     if (node.children && node.children.length) {
       node.children.forEach((child: StructureNode) => {
         this.getNodePointPosition(child, node[this.nodeKey]);
       })
     }
+  }
+
+  createLine(height: number, width: number, direction: string) {
+    let path = [];
+    if (direction === 'L') {
+      path = [
+        [0, 4],
+        [0, -height / 2],
+        [-width, -height / 2],
+        [-width, -height ],
+      ]
+    } else {
+      path = [
+        [0, 4],
+        [0, -height / 2 ],
+        [width, -height / 2 ],
+        [width, -height ],
+      ]
+    }
+    let svg = this.utilsService.createRoundedLine({
+      color: this.lineColor,
+      width: 2,
+      radius: 10,
+      direction,
+      path,
+      left: 2.5
+    })
+    return this.sanitizer.bypassSecurityTrustHtml(svg.outerHTML);;
   }
 
   /**

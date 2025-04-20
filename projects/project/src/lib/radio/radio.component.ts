@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule } from '@angular/forms';
 
@@ -12,7 +12,6 @@ export interface RadioOption {
   selector: 'lib-radio',
   imports: [CommonModule, FormsModule],
   templateUrl: './radio.component.html',
-  styleUrl: './radio.component.less',
   standalone: true,
   providers: [
     {
@@ -20,7 +19,8 @@ export interface RadioOption {
       useExisting: forwardRef(() => RadioComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class RadioComponent implements ControlValueAccessor {
   /** 选项 */

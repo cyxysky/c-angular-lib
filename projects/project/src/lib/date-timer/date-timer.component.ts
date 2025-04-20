@@ -16,7 +16,6 @@ import { UtilsService } from '@project';
     CdkOverlayOrigin
   ],
   templateUrl: './date-timer.component.html',
-  styleUrl: './date-timer.component.less',
   encapsulation: ViewEncapsulation.None,
   providers: [
     {

@@ -1,0 +1,81 @@
+.c-lib-message {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    line-height: 1.5715;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.c-lib-message-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    background: #fff;
+    pointer-events: auto;
+    display: inline-block;
+    max-width: calc(100vw - 48px);
+    min-width: 150px;
+}
+
+.c-lib-message-content {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    gap: 12px;
+}
+
+.c-lib-message-icon {
+    display: flex;
+    align-items: flex-start;
+    font-size: 16px;
+}
+
+.c-lib-message-text {
+    display: flex;
+    align-items: center;
+}
+
+.c-lib-message-close-container {
+    display: flex;
+    align-items: flex-start;
+
+    .c-lib-message-close {
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+    }
+}
+
+// 消息容器样式
+.c-lib-message-container {
+    pointer-events: none;
+    z-index: 1010;
+}
+
+// 消息Overlay样式
+.c-lib-message-overlay-panel {
+    pointer-events: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.c-lib-message-overlay-panel .cdk-overlay-pane {
+    pointer-events: none !important;
+}
+
+// 消息包装容器样式
+.c-lib-message-wrapper {
+    pointer-events: auto;
+    margin-bottom: 16px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}

@@ -1,14 +1,14 @@
-<div class="lib-slider-container" [class.lib-slider-with-marks]="marks">
-  <div class="lib-slider-rail"></div>
+<div class="c-lib-slider-container" [class.c-lib-slider-with-marks]="marks">
+  <div class="c-lib-slider-rail"></div>
   <div 
-    class="lib-slider-track" 
+    class="c-lib-slider-track" 
     [ngStyle]="{'background-color': trackColor, 'width': trackWidth, 'left': isRange ? rangeValues[0] + '%' : '0'}"
   ></div>
   
   <!-- 单滑块 -->
   <div 
     *ngIf="!isRange"
-    class="lib-slider-handle" 
+    class="c-lib-slider-handle" 
     [ngStyle]="{'left': value + '%', 'border-color': handleColor}"
     libTooltip
     #singalSliderTooltip="libTooltip"
@@ -21,7 +21,7 @@
   <!-- 范围滑块 -->
   <div 
     *ngIf="isRange"
-    class="lib-slider-handle" 
+    class="c-lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[0] + '%', 'border-color': handleColor}"
     libTooltip
     [tooltipStrictVisiable]="rangeLeftSliderHandleVisible"
@@ -32,7 +32,7 @@
   ></div>
   <div 
     *ngIf="isRange"
-    class="lib-slider-handle" 
+    class="c-lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[1] + '%', 'border-color': handleColor}"
     libTooltip
     [tooltipStrictVisiable]="rangeRightSliderHandleVisible"
@@ -43,10 +43,10 @@
   ></div>
   
   <!-- 刻度 -->
-  <div *ngIf="marks" class="lib-slider-marks">
+  <div *ngIf="marks" class="c-lib-slider-marks">
     <span 
       *ngFor="let mark of markList" 
-      class="lib-slider-mark" 
+      class="c-lib-slider-mark" 
       [ngStyle]="{'left': mark.value + '%'}"
     >
       <ng-container *ngTemplateOutlet="labelTemplate || defaultMarkLabel; context: { $implicit: mark }"></ng-container>

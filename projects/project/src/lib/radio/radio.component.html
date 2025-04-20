@@ -1,17 +1,17 @@
-<div class="radio-group" [class.radio-group-vertical]="direction === 'vertical'">
+<div class="c-lib-radio-group" [class.c-lib-radio-group-vertical]="direction === 'vertical'">
   <div 
-    class="radio-wrapper" 
+    class="c-lib-radio-wrapper" 
     *ngFor="let option of options" 
-    [class.radio-disabled]="disabled || option.disabled"
+    [class.c-lib-radio-disabled]="disabled || option.disabled"
     (click)="selectOption(option)"
   >
-    <span class="radio">
+    <span class="c-lib-radio">
       <input 
         type="radio" 
         [checked]="isChecked(option)" 
         [disabled]="disabled || option.disabled" 
       />
-      <span class="radio-inner" 
+      <span class="c-lib-radio-inner" 
         [style.borderColor]="isChecked(option) ? color : ''"
         [style.color]="color">
       </span>
@@ -22,5 +22,5 @@
 
 
 <ng-template #defaultLabel let-option>
-    <span class="radio-label">{{ option.label }}</span>
+    <span class="c-lib-radio-label">{{ option.label }}</span>
 </ng-template>

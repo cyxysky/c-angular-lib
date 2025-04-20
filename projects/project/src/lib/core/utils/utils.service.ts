@@ -198,7 +198,6 @@ export class UtilsService {
    * @param {number} options.width - 线条宽度(px)
    * @param {number} options.radius - 拐角弧度(px)
    * @param {Array} options.path - 路径点数组，格式为[[x1,y1], [x2,y2], ...]
-   * @param {HTMLElement|string} options.container - 容器元素或选择器
    * @returns {SVGElement} - 创建的SVG元素
    */
   public createRoundedLine(options: any) {
@@ -207,14 +206,16 @@ export class UtilsService {
       width = 2,
       radius = 20,
       path = [],
+      left = 0,
+      top = 0,
     } = options;
     // 创建SVG元素
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', '100%');
     svg.setAttribute('height', '100%');
     svg.style.position = 'absolute';
-    svg.style.top = '0';
-    svg.style.left = '0';
+    svg.style.top = `${top}px`;
+    svg.style.left = `${left}px`;
     svg.style.overflow = 'visible';
     // 创建路径
     const svgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');

@@ -1,36 +1,39 @@
 <div *ngIf="isVisible">
   <div 
     *ngIf="mask && maskVisible" 
-    class="lib-drawer-mask" 
+    class="c-lib-drawer-mask" 
     [@maskMotion]="visible ? 'enter' : 'void'"
     [style.zIndex]="zIndex - 1"
     (click)="maskClosable && close()">
   </div>
   <div 
-    class="lib-drawer" 
-    [class.no-mask]="!mask"
-    [class.lib-drawer-open]="visible"
+    class="c-lib-drawer" 
+    [class.c-lib-drawer-no-mask]="!mask"
+    [class.c-lib-drawer-open]="visible"
     [style.zIndex]="zIndex"
     [style.width]="placement === 'left' || placement === 'right' ? width : height"
     [style.height]="placement === 'top' || placement === 'bottom' ? width : '100%'"
     [style.top]="placement === 'top' ? top : null"
     [style.left]="placement === 'left' ? left : null"
-    [ngClass]="drawerClassMap"
+    [class.c-lib-drawer-left]="placement === 'left'"
+    [class.c-lib-drawer-right]="placement === 'right'"
+    [class.c-lib-drawer-top]="placement === 'top'"
+    [class.c-lib-drawer-bottom]="placement === 'bottom'"
     [@drawerMotion]="animationState"
     (@drawerMotion.done)="animationDone($event)">
-    <div class="lib-drawer-content-wrapper">
-      <div class="lib-drawer-header" *ngIf="title">
-        <div class="lib-drawer-title">
+    <div class="c-lib-drawer-content-wrapper">
+      <div class="c-lib-drawer-header" *ngIf="title">
+        <div class="c-lib-drawer-title">
           <ng-container *ngIf="isTemplateRef(title); else stringTitle">
             <ng-container *ngTemplateOutlet="title; context: { $implicit: contentContext }"></ng-container>
           </ng-container>
           <ng-template #stringTitle>{{ title }}</ng-template>
         </div>
-        <button *ngIf="closable" class="lib-drawer-close" (click)="close()">
-          <span class="lib-drawer-close-x">×</span>
+        <button *ngIf="closable" class="c-lib-drawer-close" (click)="close()">
+          <span class="c-lib-drawer-close-x">×</span>
         </button>
       </div>
-      <div class="lib-drawer-body">
+      <div class="c-lib-drawer-body">
         <ng-container *ngIf="isTemplateRef(content); else stringContent">
           <ng-container *ngTemplateOutlet="content; context: { $implicit: contentContext }"></ng-container>
         </ng-container>

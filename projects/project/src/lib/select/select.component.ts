@@ -1,6 +1,6 @@
 import { CdkOverlayOrigin, Overlay, OverlayRef, OverlayConfig, ConnectedPosition } from '@angular/cdk/overlay';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import _ from 'lodash';
 import { CommonModule, } from '@angular/common';
@@ -12,7 +12,6 @@ import { SelectBoxComponent } from '../select-basic/select-box/select-box.compon
   selector: 'lib-select',
   imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectBoxComponent],
   templateUrl: './select.component.html',
-  styleUrl: './select.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -20,7 +19,8 @@ import { SelectBoxComponent } from '../select-basic/select-box/select-box.compon
       multi: true
     }
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit {
   /** 浮层初始位置 */

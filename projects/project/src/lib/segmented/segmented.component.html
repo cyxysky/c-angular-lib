@@ -1,42 +1,42 @@
-<div class="segmented-wrapper" [style.max-width.px]="maxWidth" #rootElement>
-  <div class="segmented" 
-       [class.segmented-block]="block"
-       [class.segmented-lg]="size === 'large'"
-       [class.segmented-sm]="size === 'small'"
-       [class.segmented-disabled]="disabled">
-    <div class="segmented-nav segmented-prev"
+<div class="c-lib-segmented-wrapper" [style.max-width.px]="maxWidth" #rootElement>
+  <div class="c-lib-segmented" 
+       [class.c-lib-segmented-block]="block"
+       [class.c-lib-segmented-lg]="size === 'large'"
+       [class.c-lib-segmented-sm]="size === 'small'"
+       [class.c-lib-segmented-disabled]="disabled">
+    <div class="c-lib-segmented-nav c-lib-segmented-prev"
          *ngIf="showScrollButtons"
-         [class.segmented-nav-disabled]="!canScrollLeft || disabled"
+         [class.c-lib-segmented-nav-disabled]="!canScrollLeft || disabled"
          (click)="scrollLeft()">
-      <div class="segmented-nav-icon"></div>
+      <div class="c-lib-segmented-nav-icon"></div>
     </div>
-    <div class="segmented-container" 
+    <div class="c-lib-segmented-container" 
          #segmentContainer
          (scroll)="onScroll()">
-      <div class="segmented-group" #segmentGroup>
+      <div class="c-lib-segmented-group" #segmentGroup>
         <div *ngFor="let option of options; let i = index"
-             class="segmented-item" 
-             [class.segmented-item-disabled]="disabled || option.disabled"
+             class="c-lib-segmented-item" 
+             [class.c-lib-segmented-item-disabled]="disabled || option.disabled"
              (click)="selectOption(option)"
              #segmentItem>
-          <div class="segmented-item-label">
+          <div class="c-lib-segmented-item-label">
             <ng-container *ngTemplateOutlet="template || defaultLabel; context: { $implicit: option }"></ng-container>
           </div>
         </div>
-        <div class="segmented-thumb" [style.display]="'block'" #thumb></div>
+        <div class="c-lib-segmented-thumb" [style.display]="'block'" #thumb></div>
       </div>
     </div>
-    <div class="segmented-nav segmented-next"
+    <div class="c-lib-segmented-nav c-lib-segmented-next"
          *ngIf="showScrollButtons"
-         [class.segmented-nav-disabled]="!canScrollRight || disabled"
+         [class.c-lib-segmented-nav-disabled]="!canScrollRight || disabled"
          (click)="scrollRight()">
-      <div class="segmented-nav-icon"></div>
+      <div class="c-lib-segmented-nav-icon"></div>
     </div>
   </div>
 </div>
 
 <ng-template #defaultLabel let-option>
-  <span *ngIf="option.icon" class="segmented-item-icon">
+  <span *ngIf="option.icon" class="c-lib-segmented-item-icon">
     <i class="{{option.icon}}"></i>
   </span>
   <span>{{option.label}}</span>

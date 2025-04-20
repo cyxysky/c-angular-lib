@@ -53,7 +53,7 @@ export class MessageService implements OnDestroy {
     if (!this.messageContainerElement) {
       // 创建消息容器
       this.messageContainerElement = document.createElement('div');
-      this.messageContainerElement.className = 'lib-message-container';
+      this.messageContainerElement.className = 'c-lib-message-container';
       this.messageContainerElement.style.position = 'fixed';
       this.messageContainerElement.style.top = '16px';
       this.messageContainerElement.style.left = '0';
@@ -70,7 +70,7 @@ export class MessageService implements OnDestroy {
         const overlayConfig = new OverlayConfig({
           width: '100%',
           height: '100%',
-          panelClass: 'message-overlay-panel',
+          panelClass: 'c-lib-message-overlay-panel',
           hasBackdrop: false
         });
 
@@ -129,7 +129,7 @@ export class MessageService implements OnDestroy {
   ): ComponentRef<MessageComponent> {
     // 创建消息宿主元素
     const messageElement = document.createElement('div');
-    messageElement.className = `lib-message-wrapper lib-message-wrapper-${id}`;
+    messageElement.className = `c-lib-message-wrapper c-lib-message-wrapper-${id}`;
     messageElement.style.pointerEvents = 'none';
     messageElement.style.marginBottom = '16px';
     messageElement.style.width = '100%';
@@ -184,7 +184,7 @@ export class MessageService implements OnDestroy {
       setTimeout(() => {
         try {
           // 使用选择器更安全地查找对应的元素
-          const wrapperSelector = `.lib-message-wrapper-${id}`;
+          const wrapperSelector = `.c-lib-message-wrapper-${id}`;
           const wrapperElement = document.querySelector(wrapperSelector);
           if (wrapperElement && wrapperElement.parentNode) {
             wrapperElement.parentNode.removeChild(wrapperElement);

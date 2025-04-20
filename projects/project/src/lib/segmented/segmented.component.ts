@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, ViewChildren, QueryList, ElementRef, AfterViewInit, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, OnDestroy, NgZone, Renderer2, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ViewChildren, QueryList, ElementRef, AfterViewInit, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, OnDestroy, NgZone, Renderer2, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { Subject, timer, Subscription } from 'rxjs';
@@ -16,14 +16,14 @@ export interface SegmentedOption {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './segmented.component.html',
-  styleUrl: './segmented.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SegmentedComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SegmentedComponent implements ControlValueAccessor, AfterViewInit, OnChanges, OnDestroy {
   //#region ViewChild 引用

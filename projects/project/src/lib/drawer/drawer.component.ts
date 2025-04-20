@@ -25,12 +25,11 @@ import { Subject } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './drawer.component.html',
-  styleUrl: './drawer.component.less',
+  encapsulation: ViewEncapsulation.None,
   animations: [drawerAnimations.drawerMotion, drawerAnimations.maskMotion],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.lib-drawer-open]': 'visible',
+    '[class.c-lib-drawer-open]': 'visible',
     '[style.zIndex]': 'zIndex'
   }
 })
@@ -78,8 +77,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
   maskVisible: boolean = false;
   /** 抽屉是否实际可见（用于控制DOM节点） */
   isVisible: boolean = false;
-  /** 抽屉自定义类映射 */
-  drawerClassMap: { [key: string]: boolean } = {};
   /** 抽屉变换样式 */
   transformStyle: string = '';
   /** 用于取消订阅 */
@@ -91,7 +88,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.updateContentContext();
-    this.updateClassMap();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -100,7 +96,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
       this.handleVisibleChange(this.visible);
     }
     if (placement) {
-      this.updateClassMap();
       this.updateAnimationState();
     }
     if (data) {
@@ -148,14 +143,6 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
     };
   }
 
-  /**
-   * 更新样式类映射
-   */
-  private updateClassMap(): void {
-    this.drawerClassMap = {
-      [`lib-drawer-${this.placement}`]: true
-    };
-  }
   
   /**
    * 关闭抽屉

@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute } from '@angular/core';
+import { Component, Input, forwardRef, OnInit, TemplateRef, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CheckboxOption, CheckboxDirection } from './checkbox.interface';
@@ -8,7 +8,7 @@ import { CheckboxOption, CheckboxDirection } from './checkbox.interface';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './checkbox.component.html',
-  styleUrl: './checkbox.component.less',
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

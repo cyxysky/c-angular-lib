@@ -1,35 +1,35 @@
 <div 
     (click)="createRipple($event)"
-    class="botton"
-    [class.large]="size === 'large'"
-    [class.small]="size === 'small'"
+    class="c-lib-button"
+    [class.c-lib-button-large]="size === 'large'"
+    [class.c-lib-button-small]="size === 'small'"
 
-    [class.circle]="shape === 'circle'"
-    [class.round]="shape === 'round'"
+    [class.c-lib-button-circle]="shape === 'circle'"
+    [class.c-lib-button-round]="shape === 'round'"
 
-    [class.disabled]="disabled"
+    [class.c-lib-button-disabled]="disabled"
 
-    [class.dashed]="type === 'dashed'"
-    [class.link]="type === 'link'"
-    [class.text]="type === 'text'"
+    [class.c-lib-button-dashed]="type === 'dashed'"
+    [class.c-lib-button-link]="type === 'link'"
+    [class.c-lib-button-text]="type === 'text'"
 
-    [class.primary]="color === 'primary'"
-    [class.secondary]="color === 'secondary'"
-    [class.success]="color === 'success'"
-    [class.warning]="color === 'warning'"
-    [class.danger]="color === 'danger'"
-    [class.ghost]="color === 'ghost'"
-    [class.light]="color === 'light'"
-    [class.medium]="color === 'medium'"
-    [class.dark]="color === 'dark'"
+    [class.c-lib-button-primary]="color === 'primary'"
+    [class.c-lib-button-secondary]="color === 'secondary'"
+    [class.c-lib-button-success]="color === 'success'"
+    [class.c-lib-button-warning]="color === 'warning'"
+    [class.c-lib-button-danger]="color === 'danger'"
+    [class.c-lib-button-ghost]="color === 'ghost'"
+    [class.c-lib-button-light]="color === 'light'"
+    [class.c-lib-button-medium]="color === 'medium'"
+    [class.c-lib-button-dark]="color === 'dark'"
 
-    [class.block]="block"
+    [class.c-lib-button-block]="block"
     >
     {{ content }}
     <ng-content></ng-content>
     @if(ripple.x){
         <span 
-            class="ripple" 
+            class="c-lib-button-ripple" 
             [@ripple] 
             [style.left.px]="ripple.x" 
             [style.top.px]="ripple.y" 

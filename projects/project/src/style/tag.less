@@ -1,0 +1,36 @@
+.c-lib-tag {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 2px 7px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    cursor: default;
+    transition: all 0.3s;
+
+    &.c-lib-tag-checkable {
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.85;
+        }
+
+        &:active {
+            opacity: 0.8;
+        }
+    }
+
+    .c-lib-tag-close-icon {
+        display: inline-block;
+        margin-left: 3px;
+        color: inherit;
+        font-size: 10px;
+        cursor: pointer;
+    }
+}
+
+.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}

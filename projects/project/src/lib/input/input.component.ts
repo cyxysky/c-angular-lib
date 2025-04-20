@@ -1,5 +1,4 @@
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, input, InputSignal, OnChanges, OnInit, Output, SimpleChanges, effect, signal, Input, booleanAttribute } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Output, signal, Input, booleanAttribute, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -10,7 +9,6 @@ import { InputSize, InputStatus } from './input.interface';
   selector: 'lib-input',
   imports: [FormsModule, CommonModule, NzIconModule],
   templateUrl: './input.component.html',
-  styleUrl: './input.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -19,6 +17,7 @@ import { InputSize, InputStatus } from './input.interface';
     }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class InputComponent implements ControlValueAccessor {
   /** 输入框大小 */

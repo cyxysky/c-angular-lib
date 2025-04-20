@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
@@ -13,7 +13,7 @@ import * as _ from 'lodash';
   standalone: true,
   imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectBoxComponent],
   templateUrl: './cascader.component.html',
-  styleUrl: './cascader.component.less',
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

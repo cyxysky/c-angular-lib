@@ -1,10 +1,12 @@
-.lib-tabs {
+.c-lib-tabs {
   display: flex;
   overflow: hidden;
+
   &-top,
   &-bottom {
     flex-direction: column;
   }
+
   &-nav-wrapper {
     position: relative;
     display: inline-flex;
@@ -12,31 +14,37 @@
     margin: 0 0 16px 0;
     gap: 8px;
   }
+
   &-bottom {
-    .lib-tabs-nav-wrapper {
+    .c-lib-tabs-nav-wrapper {
       order: 1;
       margin-top: 16px;
       margin-bottom: 0;
     }
-    .lib-tabs-nav {
+
+    .c-lib-tabs-nav {
       border-top: 1px solid #d9d9d9;
       border-bottom: none;
     }
-    .lib-tabs-ink-bar {
+
+    .c-lib-tabs-ink-bar {
       top: 0;
       bottom: auto;
     }
   }
+
   &-top {
-    .lib-tabs-nav {
+    .c-lib-tabs-nav {
       border-bottom: 1px solid #d9d9d9;
     }
   }
+
   &-nav {
     position: relative;
     display: flex;
     flex: 1 1 auto;
     min-width: 0;
+
     &-view {
       flex: 1;
       width: 100%;
@@ -45,17 +53,20 @@
       scrollbar-width: none;
       /* Firefox */
       -ms-overflow-style: none;
+
       /* IE 和 Edge */
       &::-webkit-scrollbar {
         display: none;
         /* Chrome, Safari, Opera */
       }
-      &.lib-tabs-nav-centered,
-      &.lib-tabs-nav-right {
+
+      &.c-lib-tabs-nav-centered,
+      &.c-lib-tabs-nav-right {
         display: flex;
         min-width: 0;
       }
     }
+
     &-list {
       display: flex;
       flex: none;
@@ -65,6 +76,7 @@
       white-space: nowrap;
       width: fit-content;
     }
+
     &-arrow {
       flex: 0 0 32px;
       min-width: 32px;
@@ -85,15 +97,18 @@
       z-index: 10;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       border-radius: 50%;
+
       &:hover {
         color: rgba(0, 0, 0, 0.65);
       }
+
       &-disabled {
         color: rgba(0, 0, 0, 0.25);
         cursor: not-allowed;
         pointer-events: none;
         opacity: 0.5;
       }
+
       &-icon {
         width: 0;
         height: 0;
@@ -101,21 +116,26 @@
         display: inline-block;
       }
     }
+
     &-prev {
       margin-right: 8px;
-      .lib-tabs-nav-arrow-icon {
+
+      .c-lib-tabs-nav-arrow-icon {
         border-width: 6px 8px 6px 0;
         border-color: transparent currentColor transparent transparent;
       }
     }
+
     &-next {
       margin-left: 8px;
-      .lib-tabs-nav-arrow-icon {
+
+      .c-lib-tabs-nav-arrow-icon {
         border-width: 6px 0 6px 8px;
         border-color: transparent transparent transparent currentColor;
       }
     }
   }
+
   &-tab {
     position: relative;
     display: flex;
@@ -129,34 +149,42 @@
     outline: none;
     cursor: pointer;
     transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
     &:last-of-type {
       margin-right: 0;
     }
+
     &-btn {
       display: flex;
       align-items: center;
       outline: none;
       transition: all 0.3s;
     }
+
     &-icon {
       margin-right: 8px;
       font-size: 14px;
+
       i {
         display: inline-block;
       }
     }
+
     &-text {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     &-active &-btn {
       color: #1890ff;
     }
+
     &-disabled {
       color: rgba(0, 0, 0, 0.25);
       cursor: not-allowed;
     }
+
     &-close {
       margin-left: 8px;
       padding: 0;
@@ -166,21 +194,26 @@
       outline: none;
       cursor: pointer;
       transition: all 0.3s;
+
       &:hover {
         color: rgba(0, 0, 0, 0.85);
       }
     }
+
     &-add {
       padding: 0 8px;
       background: #fff;
       z-index: 10;
+
       &:hover {
         color: #1890ff;
         border-color: #1890ff;
       }
+
       &-icon {
         font-size: 12px;
       }
+
       &-fixed {
         position: relative;
         margin-left: 8px;
@@ -195,6 +228,7 @@
       }
     }
   }
+
   &-ink-bar {
     position: absolute;
     bottom: 0;
@@ -206,99 +240,121 @@
       width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
       left 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
+
   &-card {
-    .lib-tabs-tab {
+    .c-lib-tabs-tab {
       margin-right: 2px;
       padding: 8px 16px;
       background: #fafafa;
       border: 1px solid #d9d9d9;
       border-radius: 2px 2px 0 0;
       transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
       &-active {
         background: #fff;
       }
+
       &-close {
         margin-left: 8px;
       }
     }
-    .lib-tabs-ink-bar {
+
+    .c-lib-tabs-ink-bar {
       display: none;
     }
   }
+
   &-small {
-    .lib-tabs-tab {
+    .c-lib-tabs-tab {
       padding: 8px 0;
       font-size: 12px;
+
       &-icon {
         font-size: 12px;
       }
+
       &-close {
         font-size: 10px;
       }
     }
-    .lib-tabs-nav-arrow {
+
+    .c-lib-tabs-nav-arrow {
       width: 24px;
       height: 24px;
+
       &-icon {
         border-width: 4px 6px 4px 0;
       }
-      &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
+
+      &.c-lib-tabs-nav-next .c-lib-tabs-nav-arrow-icon {
         border-width: 4px 0 4px 6px;
       }
     }
   }
+
   &-large {
-    .lib-tabs-tab {
+    .c-lib-tabs-tab {
       padding: 16px 0;
       font-size: 16px;
+
       &-icon {
         font-size: 16px;
       }
     }
-    .lib-tabs-nav-arrow {
+
+    .c-lib-tabs-nav-arrow {
       width: 36px;
       height: 36px;
+
       &-icon {
         border-width: 7px 9px 7px 0;
       }
-      &.lib-tabs-nav-next .lib-tabs-nav-arrow-icon {
+
+      &.c-lib-tabs-nav-next .c-lib-tabs-nav-arrow-icon {
         border-width: 7px 0 7px 9px;
       }
     }
   }
+
   &-content {
     position: relative;
     flex: 1;
     width: 100%;
   }
+
   &-tabpane {
     position: relative;
     width: 100%;
     height: 100%;
+
     &-active {
       z-index: 1;
     }
   }
 }
 
-.lib-tabs-nav-centered {
+.c-lib-tabs-nav-centered {
   display: flex;
   justify-content: center !important;
-  .lib-tabs-nav-list {
+
+  .c-lib-tabs-nav-list {
     flex: 0 0 auto;
   }
-  &.lib-tabs-nav-view {
+
+  &.c-lib-tabs-nav-view {
     justify-content: flex-start;
   }
 }
 
-.lib-tabs-nav-right {
+.c-lib-tabs-nav-right {
   display: flex;
   justify-content: flex-end !important;
-  .lib-tabs-nav-list {
+
+  .c-lib-tabs-nav-list {
     flex: 0 0 auto;
   }
-  &.lib-tabs-nav-view {
+
+  &.c-lib-tabs-nav-view {
     justify-content: flex-start;
   }
 }

@@ -143,7 +143,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
       {
-        panelClass: ['lib-tooltip-panel', this.tooltipClass],
+        panelClass: [this.tooltipClass],
         positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false)
       },
       this.elementRef,

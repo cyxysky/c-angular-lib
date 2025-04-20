@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, ElementRef, forwardRef, Input, input, model, output, signal, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, forwardRef, Input, input, model, output, signal, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -7,14 +7,14 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './switch.component.html',
-  styleUrl: './switch.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SwitchComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SwitchComponent implements ControlValueAccessor {
   @ViewChild('switchButton') switchButton!: ElementRef;

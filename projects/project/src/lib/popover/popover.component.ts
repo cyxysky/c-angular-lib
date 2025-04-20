@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef, AfterViewInit, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
 import { CommonModule } from '@angular/common';
 import { ButtonType, ButtonColor } from '../button/button.interface';
@@ -7,10 +7,10 @@ import { ButtonComponent } from '../button/button.component';
   selector: 'lib-popover',
   imports: [CommonModule, ButtonComponent],
   templateUrl: './popover.component.html',
-  styleUrl: './popover.component.less',
   host: {
     '[style]': 'getMargin()'
-  }
+  },
+  encapsulation: ViewEncapsulation.None,
 })
 export class PopoverComponent implements AfterViewInit {
   /** 标题 */

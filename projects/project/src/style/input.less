@@ -1,1 +1,216 @@
-@import './style.less';
+.c-lib-input-container {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.5715;
+}
+
+.c-lib-input-control {
+    height: 32px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 4px 0px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    line-height: 1.5715;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+    width: 100%;
+    outline: none;
+
+    &:hover {
+        border-color: #1890ff;
+    }
+
+    &:focus {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        outline: 0;
+    }
+
+    &::placeholder {
+        color: rgba(0, 0, 0, 0.25);
+    }
+}
+
+.c-lib-input-affix-wrapper {
+    display: inline-flex;
+    padding: 0 11px;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+
+    .c-lib-input-control {
+        border: none;
+        box-shadow: none;
+
+        &:hover,
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    &:hover {
+        border-color: #1890ff;
+    }
+
+    &.c-lib-input-focused {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+}
+
+.c-lib-input-prefix {
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.65);
+
+    .c-lib-input-prefix-icon {
+        margin-right: 4px;
+    }
+}
+
+.c-lib-input-suffix {
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.65);
+
+    .c-lib-input-suffix-icon {
+        margin-left: 4px;
+    }
+}
+
+.c-lib-input-clear-icon {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.25);
+    transition: color 0.3s;
+    margin-left: 4px;
+
+    &:hover {
+        color: rgba(0, 0, 0, 0.45);
+    }
+}
+
+.c-lib-input-char-count {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.c-lib-input-lg {
+    .c-lib-input-control {
+        height: 40px;
+        padding: 6.5px 0px;
+        font-size: 16px;
+    }
+}
+
+.c-lib-input-sm {
+    .c-lib-input-control {
+        height: 24px;
+        padding: 0 0px;
+        font-size: 12px;
+    }
+}
+
+.c-lib-input-status-error {
+    border-color: #ff4d4f;
+
+    .c-lib-input-control {
+        &:hover {
+            border-color: #ff4d4f;
+        }
+
+        &:focus {
+            border-color: #ff4d4f;
+        }
+    }
+
+    &:hover {
+        border-color: #ff4d4f;
+    }
+
+    &.c-lib-input-focused {
+        border-color: #ff4d4f;
+        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+    }
+}
+
+.c-lib-input-status-warning {
+    border-color: #faad14;
+
+    .c-lib-input-control {
+        &:hover {
+            border-color: #faad14;
+        }
+
+        &:focus {
+            border-color: #faad14;
+        }
+    }
+
+    &:hover {
+        border-color: #faad14;
+    }
+
+    &.c-lib-input-focused {
+        border-color: #faad14;
+        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+    }
+}
+
+.c-lib-input-disabled {
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    color: rgba(0, 0, 0, 0.25);
+    cursor: not-allowed;
+
+    .c-lib-input-control {
+        background-color: #f5f5f5;
+        color: rgba(0, 0, 0, 0.25);
+        cursor: not-allowed;
+
+        &:hover {
+            border-color: #d9d9d9;
+        }
+    }
+
+    .c-lib-input-prefix,
+    .c-lib-input-suffix {
+        color: rgba(0, 0, 0, 0.25);
+    }
+}
+
+.c-lib-input-borderless {
+    border: none;
+    box-shadow: none;
+    background-color: #fff;
+
+    .c-lib-input-control {
+        border: none;
+        box-shadow: none;
+
+        &:hover,
+        &:focus {
+            border: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.c-lib-input-error {
+    color: #ff4d4f;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 3px;
+    display: block;
+}

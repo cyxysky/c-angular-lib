@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef, booleanAttribute } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, Renderer2, ChangeDetectorRef, TemplateRef, Type, HostListener, OnDestroy, SimpleChanges, ComponentRef, ChangeDetectionStrategy, ViewContainerRef, booleanAttribute, ViewEncapsulation } from '@angular/core';
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { maskAnimation, modalAnimation } from '../core/animation';
 import { UtilsService } from '../core/utils/utils.service';
@@ -8,11 +8,11 @@ import { UtilsService } from '../core/utils/utils.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './modal.component.html',
-  styleUrl: './modal.component.less',
   animations: [
     modalAnimation, maskAnimation
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class ModalComponent implements AfterViewInit, OnDestroy {
   @ViewChild(NgComponentOutlet, { static: false }) componentsRef!: NgComponentOutlet;

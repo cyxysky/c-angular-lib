@@ -403,37 +403,37 @@ export class DocStructureTreeComponent {
               ]
             },
             {
-              id: '5-3',
+              id: '5-33',
               name: '李宁',
               title: '系统部',
               value: 3,
               children: [
                 {
-                  id: '5-2-1',
+                  id: '5-33-1',
                   name: '杨牧',
                   title: 'ACA开发中心',
                   value: 40,
                 },
                 {
-                  id: '5-2-2',
+                  id: '5-33-2',
                   name: '杨牧',
                   title: 'PAM开发中心',
                   value: 40,
                 },
                 {
-                  id: '5-2-3',
+                  id: '5-33-3',
                   name: '杨牧',
                   title: 'XXX开发中心',
                   value: 40,
                 },
                 {
-                  id: '5-2-4',
+                  id: '5-33-4',
                   name: '杨牧',
                   title: 'QQQ开发中心',
                   value: 40,
                 },
                 {
-                  id: '5-2-5',
+                  id: '5-33-5',
                   name: '杨牧',
                   title: 'KKK开发中心',
                   value: 40,

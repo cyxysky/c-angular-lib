@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, TemplateRef, ContentChild, forwardRef, ElementRef, ViewChild, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ContentChild, forwardRef, ElementRef, ViewChild, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef, booleanAttribute, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
@@ -22,12 +22,12 @@ import { TreeNodeOptions } from './tree.interface';
     CheckboxComponent
   ],
   templateUrl: './tree.component.html',
-  styleUrl: './tree.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     expandCollapse,
     rotate(90)
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TreeComponent implements OnInit, OnChanges {
   //#region 输入属性 (Inputs)

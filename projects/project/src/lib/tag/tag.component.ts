@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, input, output, booleanAttribute, model, computed, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, input, output, booleanAttribute, model, computed, effect, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ColorType, presetColors, TagColor } from './tag.interface';
 
@@ -8,8 +8,7 @@ import { ColorType, presetColors, TagColor } from './tag.interface';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './tag.component.html',
-  styleUrl: './tag.component.less',
-  exportAs: 'libTag'
+  encapsulation: ViewEncapsulation.None,
 })
 export class TagComponent {
   /** 标签是否可以关闭 */

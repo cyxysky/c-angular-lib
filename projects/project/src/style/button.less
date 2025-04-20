@@ -1,2 +1,143 @@
+lib-button {
+    display: inline-block;
+}
 
+.c-lib-button-ripple {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+}
 
+.c-lib-button {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    box-shadow: 0 2px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    height: 32px;
+    padding: 4px 15px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.c-lib-button-primary {
+    background-color: #0054e9;
+    color: #fff;
+    border-color: #0054e9;
+}
+
+.c-lib-button-secondary {
+    background-color: #0163aa;
+    color: #fff;
+    border-color: #0163aa;
+}
+
+.c-lib-button-tertiary {
+    background-color: #6030ff;
+    color: #fff;
+    border-color: #6030ff;
+}
+
+.c-lib-button-success {
+    background-color: #2dd55b;
+    color: #000;
+    border-color: #2dd55b;
+}
+
+.c-lib-button-light {
+    background-color: #f4f5f8;
+    color: #000;
+    border-color: #f4f5f8;
+}
+
+.c-lib-button-warning {
+    background-color: #ffc409;
+    color: #000;
+    border-color: #ffc409;
+}
+
+.c-lib-button-danger {
+    background-color: #c5000f;
+    color: #fff;
+    border-color: #c5000f;
+}
+
+.c-lib-button-dark {
+    background-color: #222428;
+    color: #fff;
+    border-color: #222428;
+}
+
+.c-lib-button-medium {
+    background-color: #636469;
+    color: #fff;
+    border-color: #636469;
+}
+
+.c-lib-button-ghost {
+    background-color: transparent;
+    color: #222428;
+    box-shadow: none;
+}
+
+.c-lib-button-large {
+    padding: 6.4px 15px;
+    font-size: 16px;
+    height: 40px;
+}
+
+.c-lib-button-disabled {
+    color: rgba(0, 0, 0, 0.4);
+    border-color: #d9d9d9;
+    background: #f5f5f5;
+}
+
+.c-lib-button-small {
+    padding: 0 7px;
+    font-size: 12px;
+    height: 24px;
+}
+
+.c-lib-button-circle {
+    border-radius: 40px;
+}
+
+.c-lib-button-round {
+    border-radius: 90px;
+}
+
+.c-lib-button-dashed {
+    border-style: dashed;
+}
+
+.c-lib-button-link {
+    border: none;
+    background: none;
+    color: #1890ff;
+    box-shadow: none;
+}
+
+.c-lib-button-text {
+    border: none;
+    background: none;
+    color: black;
+    box-shadow: none;
+}
+
+.c-lib-button-block {
+    display: block;
+    text-align: center;
+}

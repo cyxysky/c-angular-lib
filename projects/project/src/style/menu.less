@@ -1,0 +1,716 @@
+// 菜单主体样式
+.c-lib-menu {
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5;
+    font-feature-settings: 'tnum';
+    color: rgba(0, 0, 0, 0.85);
+    width: 240px;
+    background-color: #f0f2f5;
+    transition: background-color 0.3s, width 0.3s;
+
+    ul,
+    li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &-root {
+        width: 100%;
+    }
+
+    // 基本项样式（通用于菜单项和子菜单标题）
+    &-item,
+    &-submenu-title {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 40px;
+        line-height: 40px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+
+        &:hover {
+            color: #1890ff;
+            background-color: rgba(24, 144, 255, 0.1);
+        }
+
+        .menu-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 14px;
+            transition: color 0.3s, margin 0.3s;
+        }
+
+        .c-lib-menu-title-content {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s;
+        }
+    }
+
+    // 子菜单
+    &-submenu {
+        position: relative;
+
+        &-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+
+            &:before,
+            &:after {
+                content: '';
+                position: absolute;
+                background-color: currentColor;
+                width: 6px;
+                height: 1.5px;
+                border-radius: 2px;
+                transition: transform 0.3s, background-color 0.3s;
+            }
+
+            &:before {
+                transform: rotate(45deg) translateX(2.5px);
+            }
+
+            &:after {
+                transform: rotate(-45deg) translateX(-2.5px);
+            }
+        }
+
+        &-open>&-title>&-arrow {
+            &:before {
+                transform: rotate(-45deg) translateX(2.5px);
+            }
+
+            &:after {
+                transform: rotate(45deg) translateX(-2.5px);
+            }
+        }
+
+        // 子菜单内容
+        .c-lib-menu-sub {
+            padding: 0;
+            transition: background-color 0.3s;
+        }
+    }
+
+    // 内联模式
+    &-inline {
+        width: 240px;
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu-title {
+            width: 100%;
+        }
+
+        .c-lib-menu-submenu-title {
+            padding-right: 40px;
+        }
+
+        .c-lib-menu-sub {
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        // 子菜单项样式
+        .c-lib-menu-item {
+            padding-left: 48px;
+
+            &-selected {
+                background-color: rgba(24, 144, 255, 0.1);
+                color: #1890ff;
+                border-right: 3px solid #1890ff;
+                border-left: none;
+            }
+        }
+    }
+
+    // 垂直模式
+    &-vertical {
+        width: 240px;
+        border-right: 1px solid #f0f0f0;
+
+        .c-lib-menu-submenu {
+            .c-lib-menu-sub {
+                position: absolute;
+                left: 100%;
+                top: 0;
+                margin-left: 4px;
+                min-width: 160px;
+                z-index: 1050;
+                border-radius: 4px;
+                box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+                background-color: #fff;
+                padding: 8px 0;
+            }
+
+            // 垂直模式下子菜单项样式
+            &-title {
+                .c-lib-menu-submenu-arrow {
+                    transform: rotate(-90deg);
+                }
+            }
+
+            &-open>.c-lib-menu-submenu-title {
+                .c-lib-menu-submenu-arrow {
+                    transform: rotate(-90deg);
+                }
+            }
+        }
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu-title {
+            height: 40px;
+            line-height: 40px;
+            margin: 4px 0;
+            padding: 0 16px 0 24px;
+        }
+
+        // 垂直子菜单特定样式
+        .c-lib-menu-vertical-sub {
+
+            .c-lib-menu-item,
+            .c-lib-menu-submenu-title {
+                padding: 0 16px;
+            }
+        }
+    }
+
+    // 水平模式
+    &-horizontal {
+        display: flex;
+        border-bottom: 1px solid #f0f0f0;
+        line-height: 46px;
+        width: 100%; // 水平模式应该允许占满容器宽度
+
+        &>.c-lib-menu-root {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu {
+            margin-top: 0;
+            margin-bottom: 0;
+            border-bottom: 2px solid transparent;
+            display: inline-block;
+            vertical-align: middle;
+            height: 46px;
+            line-height: 46px;
+            position: relative;
+
+            &:hover {
+                color: #1890ff;
+                border-bottom-color: #1890ff;
+            }
+        }
+
+        .c-lib-menu-item {
+            height: 46px;
+            line-height: 46px;
+            padding: 0 20px;
+
+            // 水平模式选中项
+            &-selected {
+                color: #1890ff;
+                border-bottom: 2px solid #1890ff;
+            }
+        }
+
+        .c-lib-menu-submenu {
+            &-title {
+                height: 46px;
+                line-height: 46px;
+                padding: 0 20px;
+            }
+
+            // 水平模式下选中的子菜单
+            &-selected>.c-lib-menu-submenu-title {
+                color: #1890ff;
+            }
+
+            .c-lib-menu-sub {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                min-width: 180px;
+                margin-top: 4px;
+                z-index: 1050;
+                border-radius: 4px;
+                box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+                background-color: #fff;
+                padding: 8px 0;
+
+                .c-lib-menu-item {
+                    height: 40px;
+                    line-height: 40px;
+                    display: block;
+                    border-bottom: none;
+                    margin: 0;
+                    padding: 0 16px;
+                    white-space: nowrap;
+
+                    &:hover {
+                        border-bottom: none;
+                        background-color: rgba(24, 144, 255, 0.1);
+                    }
+
+                    // 下拉菜单中的选中项
+                    &-selected {
+                        color: #1890ff;
+                        background-color: rgba(24, 144, 255, 0.1);
+                        border-bottom: none;
+                    }
+                }
+
+                .c-lib-menu-submenu-title {
+                    padding: 0 16px;
+                    height: 40px;
+                    line-height: 40px;
+                }
+
+                .c-lib-menu-submenu {
+                    width: 100%;
+                    display: block;
+                    border-bottom: none;
+
+                    .c-lib-menu-sub {
+                        top: 0;
+                        left: 100%;
+                        margin-top: 0;
+                        margin-left: 4px;
+                    }
+
+                    // 嵌套子菜单中的选中项
+                    &-selected>.c-lib-menu-submenu-title {
+                        color: #1890ff;
+                        background-color: rgba(24, 144, 255, 0.1);
+                        border-bottom: none;
+                    }
+                }
+            }
+        }
+    }
+
+    // 亮色主题
+    &-light {
+        background: #f0f2f5;
+
+        .c-lib-menu-item-selected {
+            color: #1890ff;
+            background-color: rgba(24, 144, 255, 0.1);
+            font-weight: 500;
+        }
+
+        // 选中父级菜单项样式
+        .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
+            color: #1890ff;
+            font-weight: 500;
+        }
+
+        &.c-lib-menu-horizontal {
+            .c-lib-menu-item-selected {
+                color: #1890ff;
+                background-color: transparent;
+                border-bottom-color: #1890ff;
+
+                &:after {
+                    display: none;
+                }
+            }
+
+            .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
+                color: #1890ff;
+                border-bottom-color: #1890ff;
+            }
+        }
+    }
+
+    // 暗色主题
+    &-dark {
+        background: #001529;
+        color: rgba(255, 255, 255, 0.65);
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu-title {
+            color: rgba(255, 255, 255, 0.65);
+
+            &:hover {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        // 提高选中项的选择器权重，确保优先级高于hover
+        .c-lib-menu-item.c-lib-menu-item-selected {
+            color: #fff !important;
+            background-color: #1890ff !important;
+            font-weight: 500;
+            border-right: 3px solid #fff;
+            border-left: none;
+
+            &:hover {
+                color: #fff !important;
+                background-color: #1890ff !important;
+            }
+        }
+
+        // 选中父级菜单项样式也提高优先级
+        .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
+            color: #fff !important;
+
+            &:hover {
+                color: #fff !important;
+            }
+        }
+
+        .c-lib-menu-sub {
+            background: #000c17;
+        }
+
+        &.c-lib-menu-horizontal {
+            .c-lib-menu-item-selected {
+                color: #fff !important;
+                background-color: transparent !important;
+                border-bottom-color: #fff;
+
+                &:hover {
+                    color: #fff !important;
+                }
+            }
+
+            .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
+                color: #fff !important;
+                border-bottom-color: #fff;
+
+                &:hover {
+                    color: #fff !important;
+                }
+            }
+
+            .c-lib-menu-sub {
+                background: #000c17;
+
+                .c-lib-menu-item:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    color: #fff;
+                }
+
+                .c-lib-menu-item-selected {
+                    background-color: #1890ff !important;
+                    color: #fff !important;
+                }
+            }
+        }
+    }
+
+    // 折叠菜单样式
+    &-collapsed {
+        width: 80px;
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu>.c-lib-menu-submenu-title {
+            padding: 0 32px !important;
+            text-align: center;
+            justify-content: center;
+
+            .menu-icon {
+                margin-right: 0;
+                font-size: 16px;
+            }
+
+            .c-lib-menu-title-content {
+                display: none;
+            }
+
+            .c-lib-menu-submenu-arrow {
+                display: none;
+            }
+        }
+
+        .c-lib-menu-submenu {
+            position: relative;
+
+            // 折叠模式下子菜单的样式调整
+            .c-lib-menu-sub {
+                position: absolute;
+                left: 100%;
+                top: 0;
+                margin-left: 4px;
+                min-width: 160px;
+                z-index: 1050;
+                border-radius: 4px;
+                box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+                background-color: #fff;
+                padding: 8px 0;
+
+                // 子菜单内的所有项都显示文字内容
+                .c-lib-menu-title-content {
+                    display: inline-block;
+                }
+
+                .c-lib-menu-item,
+                .c-lib-menu-submenu-title {
+                    padding: 0 16px !important;
+                    text-align: left;
+                    justify-content: flex-start;
+                    margin: 0;
+
+                    .menu-icon {
+                        margin-right: 10px;
+                    }
+
+                    .c-lib-menu-submenu-arrow {
+                        display: inline-block;
+                        transform: rotate(-90deg);
+                    }
+                }
+
+                // 折叠模式子菜单中的子菜单
+                .c-lib-menu-sub {
+                    left: 100%;
+                    top: 0;
+                    margin-left: 4px;
+
+                    .c-lib-menu-item {
+                        padding: 0 16px !important;
+                    }
+                }
+            }
+        }
+
+        // 折叠模式下的选中样式
+        .c-lib-menu-item-selected {
+            background-color: rgba(24, 144, 255, 0.1);
+            border-right: 3px solid #1890ff;
+            border-left: none;
+        }
+
+        &.c-lib-menu-dark {
+            .c-lib-menu-sub {
+                background: #000c17;
+
+                .c-lib-menu-item,
+                .c-lib-menu-submenu-title {
+                    color: rgba(255, 255, 255, 0.65);
+
+                    &:hover {
+                        color: #fff;
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+                }
+
+                .c-lib-menu-item.c-lib-menu-item-selected {
+                    background-color: #1890ff !important;
+                    color: #fff !important;
+
+                    &:hover {
+                        background-color: #1890ff !important;
+                        color: #fff !important;
+                    }
+                }
+            }
+
+            // 折叠状态下顶级菜单项的选中样式
+            .c-lib-menu-item.c-lib-menu-item-selected {
+                background-color: #1890ff !important;
+                color: #fff !important;
+                border-right: 3px solid #fff;
+            }
+        }
+    }
+
+    // 禁用状态
+    &-item-disabled,
+    &-submenu-disabled>.c-lib-menu-submenu-title {
+        color: rgba(0, 0, 0, 0.25) !important;
+        background: none !important;
+        cursor: not-allowed !important;
+
+        &:after {
+            border-color: rgba(0, 0, 0, 0.25) !important;
+        }
+    }
+
+    &-dark &-item-disabled,
+    &-dark &-submenu-disabled>.c-lib-menu-submenu-title {
+        color: rgba(255, 255, 255, 0.35) !important;
+    }
+}
+
+// Overlay子菜单样式
+.c-lib-menu-overlay-container {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+    padding: 4px 0;
+    min-width: 160px;
+    position: relative;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: min(300px, calc(100vw - 32px));
+
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    &.c-lib-menu-dark {
+        background-color: #000c17;
+
+        .c-lib-menu-item,
+        .c-lib-menu-submenu-title {
+            color: rgba(255, 255, 255, 0.65);
+
+            &:hover {
+                color: #fff;
+                background-color: transparent;
+            }
+        }
+
+        .c-lib-menu-item-selected {
+            color: #fff;
+            background-color: #1890ff;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+            }
+        }
+    }
+
+    .c-lib-menu-sub {
+        list-style: none;
+        margin: 0;
+        padding: 4px 0;
+    }
+
+    .c-lib-menu-item,
+    .c-lib-menu-submenu-title {
+        padding: 0 20px;
+        height: 40px;
+        line-height: 40px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        margin: 1px 4px;
+        border-radius: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+            color: #1890ff;
+            background-color: rgba(24, 144, 255, 0.1);
+        }
+
+        .menu-icon {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .c-lib-menu-title-content {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .c-lib-menu-item-selected {
+        color: #1890ff;
+        background-color: rgba(24, 144, 255, 0.1);
+    }
+
+    .c-lib-menu-submenu {
+        position: relative;
+
+        .c-lib-menu-submenu-title {
+            padding-right: 36px;
+            position: relative;
+
+            .c-lib-menu-submenu-arrow {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%) rotate(-90deg);
+                width: 10px;
+                height: 10px;
+                flex-shrink: 0;
+
+                &:before,
+                &:after {
+                    content: '';
+                    position: absolute;
+                    background-color: currentColor;
+                    width: 6px;
+                    height: 1.5px;
+                    border-radius: 2px;
+                }
+
+                &:before {
+                    transform: rotate(45deg) translateX(2.5px);
+                }
+
+                &:after {
+                    transform: rotate(-45deg) translateX(-2.5px);
+                }
+            }
+        }
+    }
+}
+
+// CDK Overlay动画
+.cdk-overlay-container {
+    .cdk-overlay-connected-position-bounding-box {
+        .cdk-overlay-pane {
+            .c-lib-menu-overlay-container {
+                transform-origin: top left;
+                animation: menuFadeIn 0.1s cubic-bezier(0.23, 1, 0.32, 1);
+            }
+        }
+    }
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

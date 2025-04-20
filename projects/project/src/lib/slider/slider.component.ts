@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, HostListener, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, Input, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TooltipDirective, UtilsService } from '@project';
@@ -14,14 +14,14 @@ interface Mark {
   standalone: true,
   imports: [CommonModule, TooltipDirective],
   templateUrl: './slider.component.html',
-  styleUrl: './slider.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SliderComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SliderComponent implements OnInit, ControlValueAccessor {
   //#region 输入属性 (Inputs)

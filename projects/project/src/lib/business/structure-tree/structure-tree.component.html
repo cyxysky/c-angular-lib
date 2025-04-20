@@ -17,7 +17,6 @@ class="out-box no-copy"
         </ng-template>
         <!-- 节点模板 -->
         <ng-template #nodeTemplate let-nodes="nodes" let-level="level" let-parent="parent">
-
             <!-- 每个节点元素盒子 -->
             <div 
                 *ngIf="getShowLevel(level)"
@@ -27,14 +26,6 @@ class="out-box no-copy"
                 <ng-container *ngFor="let node of nodes; let i=index; let isLast=last">
                     <div class="tree-node-wrapper" *ngIf="isNodeInShowPath(node, level)">
                         <!-- 节点直线 -->
-                        <div *ngIf="parent && getLineWidth(node[nodeKey], level) && getLineWidth(node[nodeKey], level) < 5">
-                            <div 
-                                class="vertical-connector" 
-                                [style.left]="isDepartmentType() ? '50%' : ''"
-                                [style.height]="this.getLineHeight(node[nodeKey]) + 'px'"
-                                [style.top]="-this.getLineHeight(node[nodeKey]) + 'px'">
-                            </div>
-                        </div>
                         <div class="node-card">
                             <!-- 顶部节点圆点 -->
                             <div 
@@ -43,44 +34,7 @@ class="out-box no-copy"
                                 [class.circle-point]="isUserType()"
                                 class="point-top point">
                                 <!-- 连接线 -->
-                                <div 
-                                    *ngIf="getLineWidth(node[nodeKey], level) && getLineWidth(node[nodeKey], level) > 5 && node.showLine !== false"
-                                    class="line-wrap-box" 
-                                    [style.height]="getLineHeight(node[nodeKey]) + 'px'"
-                                    [style.top]="(-getLineHeight(node[nodeKey]) / 2) + 'px'"
-                                    [style.width]="getLineWidth(node[nodeKey], level) + 'px'"
-                                    [style.left]="getDirection(node[nodeKey]) === 'L' ? (-getLineWidth(node[nodeKey], level) + 2  + 'px') : '0px'">
-                                    <div style="position: relative;pointer-events: none;">
-                                        <!-- 底部连接线 -->
-                                        <div 
-                                            *ngIf="getDirection(node[nodeKey]) === 'L'" 
-                                            class="line-wrapper-bottom-right"
-                                            [style.border-color]="lineColor"
-                                            [style.border-bottom-left-radius]="lineRadius">
-                                        </div>
-                                        <div 
-                                            *ngIf="getDirection(node[nodeKey]) === 'R'" 
-                                            class="line-wrapper-bottom"
-                                            [style.border-color]="lineColor"
-                                            [style.border-top-left-radius]="lineRadius">
-                                        </div>
-                                    </div>
-                                    <div style="position: relative;pointer-events: none;">
-                                        <!-- 顶部连接线 -->
-                                        <div 
-                                            *ngIf="getDirection(node[nodeKey]) === 'L'" 
-                                            class="line-wrapper-top-right"
-                                            [style.border-color]="lineColor"
-                                            [style.border-top-right-radius]="lineRadius">
-                                        </div>
-                                        <div 
-                                            *ngIf="getDirection(node[nodeKey]) === 'R'" 
-                                            class="line-wrapper-top"
-                                            [style.border-color]="lineColor"
-                                            [style.border-bottom-right-radius]="lineRadius">
-                                        </div>
-                                    </div>
-                                </div>
+                                <div *ngIf="lineMap.get(node[nodeKey])?.svg" [innerHTML]="lineMap.get(node[nodeKey])?.svg" class="line-svg"></div>
                             </div>
                             <ng-container *ngTemplateOutlet="nodeTemplates || defaultNodeTemplate; context: { $implicit : node, level: level }"></ng-container>
                             <!-- 底部节点圆点 -->

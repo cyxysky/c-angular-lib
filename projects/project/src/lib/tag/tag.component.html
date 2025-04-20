@@ -1,18 +1,18 @@
-<div class="lib-tag" 
-    [class.lib-tag-checkable]="checkable()"
-    [class.lib-tag-checked]="checked()"
-    [class.lib-tag-unchecked]="!checked()"
+<div class="c-lib-tag" 
+    [class.c-lib-tag-checkable]="checkable()"
+    [class.c-lib-tag-checked]="checked()"
+    [class.c-lib-tag-unchecked]="!checked()"
     [class.disabled]="disabled()"
     [style.border]="border() ? '' : 'none'"
     [style.color]="tagStyle().color"
     [style.background]="tagStyle().background"
     [style.border-color]="tagStyle().borderColor"
     (click)="handleClick()">
-  <span class="lib-tag-content">
+  <span class="c-lib-tag-content">
     {{ content() }}
     <ng-content></ng-content>
   </span>
-  <span *ngIf="closable()" class="lib-tag-close-icon" (click)="closeTag($event)">
+  <span *ngIf="closable()" class="c-lib-tag-close-icon" (click)="closeTag($event)">
     <i class="close-icon bi-x-lg"></i>
   </span>
 </div>

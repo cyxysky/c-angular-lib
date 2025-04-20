@@ -16,7 +16,8 @@ import {
   ViewChild,
   NgZone,
   AfterViewInit,
-  booleanAttribute
+  booleanAttribute,
+  ViewEncapsulation
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TabComponent } from './tab.component';
@@ -29,8 +30,8 @@ import { TabItem, tabsDirection, tabsSize, tabsType, tabsAlign } from './tabs.in
   standalone: true,
   imports: [CommonModule],
   templateUrl: './tabs.component.html',
-  styleUrl: './tabs.component.less',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit, OnDestroy {
   /** 选中的标签索引 */

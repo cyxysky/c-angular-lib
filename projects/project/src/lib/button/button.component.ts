@@ -1,14 +1,17 @@
-import { booleanAttribute, Component, Input, input, numberAttribute } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, Input, input, numberAttribute, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { rippleAnimation } from '../core/animation/ripple.animation';
 import * as _ from 'lodash';
 import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.interface';
+import { UtilsService } from '../core/utils/utils.service';
 @Component({
 	selector: 'lib-button',
+	standalone: true,
+	encapsulation: ViewEncapsulation.None,
 	imports: [CommonModule],
 	templateUrl: './button.component.html',
-	styleUrl: './button.component.less',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	animations: [
 		trigger('ripple', [
 			transition(':enter', useAnimation(rippleAnimation)),
@@ -17,7 +20,6 @@ import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from './button.inter
 	host: {
 		'[class]': 'disabled ? "disabled" : ""',
 		'[style.pointer-events]': 'disabled ? "none" : "auto"',
-		'[style.display]': 'block ? "block" : "inline-block"',
 	}
 })
 export class ButtonComponent {
@@ -39,6 +41,13 @@ export class ButtonComponent {
 	/** 波纹 */
 	public ripple: { x?: number; y?: number; size?: number } = {};
 
+	constructor(
+		private readonly cdr: ChangeDetectorRef,
+		private readonly utils: UtilsService
+	) {
+
+	}
+
 	/**
 	 * 创建波纹
 	 * @param event 事件
@@ -50,9 +59,11 @@ export class ButtonComponent {
 		const x = event.clientX - rect.left - size / 2;
 		const y = event.clientY - rect.top - size / 2;
 		this.ripple = { x, y, size };
+		this.cdr.detectChanges();
 		// 移除波纹
-		setTimeout(() => {
+		this.utils.delayExecution(() => {
 			this.ripple = {};
+			this.cdr.detectChanges();
 		}, 800);
 	}
 }

@@ -22,13 +22,13 @@
 </lib-select-box>
 
 <ng-template #overlay>
-    <div class="overlay-select-option-box" [class.open]="modalState === 'open'" [class.closed]="modalState === 'closed'">
-        <div [style.max-height]="optionPanelMaxHeight" class="option-list-container" id="option-list-container">
-            <div *ngIf="remoteLoading" class="remote-loading">
-                <div class="loading-text">搜索中...</div>
+    <div class="c-lib-select-overlay-option-box" [class.open]="modalState === 'open'" [class.closed]="modalState === 'closed'">
+        <div [style.max-height]="optionPanelMaxHeight" class="c-lib-select-option-list-container" id="option-list-container">
+            <div *ngIf="remoteLoading" class="c-lib-select-remote-loading">
+                <div class="c-lib-select-loading-text">搜索中...</div>
             </div>
-            <div *ngIf="filteredOptions.length === 0 && !remoteLoading" class="empty-options">
-                <div class="empty-container">
+            <div *ngIf="filteredOptions.length === 0 && !remoteLoading" class="c-lib-select-empty-options">
+                <div class="c-lib-select-empty-container">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -38,27 +38,27 @@
                             <line x1="11" y1="8" x2="11" y2="14"></line>
                         </svg>
                     </div>
-                    <div class="empty-text">暂无匹配数据</div>
+                    <div class="c-lib-select-empty-text">暂无匹配数据</div>
                 </div>
             </div>
-            <div *ngIf="filteredOptions.length > 0 && !remoteLoading" class="virtual-scroll-container">
+            <div *ngIf="filteredOptions.length > 0 && !remoteLoading" class="c-lib-select-virtual-scroll-container">
                 <cdk-virtual-scroll-viewport 
                     [ngStyle]="{'contain': 'unset', 'max-height': optionPanelMaxHeight + 'px'}"
                     [minBufferPx]="optionPanelMaxHeight" 
                     [maxBufferPx]="optionPanelMaxHeight * 2" 
                     [itemSize]="itemSize" 
-                    class="virtual-scroll-viewport">
+                    class="c-lib-select-virtual-scroll-viewport">
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length === 0">
                         <div 
                             *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn; let i = index"
                             (click)="selectUser(option[optionValue], isOptionDisabled(option))"
                             (mouseenter)="activeOptionIndex = i"
-                            class="option"
-                            [class.option-active]="activeOptionIndex === i"
+                            class="c-lib-select-option"
+                            [class.c-lib-select-option-active]="activeOptionIndex === i"
                             [class.disabled]="isOptionDisabled(option) || (reachedMaxCount && !_data.includes(option[optionValue]))"
                             [class.hidden]="hideSelected && _data.includes(option[optionValue])"
-                            [class.select-option]="_data.includes(option[optionValue])">
-                            <div class="option-text">
+                            [class.c-lib-select-select-option]="_data.includes(option[optionValue])">
+                            <div class="c-lib-select-option-text">
                                 <ng-container *ngIf="optionTemplate">
                                     <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(option)"></ng-container>
                                 </ng-container>
@@ -69,18 +69,18 @@
                         </div>
                     </ng-container>
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length > 0">
-                        <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn; let i = index" class="option-group">
-                            <div *ngIf="item.type === 'group'" class="group-title">{{ item.label }}</div>
+                        <div *cdkVirtualFor="let item of getFilteredOptionsWithHideSelected(); trackBy: trackByFn; let i = index" class="c-lib-select-option-group">
+                            <div *ngIf="item.type === 'group'" class="c-lib-select-group-title">{{ item.label }}</div>
                             <div 
                                 *ngIf="item.type === 'option'"
                                 (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
                                 (mouseenter)="activeOptionIndex = i"
-                                class="option" 
-                                [class.option-active]="activeOptionIndex === i"
+                                class="c-lib-select-option" 
+                                [class.c-lib-select-option-active]="activeOptionIndex === i"
                                 [class.cursor]="(isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))) ? 'not-allowed' : 'pointer'"
                                 [class.disabled]="isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))"
-                                [class.select-option]="_data.includes(item.option[optionValue])">
-                                <div class="option-text">
+                                [class.c-lib-select-select-option]="_data.includes(item.option[optionValue])">
+                                <div class="c-lib-select-option-text">
                                     <ng-container *ngIf="optionTemplate">
                                         <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(item.option)"></ng-container>
                                     </ng-container>

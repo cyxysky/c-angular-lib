@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, TemplateRef } from '@angular/core';
+import { Component, Input, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
 @Component({
   selector: 'lib-tooltip',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './tooltip.component.html',
-  styleUrl: './tooltip.component.less',
   host: {
     '[style]': 'getMargin()'
-  }
+  },
+  encapsulation: ViewEncapsulation.None,
 })
 export class TooltipComponent {
   /** 提示内容 */

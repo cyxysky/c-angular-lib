@@ -1,4 +1,4 @@
-import { Component, forwardRef, signal, computed, input, Input, booleanAttribute } from '@angular/core';
+import { Component, forwardRef, signal, computed, input, Input, booleanAttribute, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
@@ -7,14 +7,14 @@ import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/f
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './number-input.component.html',
-  styleUrl: './number-input.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => NumberInputComponent),
       multi: true
     }
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class NumberInputComponent implements ControlValueAccessor {
   /** 最小值 */
@@ -83,7 +83,7 @@ export class NumberInputComponent implements ControlValueAccessor {
       this.updateValue(newValue);
     }
   }
-  
+
   /**
    * 输入框值变更处理
    */
@@ -183,7 +183,7 @@ export class NumberInputComponent implements ControlValueAccessor {
   private applyFormatter(value: number): any {
     return this.formatter(value);
   }
-  
+
   /**
    * 更新值
    * @param value 值
@@ -205,8 +205,8 @@ export class NumberInputComponent implements ControlValueAccessor {
   }
 
   // 实现ControlValueAccessor接口
-  private onChange: (value: number | null) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (value: number | null) => void = () => { };
+  private onTouched: () => void = () => { };
 
   /**
    * 写入值
@@ -216,7 +216,7 @@ export class NumberInputComponent implements ControlValueAccessor {
       this.value.set(null);
       return;
     }
-    
+
     // 应用精度
     const preciseValue = this.applyPrecision(value);
     this.value.set(preciseValue);

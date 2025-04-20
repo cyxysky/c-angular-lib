@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnDestroy, TemplateRef, ViewEncapsulation, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
-import { Message } from './message.interface';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AnimationEvent } from '@angular/animations';
 import { messageMotion } from './message.animations';
@@ -12,12 +11,10 @@ import { OverlayModule } from '@angular/cdk/overlay';
   standalone: true,
   imports: [CommonModule, NzIconModule, OverlayModule],
   templateUrl: './message.component.html',
-  styleUrl: './message.component.less',
   animations: [messageMotion],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    'class': 'lib-message',
     '[@messageMotion]': 'state',
     '(@messageMotion.done)': 'onAnimationEnd($event)'
   }

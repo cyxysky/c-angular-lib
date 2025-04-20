@@ -1,0 +1,124 @@
+.c-lib-tooltip {
+    position: relative;
+    max-width: 300px;
+    padding: 6px 8px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s;
+
+    &.c-lib-tooltip-visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .c-lib-tooltip-content {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+
+    .c-lib-tooltip-arrow {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.75);
+        transform: rotate(45deg);
+    }
+
+    // 基础方向
+    &.c-lib-tooltip-top {
+        .c-lib-tooltip-arrow {
+            bottom: -4px;
+            left: 50%;
+            margin-left: -4px;
+        }
+    }
+
+    &.c-lib-tooltip-bottom {
+        .c-lib-tooltip-arrow {
+            top: -4px;
+            left: 50%;
+            margin-left: -4px;
+        }
+    }
+
+    &.c-lib-tooltip-left {
+        .c-lib-tooltip-arrow {
+            top: 50%;
+            right: -4px;
+            margin-top: -4px;
+        }
+    }
+
+    &.c-lib-tooltip-right {
+        .c-lib-tooltip-arrow {
+            top: 50%;
+            left: -4px;
+            margin-top: -4px;
+        }
+    }
+
+    // 左侧系列
+    &.c-lib-tooltip-left-top {
+        .c-lib-tooltip-arrow {
+            top: 4px;
+            right: -4px;
+        }
+    }
+
+    &.c-lib-tooltip-left-bottom {
+        .c-lib-tooltip-arrow {
+            bottom: 4px;
+            right: -4px;
+        }
+    }
+
+    // 右侧系列
+    &.c-lib-tooltip-right-top {
+        .c-lib-tooltip-arrow {
+            top: 4px;
+            left: -4px;
+        }
+    }
+
+    &.c-lib-tooltip-right-bottom {
+        .c-lib-tooltip-arrow {
+            bottom: 4px;
+            left: -4px;
+        }
+    }
+
+    // 顶部系列
+    &.c-lib-tooltip-top-left {
+        .c-lib-tooltip-arrow {
+            bottom: -4px;
+            left: 12px;
+        }
+    }
+
+    &.c-lib-tooltip-top-right {
+        .c-lib-tooltip-arrow {
+            bottom: -4px;
+            right: 12px;
+        }
+    }
+
+    // 底部系列
+    &.c-lib-tooltip-bottom-left {
+        .c-lib-tooltip-arrow {
+            top: -4px;
+            left: 12px;
+        }
+    }
+
+    &.c-lib-tooltip-bottom-right {
+        .c-lib-tooltip-arrow {
+            top: -4px;
+            right: 12px;
+        }
+    }
+}
