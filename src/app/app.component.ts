@@ -63,7 +63,7 @@ export class AppComponent {
       title: item.name,
       link: item.path,
       isOpen: true,
-      icon: 'fas fa-cube' // 添加图标
+      icon: item.icon // 添加图标
     }));
 
     // 将业务组件列表转换为MenuItem类型，每个业务组件菜单项设置为默认展开
@@ -134,30 +134,30 @@ export class AppComponent {
   }
 
   components = [
-    { name: '气泡确认框', path: 'popconfirm' },
-    { name: '气泡', path: 'popover' },
-    { name: '按钮', path: 'button' },
-    { name: '开关', path: 'switch' },
-    { name: '标签', path: 'tag' },
-    { name: '数字输入框', path: 'number-input' },
-    { name: '分段器', path: 'segmented' },
-    { name: '水印', path: 'water-mark' },
-    { name: '输入框', path: 'input' },
-    { name: '提示框', path: 'tooltip' },
-    { name: '复选框', path: 'checkbox' },
-    { name: '单选框', path: 'radio' },
-    { name: '滑块', path: 'slider' },
-    { name: '模态框', path: 'modal' },
-    { name: '标签页', path: 'tabs' },
-    { name: '日期时间', path: 'date-timer' },
-    { name: '消息', path: 'message' },
-    { name: '抽屉', path: 'drawer' },
-    { name: '下拉菜单', path: 'drop-menu' },
-    { name: '树', path: 'tree' },
-    { name: '选择器', path: 'select' },
-    { name: '树选择器', path: 'tree-select' },
-    { name: '级联选择器', path: 'cascader' },
-    { name: '菜单', path: 'menu' },
+    { name: '气泡确认框', path: 'popconfirm', icon: 'bi-chat-dots-fill' },
+    { name: '气泡', path: 'popover', icon: 'bi-chat' },
+    { name: '按钮', path: 'button', icon: 'bi-plus-square-fill' },
+    { name: '开关', path: 'switch', icon: 'bi-toggles' },
+    { name: '标签', path: 'tag', icon: 'bi-tag' },
+    { name: '数字输入框', path: 'number-input', icon: 'bi-123' },
+    { name: '分段器', path: 'segmented', icon: 'bi-segmented-nav' },
+    { name: '水印', path: 'water-mark', icon: 'bi-water' },
+    { name: '输入框', path: 'input', icon: 'bi-input-cursor' },
+    { name: '提示框', path: 'tooltip', icon: 'bi-chat-square-dots-fill' },
+    { name: '复选框', path: 'checkbox', icon: 'bi-check2-square' },
+    { name: '单选框', path: 'radio', icon: 'bi-ui-radios' },
+    { name: '滑块', path: 'slider', icon: 'bi-sliders' },
+    { name: '模态框', path: 'modal', icon: 'bi-calendar3-fill' },
+    { name: '标签页', path: 'tabs', icon: 'bi-window-split' },
+    { name: '日期时间', path: 'date-timer', icon: 'bi-calendar' },
+    { name: '消息', path: 'message', icon: 'bi-chat-left' },
+    { name: '抽屉', path: 'drawer', icon: 'bi-easel3' },
+    { name: '下拉菜单', path: 'drop-menu', icon: 'bi-menu-down' },
+    { name: '树', path: 'tree', icon: 'bi-tree' },
+    { name: '选择器', path: 'select', icon: 'bi-menu-button-wide' },
+    { name: '树选择器', path: 'tree-select', icon: 'bi-menu-app' },
+    { name: '级联选择器', path: 'cascader', icon: 'bi-menu-button' },
+    { name: '菜单', path: 'menu', icon: 'bi-list' },
   ]
 
   businessComponents = [
