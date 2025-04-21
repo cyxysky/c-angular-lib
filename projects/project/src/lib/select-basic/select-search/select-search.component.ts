@@ -1,10 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'lib-select-search',
   imports: [FormsModule],
   templateUrl: './select-search.component.html',
-  styleUrl: './select-search.component.less'
+  encapsulation: ViewEncapsulation.None
 })
 export class SelectSearchComponent {
   @ViewChild('searchInput', { static: false }) searchInput!: ElementRef;

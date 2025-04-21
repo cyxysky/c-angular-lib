@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SelectTagComponent } from '../select-tag/select-tag.component';
@@ -8,7 +8,7 @@ import { SelectSearchComponent } from '../select-search/select-search.component'
   selector: 'lib-select-box',
   imports: [FormsModule, CommonModule, SelectTagComponent, SelectSearchComponent],
   templateUrl: './select-box.component.html',
-  styleUrl: './select-box.component.less'
+  encapsulation: ViewEncapsulation.None,
 })
 export class SelectBoxComponent {
   @ViewChild('searchInput', { static: false }) searchInput!: SelectSearchComponent;

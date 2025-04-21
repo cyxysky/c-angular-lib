@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'lib-select-tag',
   imports: [CommonModule],
   templateUrl: './select-tag.component.html',
-  styleUrl: './select-tag.component.less'
+  encapsulation: ViewEncapsulation.None
 })
 export class SelectTagComponent {
   @Input() closable = true;

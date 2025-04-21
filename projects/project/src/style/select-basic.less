@@ -1,0 +1,381 @@
+lib-select-box {
+    display: block;
+}
+
+.c-lib-select-basic-search-box {
+    margin-left: 4px;
+    max-width: 100%;
+    position: relative;
+
+    .c-lib-select-basic-search-text {
+        visibility: hidden;
+        position: absolute;
+        left: 0px;
+        white-space: nowrap;
+    }
+
+    .c-lib-select-basic-search-input {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        appearance: none;
+        width: 4px;
+    }
+}
+
+.c-lib-select-basic-tag {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    background-color: rgb(30 137 200 / 6%);
+    color: rgb(25 128 163 / 67%);
+    border-radius: 4px;
+    cursor: default;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    animation: 0.2s linear 0s alternate show;
+    border: 1px solid rgba(23, 184, 199, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    white-space: nowrap;
+    overflow: hidden;
+
+    .c-lib-select-basic-tag-text-box {
+        padding-right: 4px;
+        line-height: normal;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        .c-lib-select-basic-tag-text {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .c-lib-select-basic-tag-close-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: all;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        flex: 0 0 auto;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    &:hover {
+        background-color: rgba(0, 207, 226, 0.08);
+    }
+}
+
+.c-lib-select-basic-tag-base {
+    padding: 0 4px 0 8px;
+    height: 24px;
+
+    .c-lib-select-basic-tag-close-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .c-lib-select-basic-tag-text {
+        line-height: 24px;
+    }
+}
+
+.c-lib-select-basic-tag-sm {
+    padding: 0 2px 0 6px;
+    height: 16px;
+    border-radius: 2px;
+
+    .c-lib-select-basic-tag-close-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .c-lib-select-basic-tag-text {
+        line-height: 16px;
+    }
+}
+
+.c-lib-select-basic-tag-lg {
+    padding: 0 6px 0 10px;
+    height: 32px;
+
+    .c-lib-select-basic-tag-close-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .c-lib-select-basic-tag-text {
+        line-height: 32px;
+    }
+}
+
+.c-lib-select-basic-box {
+    background-color: #fff;
+    border: 1px solid #e7eaed;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    min-height: 32px;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    min-width: 200px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+    box-sizing: border-box;
+
+    &:hover {
+        border: 1px solid rgba(0, 207, 226, 0.4);
+    }
+
+    &:focus,
+    &:active,
+    &.c-lib-select-basic-box-active {
+        border: 1px solid rgba(0, 207, 226, 0.6);
+        box-shadow: 0 0 0 2px rgba(0, 207, 226, 0.12);
+        outline: none;
+    }
+
+    &.c-lib-select-basic-box-lg {
+        min-height: 40px;
+        font-size: 16px;
+
+        .c-lib-select-basic-box-content {
+            min-height: 36px;
+        }
+
+        .c-lib-select-basic-box-placeholder,
+        .c-lib-select-basic-box-singal-data {
+            font-size: 16px;
+            padding-left: 4px;
+        }
+    }
+
+    &.c-lib-select-basic-box-sm {
+        min-height: 24px;
+        font-size: 14px;
+
+        .c-lib-select-basic-box-content {
+            min-height: 20px;
+        }
+
+        .c-lib-select-basic-box-placeholder,
+        .c-lib-select-basic-box-singal-data {
+            font-size: 14px;
+            padding-left: 4px;
+        }
+
+        .c-lib-select-basic-box-suffix {
+            min-width: 24px;
+            max-width: 24px;
+            height: 100%;
+        }
+
+        .c-lib-select-basic-search-box {
+            margin-left: 4px;
+
+            .c-lib-select-basic-search-input {
+                height: 18px;
+            }
+        }
+    }
+
+    &.c-lib-select-basic-box-borderless {
+        border: none;
+        box-shadow: none;
+    }
+
+    &.c-lib-select-basic-box-error {
+        border: 1px solid #ff4d4f;
+
+        &:focus,
+        &:active,
+        &.c-lib-select-basic-box-active {
+            border: 1px solid #ff4d4f;
+            box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+        }
+    }
+
+    &.c-lib-select-basic-box-warning {
+        border: 1px solid #faad14;
+
+        &:focus,
+        &:active,
+        &.c-lib-select-basic-box-active {
+            border: 1px solid #faad14;
+            box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+        }
+    }
+
+    .c-lib-select-basic-box-content {
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 1px 4px;
+        min-height: 28px;
+        position: relative;
+        gap: 0px;
+        align-items: center;
+        max-width: calc(100% - 30px);
+        overflow: hidden;
+    }
+
+    .c-lib-select-basic-box-suffix {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 0;
+        flex-shrink: 0;
+        min-width: 30px;
+        max-width: 30px;
+        height: 100%;
+        margin-left: auto;
+
+        .c-lib-select-basic-box-clear-icon {
+            display: none;
+            color: rgba(0, 0, 0, 0.45);
+            transition: all 0.2s ease;
+
+            &:hover {
+                color: rgba(0, 0, 0, 0.65);
+            }
+        }
+
+        .c-lib-select-basic-box-icon {
+            transition: all 0.3s ease-in-out;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .c-lib-select-basic-box-icon-clear {
+            display: block;
+        }
+
+        .c-lib-select-basic-box-loading-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .c-lib-select-basic-box-loading-svg {
+                animation: rotate 1.2s linear infinite;
+                color: rgba(23, 184, 199, 0.6);
+            }
+        }
+    }
+
+    &:hover {
+        .c-lib-select-basic-box-suffix {
+            .c-lib-select-basic-box-clear-icon {
+                display: flex;
+            }
+
+            .c-lib-select-basic-box-icon-clear {
+                display: none;
+            }
+        }
+    }
+}
+
+.c-lib-select-basic-box-placeholder {
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+    color: rgba(0, 0, 0, 0.45);
+    position: absolute;
+    height: 100%;
+    line-height: normal;
+    max-width: calc(100% - 8px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .c-lib-select-basic-box-placeholder-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.c-lib-select-basic-search-box {
+    margin-left: 8px;
+    max-width: 100%;
+    position: relative;
+
+    .c-lib-select-basic-search-text {
+        visibility: hidden;
+        position: absolute;
+        left: 0px;
+        white-space: nowrap;
+    }
+
+    .c-lib-select-basic-search-input {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        appearance: none;
+        height: 24px;
+        width: 4px;
+    }
+}
+
+.c-lib-select-basic-box-singal-data {
+    padding-left: 4px;
+    color: rgba(0, 0, 0, 0.85);
+    position: absolute;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: normal;
+}
+
+.c-lib-select-basic-box-singal-data-gray {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.c-lib-select-basic-box-disabled {
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+    color: rgba(0, 0, 0, 0.25);
+    border-color: #d9d9d9;
+
+    .c-lib-select-basic-box-content,
+    .c-lib-select-basic-box-suffix {
+        pointer-events: none;
+    }
+}
+
+.c-lib-select-basic-box-search-component {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.c-lib-select-basic-box-tag-component {
+    display: inline-flex;
+    margin: 2px 4px 2px 0px;
+    max-width: 100%;
+}
