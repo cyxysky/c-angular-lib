@@ -50,6 +50,9 @@
 .example-value {
   margin-top: 16px;
   color: #666;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
 }
 
 // 演示用按钮样式
@@ -86,6 +89,58 @@
   
   .custom-menu-item-label {
     font-weight: 500;
+  }
+}
+
+// 完全自定义菜单样式
+.custom-menu-container {
+  min-width: 240px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  .custom-menu-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #fafafa;
+    
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+  
+  .custom-menu-content {
+    padding: 12px 16px;
+    
+    p {
+      margin: 0 0 12px 0;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    
+    ul {
+      margin: 0;
+      padding: 0 0 0 20px;
+      
+      li {
+        margin-bottom: 8px;
+        color: rgba(0, 0, 0, 0.75);
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  
+  .custom-menu-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f0f0f0;
+    background-color: #fafafa;
+    text-align: right;
   }
 }
 

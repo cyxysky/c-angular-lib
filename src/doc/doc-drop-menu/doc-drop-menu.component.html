@@ -18,9 +18,12 @@
       title="基本用法"
       [sourceCode]="basicSource">
       <div demo>
-        <button libDropMenu [dropMenuItems]="basicItems" class="demo-trigger-button">
-          点击显示菜单
-        </button>
+        <lib-button 
+          libDropMenu 
+          [dropMenuItems]="basicItems"
+          [buttonContent]="'点击显示菜单'"
+          [buttonType]="'default'">
+        </lib-button>
       </div>
       <div description>
         最简单的下拉菜单，点击按钮弹出。
@@ -33,12 +36,20 @@
       [sourceCode]="triggerSource">
       <div demo>
         <div style="display: flex; gap: 16px;">
-          <button libDropMenu [dropMenuItems]="basicItems" [dropMenuTrigger]="'click'" class="demo-trigger-button">
-            点击触发
-          </button>
-          <button libDropMenu [dropMenuItems]="basicItems" [dropMenuTrigger]="'hover'" class="demo-trigger-button">
-            悬停触发
-          </button>
+          <lib-button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuTrigger]="'click'"
+            [buttonContent]="'点击触发'"
+            [buttonType]="'default'">
+          </lib-button>
+          <lib-button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuTrigger]="'hover'"
+            [buttonContent]="'悬停触发'"
+            [buttonType]="'default'">
+          </lib-button>
         </div>
       </div>
       <div description>
@@ -52,13 +63,13 @@
       [sourceCode]="placementSource">
       <div demo>
         <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
-          <button *ngFor="let pos of placements" 
+          <lib-button *ngFor="let pos of placements" 
             libDropMenu 
             [dropMenuItems]="basicItems" 
-            [dropMenuPlacement]="pos" 
-            class="demo-trigger-button">
-            {{pos}}
-          </button>
+            [dropMenuPlacement]="pos"
+            [buttonContent]="pos"
+            [buttonType]="'default'">
+          </lib-button>
         </div>
       </div>
       <div description>
@@ -72,20 +83,20 @@
       [sourceCode]="widthSource">
       <div demo>
         <div style="display: flex; gap: 16px;">
-          <button 
+          <lib-button 
             libDropMenu 
             [dropMenuItems]="basicItems" 
-            [dropMenuWidth]="200" 
-            class="demo-trigger-button">
-            宽度: 200px
-          </button>
-          <button 
+            [dropMenuWidth]="200"
+            [buttonContent]="'宽度: 200px'"
+            [buttonType]="'default'">
+          </lib-button>
+          <lib-button 
             libDropMenu 
             [dropMenuItems]="basicItems" 
-            [dropMenuWidth]="'300px'" 
-            class="demo-trigger-button">
-            宽度: 300px
-          </button>
+            [dropMenuWidth]="'300px'"
+            [buttonContent]="'宽度: 300px'"
+            [buttonType]="'default'">
+          </lib-button>
         </div>
       </div>
       <div description>
@@ -98,12 +109,12 @@
       title="嵌套菜单"
       [sourceCode]="nestedSource">
       <div demo>
-        <button 
+        <lib-button 
           libDropMenu 
-          [dropMenuItems]="nestedItems" 
-          class="demo-trigger-button">
-          嵌套菜单
-        </button>
+          [dropMenuItems]="nestedItems"
+          [buttonContent]="'嵌套菜单'"
+          [buttonType]="'default'">
+        </lib-button>
       </div>
       <div description>
         下拉菜单支持多级嵌套，鼠标悬停在带有子菜单的项目上会显示子菜单。子菜单会继承父菜单的自动关闭设置。
@@ -115,13 +126,13 @@
       title="自定义菜单项"
       [sourceCode]="customTemplateSource">
       <div demo>
-        <button 
+        <lib-button 
           libDropMenu 
           [dropMenuItems]="customItems" 
-          [dropMenuItemTemplate]="customItemTpl" 
-          class="demo-trigger-button">
-          自定义菜单项
-        </button>
+          [dropMenuItemTemplate]="customItemTpl"
+          [buttonContent]="'自定义菜单项'"
+          [buttonType]="'default'">
+        </lib-button>
         
         <ng-template #customItemTpl let-item let-index="index">
           <li (click)="onItemClick(item)">
@@ -141,21 +152,23 @@
       title="受控模式"
       [sourceCode]="controlledSource">
       <div demo>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button (click)="controlledVisible = !controlledVisible" class="demo-trigger-button">
-            {{ controlledVisible ? '隐藏菜单' : '显示菜单' }}
-          </button>
+        <div style="display: flex; flex-direction: column; gap: 8px;align-items: flex-start;">
+          <lib-button 
+            (click)="controlledVisible = !controlledVisible"
+            [buttonContent]="controlledVisible ? '隐藏菜单' : '显示菜单'"
+            [buttonType]="'default'">
+          </lib-button>
           
           <div style="position: relative; margin-top: 20px;">
-            <button 
+            <lib-button 
               libDropMenu 
               [dropMenuItems]="basicItems" 
               [dropMenuVisible]="controlledVisible"
               [dropMenuStrictVisible]="true"
               (dropMenuVisibleChange)="onVisibleChange($event)"
-              class="demo-trigger-button">
-              受控的菜单
-            </button>
+              [buttonContent]="'受控的菜单'"
+              [buttonType]="'default'">
+            </lib-button>
           </div>
         </div>
       </div>
@@ -169,14 +182,14 @@
       title="监听菜单项点击"
       [sourceCode]="eventSource">
       <div demo>
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <button 
+        <div style="display: flex; flex-direction: column; gap: 16px;align-items: flex-start;">
+          <lib-button 
             libDropMenu 
             [dropMenuItems]="basicItems" 
             (dropMenuItemClick)="onMenuItemClick($event)"
-            class="demo-trigger-button">
-            点击菜单项
-          </button>
+            [buttonContent]="'点击菜单项'"
+            [buttonType]="'default'">
+          </lib-button>
           
           <div *ngIf="selectedItem" class="example-value">
             已选择: {{ selectedItem.label }}
@@ -194,24 +207,91 @@
       [sourceCode]="autoCloseSource">
       <div demo>
         <div style="display: flex; gap: 16px;">
-          <button 
+          <lib-button 
             libDropMenu 
             [dropMenuItems]="basicItems" 
-            [dropMenuAutoClose]="true" 
-            class="demo-trigger-button">
-            自动关闭
-          </button>
-          <button 
+            [dropMenuAutoClose]="true"
+            [buttonContent]="'自动关闭'"
+            [buttonType]="'default'">
+          </lib-button>
+          <lib-button 
             libDropMenu 
             [dropMenuItems]="basicItems" 
-            [dropMenuAutoClose]="false" 
-            class="demo-trigger-button">
-            点击不关闭
-          </button>
+            [dropMenuAutoClose]="false"
+            [buttonContent]="'点击不关闭'"
+            [buttonType]="'default'">
+          </lib-button>
         </div>
       </div>
       <div description>
         自动关闭模式决定点击菜单项后是否自动关闭菜单。设置 dropMenuAutoClose=false 可以保持菜单打开状态。
+      </div>
+    </app-doc-box>
+
+    <!-- 选中状态 -->
+    <app-doc-box
+      title="菜单项选中状态"
+      [sourceCode]="selectedItemSource">
+      <div demo>
+        <div style="display: flex; flex-direction: column; gap: 16px;align-items: flex-start;">
+          <lib-button 
+            libDropMenu 
+            [dropMenuItems]="basicItems" 
+            [dropMenuSelected]="selectedMenuItem"
+            (dropMenuSelectedChange)="onSelectedChange($event)"
+            [buttonContent]="'选择菜单项'"
+            [buttonType]="'default'">
+          </lib-button>
+          
+          <div *ngIf="selectedMenuItem" class="example-value">
+            当前选中: {{ selectedMenuItem.label }}
+          </div>
+        </div>
+      </div>
+      <div description>
+        通过 dropMenuSelected 设置当前选中项，通过 dropMenuSelectedChange 事件监听选中项变化。
+      </div>
+    </app-doc-box>
+
+    <!-- 完全自定义模板 -->
+    <app-doc-box
+      title="完全自定义模板"
+      [sourceCode]="fullTemplateSource">
+      <div demo>
+        <lib-button 
+          libDropMenu 
+          [dropMenuTemplate]="fullCustomTpl"
+          [(dropMenuVisible)]="fullCustomVisible"
+          [buttonContent]="'完全自定义模板'"
+          [buttonType]="'default'">
+        </lib-button>
+        
+        <ng-template #fullCustomTpl>
+          <div class="custom-menu-container">
+            <div class="custom-menu-header">
+              <h3>自定义菜单头部</h3>
+            </div>
+            <div class="custom-menu-content">
+              <p>这是一个完全自定义的菜单内容</p>
+              <ul>
+                <li>自定义项 1</li>
+                <li>自定义项 2</li>
+                <li>自定义项 3</li>
+              </ul>
+            </div>
+            <div class="custom-menu-footer">
+              <lib-button 
+                [buttonContent]="'关闭菜单'"
+                [buttonType]="'default'"
+                [buttonSize]="'small'"
+                (click)="closeMenu()">
+              </lib-button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <div description>
+        通过 dropMenuTemplate 可以完全自定义整个菜单的内容，不再受限于默认的菜单项结构。
       </div>
     </app-doc-box>
   </div>
@@ -235,6 +315,16 @@
     <h3 class="doc-sub-title">3. 自动关闭选项</h3>
     <p class="doc-description">
       添加了自动关闭选项（dropMenuAutoClose），允许控制点击菜单项后是否自动关闭菜单。对于需要用户连续选择多个菜单项的场景，可以设置为false以保持菜单打开状态。
+    </p>
+
+    <h3 class="doc-sub-title">4. 菜单项选中功能</h3>
+    <p class="doc-description">
+      新增菜单项选中功能（dropMenuSelected），支持通过编程方式设置当前选中的菜单项，并通过dropMenuSelectedChange事件监听选中项变化。
+    </p>
+
+    <h3 class="doc-sub-title">5. 完全自定义模板</h3>
+    <p class="doc-description">
+      新增完全自定义模板功能（dropMenuTemplate），允许用户完全控制菜单的内容和样式，不再受限于默认的菜单项结构。
     </p>
   </div>
 </div>

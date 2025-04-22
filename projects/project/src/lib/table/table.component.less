@@ -12,6 +12,8 @@
 @table-padding-horizontal: 16px;
 @primary-color: #1890ff;
 @box-shadow-base: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+@shadow-color: rgba(0, 0, 0, 0.15);
+@disabled-color: rgba(0, 0, 0, 0.25);
 
 // 表格样式
 .lib-table-wrapper {
@@ -19,6 +21,37 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  background: @table-bg;
+  border-radius: @table-border-radius;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+// 表格工具栏样式
+.lib-table-toolbar {
+  padding: 16px 24px;
+  background: @table-bg;
+  border-radius: @table-border-radius @table-border-radius 0 0;
+  border: @table-border;
+  border-bottom: 0;
+}
+
+.lib-table-toolbar-default {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lib-table-toolbar-title {
+  flex: 1;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.lib-table-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .lib-table {
@@ -66,6 +99,11 @@
     margin-top: -8px;
     text-align: center;
     cursor: pointer;
+    transition: color 0.3s;
+    
+    &:hover {
+      color: @primary-color;
+    }
   }
 
   .lib-table-sorter-inner {
@@ -195,9 +233,10 @@
 
   // 无数据状态
   .lib-table-empty {
-    padding: 20px 0;
+    padding: 40px 0;
     text-align: center;
     color: rgba(0, 0, 0, 0.25);
+    font-size: 14px;
   }
 
   // 加载状态
@@ -287,23 +326,76 @@
     }
   }
 
+  // 有滚动条的表格 - 阴影效果
+  &.lib-table-scrollable {
+    .lib-table-container {
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    // 固定列基本样式
+    .lib-table-column-fixed-left,
+    .lib-table-column-fixed-right {
+      position: sticky !important;
+      z-index: 1;
+      transition: box-shadow 0.3s; // 添加过渡效果
+      box-shadow: none; // 默认无阴影
+    }
+
+    .lib-table-column-fixed-left {
+      border-right: 1px solid #e8e8e8;
+    }
+
+    .lib-table-column-fixed-right {
+      border-left: 1px solid #e8e8e8;
+    }
+
+    // 滚动到中间位置 - 两侧都显示阴影
+    &.lib-table-scroll-middle {
+      .lib-table-column-fixed-left {
+        box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      }
+      .lib-table-column-fixed-right {
+        box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    // 滚动到最左侧 - 左侧无阴影，右侧有阴影
+    &.lib-table-scroll-start {
+      .lib-table-column-fixed-left {
+        box-shadow: none;
+      }
+      .lib-table-column-fixed-right {
+        box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    // 滚动到最右侧 - 右侧无阴影，左侧有阴影
+    &.lib-table-scroll-end {
+      .lib-table-column-fixed-left {
+        box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      }
+      .lib-table-column-fixed-right {
+        box-shadow: none;
+      }
+    }
+
+    // 确保表头固定列有正确的z-index
+    .lib-table-thead {
+      .lib-table-column-fixed-left,
+      .lib-table-column-fixed-right {
+        background-color: @table-header-bg;
+        z-index: 3;
+      }
+    }
+  }
+
   // 固定列样式
   .lib-table-column-fixed-left,
   .lib-table-column-fixed-right {
-    position: sticky;
-    z-index: 2;
+    position: sticky !important;
+    z-index: 1;
     background: @table-bg;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 30px;
-      pointer-events: none;
-      transition: box-shadow 0.3s;
-      box-shadow: none;
-    }
     
     tr:hover & {
       background-color: @table-row-hover-bg;
@@ -312,33 +404,10 @@
 
   .lib-table-column-fixed-left {
     left: 0;
-    &:after {
-      right: -30px;
-    }
   }
 
   .lib-table-column-fixed-right {
     right: 0;
-    &:after {
-      left: -30px;
-    }
-  }
-  
-  // 显示阴影效果
-  .lib-table-container:hover {
-    .lib-table-column-fixed-left:after {
-      box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .lib-table-column-fixed-right:after {
-      box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .lib-table-thead .lib-table-column-fixed-left:after,
-    .lib-table-thead .lib-table-column-fixed-right:after {
-      bottom: 0;
-      box-shadow: inset 0 -10px 8px -8px rgba(0, 0, 0, 0.15);
-    }
   }
 }
 
@@ -364,6 +433,17 @@
   margin: 16px 0;
   display: flex;
   justify-content: flex-end;
+  
+  &.lib-table-pagination-fixed {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    background: @table-bg;
+    padding: 16px;
+    border-top: @table-border;
+    margin: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.09);
+  }
 }
 
 .lib-pagination {
@@ -379,19 +459,31 @@
   align-items: center;
 }
 
+.lib-pagination-total {
+  margin-right: 16px;
+}
+
 .lib-pagination-item,
 .lib-pagination-prev,
 .lib-pagination-next {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 32px;
   height: 32px;
-  line-height: 30px;
-  text-align: center;
   margin-right: 8px;
   border: @table-border;
   border-radius: @table-border-radius;
   cursor: pointer;
   transition: all 0.3s;
+  
+  .lib-pagination-item-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
 
   &:hover {
     color: @primary-color;
@@ -400,49 +492,66 @@
 
   &.lib-pagination-item-active {
     border-color: @primary-color;
+    background-color: #e6f7ff;
     color: @primary-color;
+    font-weight: 500;
   }
 
   &.lib-pagination-disabled {
-    color: rgba(0, 0, 0, 0.25);
+    color: @disabled-color;
     cursor: not-allowed;
     border-color: @border-color;
     
     &:hover {
-      color: rgba(0, 0, 0, 0.25);
+      color: @disabled-color;
       border-color: @border-color;
     }
   }
 }
 
 .lib-pagination-options {
-  display: inline-block;
+  display: flex;
   margin-left: 16px;
   
-  select {
-    padding: 0 8px;
-    height: 32px;
-    border: @table-border;
-    border-radius: @table-border-radius;
-    outline: none;
+  .lib-pagination-options-size-changer {
+    select {
+      padding: 0 8px;
+      height: 32px;
+      border: @table-border;
+      border-radius: @table-border-radius;
+      outline: none;
+      cursor: pointer;
+      
+      &:hover {
+        border-color: @primary-color;
+      }
+    }
   }
 }
 
 .lib-pagination-jumper {
-  display: inline-block;
+  display: flex;
   margin-left: 16px;
-  height: 32px;
-  line-height: 32px;
   
-  input {
-    width: 50px;
-    padding: 0 8px;
+  .lib-pagination-options-quick-jumper {
+    display: flex;
+    align-items: center;
     height: 32px;
-    text-align: center;
-    margin: 0 8px;
-    border: @table-border;
-    border-radius: @table-border-radius;
-    outline: none;
+    
+    input {
+      width: 50px;
+      padding: 4px 8px;
+      height: 24px;
+      text-align: center;
+      margin: 0 8px;
+      border: @table-border;
+      border-radius: @table-border-radius;
+      outline: none;
+      
+      &:hover, &:focus {
+        border-color: @primary-color;
+      }
+    }
   }
 }
 
@@ -462,14 +571,15 @@
 
 // 过滤气泡样式
 .lib-table-filter-popover {
-  padding: 4px 0;
+  min-width: 160px;
+  max-width: 300px;
 }
 
 .lib-table-filter-popover-list {
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
   margin: 0;
-  padding: 0;
+  padding: 4px 0;
   list-style: none;
 }
 
@@ -507,7 +617,8 @@
   background: transparent;
   border: 0;
   cursor: pointer;
-  padding: 0 7px;
+  padding: 4px 8px;
+  transition: all 0.3s;
   
   &.confirm {
     color: @primary-color;
@@ -515,6 +626,47 @@
   
   &:hover {
     color: @primary-color;
+  }
+}
+
+// 操作列样式
+.lib-table-operation-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.lib-table-btn {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &.lib-table-btn-link {
+    color: @primary-color;
+    
+    &:hover {
+      color: lighten(@primary-color, 10%);
+      text-decoration: underline;
+    }
+  }
+}
+
+// 组件样式调整
+:host ::ng-deep {
+  .lib-pagination-options {
+    lib-select {
+      min-width: 90px;
+    }
+  }
+  
+  .lib-pagination-jumper {
+    lib-number-input {
+      margin: 0 8px;
+    }
   }
 }
 
