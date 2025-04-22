@@ -57,6 +57,8 @@ export class SelectBoxComponent {
   /** 搜索值 */
   public searchOnCompositionValue = '';
 
+  ngOnChanges(changes: any): void {}
+
   /**
    * 获取标签
    * @param data 数据
@@ -146,7 +148,7 @@ export class SelectBoxComponent {
    * @returns 是否显示占位符
    */
   showPlaceholder() {
-    return (!this.data || (this.data && this.data.length === 0)) && !this.searchOnCompositionValue
+    return (this.data === undefined || this.data === null || (this.data && this.data.length === 0)) && !this.searchOnCompositionValue;
   }
 
   /**
@@ -154,7 +156,7 @@ export class SelectBoxComponent {
    * @returns 是否显示单选数据
    */
   showSingalData() {
-    return this.selectMode === 'single' && this.searchOnCompositionValue === '' && this.data && this.data.length > 0;
+    return this.selectMode === 'single' && this.searchOnCompositionValue === '' && this.data !== undefined && this.data !== null;
   }
 
   /**

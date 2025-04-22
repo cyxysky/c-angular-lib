@@ -151,7 +151,7 @@
       <div demo>
         <lib-select
           [(ngModel)]="searchSelected"
-          [selectSearch]="true"
+          [selectShowSearch]="true"
           [selectOption]="largeOptions"
           selectOptionKey="label"
           selectOptionValue="value"
@@ -173,7 +173,7 @@
       <div demo>
         <lib-select
           [(ngModel)]="remoteSelected"
-          [selectSearch]="true"
+          [selectShowSearch]="true"
           [selectLoading]="remoteLoading"
           [selectSearchFn]="onRemoteSearch"
           [selectOption]="remoteOptions"

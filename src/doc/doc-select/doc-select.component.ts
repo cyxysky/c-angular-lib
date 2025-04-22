@@ -20,7 +20,7 @@ import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.co
 })
 export class DocSelectComponent implements OnInit {
   // 基本用法
-  selectedValue: string = '';
+  selectedValue: any = 2;
   
   // 三种大小
   selectedSizes = {
@@ -66,16 +66,16 @@ export class DocSelectComponent implements OnInit {
   maxCountSelected: string[] = [];
   
   // 底部操作栏
-  bottomBarSelected: string[] = [];
+  bottomBarSelected: any[] = [];
   
   // 基础选项
   options = [
-    { label: '选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1', value: 'option1' },
-    { label: '选项2', value: 'option2' },
-    { label: '选项3', value: 'option3' },
-    { label: '选项4', value: 'option4' },
-    { label: '选项5', value: 'option5' },
-    { label: '选项6', value: 'option6' }
+    { label: '选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1选项1', value: 1 },
+    { label: '选项2', value: 2 },
+    { label: '选项3', value: 3 },
+    { label: '选项4', value: 4 },
+    { label: '选项5', value: 5 },
+    { label: '选项6', value: 6 }
   ];
   
   // 分组选项

@@ -28,7 +28,7 @@
 
 // 表格工具栏样式
 .lib-table-toolbar {
-  padding: 16px 24px;
+  padding: 16px;
   background: @table-bg;
   border-radius: @table-border-radius @table-border-radius 0 0;
   border: @table-border;
@@ -78,7 +78,6 @@
     border-bottom: @table-border;
     padding: @table-padding-vertical @table-padding-horizontal;
     position: relative;
-    overflow: hidden;
     transition: background 0.3s ease;
   }
 
@@ -243,34 +242,72 @@
   &.lib-table-loading {
     position: relative;
     
-    &:before {
-      content: "";
+    &::before {
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(255, 255, 255, 0.7);
-      z-index: 1;
+      background-color: rgba(255, 255, 255, 0.5);
+      z-index: 999;
+    }
+    
+    .lib-table-column-fixed-left::after {
+      animation: shadowPulseLeft 2s infinite ease-in-out;
+    }
+    .lib-table-column-fixed-right::after {
+      animation: shadowPulseRight 2s infinite ease-in-out;
     }
   }
-
-  .lib-table-loading-indicator {
+  
+  .lib-table-center-loading {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2;
+    z-index: 1000;
+    background-color: transparent;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .lib-table-loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(24, 144, 255, 0.1);
+      border-top-color: #1890ff;
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
   }
 
-  .lib-table-loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-top-color: rgba(0, 0, 0, 0.8);
-    border-radius: 50%;
-    animation: spin 1s infinite linear;
+  @keyframes shadowPulseLeft {
+    0% {
+      box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+      box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.25);
+    }
+    100% {
+      box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  @keyframes shadowPulseRight {
+    0% {
+      box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+      box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.25);
+    }
+    100% {
+      box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+    }
   }
 
   @keyframes spin {
@@ -344,38 +381,60 @@
 
     .lib-table-column-fixed-left {
       border-right: 1px solid #e8e8e8;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -10px;
+        bottom: 0;
+        width: 10px;
+        pointer-events: none;
+        box-shadow: none;
+        transition: box-shadow 0.3s;
+      }
     }
 
     .lib-table-column-fixed-right {
       border-left: 1px solid #e8e8e8;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -10px;
+        bottom: 0;
+        width: 10px;
+        pointer-events: none;
+        box-shadow: none;
+        transition: box-shadow 0.3s;
+      }
     }
 
     // 滚动到中间位置 - 两侧都显示阴影
     &.lib-table-scroll-middle {
-      .lib-table-column-fixed-left {
-        box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      .lib-table-column-fixed-left::after {
+        box-shadow: inset 10px 0 8px -8px #00000026;
       }
-      .lib-table-column-fixed-right {
-        box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      .lib-table-column-fixed-right::after {
+        box-shadow: inset -10px 0 8px -8px #00000026;
       }
     }
 
     // 滚动到最左侧 - 左侧无阴影，右侧有阴影
     &.lib-table-scroll-start {
-      .lib-table-column-fixed-left {
+      .lib-table-column-fixed-left::after {
         box-shadow: none;
       }
-      .lib-table-column-fixed-right {
-        box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      .lib-table-column-fixed-right::after {
+        box-shadow: inset -10px 0 8px -8px #00000026;
       }
     }
 
     // 滚动到最右侧 - 右侧无阴影，左侧有阴影
     &.lib-table-scroll-end {
-      .lib-table-column-fixed-left {
-        box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.12);
+      .lib-table-column-fixed-left::after {
+        box-shadow: inset 10px 0 8px -8px #00000026;
       }
-      .lib-table-column-fixed-right {
+      .lib-table-column-fixed-right::after {
         box-shadow: none;
       }
     }
@@ -385,6 +444,13 @@
       .lib-table-column-fixed-left,
       .lib-table-column-fixed-right {
         background-color: @table-header-bg;
+        z-index: 3;
+      }
+      
+      .lib-table-column-fixed-left::after,
+      .lib-table-column-fixed-right::after {
+        top: 0;
+        bottom: 0;
         z-index: 3;
       }
     }
@@ -537,21 +603,6 @@
     display: flex;
     align-items: center;
     height: 32px;
-    
-    input {
-      width: 50px;
-      padding: 4px 8px;
-      height: 24px;
-      text-align: center;
-      margin: 0 8px;
-      border: @table-border;
-      border-radius: @table-border-radius;
-      outline: none;
-      
-      &:hover, &:focus {
-        border-color: @primary-color;
-      }
-    }
   }
 }
 
@@ -655,20 +706,7 @@
   }
 }
 
-// 组件样式调整
-:host ::ng-deep {
-  .lib-pagination-options {
-    lib-select {
-      min-width: 90px;
-    }
-  }
-  
-  .lib-pagination-jumper {
-    lib-number-input {
-      margin: 0 8px;
-    }
-  }
-}
+
 
 // 过滤气泡样式覆盖
 :host ::ng-deep .lib-popover {

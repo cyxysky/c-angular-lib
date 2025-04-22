@@ -12,12 +12,12 @@
         </div>
         <div *ngIf="showSingalData()" class="c-lib-select-basic-box-singal-data" [ngClass]="{'c-lib-select-basic-box-singal-data-gray': isActive}">
             <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultSingalLabelTemplate; context: { $implicit: data, label: getDisplayTags(data) }"></ng-container>
-            <ng-template #defaultSingalLabelTemplate let-data>{{ getDisplayTags(data) }}</ng-template>
+            <ng-template #defaultSingalLabelTemplate let-data let-label="label">{{ label }}</ng-template>
         </div>
         <ng-container *ngIf="showMultipleData()">
             <lib-select-tag *ngFor="let tag of data;index as i" [size]="size" [closable]="true" (remove)="removeTag($event, tag)" class="c-lib-select-basic-box-tag-component">
-                <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultMultipleLabelTemplate; context: { $implicit: tag, label: getDisplayTags(data) }"></ng-container>
-                <ng-template #defaultMultipleLabelTemplate let-tag>{{ getDisplayTags(tag) }}</ng-template>
+                <ng-container *ngTemplateOutlet="optionLabelTemplate || defaultMultipleLabelTemplate; context: { $implicit: tag, label: getDisplayTags(tag) }"></ng-container>
+                <ng-template #defaultMultipleLabelTemplate let-tag let-label="label">{{ label }}</ng-template>
             </lib-select-tag>
         </ng-container>
         <lib-select-search
@@ -39,8 +39,11 @@
                 <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
             </svg>
         </div>
-        <i class="bi bi-search" *ngIf="!loading && search && isActive && !disabled"></i>
+        <!-- 搜索 -->
+        <i class="bi bi-search" *ngIf="!loading && allowSearch && isActive && !disabled"></i>
+        <!-- 下拉 -->
         <i class="bi bi-caret-down-fill c-lib-select-basic-box-icon" *ngIf="!loading && !search && data && !disabled" [ngClass]="{'c-lib-select-basic-box-icon-clear': allowClear}" [style.transform]="isActive ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
-        <i class="bi-x-circle-fill c-lib-select-basic-box-clear-icon" *ngIf="allowClear && !loading && !isActive && !disabled" (click)="clearValue($event)"></i>
+        <!-- 清空 -->
+        <i class="bi-x-circle-fill c-lib-select-basic-box-clear-icon" *ngIf="!loading && allowClear && !isActive && !disabled" (click)="clearValue($event)"></i>
     </div>
 </div>

@@ -130,6 +130,16 @@ export class TableComponent implements OnInit, OnChanges {
     this.originalData = [...this.data];
     this.refreshData();
     this.checkFixedColumns();
+    
+    // 初始化设置滚动状态为起始状态（显示右侧阴影）
+    setTimeout(() => {
+      const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
+      if (tableElement) {
+        this.renderer.addClass(tableElement, 'lib-table-scroll-start');
+        this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+        this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+      }
+    }, 0);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -160,19 +170,13 @@ export class TableComponent implements OnInit, OnChanges {
     const scrollLeft = container.scrollLeft;
     const maxScrollLeft = container.scrollWidth - container.clientWidth;
     
-    // 在最左侧时，移除左侧阴影类，添加右侧阴影类（如果不在最右侧）
+    // 在最左侧时，左侧无阴影，右侧有阴影
     if (scrollLeft === 0) {
       this.renderer.addClass(tableElement, 'lib-table-scroll-start');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
-      
-      if (Math.abs(scrollLeft - maxScrollLeft) < 1) {
-        // 内容刚好在一屏内，左右阴影都不显示
-        this.renderer.addClass(tableElement, 'lib-table-scroll-end');
-      } else {
-        this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
-      }
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
     } 
-    // 在最右侧时，添加右侧阴影类，移除左侧阴影类
+    // 在最右侧时，左侧有阴影，右侧无阴影
     else if (Math.abs(scrollLeft - maxScrollLeft) < 1) {
       this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');

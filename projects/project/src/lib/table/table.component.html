@@ -1,31 +1,11 @@
 <div class="lib-table-wrapper">
-  <!-- 加载中指示器 -->
-  <div class="lib-table-loading" *ngIf="loading">
-    <ng-container *ngIf="loadingIndicator; else defaultLoadingTpl">
-      <ng-container *ngTemplateOutlet="loadingIndicator"></ng-container>
-    </ng-container>
-    <ng-template #defaultLoadingTpl>
-      <div class="lib-table-loading-indicator">
-        <div class="lib-table-loading-spinner"></div>
-      </div>
-    </ng-template>
-  </div>
-
   <!-- 表格操作区（顶部工具栏） -->
-  <div class="lib-table-toolbar" *ngIf="toolbarTemplate || showToolbar">
-    <ng-container *ngIf="toolbarTemplate">
-      <ng-container *ngTemplateOutlet="toolbarTemplate"></ng-container>
-    </ng-container>
-    <div *ngIf="!toolbarTemplate && showToolbar" class="lib-table-toolbar-default">
-      <div class="lib-table-toolbar-title" *ngIf="title">
+  <div class="lib-table-toolbar" *ngIf="title">
+    <div  class="lib-table-toolbar-default">
+      <div class="lib-table-toolbar-title">
         <ng-container *ngIf="!isTemplateRef(title)">{{ title }}</ng-container>
         <ng-container *ngIf="isTemplateRef(title)">
           <ng-container *ngTemplateOutlet="title"></ng-container>
-        </ng-container>
-      </div>
-      <div class="lib-table-toolbar-actions">
-        <ng-container *ngIf="toolbarActionsTemplate">
-          <ng-container *ngTemplateOutlet="toolbarActionsTemplate"></ng-container>
         </ng-container>
       </div>
     </div>
@@ -39,7 +19,13 @@
     [class.lib-table-fixed-header]="scroll?.y"
     [class.lib-table-fixed-left]="hasFixedLeft"
     [class.lib-table-fixed-right]="hasFixedRight"
+    [class.lib-table-loading]="loading"
     [class.lib-table-scrollable]="scroll?.x || scroll?.y">
+    
+    <!-- 正中心加载动画 -->
+    <div class="lib-table-center-loading" *ngIf="loading">
+      <div class="lib-table-loading-spinner"></div>
+    </div>
 
     <div class="lib-table-container" 
       [ngStyle]="{
@@ -222,21 +208,22 @@
           <li class="lib-pagination-options">
             <div class="lib-pagination-options-size-changer">
               <lib-select 
+                style="width: 100px;"
                 [selectOption]="pageSizeOptions | pageSizeOptionsFormat"
                 [selectPlaceHolder]="'每页条数'"
                 [selectMode]="'single'"
-                [selectSize]="'small'"
-                [selectSearch]="false"
+                [selectShowSearch]="false"
+                [selectAllowClear]="false"
                 [(ngModel)]="pageSize"
                 (ngModelChange)="onPageSizeChange($event)">
               </lib-select>
+              {{ pageSize }}
             </div>
           </li>
           
           <!-- 跳转至 -->
           <li class="lib-pagination-jumper" *ngIf="showQuickJumper">
             <div class="lib-pagination-options-quick-jumper">
-              跳至
               <lib-number-input
                 [numberInputMin]="1"
                 [numberInputMax]="getLastPage()"
@@ -244,9 +231,14 @@
                 [numberInputPrecision]="0"
                 [(ngModel)]="pageIndex"
                 (ngModelChange)="onPageIndexChange($event)"
-                style="width: 50px;">
+                style="width: 120px;">
+                <div prefix>
+                  跳至
+                </div>
+                <div suffix>
+                  页
+                </div>
               </lib-number-input>
-              页
             </div>
           </li>
         </ul>

@@ -156,6 +156,8 @@
         <p style="margin-bottom: 8px;">模板方式</p>
         <lib-table 
           [data]="headerFooterData" 
+          [title]="title"
+          [footer]="footer"
           [columns]="headerFooterColumns">
           <ng-template #title>
             <div style="display: flex; justify-content: space-between; align-items: center;">

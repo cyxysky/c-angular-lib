@@ -1,4 +1,9 @@
 lib-select-box {
+    display: inline-block;
+    width: 100%;
+}
+
+lib-select {
     display: block;
 }
 
@@ -132,7 +137,6 @@ lib-select-box {
     display: flex;
     align-items: center;
     overflow: hidden;
-    min-width: 200px;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
     box-sizing: border-box;
 
@@ -304,30 +308,6 @@ lib-select-box {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-}
-
-.c-lib-select-basic-search-box {
-    margin-left: 8px;
-    max-width: 100%;
-    position: relative;
-
-    .c-lib-select-basic-search-text {
-        visibility: hidden;
-        position: absolute;
-        left: 0px;
-        white-space: nowrap;
-    }
-
-    .c-lib-select-basic-search-input {
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        border: none;
-        outline: none;
-        appearance: none;
-        height: 24px;
-        width: 4px;
     }
 }
 

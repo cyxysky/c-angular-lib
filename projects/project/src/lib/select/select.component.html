@@ -1,5 +1,5 @@
 <lib-select-box 
-    (click)="openModal()" 
+    #searchInput
     cdkOverlayOrigin
     [selectMode]="selectMode"
     [loading]="loading"
@@ -9,11 +9,13 @@
     [placeholder]="placeHolder"
     [status]="status"
     [isActive]="modalState === 'open'"
+    [allowSearch]="showSearch"
+    [allowClear]="allowClear"
     [optionLabelTemplate]="optionLabelTemplate"
     [(searchValue)]="searchValue"
     [data]="_data"
     [getLabel]="getLabel"
-    #searchInput
+    (click)="openModal()" 
     (clear)="clear()"
     (remove)="removeUser($event)"
     (search)="onSearch($event)"
@@ -22,7 +24,10 @@
 </lib-select-box>
 
 <ng-template #overlay>
-    <div class="c-lib-select-overlay-option-box" [class.open]="modalState === 'open'" [class.closed]="modalState === 'closed'">
+    <div 
+        class="c-lib-select-overlay-option-box" 
+        [class.c-lib-select-overlay-option-box-open]="modalState === 'open'" 
+        [class.c-lib-select-overlay-option-box-closed]="modalState === 'closed'">
         <div [style.max-height]="optionPanelMaxHeight" class="c-lib-select-option-list-container" id="option-list-container">
             <div *ngIf="remoteLoading" class="c-lib-select-remote-loading">
                 <div class="c-lib-select-loading-text">搜索中...</div>
@@ -55,12 +60,12 @@
                             (mouseenter)="activeOptionIndex = i"
                             class="c-lib-select-option"
                             [class.c-lib-select-option-active]="activeOptionIndex === i"
-                            [class.disabled]="isOptionDisabled(option) || (reachedMaxCount && !_data.includes(option[optionValue]))"
-                            [class.hidden]="hideSelected && _data.includes(option[optionValue])"
-                            [class.c-lib-select-select-option]="_data.includes(option[optionValue])">
+                            [class.c-lib-select-option-disabled]="optionDisabled(option)"
+                            [class.c-lib-select-option-hidden]="hideSelected && optionSelected(option)"
+                            [class.c-lib-select-select-option]="optionSelected(option)">
                             <div class="c-lib-select-option-text">
                                 <ng-container *ngIf="optionTemplate">
-                                    <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(option)"></ng-container>
+                                    <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: option, label: option[optionKey] }"></ng-container>
                                 </ng-container>
                                 <ng-container *ngIf="!optionTemplate">
                                     {{ option[optionKey] }}
@@ -75,14 +80,14 @@
                                 *ngIf="item.type === 'option'"
                                 (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
                                 (mouseenter)="activeOptionIndex = i"
+                                [style.cursor]="optionCursor(item.option)"
                                 class="c-lib-select-option" 
                                 [class.c-lib-select-option-active]="activeOptionIndex === i"
-                                [class.cursor]="(isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))) ? 'not-allowed' : 'pointer'"
-                                [class.disabled]="isOptionDisabled(item.option) || (reachedMaxCount && !_data.includes(item.option[optionValue]))"
-                                [class.c-lib-select-select-option]="_data.includes(item.option[optionValue])">
+                                [class.c-lib-select-option-disabled]="optionDisabled(item.option)"
+                                [class.c-lib-select-select-option]="optionSelected(item.option)">
                                 <div class="c-lib-select-option-text">
                                     <ng-container *ngIf="optionTemplate">
-                                        <ng-container *ngTemplateOutlet="optionTemplate; context: getTemplateContext(item.option)"></ng-container>
+                                        <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: item.option, label: item.option[optionKey] }"></ng-container>
                                     </ng-container>
                                     <ng-container *ngIf="!optionTemplate">
                                         {{ item.option[optionKey] }}
