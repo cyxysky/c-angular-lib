@@ -42,6 +42,7 @@ import { MessageComponent } from './message/message.component';
 import { DrawerComponent } from './drawer/drawer.component';
 import { DropMenuComponent } from './drop-menu/drop-menu.component';
 import { MenuComponent } from './menu/menu.component';
+import { TableComponent } from './table/table.component';
 // 服务
 
 export * from './core';
@@ -74,6 +75,7 @@ export * from './message';
 export * from './drawer';
 export * from './drop-menu';
 export * from './menu';
+export * from './table';
 @NgModule({
   declarations: [],
   imports: [
@@ -117,7 +119,8 @@ export * from './menu';
     MessageComponent,
     DrawerComponent,
     DropMenuComponent,
-    MenuComponent
+    MenuComponent,
+    TableComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -159,7 +162,8 @@ export * from './menu';
     MessageComponent,
     DrawerComponent,
     DropMenuComponent,
-    MenuComponent
+    MenuComponent,
+    TableComponent
   ],
   providers: [
 

@@ -8,7 +8,6 @@ import { UtilsService } from '../core/utils/utils.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './drop-menu.component.html',
-  styleUrl: './drop-menu.component.less',
   encapsulation: ViewEncapsulation.None // 确保嵌套样式可以渗透到子组件
 })
 export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
@@ -30,6 +29,8 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedItem: DropMenu | null = null;
   /** 父级是否禁用 */
   @Input() parentDisabled: boolean = false;
+  /** 纯模板 */
+  @Input() template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
   /** 菜单关闭事件 */

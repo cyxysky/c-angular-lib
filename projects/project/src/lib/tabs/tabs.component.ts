@@ -52,6 +52,10 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   @Input({ alias: 'tabsCloseIcon' }) closeIcon = 'bi-x-lg';
   /** 是否可关闭 */
   @Input({ alias: 'tabsClosable', transform: booleanAttribute }) closable = false;
+  /** 是否启用懒加载，仅在首次选中时加载内容 */
+  @Input({ alias: 'tabsLazyLoad', transform: booleanAttribute }) lazyLoad = false;
+  /** 是否销毁未选中的标签页，为true时未选中的标签不渲染 */
+  @Input({ alias: 'tabsDestroyInactive', transform: booleanAttribute }) destroyInactive = false;
 
   /** 选中的标签索引改变事件 */
   @Output('tabsSelectedIndexChange') selectedIndexChange = new EventEmitter<number>();
@@ -76,6 +80,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   showScrollNav = false;
 
   allTabs: TabItem[] = [];
+  // 记录已经加载过的标签页
+  loadedTabs: Set<number> = new Set<number>();
   inkBarStyle: { [key: string]: string } = {};
   private destroy$ = new Subject<void>();
   private resizeObserver: ResizeObserver | null = null;
@@ -97,10 +103,20 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedIndex'] && !changes['selectedIndex'].firstChange) {
       this.updateSelectedIndex();
+      
+      // 如果启用了懒加载，则将当前选中的标签页添加到已加载集合中
+      if (this.lazyLoad) {
+        this.loadedTabs.add(this.selectedIndex);
+      }
     }
 
     if (changes['tabPosition']) {
       this.updateInkBarStyles();
+    }
+    
+    // 如果懒加载设置发生变化，且关闭了懒加载，则加载所有标签页
+    if (changes['lazyLoad'] && !changes['lazyLoad'].firstChange && !this.lazyLoad) {
+      this.loadAllTabs();
     }
   }
 
@@ -108,6 +124,13 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     this.buildAllTabs();
     if (this.tabComponents) {
       this.tabComponents.changes.pipe(takeUntil(this.destroy$)).subscribe(() => this.buildAllTabs());
+    }
+    
+    // 初始化已加载标签页集合
+    if (this.lazyLoad) {
+      this.loadedTabs.add(this.selectedIndex);
+    } else {
+      this.loadAllTabs();
     }
   }
 
@@ -150,6 +173,12 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       return;
     }
     this.selectedIndex = index;
+    
+    // 如果启用了懒加载，将当前选中的标签页添加到已加载集合中
+    if (this.lazyLoad) {
+      this.loadedTabs.add(index);
+    }
+    
     // 设置动画方向
     this.selectedIndexChange.emit(index);
     this.tabClick.emit({ index, tab: this.allTabs[index] });
@@ -161,6 +190,33 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
 
   isActive(index: number): boolean {
     return index === this.selectedIndex;
+  }
+  
+  /**
+   * 判断标签页是否应该被渲染
+   * 1. 如果不启用懒加载，则所有标签页都会被渲染
+   * 2. 如果启用懒加载，则只有已经加载过的标签页会被渲染
+   * 3. 如果启用了destroyInactive，则只渲染当前选中的标签页
+   */
+  shouldRenderTab(index: number): boolean {
+    if (this.destroyInactive) {
+      return this.isActive(index);
+    }
+    
+    if (this.lazyLoad) {
+      return this.loadedTabs.has(index);
+    }
+    
+    return true;
+  }
+  
+  /**
+   * 加载所有标签页
+   */
+  private loadAllTabs(): void {
+    for (let i = 0; i < this.allTabs.length; i++) {
+      this.loadedTabs.add(i);
+    }
   }
 
   onAddTab(): void {
@@ -397,12 +453,22 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.selectedIndex = this.allTabs.length - 1;
       this.selectedIndexChange.emit(this.selectedIndex);
       this.selectChange.emit(this.allTabs[this.selectedIndex]);
+      
+      // 如果启用了懒加载，将新标签添加到已加载集合中
+      if (this.lazyLoad) {
+        this.loadedTabs.add(this.selectedIndex);
+      }
     } else if (this.selectedIndex >= this.allTabs.length) {
       // 如果当前选中的标签已被移除
       this.selectedIndex = Math.max(0, this.allTabs.length - 1);
       this.selectedIndexChange.emit(this.selectedIndex);
       if (this.allTabs.length > 0) {
         this.selectChange.emit(this.allTabs[this.selectedIndex]);
+        
+        // 如果启用了懒加载，将新选中的标签添加到已加载集合中
+        if (this.lazyLoad) {
+          this.loadedTabs.add(this.selectedIndex);
+        }
       }
     }
 

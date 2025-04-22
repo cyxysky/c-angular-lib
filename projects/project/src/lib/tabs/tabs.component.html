@@ -74,8 +74,10 @@
          class="c-lib-tabs-tabpane"
          [class.c-lib-tabs-tabpane-active]="isActive(i)"
          [style.display]="!isActive(i) ? 'none' : 'block'">
-      <ng-container *ngIf="isActive(i)">
-        <ng-container [ngTemplateOutlet]="tab.content"></ng-container>
+      <ng-container *ngIf="shouldRenderTab(i)">
+        <ng-container *ngIf="isActive(i) || !destroyInactive">
+          <ng-container [ngTemplateOutlet]="tab.content"></ng-container>
+        </ng-container>
       </ng-container>
     </div>
   </div>

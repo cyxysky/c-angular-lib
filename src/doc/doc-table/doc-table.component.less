@@ -1,0 +1,153 @@
+h1 {
+  margin-bottom: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+h2 {
+  margin: 32px 0 24px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 24px;
+  line-height: 1.4;
+  clear: both;
+}
+
+h3 {
+  margin: 32px 0 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+p {
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+table {
+  font-size: 14px;
+}
+
+// 响应式栅格布局
+.table-docs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// 演示区样式
+[demo] {
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+// 描述区域样式
+[description] {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  
+  ul {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+  
+  code {
+    background-color: #f0f0f0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+  
+  strong {
+    font-weight: 600;
+  }
+}
+
+// 自定义表格样式
+.action-button {
+  padding: 4px 8px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #40a9ff;
+  }
+}
+
+// 适配移动设备的额外样式
+@media (max-width: 600px) {
+  [demo] {
+    overflow-x: auto;
+  }
+}
+
+// 表格固定列样式
+.lib-table-wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+// 固定列演示需要足够的空间
+[demo] .lib-table-container {
+  overflow-x: auto;
+  min-width: 100%;
+}
+
+// 更好地展示表格排序和筛选图标
+.lib-table-column-title {
+  display: flex;
+  align-items: center;
+}
+
+.lib-table-sorter,
+.lib-table-filter {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+// 表格加载中样式
+.lib-table-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.lib-table-loading-spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #1890ff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

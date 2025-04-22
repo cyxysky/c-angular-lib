@@ -31,7 +31,7 @@ import { GeneratePngComponent } from '@project';
 import { DynamicTableComponent } from '@project';
 import { UserSelectComponent } from '@project';
 import { DocMenuComponent } from '../doc/doc-menu/doc-menu.component';
-
+import { DocTableComponent } from '../doc/doc-table/doc-table.component';
 export const routes: Routes = [
     {
         path: 'popconfirm',
@@ -160,5 +160,9 @@ export const routes: Routes = [
     {
         path: 'menu',
         component: DocMenuComponent
+    },
+    {
+        path: 'table',
+        component: DocTableComponent
     }
 ];

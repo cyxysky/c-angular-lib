@@ -109,7 +109,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       positions,
       (ref) => {
         if (this.strictVisiable) return;
-        this.closePopover()
+        this.hide()
       },
       (position, isBackupUsed) => {
         if (isBackupUsed) {
@@ -165,7 +165,20 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 隐藏
    */
   public hide(): void {
-    this.closePopover();
+    this.changeVisible(false);
+    this.popconfirmComponentRef?.setInput('isVisible', false);
+    this.utilsService.delayExecution(() => {
+      this.closePopover();
+    }, 150);
+  }
+
+  /**
+   * 改变显示状态
+   * @param visible 显示状态
+   */
+  changeVisible(visible: boolean): void {
+    this.visible = visible;
+    this.visibleChange.emit(this.visible);
   }
 
   /**

@@ -158,6 +158,7 @@ export class AppComponent {
     { name: '树选择器', path: 'tree-select', icon: 'bi-menu-app' },
     { name: '级联选择器', path: 'cascader', icon: 'bi-menu-button' },
     { name: '菜单', path: 'menu', icon: 'bi-list' },
+    { name: '表格', path: 'table', icon: 'bi-table' },
   ]
 
   businessComponents = [

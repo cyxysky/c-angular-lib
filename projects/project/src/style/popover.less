@@ -1,12 +1,13 @@
 .c-lib-popover {
     position: relative;
     min-width: 150px;
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transform: scale(0.1);
     opacity: 0;
     transition: all 0.2s ease;
     background-color: white;
+    font-size: 14px;
 
     &.c-lib-popover-visible {
         opacity: 1;
@@ -22,8 +23,9 @@
 
     .c-lib-popover-title {
         margin: 0;
-        padding: 4px 16px;
-        font-weight: 800;
+        padding: 5px 16px 4px;
+        color: #000000d9;
+        font-weight: 600;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
@@ -178,5 +180,5 @@
 .c-lib-popover-footer {
     display: flex;
     gap: 8px;
-    padding: 4px 12px;
+    padding: 4px;
 }

@@ -138,7 +138,7 @@ export class PopoverDirective implements OverlayBasicDirective {
       positions,
       (ref) => {
         if (this.strictVisiable) return;
-        this.closePopover();
+        this.hide();
       },
       (position, isBackupUsed) => {
         if (isBackupUsed) {
@@ -186,9 +186,20 @@ export class PopoverDirective implements OverlayBasicDirective {
    */
   public hide(): void {
     if (!this.visible || this.componentHover) return;
+    this.changeVisible(false);
+    this.popoverComponentRef?.setInput('isVisible', false);
+    this.utilsService.delayExecution(() => {
+      this.closePopover();
+    }, 150);
+  }
+
+  /**
+   * 改变显示状态
+   * @param visible 显示状态
+   */
+  changeVisible(visible: boolean): void {
+    this.visible = visible;
     this.visibleChange.emit(this.visible);
-    this.visible = false;
-    this.closePopover();
   }
 
   /**

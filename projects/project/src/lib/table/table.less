@@ -1,0 +1,60 @@
+// 添加筛选下拉面板样式
+.lib-table-filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 3;
+  min-width: 120px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.lib-table-filter-dropdown-list {
+  max-height: 300px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lib-table-filter-dropdown-item {
+  margin-bottom: 8px;
+}
+
+.lib-table-filter-dropdown-item-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.lib-table-filter-dropdown-item-label input {
+  margin-right: 8px;
+}
+
+.lib-table-filter-dropdown-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.lib-table-filter-dropdown-link {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.lib-table-filter-dropdown-link.confirm {
+  color: #1890ff;
+}
+
+.lib-table-filter-dropdown-link.clear {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.lib-table-filter-icon.active {
+  color: #1890ff;
+} 

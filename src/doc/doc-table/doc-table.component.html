@@ -1,0 +1,211 @@
+<h1>Table 表格</h1>
+
+<p>表格组件，用于展示大量结构化数据。</p>
+
+<h2>代码演示</h2>
+
+<div class="table-docs-grid">
+  <!-- 基础用法 -->
+  <app-doc-box title="基础用法" [sourceCode]="basicTableSource">
+    <div demo>
+      <lib-table [data]="basicData" [columns]="basicColumns">
+      </lib-table>
+    </div>
+    <div description>
+      最简单的表格用法，展示数据内容。
+    </div>
+  </app-doc-box>
+
+  <!-- 带边框表格 -->
+  <app-doc-box title="带边框表格" [sourceCode]="borderedTableSource">
+    <div demo>
+      <lib-table 
+        [data]="borderedData" 
+        [columns]="borderedColumns"
+        [bordered]="true">
+      </lib-table>
+    </div>
+    <div description>
+      显示边框的表格，通过设置 bordered 属性启用。
+    </div>
+  </app-doc-box>
+
+  <!-- 排序表格 -->
+  <app-doc-box title="排序表格" [sourceCode]="sortableTableSource">
+    <div demo>
+      <lib-table 
+        [data]="sortableData" 
+        [columns]="sortableColumns"
+        (sortChange)="onSortChange($event)">
+      </lib-table>
+    </div>
+    <div description>
+      支持排序功能的表格，点击表头可以对数据进行排序。通过在列配置中设置 sortable 为 true 启用排序功能。
+    </div>
+  </app-doc-box>
+
+  <!-- 筛选表格 -->
+  <app-doc-box title="筛选表格" [sourceCode]="filterTableSource">
+    <div demo>
+      <lib-table 
+        [data]="filterData" 
+        [columns]="filterColumns"
+        (filterChange)="onFilterChange($event)">
+      </lib-table>
+    </div>
+    <div description>
+      支持筛选功能的表格，点击筛选图标可以对数据进行筛选。通过在列配置中设置 filters 数组和 filterMultiple 属性来启用筛选功能。
+    </div>
+  </app-doc-box>
+
+  <!-- 固定列 -->
+  <app-doc-box title="固定列" [sourceCode]="fixedColumnsTableSource">
+    <div demo>
+      <lib-table 
+        [data]="fixedColumnsData" 
+        [columns]="fixedColumnsColumns"
+        [scroll]="fixedColumnsScroll">
+        <ng-template #actionTemplate let-row>
+          <button class="action-button" (click)="onAction(row)">查看</button>
+        </ng-template>
+      </lib-table>
+    </div>
+    <div description>
+      对于列数很多的数据，可以使用固定列，固定在左侧或右侧。通过设置列配置的 fixed: 'left' 或 fixed: 'right' 来启用。需要同时设置 scroll.x 属性。
+    </div>
+  </app-doc-box>
+
+  <!-- 不同大小表格 -->
+  <app-doc-box title="不同大小表格" [sourceCode]="sizeTableSource">
+    <div demo>
+      <div style="margin-bottom: 16px;">
+        <p style="margin-bottom: 8px;">默认大小</p>
+        <lib-table 
+          [data]="sizeData" 
+          [columns]="sizeColumns"
+          [size]="'default'">
+        </lib-table>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <p style="margin-bottom: 8px;">中等大小</p>
+        <lib-table 
+          [data]="sizeData" 
+          [columns]="sizeColumns"
+          [size]="'middle'">
+        </lib-table>
+      </div>
+      <div>
+        <p style="margin-bottom: 8px;">小尺寸</p>
+        <lib-table 
+          [data]="sizeData" 
+          [columns]="sizeColumns"
+          [size]="'small'">
+        </lib-table>
+      </div>
+    </div>
+    <div description>
+      表格有三种尺寸：默认（default）、中等（middle）和小（small），通过设置 size 属性来控制。
+    </div>
+  </app-doc-box>
+
+  <!-- 自定义单元格 -->
+  <app-doc-box title="自定义单元格" [sourceCode]="customCellTableSource">
+    <div demo>
+      <div class="custom-cell-demo">
+        <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要在组件中设置模板引用</p>
+        <lib-table [data]="customData" [columns]="customColumns">
+        </lib-table>
+      </div>
+    </div>
+    <div description>
+      可以自定义单元格内容，通过在组件中设置模板引用并赋值给列配置。需要在ngAfterViewInit生命周期中将模板引用赋值给列配置的customCell属性。
+    </div>
+  </app-doc-box>
+
+  <!-- 异步加载数据 -->
+  <app-doc-box title="异步加载数据" [sourceCode]="asyncTableSource">
+    <div demo>
+      <lib-table 
+        [data]="asyncData" 
+        [columns]="asyncColumns"
+        [loading]="asyncLoading">
+      </lib-table>
+      <button style="margin-top: 8px;" (click)="reloadAsyncData()">重新加载</button>
+    </div>
+    <div description>
+      演示异步加载数据的表格，加载过程中显示加载状态，可以通过 loading 属性控制。
+    </div>
+  </app-doc-box>
+
+  <!-- 表头表尾 -->
+  <app-doc-box title="表头表尾" [sourceCode]="headerFooterTableSource">
+    <div demo>
+      <!-- 字符串方式 -->
+      <div style="margin-bottom: 16px;">
+        <p style="margin-bottom: 8px;">字符串方式</p>
+        <lib-table 
+          [data]="headerFooterData" 
+          [columns]="headerFooterColumns"
+          [title]="tableTitle"
+          [footer]="tableFooter">
+        </lib-table>
+      </div>
+      
+      <!-- 模板方式 -->
+      <div>
+        <p style="margin-bottom: 8px;">模板方式</p>
+        <lib-table 
+          [data]="headerFooterData" 
+          [columns]="headerFooterColumns">
+          <ng-template #title>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>用户列表</span>
+              <button class="action-button">添加用户</button>
+            </div>
+          </ng-template>
+          <ng-template #footer>
+            <div style="text-align: right;">共{{ headerFooterData.length }}条数据</div>
+          </ng-template>
+        </lib-table>
+      </div>
+    </div>
+    <div description>
+      表格可以设置表头和表尾，可以使用字符串或模板方式。
+    </div>
+  </app-doc-box>
+
+  <!-- 分页表格 -->
+  <app-doc-box title="分页表格" [sourceCode]="paginationTableSource">
+    <div demo>
+      <lib-table 
+        [data]="paginationData" 
+        [columns]="paginationColumns"
+        [showPagination]="true"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [total]="total"
+        (pageIndexChange)="onPageIndexChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)">
+      </lib-table>
+    </div>
+    <div description>
+      带分页功能的表格，可以设置当前页码、每页条数和总数据量。
+    </div>
+  </app-doc-box>
+
+  <!-- 加载状态 -->
+  <app-doc-box title="加载状态" [sourceCode]="loadingTableSource">
+    <div demo>
+      <lib-table 
+        [data]="loadingData" 
+        [columns]="loadingColumns"
+        [loading]="true">
+      </lib-table>
+    </div>
+    <div description>
+      表格的加载中状态，当异步获取数据时显示。
+    </div>
+  </app-doc-box>
+</div>
+
+<app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

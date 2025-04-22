@@ -5,7 +5,7 @@ import { Subject, timer, Subscription } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 
 export interface SegmentedOption {
-  value: string | number;
+  value: string | number | any;
   label: string;
   disabled?: boolean;
   icon?: string;

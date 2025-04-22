@@ -40,6 +40,8 @@ export class DropMenuDirective implements OverlayBasicDirective {
   @Output('dropMenuItemClick') itemClick: EventEmitter<DropMenu> = new EventEmitter<DropMenu>();
   /** 当前选中的菜单项 */
   @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
+  /** 纯模板 */
+  @Input('dropMenuTemplate') template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 菜单项选中事件 */
   @Output('dropMenuSelectedChange') selectedChange: EventEmitter<DropMenu | null> = new EventEmitter<DropMenu | null>();
 
@@ -210,6 +212,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
     componentRef.setInput('itemTemplate', this.itemTemplate);
     componentRef.setInput('autoClose', this.autoClose);
     componentRef.setInput('selectedItem', this.selectedItem);
+    componentRef.setInput('template', this.template);
 
     // 订阅事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((item: DropMenu) => {

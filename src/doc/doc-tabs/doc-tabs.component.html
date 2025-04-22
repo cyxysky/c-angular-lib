@@ -129,6 +129,73 @@
                 可以自定义标签页的标题模板。
             </div>
         </app-doc-box>
+
+        <!-- 懒加载 -->
+        <app-doc-box title="懒加载" [sourceCode]="lazyLoadSource">
+            <div demo>
+                <p class="load-status">当前已加载的标签页: {{ loadedTabsInfo }}</p>
+                <lib-tabs [tabsLazyLoad]="true" (tabsSelectedIndexChange)="onLazyTabChange($event)">
+                    <lib-tab tabTitle="标签页1">
+                        <div class="tab-content">
+                            <p>标签页1的内容</p>
+                            <p><b>初始化时间:</b> {{ getTabInitTime(0) }}</p>
+                        </div>
+                    </lib-tab>
+                    <lib-tab tabTitle="标签页2">
+                        <div class="tab-content">
+                            <p>标签页2的内容</p>
+                            <p><b>初始化时间:</b> {{ getTabInitTime(1) }}</p>
+                        </div>
+                    </lib-tab>
+                    <lib-tab tabTitle="标签页3">
+                        <div class="tab-content">
+                            <p>标签页3的内容</p>
+                            <p><b>初始化时间:</b> {{ getTabInitTime(2) }}</p>
+                        </div>
+                    </lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                设置tabsLazyLoad="true"开启懒加载模式，标签页内容仅在首次被选中时才会初始化，可以提高性能。
+            </div>
+        </app-doc-box>
+
+        <!-- 销毁非活动标签 -->
+        <app-doc-box title="销毁非活动标签" [sourceCode]="destroyInactiveSource">
+            <div demo>
+                <div style="margin-bottom: 16px;">
+                    <lib-segmented 
+                        [segmentedOptions]="destroyOptions" 
+                        [(ngModel)]="destroyInactive"
+                        (ngModelChange)="onDestroyModeChange()">
+                    </lib-segmented>
+                </div>
+                <p class="load-status">当前已渲染的标签页: {{ currentTabInfo }}</p>
+                <lib-tabs [tabsDestroyInactive]="destroyInactive" (tabsSelectedIndexChange)="onDestroyTabChange($event)">
+                    <lib-tab tabTitle="标签页1">
+                        <div class="tab-content">
+                            <p>标签页1的内容</p>
+                            <p><b>最近渲染时间:</b> {{ getDestroyTabRenderTime(0) }}</p>
+                        </div>
+                    </lib-tab>
+                    <lib-tab tabTitle="标签页2">
+                        <div class="tab-content">
+                            <p>标签页2的内容</p>
+                            <p><b>最近渲染时间:</b> {{ getDestroyTabRenderTime(1) }}</p>
+                        </div>
+                    </lib-tab>
+                    <lib-tab tabTitle="标签页3">
+                        <div class="tab-content">
+                            <p>标签页3的内容</p>
+                            <p><b>最近渲染时间:</b> {{ getDestroyTabRenderTime(2) }}</p>
+                        </div>
+                    </lib-tab>
+                </lib-tabs>
+            </div>
+            <div description>
+                设置tabsDestroyInactive="true"，未选中的标签页将被销毁，不会保留在DOM中，切换回来时会重新渲染。这适用于需要频繁重建视图或内容占用大量内存的场景。
+            </div>
+        </app-doc-box>
     </div>
 
     <h2 class="doc-section-title">API</h2>
