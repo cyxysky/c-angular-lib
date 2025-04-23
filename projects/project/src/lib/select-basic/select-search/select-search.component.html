@@ -1,12 +1,14 @@
 <div #searchBox class="c-lib-select-basic-search-box">
     <input 
+        #searchInput 
         class="c-lib-select-basic-search-input"
         [style.fontSize]="fontSize"
-        #searchInput 
         [(ngModel)]="searchValue" 
         (ngModelChange)="onSearch($event)"
         (compositionupdate)="onCompositionChange($event)"
         (paste)="onPaste($event)"
         [disabled]="disabled"/>
-    <span class="c-lib-select-basic-search-text" #searchText>{{ searchOnCompositionValue }}</span>
+    <span #searchText class="c-lib-select-basic-search-text">
+        {{ searchOnCompositionValue }}
+    </span>
 </div>

@@ -1,4 +1,7 @@
-<div class="c-lib-radio-group" [class.c-lib-radio-group-vertical]="direction === 'vertical'">
+<div 
+  class="c-lib-radio-group" 
+  [class.c-lib-radio-group-vertical]="direction === 'vertical'"
+  >
   <div 
     class="c-lib-radio-wrapper" 
     *ngFor="let option of options" 
@@ -19,7 +22,6 @@
     <ng-container [ngTemplateOutlet]="labelTemplate || defaultLabel" [ngTemplateOutletContext]="{ $implicit: option }"></ng-container>
   </div>
 </div>
-
 
 <ng-template #defaultLabel let-option>
     <span class="c-lib-radio-label">{{ option.label }}</span>

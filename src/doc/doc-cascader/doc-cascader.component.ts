@@ -24,9 +24,9 @@ export class DocCascaderComponent implements OnInit {
   
   // 三种大小
   selectedSizes = {
-    large: [],
-    default: [],
-    small: []
+    large: [['zhejiang', 'hangzhou', 'xihu']],
+    default: [['zhejiang']],
+    small: [['zhejiang','ningbo']]
   };
   
   // 移入展开
@@ -355,6 +355,9 @@ export class DocCascaderComponent implements OnInit {
   ngOnInit(): void {
     // 初始化大量选项
     this.initLargeOptions();
+  }
+  con(dta: any) {
+    console.log(dta);
   }
   
   // 初始化大量选项

@@ -1,6 +1,6 @@
 <lib-select-box 
-    (click)="openDropdown()" 
     cdkOverlayOrigin
+    #searchInput
     [selectMode]="isMultiple ? 'multiple' : 'single'"
     [loading]="loading"
     [size]="size"
@@ -14,14 +14,13 @@
     [optionLabelTemplate]="optionLabelTemplate"
     [getLabel]="getLabel"
     [(searchValue)]="searchValue"
-    [data]="!isMultiple ? displayLabels : displayTags"
-    #searchInput
+    (click)="openDropdown()" 
+    [data]="getDisplayOptions()"
     (clear)="clear()"
-    (remove)="removeItem($event.value)"
+    (remove)="removeItem($event)"
     (search)="onSearch($event)"
     (inputWidthChange)="asyncUpdateDropdownPosition()">
 </lib-select-box>
-
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
     <div class="c-lib-cascader-dropdown"
@@ -50,7 +49,6 @@
                         class="c-lib-cascader-search-option"
                         [class.c-lib-cascader-disabled]="option.disabled"
                         [class.c-lib-cascader-selected]="option.checked"
-                        [class.keyboard-active]="keyboardNavIndex === i"
                         (click)="onSearchOptionClick(option)">
                         <div class="c-lib-cascader-option-path">
                             <ng-container *ngIf="optionLabelTemplate">

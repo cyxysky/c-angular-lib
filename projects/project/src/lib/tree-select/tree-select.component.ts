@@ -49,6 +49,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   @Input({ alias: 'treeBorderless', transform: booleanAttribute }) borderless: boolean = false;
   /** 状态 */
   @Input({ alias: 'treeStatus' }) status: 'error' | 'warning' | null = null;
+  /** 自定义节点属性 */
+  @Input({ alias: 'treeSelectCustomFields' }) customFields: { label: string; value: string; children: string; } = { label: 'title', value: 'key', children: 'children' };
   /** 下拉菜单的宽度 */
   @Input({ alias: 'treeDropdownWidth' }) dropdownWidth: string = '100%';
   /** 下拉菜单的高度 */
@@ -102,39 +104,48 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   // 内部状态
   /** 选中值 */
-  value: string | string[] = '';
+  public value: string[] = [];
   /** key到节点的映射 */
   public nodeMap: Map<string, TreeNodeOptions> = new Map();
   /** 浮层引用 */
-  overlayRef: OverlayRef | null = null;
+  public overlayRef: OverlayRef | null = null;
   /** 下拉状态 */
-  isDropdownOpen: boolean = false;
+  public isDropdownOpen: boolean = false;
   /** 搜索关键字 */
-  searchValue: string = '';
-  /** 中文输入法 */
-  compositionValue: string = '';
-  /** 多选模式下显示的标签 */
-  displayTags: { label: string, value: string, node: TreeNodeOptions }[] = [];
+  public searchValue: string = '';
   /** 鼠标悬停关闭定时器 */
-  private hoverCloseTimer: any = null;
-  /** 目前浮层是否打开 */
-  public isNowDropdownOpen: boolean = false;
+  public hoverCloseTimer: any = null;
   /** 父节点集合 */
-  private parentNodeKeys: Set<string> = new Set();
+  public parentNodeKeys: Set<string> = new Set();
   /** 是否已初始化 */
-  private isInitialized: boolean = false;
+  public isInitialized: boolean = false;
   /** 树组件是否已准备好 */
-  private isTreeReady: boolean = false;
+  public isTreeReady: boolean = false;
   /** 默认选中节点 */
   public defaultCheckedKeys: string[] = [];
   /** 默认选中节点 */
   public defaultSelectedKeys: string[] = [];
   /** 选项数据 */
   public treeData: TreeNodeOptions[] = [];
+  /** 是否使用展开动画 */
+  public treeUseExpandAnimation: boolean = true;
+  /** 是否打开浮层 */
+  public isOpenOverlay: boolean = false;
+  /** 标签属性 */
+  get labelProperty(): string {
+    return this.customFields?.label || 'title';
+  }
+  /** 值属性 */
+  get valueProperty(): string {
+    return this.customFields?.value || 'key';
+  }
+  /** 子选项属性 */
+  get childrenProperty(): string {
+    return this.customFields?.children || 'children';
+  }
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private renderer: Renderer2,
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef,
     private overlayService: OverlayService,
@@ -151,7 +162,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.isTreeReady = !!this.treeComponent;
     if (this.isTreeReady && !this.isInitialized) {
       this.initNodeMap();
-      this.initSelectedState();
       this.isInitialized = true;
     }
   }
@@ -161,16 +171,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.treeData = _.cloneDeep(this.originTreeData);
       // 当树数据变化时，重新初始化节点映射
       this.initNodeMap();
-
-      // 如果不是首次变更，还需要更新选中状态
-      if (!changes['originTreeData'].firstChange) {
-        this.utilsService.delayExecution(() => {
-          this.initSelectedState();
-          if (this.value && this.isDropdownOpen && this.treeComponent) {
-            this.expandSelectedPaths();
-          }
-        }, 100);
-      }
     }
   }
 
@@ -185,7 +185,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   private initNodeMap(): void {
     // 创建一个空的Map作为初始值
     this.nodeMap = new Map<string, TreeNodeOptions>();
-
     // 递归处理节点数据
     const processNodes = (nodes: TreeNodeOptions[], parentKey?: string) => {
       nodes.forEach(node => {
@@ -193,47 +192,27 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         if (parentKey) {
           node["parentKey"] = parentKey;
         }
-
         // 添加到Map中
-        this.nodeMap.set(node.key, node);
-
+        this.nodeMap.set(node[this.valueProperty], node);
         // 处理子节点
-        if (node.children && node.children.length > 0) {
-          processNodes(node.children, node.key);
+        if (node[this.childrenProperty] && node[this.childrenProperty].length > 0) {
+          processNodes(node[this.childrenProperty], node[this.valueProperty]);
         }
       });
     };
-
     // 初始处理所有节点
     processNodes(this.treeData);
-
-    // 如果树组件已准备好，更新为树组件的扁平节点Map
-    if (this.treeComponent) {
-      const treeNodeMap = this.treeComponent.getFlattenNodes();
-      if (treeNodeMap && treeNodeMap.size > 0) {
-        this.nodeMap = treeNodeMap;
-      }
-    }
   }
 
-  // 获取选中节点
-  getSelectedNodes(): TreeNodeOptions[] {
-    if (!this.value || (Array.isArray(this.value) && this.value.length === 0)) {
-      return [];
-    }
-    const keys = Array.isArray(this.value) ? this.value : [this.value];
-    return keys.map(key => this.nodeMap.get(key)).filter(Boolean) as TreeNodeOptions[];
-  }
-
+  /**
+   * 打开下拉菜单
+   */
   openDropdown(): void {
-    if (this.disabled || this.isDropdownOpen) return;
-    this.isNowDropdownOpen = true;
-    this.getExpandedKeys();
+    if (this.disabled || this.isOpenOverlay) return;
+    this.initTreeKeys();
     this.visibleChange.emit(true);
     this.cdr.detectChanges();
-
     const origin = this.overlayOrigin.elementRef.nativeElement;
-    this.renderer.addClass(origin, 'tree-select-open');
     const positions: ConnectedPosition[] = [
       {
         originX: 'start',
@@ -256,9 +235,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       withPush(true).
       withGrowAfterOpen(true).
       withLockedPosition(false);
-
     this.overlayRef = this.overlayService.createOverlay({
-      hasBackdrop: true,
+      hasBackdrop: false,
       width: origin.getBoundingClientRect().width,
       backdropClass: 'transparent-backdrop',
       maxHeight: '80vh',
@@ -275,267 +253,88 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         }
       },
       undefined);
-
     if (this.overlayRef) {
       this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
       this.focusSearch();
-      this.utilsService.delayExecution(() => {
-        if (this.treeComponent && this.value) {
-          this.expandSelectedPaths();
-        }
-      }, 100);
     }
+    this.treeUseExpandAnimation = true;
     this.isDropdownOpen = true;
+    this.isOpenOverlay = true;
   }
 
-  private expandSelectedPaths(): void {
-    if (!this.treeComponent || !this.value || (Array.isArray(this.value) && this.value.length === 0)) return;
-    const keysToExpand = new Set<string>();
-    const getParentKeys = (node: TreeNodeOptions): void => {
-      if (!node || !node["parentKey"]) return;
-      keysToExpand.add(node["parentKey"]);
-      const parentNode = this.nodeMap.get(node["parentKey"]);
-      if (parentNode) {
-        getParentKeys(parentNode);
-      }
-    };
-
-    const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
-    selectedKeys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node) {
-        getParentKeys(node);
-      }
-    });
-
-    if (keysToExpand.size > 0) {
-      this.treeComponent.expendNodeByKeys(Array.from(keysToExpand), false, false);
-      this.cdr.detectChanges();
-    }
-  }
-
+  /**
+   * 关闭下拉菜单
+   */
   closeDropdown(): void {
     if (!this.isDropdownOpen) return;
-    this.getExpandedKeys();
     this.isDropdownOpen = false;
-    this.isNowDropdownOpen = false;
+    this.treeUseExpandAnimation = false;
     this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
     this.utilsService.delayExecution(() => {
       this.visibleChange.emit(false);
-      const origin = this.overlayOrigin?.elementRef?.nativeElement;
-      if (origin) {
-        this.renderer.removeClass(origin, 'tree-select-open');
-      }
+      this.isOpenOverlay = false;
       if (this.overlayRef) {
         this.overlayRef.detach();
         this.overlayRef.dispose();
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-    }, 300)
+    }, 200)
   }
 
-  public updateDropdownPosition(): void {
-    if (!this.overlayRef) return;
-    this.utilsService.delayExecution(() => {
-      if (this.overlayRef && this.isDropdownOpen) {
-        this.overlayRef.updatePosition();
-      }
-    }, 0);
-  }
-
+  /**
+   * 选中节点
+   * @param node 节点
+   */
   onNodeSelect(node: TreeNodeOptions): void {
     if (node.disabled) return;
     if (this.multiple) {
       this.handleMultipleSelect(node);
+      this.focusSearch();
     } else {
       this.handleSingleSelect(node);
     }
     this.updateData();
   }
 
+  /**
+   * 单选模式下选中节点
+   * @param node 节点
+   */
   private handleSingleSelect(node: TreeNodeOptions): void {
-    // 如果有之前选中的节点，取消选中
-    if (this.value) {
-      const prevNode = this.nodeMap.get(this.value as string);
-      if (prevNode) {
-        prevNode.selected = false;
-      }
-    }
     node.selected = true;
-    this.value = node.key;
+    this.value = [node[this.valueProperty]]; // 存储为数组
     this.closeDropdown();
   }
 
+  /**
+   * 多选模式下选中节点
+   * @param node 节点
+   */
   private handleMultipleSelect(node: TreeNodeOptions): void {
     if (this.treeCheckable) return;
     const valueArray = Array.isArray(this.value) ? this.value : [];
-    const index = valueArray.indexOf(node.key);
-
+    const index = valueArray.indexOf(node[this.valueProperty]);
     if (index !== -1) {
-      node.selected = false;
       valueArray.splice(index, 1);
     } else {
-      node.selected = true;
-      valueArray.push(node.key);
+      valueArray.push(node[this.valueProperty]);
     }
     this.value = valueArray;
-    this.getMultipleTags(valueArray);
   }
 
-  getMultipleTags(values: string[]) {
-    if (!values) {
-      this.displayTags = [];
-    }
-    let tags: any = [];
-    values.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node) {
-        tags.push({
-          label: node!.title,
-          value: node!.key,
-          node: node!
-        })
-      }
-    })
-    this.displayTags = tags;
-    this.cdr.detectChanges();
-  }
-
+  /**
+   * 复选框变化事件
+   * @param event 事件
+   */
   onCheckBoxChange(event: { checked: boolean, node: TreeNodeOptions }): void {
     if (!this.multiple || !this.treeCheckable) return;
     this.checkBoxChange.emit(event);
-
-    const checkedKeys = Array.from(this.treeComponent.getCheckedKeys());
-    // 只在复选框状态下自动归并子级到父级
-    if (this.treeCheckable) {
-      const filteredKeys = this.filterChildNodesOfCheckedParents(checkedKeys);
-      this.value = filteredKeys;
-    } else {
-      this.value = checkedKeys;
-    }
-    this.updateDisplayTags();
+    this.value = [...this.treeComponent.getMergedCheckedKeys()];
+    this.focusSearch();
     this.updateData();
-  }
-
-  private filterChildNodesOfCheckedParents(checkedKeys: string[]): string[] {
-    if (checkedKeys.length === 0) return [];
-
-    // 首先找出所有父节点
-    const parentNodes: TreeNodeOptions[] = [];
-    checkedKeys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node && node.children && node.children.length > 0) {
-        parentNodes.push(node);
-      }
-    });
-
-    // 获取所有父节点的子节点key集合
-    const childrenOfSelectedParents = new Set<string>();
-    parentNodes.forEach(parent => {
-      const getAllChildrenKeys = (node: TreeNodeOptions): void => {
-        if (node.children && node.children.length) {
-          node.children.forEach((child: TreeNodeOptions) => {
-            childrenOfSelectedParents.add(child.key);
-            getAllChildrenKeys(child);
-          });
-        }
-      };
-      getAllChildrenKeys(parent);
-    });
-
-    // 只返回不是被选中父节点的子节点的节点key
-    return checkedKeys.filter(key => !childrenOfSelectedParents.has(key));
-  }
-
-  private updateDisplayTags(): void {
-    if (!this.multiple || !this.value || (Array.isArray(this.value) && this.value.length === 0)) {
-      this.displayTags = [];
-      return;
-    }
-
-    if (!this.treeComponent) {
-      const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
-      this.displayTags = selectedKeys
-        .map(key => this.nodeMap.get(key))
-        .filter(Boolean)
-        .map(node => ({
-          label: node!.title,
-          value: node!.key,
-          node: node!
-        }));
-      return;
-    }
-
-    // 建立父子关系映射
-    const childrenMap: Map<string, Set<string>> = new Map();
-    const parentMap: Map<string, string> = new Map();
-
-    this.nodeMap.forEach((node, key) => {
-      if (node["parentKey"]) {
-        parentMap.set(key, node["parentKey"]);
-
-        if (!childrenMap.has(node["parentKey"])) {
-          childrenMap.set(node["parentKey"], new Set());
-        }
-        childrenMap.get(node["parentKey"])!.add(key);
-      }
-    });
-
-    // 计算哪些父节点的所有子节点都被选中
-    const selectedKeys = Array.isArray(this.value) ? this.value : [this.value];
-    const nodeKeysSet = new Set(selectedKeys);
-    const fullySelectedParents = new Set<string>();
-
-    selectedKeys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node && this.parentNodeKeys.has(key)) {
-        const childKeys = childrenMap.get(key) || new Set();
-        let allChildrenSelected = true;
-
-        childKeys.forEach(childKey => {
-          if (!nodeKeysSet.has(childKey)) {
-            allChildrenSelected = false;
-          }
-        });
-
-        if (allChildrenSelected && childKeys.size > 0) {
-          fullySelectedParents.add(key);
-        }
-      }
-    });
-
-    // 过滤节点
-    const filteredNodes: TreeNodeOptions[] = [];
-    selectedKeys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (!node) return;
-
-      let shouldDisplay = true;
-
-      if (node["parentKey"]) {
-        let currentParentKey = node["parentKey"];
-        while (currentParentKey) {
-          if (nodeKeysSet.has(currentParentKey)) {
-            shouldDisplay = false;
-            break;
-          }
-          currentParentKey = parentMap.get(currentParentKey);
-        }
-      }
-
-      if (shouldDisplay) {
-        filteredNodes.push(node);
-      }
-    });
-
-    this.displayTags = filteredNodes.map(node => ({
-      label: node.title,
-      value: node.key,
-      node: node
-    }));
   }
 
   /**
@@ -570,25 +369,13 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   }
 
   /**
-   * 输入法输入
-   * @param event 输入事件
-   */
-  onCompositionChange(event: string): void {
-    this.compositionValue = event;
-  }
-
-  /**
    * 移除节点
    * @param key 节点key
    */
   removeItem(key: string): void {
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
-    // 更新节点状态和获取所有需要移除的key
-    const keysToRemove = this.updateNodeStatus(key, false);
-    // 更新value和相关数据
-    this.updateSelectionState(keysToRemove);
-    this.updateDisplayTags();
+    _.pull(this.value, key);
     this.updateData();
   }
 
@@ -603,135 +390,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.updateData();
   }
 
-  /**
-   * 获取节点标签
-   * @param node 节点
-   * @returns 节点标签
-   */
-  getLabel = (node: any): string => {
-    if (this.multiple) {
-      return node?.node?.title;
-    } else {
-      return node;
-    }
-  }
 
-  /**
-   * 更新节点选中状态并获取相关的所有key
-   * @param key 节点key
-   * @param checked 是否选中
-   * @returns 所有需要更新状态的key
-   */
-  private updateNodeStatus(key: string, checked: boolean): string[] {
-    const node = this.nodeMap.get(key);
-    if (!node) return [key];
-    // 更新节点本身状态
-    this.updateSingleNodeStatus(node, checked);
-    const keysToUpdate = [key];
-    // 处理子节点状态
-    if (this.treeCheckable && node.children?.length) {
-      node.children.forEach((child: TreeNodeOptions) => {
-        if (!child.disabled && !child.disableCheckbox) {
-          keysToUpdate.push(...this.updateNodeStatus(child.key, checked));
-        }
-      });
-    }
-    // 处理父节点状态
-    if (this.treeCheckable) {
-      this.updateAncestorNodesStatus(node);
-    }
-    return keysToUpdate;
-  }
-
-  /**
-   * 更新单个节点状态
-   */
-  private updateSingleNodeStatus(node: TreeNodeOptions, checked: boolean): void {
-    if (this.treeCheckable) {
-      node.checked = checked;
-      node.indeterminate = false;
-      if (this.parentNodeKeys.has(node.key) && !checked) {
-        this.parentNodeKeys.delete(node.key);
-      }
-    } else {
-      node.selected = checked;
-    }
-  }
-
-  /**
-   * 更新所有祖先节点状态
-   */
-  private updateAncestorNodesStatus(node: TreeNodeOptions): void {
-    // 找到直接父节点
-    let parentKey = this.findParentKey(node.key);
-    if (!parentKey) return;
-    const parent = this.nodeMap.get(parentKey);
-    if (!parent || !parent.children || parent.disabled || parent.disableCheckbox) return;
-    // 计算父节点状态
-    this.calculateParentNodeStatus(parent);
-    // 递归处理上级节点
-    this.updateAncestorNodesStatus(parent);
-  }
-
-  /**
-   * 计算父节点状态
-   */
-  private calculateParentNodeStatus(parent: TreeNodeOptions): void {
-    if (!parent.children) return;
-    const children = parent.children;
-    const checkedCount = children.filter((child: TreeNodeOptions) => child.checked && !child.disabled && !child.disableCheckbox).length;
-    const indeterminateCount = children.filter((child: TreeNodeOptions) => child.indeterminate && !child.disabled && !child.disableCheckbox).length;
-    const enabledCount = children.filter((child: TreeNodeOptions) => !child.disabled && !child.disableCheckbox).length;
-    if (checkedCount === 0 && indeterminateCount === 0) {
-      parent.checked = false;
-      parent.indeterminate = false;
-    } else if (checkedCount === enabledCount) {
-      parent.checked = true;
-      parent.indeterminate = false;
-    } else {
-      parent.checked = false;
-      parent.indeterminate = true;
-    }
-  }
-
-  /**
-   * 查找节点的父节点key
-   */
-  private findParentKey(key: string): string | undefined {
-    for (let [nodeKey, node] of this.nodeMap.entries()) {
-      if (node.children?.some((child: TreeNodeOptions) => child.key === key)) {
-        return nodeKey;
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * 更新选中状态相关数据
-   */
-  private updateSelectionState(keysToRemove: string[]): void {
-    // 更新value
-    this.value = (this.value as string[]).filter(k => !keysToRemove.includes(k));
-
-    // 更新defaultCheckedKeys和defaultSelectedKeys
-    if (this.treeCheckable) {
-      this.defaultCheckedKeys = this.defaultCheckedKeys.filter(k => !keysToRemove.includes(k));
-    } else {
-      this.defaultSelectedKeys = this.defaultSelectedKeys.filter(k => !keysToRemove.includes(k));
-    }
-
-    // 更新展开节点状态
-    this.defaultExpandedKeys = this.defaultExpandedKeys.filter(k => !keysToRemove.includes(k));
-  }
 
   /**
    * 重置所有状态
    */
   private resetAllState(): void {
-    this.value = this.multiple ? [] : '';
-    this.displayTags = [];
+    this.value = [];
     this.parentNodeKeys.clear();
-
     // 重置所有节点状态
     this.nodeMap.forEach(node => {
       if (this.treeCheckable) {
@@ -741,7 +407,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         node.selected = false;
       }
     });
-
     // 重置defaultCheckedKeys和defaultSelectedKeys
     this.defaultCheckedKeys = [];
     this.defaultSelectedKeys = [];
@@ -752,9 +417,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 更新下拉菜单位置
    */
   updateOverlayPosition(): void {
-    if (this.overlayRef) {
-      this.overlayService.asyncUpdateOverlayPosition(this.overlayRef, 0);
-    };
+    if (this.overlayRef) this.overlayService.asyncUpdateOverlayPosition(this.overlayRef, 0);
   }
 
   /**
@@ -762,18 +425,10 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    */
   updateData() {
     // 将value转换为节点列表
-    const selectedNodes: TreeNodeOptions[] = [];
-    const keys = Array.isArray(this.value) ? this.value : [this.value];
-    keys.forEach(key => {
-      const node = this.nodeMap.get(key);
-      if (node) {
-        selectedNodes.push(node);
-      }
-    });
-
+    const selectedNodes: TreeNodeOptions[] = this.value && this.value.length > 0 ? this.value.map(key => this.nodeMap.get(key) as TreeNodeOptions) : [];
     this.selectionChange.emit(selectedNodes);
-    this.onChange(this.value);
-    this.focusSearch();
+    // 单选模式下只返回第一个元素，多选模式下返回整个数组
+    this.onChange(this.multiple ? this.value : this.value.length > 0 ? this.value[0] : null);
     this.updateOverlayPosition();
     this.cdr.detectChanges();
   }
@@ -782,102 +437,59 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.loadData.emit(node);
   }
 
-  showPlaceHolder(): boolean {
-    return (!this.value || (Array.isArray(this.value) && this.value.length === 0)) &&
-      !this.searchValue && !this.compositionValue;
-  }
-
-  showSingleData(): boolean {
-    return !this.multiple && !!this.getSingleNode() &&
-      !this.searchValue && !this.compositionValue;
-  }
-
-  showMultipleData(): boolean {
-    return this.multiple && this.displayTags.length > 0;
-  }
-
   getAllNodes(): Map<string, TreeNodeOptions> {
     return this.nodeMap;
   }
 
-  private initSelectedState(): void {
-    if (!this.value || (Array.isArray(this.value) && this.value.length === 0)) {
-      this.displayTags = [];
-      return;
+  initTreeKeys(): void {
+    this.defaultExpandedKeys = [...this.value];
+    if (this.treeCheckable) {
+      this.defaultCheckedKeys = [...this.value];
+    } else {
+      this.defaultSelectedKeys = [...this.value];
     }
-
-    if (!this.nodeMap || this.nodeMap.size === 0) {
-      return;
-    }
-
-    if (this.multiple && Array.isArray(this.value)) {
-      this.parentNodeKeys.clear();
-
-      // 只在复选框状态下应用筛选逻辑
-      const filteredValues = this.treeCheckable
-        ? this.filterChildNodesOfCheckedParents(this.value)
-        : this.value;
-
-      filteredValues.forEach(key => {
-        const node = this.nodeMap.get(key);
-        if (node) {
-          if (this.treeComponent) {
-            if (this.treeCheckable) {
-              node.checked = true;
-              this.treeComponent.onNodeCheck(node, true);
-            } else {
-              node.selected = true;
-              this.treeComponent.selectedKeys.add(key);
-            }
-          } else {
-            // 如果树组件未准备好，仍然设置节点状态
-            if (this.treeCheckable) {
-              node.checked = true;
-            } else {
-              node.selected = true;
-            }
-          }
-
-          if (node.children && node.children.length > 0) {
-            this.parentNodeKeys.add(node.key);
-          }
-        }
-      });
-
-      this.updateDisplayTags();
-    } else if (!this.multiple) {
-      const key = this.value as string;
-      const node = this.nodeMap.get(key);
-
-      if (node) {
-        node.selected = true;
-        if (this.treeComponent) {
-          this.treeComponent.selectedKeys.add(key);
-        }
-      }
-    }
-
-    this.cdr.detectChanges();
+    console.log(this.defaultExpandedKeys);
+    console.log(this.defaultCheckedKeys);
+    console.log(this.defaultSelectedKeys);
   }
 
-  getExpandedKeys(): void {
-    this.defaultExpandedKeys = typeof this.value === 'string' ? [this.value] : [...(this.value as string[])];
+  /**
+   * 获取节点标签
+   * @param node 节点
+   * @returns 节点标签
+   */
+  getLabel = (node: any): string => {
+    return node && node.title !== undefined && node.title !== null ? node.title : null;
+  }
+
+  /**
+   * 获取显示的选项
+   * @returns 显示的选项
+   */
+  getDisplayOptions(): any {
+    if (this.multiple) {
+      return this.value && this.value.length > 0 ? this.value.map(key => this.nodeMap.get(key)) : [];
+    } else {
+      return this.value && this.value.length > 0 ? [this.nodeMap.get(this.value[0])] : [];
+    }
   }
 
   // ControlValueAccessor 接口实现
   onChange: (value: any) => void = () => { };
   onTouched: () => void = () => { };
 
-  writeValue(value: string | string[]): void {
+  writeValue(value: string | string[] | null): void {
     if (value === null || value === undefined) {
-      this.value = this.multiple ? [] : '';
-      this.displayTags = [];
-      this.defaultExpandedKeys = [];
+      this.value = [];
       this.cdr.detectChanges();
       return;
     }
-    this.value = value;
-    this.initSelectedState();
+    if (Array.isArray(value)) {
+      this.value = value;
+    } else {
+      // 如果是字符串，单选模式下转为数组
+      this.value = [value];
+    }
     this.cdr.detectChanges();
   }
 
@@ -887,24 +499,5 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-    this.cdr.markForCheck();
-  }
-
-  // 获取单选节点
-  getSingleNode(): TreeNodeOptions | null {
-    if (!this.multiple && typeof this.value === 'string' && this.value) {
-      return this.nodeMap.get(this.value) || null;
-    }
-    return null;
-  }
-
-  // 获取单选节点标题
-  getSingleNodeTitle(): string {
-    const node = this.getSingleNode();
-    return node ? node.title : '';
   }
 }

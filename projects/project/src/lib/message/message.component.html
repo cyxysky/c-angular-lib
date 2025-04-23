@@ -1,4 +1,10 @@
-<div class="c-lib-message-item" [class]="'c-lib-message-' + type">
+<div 
+  class="c-lib-message-item"
+  [class.c-lib-message-success]="type === 'success'"
+  [class.c-lib-message-warning]="type === 'warning'"
+  [class.c-lib-message-error]="type === 'error'"
+  [class.c-lib-message-info]="type === 'info'"
+  >
   <div class="c-lib-message-content">
     <div class="c-lib-message-icon">
       <i [style.color]="getIconColor()" [class]="getIconType()"></i>

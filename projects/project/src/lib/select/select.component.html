@@ -13,11 +13,11 @@
     [allowClear]="allowClear"
     [optionLabelTemplate]="optionLabelTemplate"
     [(searchValue)]="searchValue"
-    [data]="_data"
+    [data]="getDisplayOptions()"
     [getLabel]="getLabel"
     (click)="openModal()" 
     (clear)="clear()"
-    (remove)="removeUser($event)"
+    (remove)="removeOption($event[optionValue])"
     (search)="onSearch($event)"
     (paste)="handlePaste($event)"
     (inputWidthChange)="updateOverlayRefPosition()">
@@ -28,7 +28,10 @@
         class="c-lib-select-overlay-option-box" 
         [class.c-lib-select-overlay-option-box-open]="modalState === 'open'" 
         [class.c-lib-select-overlay-option-box-closed]="modalState === 'closed'">
-        <div [style.max-height]="optionPanelMaxHeight" class="c-lib-select-option-list-container" id="option-list-container">
+        <div 
+            [style.max-height]="optionPanelMaxHeight" 
+            class="c-lib-select-option-list-container" 
+            id="option-list-container">
             <div *ngIf="remoteLoading" class="c-lib-select-remote-loading">
                 <div class="c-lib-select-loading-text">搜索中...</div>
             </div>
@@ -56,7 +59,7 @@
                     <ng-container *ngIf="getObjectKeys(optionsGroups).length === 0">
                         <div 
                             *cdkVirtualFor="let option of getFilteredOptionsWithHideSelected();trackBy: trackByFn; let i = index"
-                            (click)="selectUser(option[optionValue], isOptionDisabled(option))"
+                            (click)="selectOption(option[optionValue], isOptionDisabled(option))"
                             (mouseenter)="activeOptionIndex = i"
                             class="c-lib-select-option"
                             [class.c-lib-select-option-active]="activeOptionIndex === i"
@@ -65,10 +68,10 @@
                             [class.c-lib-select-select-option]="optionSelected(option)">
                             <div class="c-lib-select-option-text">
                                 <ng-container *ngIf="optionTemplate">
-                                    <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: option, label: option[optionKey] }"></ng-container>
+                                    <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: option, label: option[optionLabel] }"></ng-container>
                                 </ng-container>
                                 <ng-container *ngIf="!optionTemplate">
-                                    {{ option[optionKey] }}
+                                    {{ option[optionLabel] }}
                                 </ng-container>
                             </div>
                         </div>
@@ -78,7 +81,7 @@
                             <div *ngIf="item.type === 'group'" class="c-lib-select-group-title">{{ item.label }}</div>
                             <div 
                                 *ngIf="item.type === 'option'"
-                                (click)="selectUser(item.option[optionValue], isOptionDisabled(item.option))"
+                                (click)="selectOption(item.option[optionValue], isOptionDisabled(item.option))"
                                 (mouseenter)="activeOptionIndex = i"
                                 [style.cursor]="optionCursor(item.option)"
                                 class="c-lib-select-option" 
@@ -87,10 +90,10 @@
                                 [class.c-lib-select-select-option]="optionSelected(item.option)">
                                 <div class="c-lib-select-option-text">
                                     <ng-container *ngIf="optionTemplate">
-                                        <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: item.option, label: item.option[optionKey] }"></ng-container>
+                                        <ng-container *ngTemplateOutlet="optionTemplate; context: { $implicit: item.option, label: item.option[optionLabel] }"></ng-container>
                                     </ng-container>
                                     <ng-container *ngIf="!optionTemplate">
-                                        {{ item.option[optionKey] }}
+                                        {{ item.option[optionLabel] }}
                                     </ng-container>
                                 </div>
                             </div>

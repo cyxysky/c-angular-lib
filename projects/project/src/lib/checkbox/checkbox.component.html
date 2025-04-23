@@ -1,7 +1,10 @@
 <div class="c-lib-checkbox-group" [class.c-lib-checkbox-vertical]="direction === 'vertical'" [class.c-lib-checkbox-horizontal]="direction === 'horizontal'">  
   <div class="c-lib-checkbox-options">
     <ng-container *ngIf="!single">
-      <label class="c-lib-checkbox-wrapper" *ngFor="let option of options" [class.c-lib-checkbox-disabled]="disabled || option.disabled">
+      <label 
+        *ngFor="let option of options" 
+        class="c-lib-checkbox-wrapper" 
+        [class.c-lib-checkbox-disabled]="disabled || option.disabled">
         <span class="c-lib-checkbox-input">
           <input 
             type="checkbox" 
@@ -24,7 +27,10 @@
         <span class="c-lib-checkbox-label">{{ option.label }}</span>
       </label>
     </ng-container>
-    <label class="c-lib-checkbox-wrapper" *ngIf="single" [class.c-lib-checkbox-disabled]="disabled">
+    <label 
+      *ngIf="single" 
+      class="c-lib-checkbox-wrapper" 
+      [class.c-lib-checkbox-disabled]="disabled">
       <span class="c-lib-checkbox-input">
         <input 
           type="checkbox" 
@@ -44,7 +50,7 @@
           <span class="c-lib-checkbox-inner" [style.--before-color]="indeterminateColor ? indeterminateColor : '#1890ff'"></span>
         </span>
       </span>
-      <span class="c-lib-checkbox-label" *ngIf="!isTemplate(singleLabelContent)">{{ singleLabelContent }}</span>
+      <span *ngIf="!isTemplate(singleLabelContent)" class="c-lib-checkbox-label">{{ singleLabelContent }}</span>
       <ng-container *ngIf="isTemplate(singleLabelContent)" [ngTemplateOutlet]="singleLabelContent"></ng-container>
     </label>
   </div>

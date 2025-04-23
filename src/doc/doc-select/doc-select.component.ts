@@ -4,7 +4,6 @@ import { SelectComponent, ButtonComponent } from '@project';
 import { FormsModule } from '@angular/forms';
 import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
-
 @Component({
   selector: 'app-doc-select',
   standalone: true,
@@ -13,7 +12,7 @@ import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.co
     SelectComponent, 
     FormsModule,
     DocBoxComponent,
-    DocApiTableComponent
+    DocApiTableComponent,
   ],
   templateUrl: './doc-select.component.html',
   styleUrl: './doc-select.component.less'
@@ -24,9 +23,9 @@ export class DocSelectComponent implements OnInit {
   
   // 三种大小
   selectedSizes = {
-    large: '',
-    default: '',
-    small: ''
+    large: null,
+    default: null,
+    small: null
   };
   
   // 多选模式
@@ -36,7 +35,7 @@ export class DocSelectComponent implements OnInit {
   tagsSelected: string[] = [];
   
   // 分组
-  groupSelected: string = '';
+  groupSelected: string | null = null;
   
   // 搜索
   searchSelected: string = '';

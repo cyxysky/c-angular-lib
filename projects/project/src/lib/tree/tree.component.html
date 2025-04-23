@@ -10,7 +10,7 @@
     class="c-lib-tree-node-container" 
     [class.c-lib-tree-with-lines]="showLine"
     [class.c-lib-tree-hidden]="showEmptyState()"
-  >
+    >
     <!-- 非虚拟滚动模式 -->
     <ng-container *ngIf="!isVirtualScroll">
       <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: treeData, level: 0 }"></ng-container>
@@ -23,8 +23,7 @@
       [itemSize]="virtualItemSize"
       [maxBufferPx]="virtualMaxBuffer"
       [minBufferPx]="virtualMinBuffer"
-      class="virtual-scroll-viewport"
-    >
+      >
       <ng-container *cdkVirtualFor="let node of getVisibleVirtualNodes(); trackBy: trackBy">
         <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node.node, isLast: node.isLast, level: node.level }"></ng-container>
       </ng-container>
@@ -35,13 +34,16 @@
 <!-- 树节点模板 -->
 <ng-template #renderTreeNodesTemplate let-nodes let-level="level" let-parentNode="parentNode">
   <ul class="c-lib-tree-node-list">
-    <li *ngFor="let node of nodes; let isLast = last; let index = index" class="c-lib-tree-node" [class.c-lib-tree-node-last]="isLast">
+    <li 
+      *ngFor="let node of nodes; let isLast = last; let index = index" 
+      class="c-lib-tree-node" 
+      [class.c-lib-tree-node-last]="isLast">
       <div 
         class="c-lib-tree-node-content"
         [class.c-lib-tree-node-content-selected]="node.selected"
         [class.c-lib-tree-node-content-disabled]="node.disabled"
         [style.height]="optionHeight + 'px'"
-      >
+        >
         <!-- 缩进 -->
         <ng-container *ngTemplateOutlet="indentTemplate; context: { $implicit: node, isLast: isLast, level: level, index: index, parentLength: nodes.length }"></ng-container>
         <!-- 展开/折叠图标 -->
@@ -52,10 +54,10 @@
         <span 
           *ngIf="showIcon" 
           class="c-lib-tree-icon"
-        >
+          >
           <ng-container *ngTemplateOutlet="iconTemplate || defaultIconTpl; context: { $implicit: node, origin: node }"></ng-container>
           <ng-template #defaultIconTpl>
-            <i class="c-lib-tree-icon" [ngClass]="node.icon || (node.isLeaf ? 'file-icon' : (expandedKeys.has(node[keyName]) ? 'folder-open-icon' : 'folder-icon'))"></i>
+            <i class="c-lib-tree-icon" [ngClass]="node.icon || (node.isLeaf ? 'file-icon' : (expandedKeys.has(node[valueProperty]) ? 'folder-open-icon' : 'folder-icon'))"></i>
           </ng-template>
         </span>
         <!-- 节点内容 -->
@@ -66,19 +68,28 @@
           (click)="onNodeSelect(node, $event)">
           <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, origin: node, node: node }"></ng-container>
           <ng-template #defaultNodeTpl>
-            {{ node.title }}
+            {{ node[labelProperty] }}
           </ng-template>
         </div>
       </div>
 
       <!-- 子节点递归 - 树节点模板中 -->
-      <div 
-        class="c-lib-tree-children" 
-        *ngIf="node.children && node.children.length && expandedKeys.has(node[keyName])" 
-        @expandCollapse
-        (@expandCollapse.done)="onAnimationDone($event, node)">
-        <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
-      </div>
+      @if (useExpandAnimation) {
+        <div 
+          class="c-lib-tree-children" 
+          *ngIf="node.children && node.children.length && expandedKeys.has(node[valueProperty])" 
+          [@expandCollapse]="false"
+          >
+          <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
+        </div>
+      } @else {
+        <div 
+          class="c-lib-tree-children" 
+          *ngIf="node.children && node.children.length && expandedKeys.has(node[valueProperty])" 
+          >
+          <ng-container *ngTemplateOutlet="renderTreeNodesTemplate; context: { $implicit: node.children, level: level + 1, parentNode: node }"></ng-container>
+        </div>
+      }
     </li>
   </ul>
 </ng-template>
@@ -91,7 +102,7 @@
       [class.c-lib-tree-node-content-selected]="node.selected"
       [class.c-lib-tree-node-content-disabled]="node.disabled"
       [style.height.px]="optionHeight"
-    >
+      >
       <!-- 缩进 -->
       <ng-container *ngTemplateOutlet="indentTemplate; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
       <!-- 展开/折叠图标 -->
@@ -105,7 +116,7 @@
           (click)="onNodeSelect(node, $event)">
           <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
           <ng-template #defaultNodeTpl let-node>
-            {{ node.title }}
+            {{ node[labelProperty] }}
           </ng-template>
       </div>
     </div>
@@ -122,10 +133,10 @@
     [class.c-lib-tree-switcher-expanded]="node.expanded"
     [class.c-lib-tree-switcher-disabled]="node.disabled"
     (click)="$event.stopPropagation(); onNodeExpand(node)"
-  >
+    >
     <ng-container *ngTemplateOutlet="expandedIcon || defaultExpandedIconTpl; context: { $implicit: node }"></ng-container>
     <ng-template #defaultExpandedIconTpl>
-      <i class="tree-switcher-icon" [@rotate]="node.expanded ? 'end' : 'start'"></i>
+      <i class="c-lib-tree-switcher-icon" [@rotate]="node.expanded ? 'end' : 'start'"></i>
     </ng-template>
   </span>
   <!-- 异步加载 -->

@@ -1,7 +1,8 @@
-<div class="c-lib-tooltip" 
-     [class.c-lib-tooltip-visible]="isVisible"
-     [class]="'c-lib-tooltip-' + placement"
-     [style.background]="color">
+<div 
+  class="c-lib-tooltip" 
+  [class.c-lib-tooltip-visible]="isVisible" 
+  [class]="'c-lib-tooltip-' + placement"
+  [style.background]="color">
   <div class="c-lib-tooltip-arrow" [style.background]="color"></div>
   <div class="c-lib-tooltip-content">
     <ng-container *ngIf="isTemplateRef(content); else stringTemplate">

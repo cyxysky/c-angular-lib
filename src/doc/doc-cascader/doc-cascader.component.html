@@ -21,10 +21,11 @@
           <lib-cascader
             [(ngModel)]="selectedValue"
             [cascaderOptions]="options"
+            (ngModelChange)="con($event)"
             [cascaderPlaceholder]="'请选择'">
           </lib-cascader>
           <div *ngIf="selectedValue && selectedValue.length" class="example-value">
-            当前选择: {{ getDisplayText(selectedValue) }}
+            当前选择: {{ getDisplayText(selectedValue) }} {{ selectedValue }}
           </div>
         </div>
         <div description>
@@ -41,21 +42,24 @@
             <lib-cascader
               [cascaderSize]="'large'"
               [(ngModel)]="selectedSizes.large"
-              [cascaderIsMultiple]="true"
+              [cascaderIsMultiple]="true"            
+              (ngModelChange)="con($event)"
               [cascaderOptions]="options"
               [cascaderPlaceholder]="'大号级联选择'">
             </lib-cascader>
             
             <lib-cascader
               [(ngModel)]="selectedSizes.default"
-              [cascaderIsMultiple]="true"
+              [cascaderIsMultiple]="true"            
+              (ngModelChange)="con($event)"
               [cascaderOptions]="options"
               [cascaderPlaceholder]="'默认大小'">
             </lib-cascader>
             
             <lib-cascader
               [cascaderSize]="'small'"
-              [(ngModel)]="selectedSizes.small"
+              [(ngModel)]="selectedSizes.small"            
+              (ngModelChange)="con($event)"
               [cascaderIsMultiple]="true"
               [cascaderOptions]="options"
               [cascaderPlaceholder]="'小号级联选择'">
@@ -95,6 +99,7 @@
           <lib-cascader
             [(ngModel)]="changeOnSelectValue"
             [cascaderOptions]="options"
+            (ngModelChange)="con($event)"
             [cascaderChangeOnSelect]="true"
             [cascaderPlaceholder]="'选择即改变'">
           </lib-cascader>
@@ -114,6 +119,7 @@
         <div demo>
           <lib-cascader
             [(ngModel)]="multipleSelected"
+            (ngModelChange)="con($event)"
             [cascaderOptions]="options"
             [cascaderIsMultiple]="true"
             [cascaderPlaceholder]="'请选择多个选项'">

@@ -2,13 +2,12 @@ import { Component, Input, Output, EventEmitter, TemplateRef, ContentChild, forw
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
-import { trigger, state, style, transition, animate, AnimationEvent } from '@angular/animations';
 import { expandCollapse } from '../core/animation/expandCollapse.animation';
 import { rotate } from '../core/animation/rotate.animation';
 import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { TreeNodeOptions } from './tree.interface';
-
+import * as _ from 'lodash';
 
 @Component({
   selector: 'lib-tree',
@@ -30,9 +29,8 @@ import { TreeNodeOptions } from './tree.interface';
   encapsulation: ViewEncapsulation.None,
 })
 export class TreeComponent implements OnInit, OnChanges {
-  //#region 输入属性 (Inputs)
   /** 树数据 */
-  @Input({ alias: 'treeData' }) treeData: TreeNodeOptions[] = [];
+  @Input({ alias: 'treeData' }) originTreeData: TreeNodeOptions[] = [];
   /** 是否显示图标 */
   @Input({ alias: 'treeShowIcon', transform: booleanAttribute }) showIcon = false;
   /** 是否显示连接线 */
@@ -71,13 +69,13 @@ export class TreeComponent implements OnInit, OnChanges {
   @Input({ alias: 'treeDefaultCheckedKeys' }) defaultCheckedKeys: string[] = [];
   /** 默认展开的节点 */
   @Input({ alias: 'treeDefaultExpandedKeys' }) defaultExpandedKeys: string[] = [];
-  /** 节点唯一标识名称 */
-  @Input({ alias: 'treeKeyName' }) keyName: string = 'key';
+  /** 自定义节点属性 */
+  @Input({ alias: 'treeCustomFields' }) customFields: { label: string; value: string; children: string; } = { label: 'title', value: 'key', children: 'children' };
   /** 节点模板 */
   @Input({ alias: 'treeTemplate' }) treeTemplate: TemplateRef<{ $implicit: TreeNodeOptions, isLast: boolean, level: number }> | null = null;
-  //#endregion
+  /** 是否使用展开动画 */
+  @Input({ alias: 'treeUseExpandAnimation', transform: booleanAttribute }) useExpandAnimation = true;
 
-  //#region 输出事件 (Outputs)
   /** 勾选事件 */
   @Output() checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
   /** 展开事件 */
@@ -88,28 +86,56 @@ export class TreeComponent implements OnInit, OnChanges {
   @Output() searchChange = new EventEmitter<string>();
   /** 加载数据事件 */
   @Output() loadData = new EventEmitter<TreeNodeOptions>();
-  //#endregion
 
-  //#region 内部状态变量
   @ContentChild('iconTemplate') iconTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any }>;
   @ViewChild('treeContainer') treeContainer!: ElementRef;
 
+  /** 扁平化节点 */
   flattenNodes: Map<string, TreeNodeOptions> = new Map();
+  /** 展开的节点 */
   expandedKeys: Set<string> = new Set();
+  /** 选中的节点 */
   selectedKeys: Set<string> = new Set();
+  /** 选中的节点 */
   checkedKeys: Set<string> = new Set();
+  /** 不确定的节点 */
   indeterminateKeys: Set<string> = new Set();
+  /** 搜索结果 */
   searchResults: TreeNodeOptions[] = [];
+  /** 虚拟滚动节点 */
   flattenVirtualNodes: Array<any> = [];
+  /** 虚拟滚动父节点 */
   virtualFlattenNodesParentMap: Map<string, string> = new Map();
+  /** 扁平化节点父节点 */
   flattenNodesParentMap: Map<string, string> = new Map();
-  initData: boolean = false;
+  /** 搜索中 */
   searching: boolean = false;
+  /** 树数据 */
+  treeData: TreeNodeOptions[] = [];
+
+  /** 标签属性 */
+  get labelProperty(): string {
+    return this.customFields?.label || 'title';
+  }
+  /** 值属性 */
+  get valueProperty(): string {
+    return this.customFields?.value || 'key';
+  }
+  /** 子选项属性 */
+  get childrenProperty(): string {
+    return this.customFields?.children || 'children';
+  }
+
   constructor(
     private cdr: ChangeDetectorRef,
     private utilsService: UtilsService
   ) { }
-  // 生成缩进数组
+
+  /**
+   * 生成缩进数组
+   * @param level 层级
+   * @returns 缩进数组
+   */
   getIndentArray(level: number): number[] {
     return Array(level).fill(0).map((_, i) => i);
   }
@@ -127,11 +153,10 @@ export class TreeComponent implements OnInit, OnChanges {
       this.handleSearch();
       this.searching = false;
     }
-    this.initData = true;
-    if (changes['treeData']) {
+    if (changes['originTreeData']) {
+      this.treeData = _.cloneDeep(this.originTreeData);
       this.flattenTree();
     }
-
     if (changes['defaultExpandAll']) {
       if (this.defaultExpandAll) {
         this.handleExpandAll();
@@ -147,7 +172,6 @@ export class TreeComponent implements OnInit, OnChanges {
       this.initDefaultCheckedKeys();
     }
     this.cdr.detectChanges();
-    this.initData = false;
   }
 
   /**
@@ -221,19 +245,19 @@ export class TreeComponent implements OnInit, OnChanges {
           level
         });
         if (parent) {
-          this.virtualFlattenNodesParentMap.set(node[this.keyName], parent[this.keyName]);
+          this.virtualFlattenNodesParentMap.set(node[this.valueProperty], parent[this.valueProperty]);
         }
       }
       // 将多个条件判断合并成一个循环
-      this.flattenNodes.set(node[this.keyName], node);
-      node.expanded && this.expandedKeys.add(node[this.keyName]);
-      node.selected && this.selectedKeys.add(node[this.keyName]);
-      node.checked && this.checkedKeys.add(node[this.keyName]);
-      node.indeterminate && this.indeterminateKeys.add(node[this.keyName]);
-      parent && this.flattenNodesParentMap.set(node[this.keyName], parent[this.keyName]);
+      this.flattenNodes.set(node[this.valueProperty], node);
+      node.expanded && this.expandedKeys.add(node[this.valueProperty]);
+      node.selected && this.selectedKeys.add(node[this.valueProperty]);
+      node.checked && this.checkedKeys.add(node[this.valueProperty]);
+      node.indeterminate && this.indeterminateKeys.add(node[this.valueProperty]);
+      parent && this.flattenNodesParentMap.set(node[this.valueProperty], parent[this.valueProperty]);
       // 简化子节点处理逻辑
-      if (node.children?.length) {
-        this.flattenTreeNodes(node.children, level + 1, node);
+      if (node?.[this.childrenProperty]?.length) {
+        this.flattenTreeNodes(node[this.childrenProperty], level + 1, node);
       } else {
         !this.asyncData && (node.isLeaf = true);
       }
@@ -255,10 +279,10 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   private traverseNodesForExpandAll(nodes: TreeNodeOptions[]): void {
     nodes.forEach(node => {
-      if (!node.isLeaf && node.children && node.children.length) {
-        this.expandedKeys.add(node[this.keyName]);
+      if (!node.isLeaf && node?.[this.childrenProperty] && node?.[this.childrenProperty]?.length) {
+        this.expandedKeys.add(node[this.valueProperty]);
         node.expanded = true;
-        this.traverseNodesForExpandAll(node.children);
+        this.traverseNodesForExpandAll(node[this.childrenProperty]);
       }
     });
   }
@@ -268,10 +292,10 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 节点
    */
   onNodeExpand(node: TreeNodeOptions): void {
-    if (this.asyncData && (!node.children || node.children.length === 0) && !node.isLeaf) {
+    if (this.asyncData && (!node?.[this.childrenProperty] || node?.[this.childrenProperty]?.length === 0) && !node.isLeaf) {
       // 异步加载数据
       node.changeChildren = (children: TreeNodeOptions[]) => {
-        node.children = children;
+        node[this.childrenProperty] = children;
         node.asyncLoading = false;
         this.cdr.detectChanges();
       };
@@ -282,28 +306,15 @@ export class TreeComponent implements OnInit, OnChanges {
     if (node.expanded) {
       // 收起：先更新状态，保持DOM渲染直到动画结束
       node.expanded = false;
-      this.expandedKeys.delete(node[this.keyName]);
+      this.expandedKeys.delete(node[this.valueProperty]);
       // nodeRenderMap保持不变，等动画结束后再移除
     } else {
       // 展开：先添加到渲染集合，再立即更新状态
-      this.expandedKeys.add(node[this.keyName]);
+      this.expandedKeys.add(node[this.valueProperty]);
       node.expanded = true;
     }
     this.cdr.detectChanges();
     this.expandChange.emit({ expanded: node.expanded, node });
-  }
-
-  /**
-   * 节点动画结束事件
-   * @param event 事件
-   * @param node 节点
-   */
-  onAnimationDone(event: AnimationEvent, node: TreeNodeOptions): void {
-    // 仅当收起动画完成时，从渲染集合中移除
-    if (event.toState === 'collapsed' && !node.expanded) {
-      this.expandedKeys.delete(node[this.keyName]);
-      this.cdr.detectChanges();
-    }
   }
 
   /**
@@ -320,12 +331,12 @@ export class TreeComponent implements OnInit, OnChanges {
     !this.multiple && this.utilsService.traverseAllNodes(this.treeData, (node: TreeNodeOptions) => {
       node.selected && (node.selected = false);
     });
-    if (this.selectedKeys.has(node[this.keyName])) {
-      this.selectedKeys.delete(node[this.keyName])
+    if (this.selectedKeys.has(node[this.valueProperty])) {
+      this.selectedKeys.delete(node[this.valueProperty])
       node.selected = false;
     } else {
       !this.multiple && this.selectedKeys.clear();
-      this.selectedKeys.add(node[this.keyName]);
+      this.selectedKeys.add(node[this.valueProperty]);
       node.selected = true;
     }
     this.cdr.detectChanges();
@@ -344,11 +355,11 @@ export class TreeComponent implements OnInit, OnChanges {
     node.checked = checked;
     node.indeterminate = false;
     if (checked) {
-      this.checkedKeys.add(node[this.keyName]);
-      this.indeterminateKeys.delete(node[this.keyName]);
+      this.checkedKeys.add(node[this.valueProperty]);
+      this.indeterminateKeys.delete(node[this.valueProperty]);
     } else {
-      this.checkedKeys.delete(node[this.keyName]);
-      this.indeterminateKeys.delete(node[this.keyName]);
+      this.checkedKeys.delete(node[this.valueProperty]);
+      this.indeterminateKeys.delete(node[this.valueProperty]);
     }
     this.updateChildrenCheckState(node, checked);
     this.updateParentCheckState(node);
@@ -362,17 +373,17 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param checked 
    */
   public updateChildrenCheckState(node: TreeNodeOptions, checked: boolean): void {
-    if (node.children) {
-      node.children.forEach(child => {
+    if (node?.[this.childrenProperty]) {
+      node[this.childrenProperty].forEach((child: TreeNodeOptions) => {
         if (!child.disabled && !child.disableCheckbox) {
           child.checked = checked;
           child.indeterminate = false;
           if (checked) {
-            this.checkedKeys.add(child[this.keyName]);
-            this.indeterminateKeys.delete(child[this.keyName]);
+            this.checkedKeys.add(child[this.valueProperty]);
+            this.indeterminateKeys.delete(child[this.valueProperty]);
           } else {
-            this.checkedKeys.delete(child[this.keyName]);
-            this.indeterminateKeys.delete(child[this.keyName]);
+            this.checkedKeys.delete(child[this.valueProperty]);
+            this.indeterminateKeys.delete(child[this.valueProperty]);
           }
           this.updateChildrenCheckState(child, checked);
         }
@@ -385,15 +396,15 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 
    */
   public updateParentCheckState(node: TreeNodeOptions): void {
-    let parentKey = this.isVirtualScroll ? this.virtualFlattenNodesParentMap.get(node[this.keyName]) : this.flattenNodesParentMap.get(node[this.keyName]);
+    let parentKey = this.isVirtualScroll ? this.virtualFlattenNodesParentMap.get(node[this.valueProperty]) : this.flattenNodesParentMap.get(node[this.valueProperty]);
     if (!parentKey) return;
     const parent = this.flattenNodes.get(parentKey);
-    if (!parent?.children) return;
+    if (!parent?.[this.childrenProperty]) return;
     // 使用过滤器函数简化逻辑
     const isEnabledChild = (child: TreeNodeOptions) => !child.disabled && !child.disableCheckbox;
-    const totalEnabledChildren = parent.children.filter(isEnabledChild).length;
-    const checkedChildren = parent.children.filter(child => child.checked && isEnabledChild(child)).length;
-    const indeterminateChildren = parent.children.filter(child => child.indeterminate && isEnabledChild(child)).length;
+    const totalEnabledChildren = parent[this.childrenProperty].filter(isEnabledChild).length;
+    const checkedChildren = parent[this.childrenProperty].filter((child: TreeNodeOptions) => child.checked && isEnabledChild(child)).length;
+    const indeterminateChildren = parent[this.childrenProperty].filter((child: TreeNodeOptions) => child.indeterminate && isEnabledChild(child)).length;
     // 父节点不可用时直接返回
     if (parent.disabled || parent.disableCheckbox) return;
     // 更新父节点状态
@@ -401,22 +412,22 @@ export class TreeComponent implements OnInit, OnChanges {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = false;
         parent.indeterminate = false;
-        this.checkedKeys.delete(parent[this.keyName]);
-        this.indeterminateKeys.delete(parent[this.keyName]);
+        this.checkedKeys.delete(parent[this.valueProperty]);
+        this.indeterminateKeys.delete(parent[this.valueProperty]);
       }
     } else if (checkedChildren === totalEnabledChildren) {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = true;
         parent.indeterminate = false;
-        this.checkedKeys.add(parent[this.keyName]);
-        this.indeterminateKeys.delete(parent[this.keyName]);
+        this.checkedKeys.add(parent[this.valueProperty]);
+        this.indeterminateKeys.delete(parent[this.valueProperty]);
       }
     } else {
       if (!parent.disabled && !parent.disableCheckbox) {
         parent.checked = false;
         parent.indeterminate = true;
-        this.checkedKeys.delete(parent[this.keyName]);
-        this.indeterminateKeys.add(parent[this.keyName]);
+        this.checkedKeys.delete(parent[this.valueProperty]);
+        this.indeterminateKeys.add(parent[this.valueProperty]);
       }
     }
     this.updateParentCheckState(parent);
@@ -480,12 +491,12 @@ export class TreeComponent implements OnInit, OnChanges {
   private searchTreeNodes(nodes: TreeNodeOptions[], searchValue: string): TreeNodeOptions[] {
     const results: TreeNodeOptions[] = [];
     nodes.forEach(node => {
-      const nodeTitleLower = node.title.toLowerCase();
-      if (nodeTitleLower.includes(searchValue)) {
+      const nodeTitleLower = node?.[this.labelProperty]?.toLowerCase();
+      if (nodeTitleLower?.includes(searchValue)) {
         results.push(node);
       }
-      if (node.children && node.children.length) {
-        const childResults = this.searchTreeNodes(node.children, searchValue);
+      if (node?.[this.childrenProperty] && node?.[this.childrenProperty]?.length) {
+        const childResults = this.searchTreeNodes(node[this.childrenProperty], searchValue);
         if (childResults.length > 0) {
           results.push(...childResults);
         }
@@ -511,14 +522,14 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   private expandNodeParents(node: TreeNodeOptions, expandSelf: boolean = true): void {
     const parentNodes = this.getParentNodes(node);
-    parentNodes.forEach(pathNode => {
-      if (!pathNode.isLeaf && pathNode.children && pathNode.children.length) {
-        this.expandedKeys.add(pathNode[this.keyName]);
+    parentNodes.forEach((pathNode: TreeNodeOptions) => {
+      if (!pathNode.isLeaf && pathNode?.[this.childrenProperty] && pathNode?.[this.childrenProperty]?.length) {
+        this.expandedKeys.add(pathNode[this.valueProperty]);
         pathNode.expanded = true;
       }
     });
-    if (expandSelf && !node.isLeaf && node.children && node.children.length) {
-      this.expandedKeys.add(node[this.keyName]);
+    if (expandSelf && !node.isLeaf && node?.[this.childrenProperty] && node?.[this.childrenProperty]?.length) {
+      this.expandedKeys.add(node[this.valueProperty]);
       node.expanded = true;
     }
   }
@@ -548,8 +559,8 @@ export class TreeComponent implements OnInit, OnChanges {
     }
     let nowParent = parents[index + 1];
     let parentParent = parents[index];
-    if (nowParent && parentParent && parentParent.children) {
-      if (parentParent.children[parentParent.children.length - 1][this.keyName] === nowParent[this.keyName]) {
+    if (nowParent && parentParent && parentParent?.[this.childrenProperty]) {
+      if (parentParent[this.childrenProperty][parentParent[this.childrenProperty].length - 1][this.valueProperty] === nowParent[this.valueProperty]) {
         return false;
       }
     }
@@ -570,7 +581,7 @@ export class TreeComponent implements OnInit, OnChanges {
         findParents(parentNode);
       }
     };
-    findParents(node[this.keyName]);
+    findParents(node[this.valueProperty]);
     let parents: TreeNodeOptions[] = [];
     parentsKey.forEach(key => {
       const parent = this.flattenNodes.get(key);
@@ -596,7 +607,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @returns 可见的虚拟节点
    */
   getVisibleVirtualNodes(): Array<any> {
-    return !this.flattenVirtualNodes?.length ? [] : this.flattenVirtualNodes.filter(item => item.node && this.isNodeVisible(item.node[this.keyName]));
+    return !this.flattenVirtualNodes?.length ? [] : this.flattenVirtualNodes.filter(item => item.node && this.isNodeVisible(item.node[this.valueProperty]));
   }
 
   /**
@@ -639,6 +650,81 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   public getCheckedKeys(): Set<string> {
     return this.checkedKeys;
+  }
+
+  /**
+   * 获取归并后的勾选节点，合并父子节点（如果选中父级节点下所有非禁用的节点，就只输出该父节点）
+   * @returns 归并后的勾选节点
+   */
+  public getMergedCheckedKeys(): string[] {
+    const result: string[] = [];
+    const checkedKeysArray = Array.from(this.checkedKeys);
+    
+    // 创建一个映射，记录每个父节点下已选中的子节点数量
+    const parentCheckedCountMap: Map<string, number> = new Map();
+    // 创建一个映射，记录每个父节点下可选中的子节点总数（排除禁用的节点）
+    const parentTotalSelectableCountMap: Map<string, number> = new Map();
+    
+    // 初始化计数映射
+    this.flattenNodes.forEach((node, key) => {
+      if (node?.[this.childrenProperty]?.length) {
+        const selectableChildrenCount = node[this.childrenProperty].filter(
+          (child: TreeNodeOptions) => !child.disabled && !child.disableCheckbox
+        ).length;
+        parentTotalSelectableCountMap.set(key, selectableChildrenCount);
+        parentCheckedCountMap.set(key, 0);
+      }
+    });
+    
+    // 计算每个父节点的已选中子节点数
+    checkedKeysArray.forEach(key => {
+      const node = this.flattenNodes.get(key);
+      if (node) {
+        // 获取当前节点的父节点
+        const parentKey = this.isVirtualScroll ? 
+          this.virtualFlattenNodesParentMap.get(key) : 
+          this.flattenNodesParentMap.get(key);
+          
+        if (parentKey) {
+          // 如果父节点存在，且当前节点未禁用，则增加父节点下已选中子节点计数
+          if (!node.disabled && !node.disableCheckbox) {
+            const currentCount = parentCheckedCountMap.get(parentKey) || 0;
+            parentCheckedCountMap.set(parentKey, currentCount + 1);
+          }
+        }
+      }
+    });
+    
+    // 检查哪些节点应该包含在结果中
+    checkedKeysArray.forEach(key => {
+      const node = this.flattenNodes.get(key);
+      if (!node) return;
+      
+      const parentKey = this.isVirtualScroll ? 
+        this.virtualFlattenNodesParentMap.get(key) : 
+        this.flattenNodesParentMap.get(key);
+      
+      // 如果没有父节点，或者父节点的选中状态不完整，则将该节点添加到结果中
+      if (!parentKey) {
+        // 根节点，直接添加
+        result.push(key);
+      } else {
+        const parent = this.flattenNodes.get(parentKey);
+        if (parent) {
+          // 检查父节点是否已经选中了所有可选子节点
+          const totalSelectableCount = parentTotalSelectableCountMap.get(parentKey) || 0;
+          const checkedCount = parentCheckedCountMap.get(parentKey) || 0;
+          
+          // 如果父节点未选中所有可选子节点，或者父节点已被跳过（父节点未被选中），则添加当前节点
+          if (checkedCount < totalSelectableCount || !this.checkedKeys.has(parentKey)) {
+            result.push(key);
+          }
+          // 如果父节点已选中所有可选子节点，则子节点不添加（它们会被父节点代表）
+        }
+      }
+    });
+    
+    return result;
   }
 
   /**

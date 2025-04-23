@@ -23,6 +23,11 @@ import { SegmentedComponent } from '../../../projects/project/src/lib/segmented/
 export class DocTreeSelectComponent {
   // 基本用法示例
   basicValue: string = 'node1';
+  customFieldNames = {
+    label: 'title',
+    value: 'key',
+    children: 'children'
+  }
   basicTreeData: any[] = [
     {
       key: 'node1',
@@ -112,6 +117,22 @@ export class DocTreeSelectComponent {
         {
           key: 'node2-2',
           title: '子节点2-2'
+        },
+        {
+          key: 'node2-3',
+          title: '子节点2-3',
+          disabled: true
+        }
+      ]
+    },
+    {
+      key: 'node3',
+      title: '父节点3',
+      children: [
+        {
+          key: 'node3-1',
+          title: '子节点3-1',
+          disabled: true
         }
       ]
     }
@@ -232,6 +253,11 @@ export class DocTreeSelectComponent {
     // 复制数据用于自定义标签示例
     this.labelTreeData = [...this.searchTreeData];
   }
+
+  con(dta: any) {
+    console.log(dta);
+  }
+
 
   private generateVirtualData(): void {
     for (let i = 0; i < 50; i++) {

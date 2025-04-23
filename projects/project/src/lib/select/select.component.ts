@@ -42,8 +42,8 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   @Input({ alias: 'selectShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 选项列表 */
   @Input({ alias: 'selectOption' }) optionList: Array<any> = [];
-  /** 选项列表key */
-  @Input({ alias: 'selectOptionKey' }) optionKey: string = 'label';
+  /** 选项列表label */
+  @Input({ alias: 'selectOptionLabel' }) optionLabel: string = 'label';
   /** 选项列表value */
   @Input({ alias: 'selectOptionValue' }) optionValue: string = 'value';
   /** 尺寸大小 */
@@ -74,15 +74,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   @Input({ alias: 'selectBottomBar' }) bottomBar: TemplateRef<any> | null = null;
 
   /** 组件内部数据 */
-  public _data: any = null;
+  public _data: any = [];
   /** 浮层引用 */
   public overlayRef: OverlayRef | null = null;
   /** 模态框状态 */
   public modalState: 'open' | 'closed' = 'closed';
   /** 搜索值 */
   public searchValue = '';
-  /** 输入法输入时的暂存值 */
-  public searchOnCompositionValue = '';
   /** 选项分组 */
   public optionsGroups: { [key: string]: any[] } = {};
   /** 远程加载状态 */
@@ -101,8 +99,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   private debouncedSearch: ((value: string) => void) | null = null;
   /** 扁平化的分组选项 */
   public flattenedGroupOptions: Array<{ type: 'group' | 'option', label?: string, option?: any }> = [];
-  /** 悬浮选项索引 */
-  public hoverKey: string = '';
   /** 当前激活选项的索引 */
   public activeOptionIndex: number = -1;
 
@@ -163,25 +159,25 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 初始化选项相关数据
    */
   private initializeOptions(): void {
-    this.processOptions();
-    this.processGroupedOptions();
+    this.initOptionMap();
+    this.initOptionsGroups();
     this.filteredOptions = [...this.optionList];
   }
 
   /**
    * 处理选项数据，建立映射关系
    */
-  private processOptions(): void {
+  private initOptionMap(): void {
     this.optionMap.clear();
     this.optionList && this.optionList.forEach(option => {
-      this.optionMap.set(option[this.optionValue], option[this.optionKey]);
+      this.optionMap.set(option[this.optionValue], option);
     });
   }
 
   /**
    * 处理分组选项
    */
-  private processGroupedOptions(): void {
+  private initOptionsGroups(): void {
     this.optionsGroups = {};
     const options = this.filteredOptions.length > 0 ? this.filteredOptions : this.optionList;
     options.forEach(option => {
@@ -237,7 +233,19 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 根据值获取标签
    */
   public getLabel = (value?: any): string => {
-    return this.optionMap.get(value) || value;
+    return value ? value[this.optionLabel] : null;
+  }
+
+  /**
+   * 获取显示的选项
+   * @returns 选项
+   */
+  public getDisplayOptions(): any {
+    if (this.selectMode === 'multiple') {
+      return this._data && this._data.length > 0 ? this._data.map((value: any) => this.optionMap.get(value)) : [];
+    } else {
+      return this._data && this._data.length > 0 ? [this.optionMap.get(this._data[0])] : [];
+    }
   }
 
   /**
@@ -258,7 +266,8 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public handleSelectionChange(value: any, action: 'add' | 'remove'): void {
     let data;
     if (this.selectMode === 'single') {
-      data = action === 'add' ? value : '';
+      // 单选模式也用数组保存
+      data = action === 'add' ? [value] : [];
     } else {
       data = [...this._data];
 
@@ -275,7 +284,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 选择用户
    */
-  public selectUser(value: any, disabled: boolean = false): void {
+  public selectOption(value: any, disabled: boolean = false): void {
     if (disabled) return;
     if (this.selectMode === 'single') {
       this.handleSelectionChange(value, 'add');
@@ -284,15 +293,15 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     }
     // 多选
     this.focusSearchInput();
-    const action = this._data.includes(value) ? 'remove' : 'add';
-    this.handleSelectionChange(value, action);
+    // 对于多选，检查值是否已经在数组中
+    this.handleSelectionChange(value, this._data?.includes(value) ? 'remove' : 'add');
   }
 
   /**
-   * 移除用户
+   * 移除选项
    */
-  public removeUser(userId: any): void {
-    this.handleSelectionChange(userId, 'remove');
+  public removeOption(optionValue: any): void {
+    this.handleSelectionChange(optionValue, 'remove');
   }
 
   /**
@@ -300,8 +309,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param data 数据
    */
   public updateData(data: any): void {
-    this._data = data;
-    this.onChange(this._data);
+    // 确保数据始终是数组
+    this._data = Array.isArray(data) ? data : data !== null && data !== undefined ? [data] : [];
+    // 单选模式输出第一个元素，多选模式输出整个数组
+    this.onChange(this.selectMode === 'multiple' ? this._data : this._data.length > 0 ? this._data[0] : null);
     this.updateOverlayRefPosition();
     this.cdr.detectChanges();
   }
@@ -310,7 +321,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 清空数据
    */
   public clear(): void {
-    this.updateData(null);
+    this.updateData([]);
     this.reachedMaxCount = false;
   }
 
@@ -327,8 +338,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param value 搜索值
    */
   public onSearch(value: any): void {
-    this.searchOnCompositionValue = value;
-    // 执行搜索
     if (!this.searchFn) {
       this.executeLocalSearch(value);
     } else {
@@ -341,11 +350,11 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    */
   private executeLocalSearch(value: string): void {
     this.filteredOptions = !value || value.trim() === '' ? [...this.optionList] : this.optionList.filter(option => {
-      const optionText = String(option[this.optionKey] || '');
+      const optionText = String(option[this.optionLabel] || '');
       return optionText.toLowerCase().includes(value.toLowerCase());
     });
     // 更新分组数据
-    this.processGroupedOptions();
+    this.initOptionsGroups();
     this.cdr.detectChanges();
   }
 
@@ -356,14 +365,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     if (!this.searchFn) return;
     this.remoteLoading = true;
     this.cdr.detectChanges();
-
     if (!this.debouncedSearch) {
       // 创建一个新的防抖处理函数
       this.debouncedSearch = this.utilsService.debounce((searchValue: string) => {
         return this.searchFn!(searchValue)
           .then(results => {
             this.filteredOptions = results;
-            this.processGroupedOptions();
+            this.initOptionsGroups();
             this.remoteLoading = false;
             this.cdr.detectChanges();
             return results;
@@ -385,7 +393,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.searchValue = '';
     this.searchInput.clearSearchValue();
     this.filteredOptions = [...this.optionList];
-    this.processGroupedOptions();
+    this.initOptionsGroups();
   }
 
   /**
@@ -411,7 +419,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
         if (!newData.includes(tag) && newData.length < this.maxMultipleCount) {
           newData.push(tag);
           this.customTags.push(tag);
-          this.optionMap.set(tag, tag);
+          this.optionMap.set(tag, { [this.optionLabel]: tag, [this.optionValue]: tag });
           tagsAdded = true;
         }
       });
@@ -422,7 +430,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     } else {
       this.updateData(tags[0]);
       this.customTags.push(tags[0]);
-      this.optionMap.set(tags[0], tags[0]);
+      this.optionMap.set(tags[0], { [this.optionLabel]: tags[0], [this.optionValue]: tags[0] });
     }
   }
 
@@ -448,18 +456,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     if (this.overlayRef || this.disabled) return;
     this.focusSearchInput();
     this.resetOptionList();
-    this.processGroupedOptions();
+    this.initOptionsGroups();
     this.createAndSetupOverlay(this._overlayOrigin.elementRef.nativeElement);
     this.modalState = 'open';
     this.cdr.detectChanges();
-  }
-
-  /**
-   * 处理输入法输入
-   * @param event 输入事件
-   */
-  onCompositionChange(event: string) {
-    this.searchOnCompositionValue = event;
   }
 
   /**
@@ -529,9 +529,8 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 异步更新浮层位置
    */
   public updateOverlayRefPosition(): void {
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       this.overlayRef && this.overlayRef.updatePosition();
-      clearTimeout(timer);
     }, 0);
   }
 
@@ -558,11 +557,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public onTouch = (): void => { };
   public onChange = (value: any): void => { }
   public writeValue(obj: any): void {
-    if (!obj) return;
-    if (this.selectMode === 'multiple') {
-      this._data = [...obj];
+    if (obj === null || obj === undefined) {
+      this._data = [];
+    } else if (this.selectMode === 'multiple') {
+      this._data = Array.isArray(obj) ? obj : [obj];
     } else {
-      this._data = _.isArray(obj) ? obj.length > 0 ? obj[0] : null : obj;
+      // 单选模式也用数组表示，但只保留第一个元素
+      this._data = Array.isArray(obj) ? (obj.length > 0 ? [obj[0]] : []) : [obj];
     }
     this.cdr.detectChanges();
     this.updateOverlayRefPosition();
@@ -663,18 +664,13 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
         return;
       }
     }
-
     this.activeOptionIndex = newIndex;
     this.cdr.detectChanges();
-
     // 滚动到可视区域
-    setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       const activeElements = document.querySelectorAll('.option-active');
       if (activeElements.length > 0) {
-        (activeElements[0] as HTMLElement).scrollIntoView({
-          block: 'nearest',
-          inline: 'nearest'
-        });
+        (activeElements[0] as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     }, 0);
   }
@@ -689,10 +685,10 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
 
     if (hasGroups) {
       if (activeItem.type === 'option' && !this.isOptionDisabled(activeItem.option)) {
-        this.selectUser(activeItem.option[this.optionValue], this.isOptionDisabled(activeItem.option));
+        this.selectOption(activeItem.option[this.optionValue], this.isOptionDisabled(activeItem.option));
       }
     } else {
-      this.selectUser(activeItem[this.optionValue], this.isOptionDisabled(activeItem));
+      this.selectOption(activeItem[this.optionValue], this.isOptionDisabled(activeItem));
     }
   }
 
@@ -713,11 +709,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param option 选项
    */
   optionSelected(option: any): boolean {
-    if (this.selectMode === 'multiple') {
-      return this._data && this._data?.includes(option[this.optionValue]);
-    } else {
-      return this._data === option[this.optionValue];
-    }
+    return this._data && this._data.includes(option[this.optionValue]);
   }
 
   /**
@@ -725,11 +717,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param option 选项
    */
   optionCursor(option: any): string {
-    if (this.selectMode === 'multiple') {
-      return (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]))) ? 'not-allowed' : 'pointer';
-    } else {
-      return (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data === option[this.optionValue])) ? 'not-allowed' : 'pointer';
-    }
+    return (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]))) ? 'not-allowed' : 'pointer';
   }
 
 }

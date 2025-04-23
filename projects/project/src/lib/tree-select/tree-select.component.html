@@ -1,7 +1,6 @@
 <lib-select-box 
-    (click)="openDropdown()" 
+    #searchInput
     cdkOverlayOrigin
-
     [selectMode]="multiple ? 'multiple' : 'single'"
     [loading]="loading"
     [size]="size"
@@ -12,30 +11,26 @@
     [isActive]="isDropdownOpen"
     [allowSearch]="showSearch"
     [allowClear]="allowClear"
-
     [optionLabelTemplate]="labelTemplate"
     [getLabel]="getLabel"
-
     [(searchValue)]="searchValue"
-    [data]="!multiple ? getSingleNodeTitle() : displayTags"
-    #searchInput
-
+    [data]="getDisplayOptions()"
+    (click)="openDropdown()" 
     (clear)="clear()"
-    (remove)="removeItem($event.value)"
+    (remove)="removeItem($event[valueProperty])"
     (search)="onSearch($event)"
-    (inputWidthChange)="updateDropdownPosition()"
+    (inputWidthChange)="updateOverlayPosition()"
     >
 </lib-select-box>
-
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
-    <div class="c-lib-tree-select-dropdown"
-        [class.open]="isDropdownOpen" 
-        [class.closed]="!isDropdownOpen"
-        [style.min-width]="dropdownWidth">
-        
-        <!-- 搜索结果树 -->
-        <div class="tree-container" [style.max-height.px]="dropdownHeight">
+    <div 
+        class="c-lib-tree-select-dropdown"
+        [class.c-lib-tree-select-dropdown-open]="isDropdownOpen" 
+        [class.c-lib-tree-select-dropdown-closed]="!isDropdownOpen"
+        [style.min-width]="dropdownWidth"
+        >
+        <div class="c-lib-tree-select-container" [style.max-height.px]="dropdownHeight">
             <!-- 树组件 -->
             <lib-tree
                 [treeData]="treeData"
@@ -46,6 +41,7 @@
                 [treeMultiple]="multiple"
                 [treeShowLine]="treeShowLine"
                 [treeShowIcon]="treeShowIcon"
+                [treeCustomFields]="customFields"
                 [treeAsyncData]="treeAsyncData"
                 [treeVirtualHeight]="dropdownHeight"
                 [treeIsVirtualScroll]="treeVirtualScroll"
@@ -54,6 +50,7 @@
                 [treeVirtualItemSize]="treeVirtualItemSize"
                 [treeVirtualMinBuffer]="treeVirtualMinBuffer"
                 [treeVirtualMaxBuffer]="treeVirtualMaxBuffer"
+                [treeUseExpandAnimation]="treeUseExpandAnimation"
                 [treeDefaultExpandedKeys]="defaultExpandedKeys"
                 [treeDefaultSelectedKeys]="defaultSelectedKeys"
                 [treeDefaultCheckedKeys]="defaultCheckedKeys"

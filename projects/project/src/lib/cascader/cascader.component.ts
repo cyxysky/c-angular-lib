@@ -96,10 +96,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   isDropdownOpen: boolean = false;
   /** 搜索关键字 */
   searchValue: string = '';
-  /** 中文输入法 */
-  compositionValue: string = '';
-  /** 多选模式下显示的标签 */
-  displayTags: { label: string, value: any, option: CascaderOption }[] = [];
   /** 搜索过滤后的选项 */
   filteredOptions: CascaderOption[] = [];
   /** 键盘导航索引 */
@@ -129,7 +125,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public isNowDropdownOpen: boolean = false;
   /** 选项数据 */
   public options: CascaderOption[] = [];
-  // getter/setter
+
   /** 标签属性 */
   get labelProperty(): string {
     return this.fieldNames.label;
@@ -141,11 +137,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /** 子选项属性 */
   get childrenProperty(): string {
     return this.fieldNames.children;
-  }
-  /** 显示标签 */
-  get displayLabels(): string[] {
-    if (!this.selectedOptions.length) return [];
-    return this.selectedOptions.map(o => o[this.labelProperty]);
   }
 
   constructor(
@@ -243,8 +234,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.cdr.detectChanges();
     // 创建浮层
     const origin = this.overlayOrigin.elementRef.nativeElement;
-    // 添加打开状态样式类
-    this.renderer.addClass(origin, 'cascader-open');
     const positions: ConnectedPosition[] = [
       {
         originX: 'start',
@@ -330,14 +319,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
-    let timer = setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       document.removeEventListener('keydown', this.enhancedKeyboardHandler);
       this.visibleChange.emit(false);
-      // 移除打开状态样式类
-      const origin = this.overlayOrigin?.elementRef?.nativeElement;
-      if (origin) {
-        this.renderer.removeClass(origin, 'cascader-open');
-      }
       this.keyboardNavIndex = -1;
       // 安全地销毁浮层
       if (this.overlayRef) {
@@ -346,10 +330,12 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-      clearTimeout(timer);
     }, 300)
   }
 
+  /**
+   * 失去焦点
+   */
   public blurSearch() {
     this.searchInput && this.searchInput.blurSearchInput();
   }
@@ -660,44 +646,26 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   private updateMultipleValues(): void {
     if (this.selectedPathsMap.size === 0) {
       this.value = [];
-      this.displayTags = [];
       return;
     }
     // 直接使用已经归并过的路径
     this.value = Array.from(this.selectedPathsMap.values()).map(
       path => path.map(opt => this.getOptionValue(opt))
     );
-    this.updateDisplayTags();
   }
 
-  getLabel = (option: any): string => {
-    if (!this.isMultiple) {
-      return option.join(' / ');
+  getDisplayOptions(): any {
+    let result: any = [];
+    if (this.isMultiple) {
+      result = this.value && this.value.length > 0 ? this.value.map((item: any) => item.map((opt: any) => this.valueOptionMap.get(opt))) : [];
+    } else {
+      result = this.value && this.value.length > 0 ? [this.value.map((opt: any) => this.valueOptionMap.get(opt))] : [];
     }
-    return option[this.labelProperty];
+    return result;
   }
 
-  /**
-   * 更新显示标签
-   */
-  private updateDisplayTags(): void {
-    if (!this.isMultiple || this.selectedPathsMap.size === 0) {
-      this.displayTags = [];
-      return;
-    }
-    const tags: { label: string, value: any, option: CascaderOption }[] = [];
-    // 直接从选中路径映射生成标签
-    for (const path of this.selectedPathsMap.values()) {
-      if (!path.length) continue;
-      const lastOption = path[path.length - 1];
-      const pathLabels = path.map(opt => String(opt[this.labelProperty])).join(' / ');
-      tags.push({
-        label: pathLabels,
-        value: this.getOptionValue(lastOption),
-        option: lastOption
-      });
-    }
-    this.displayTags = tags;
+  getLabel = (option: any): any => {
+    return option && option.length > 0 ? option.map((opt: any) => opt[this.labelProperty]).join(' / ') : null;
   }
 
   // 搜索相关
@@ -1035,7 +1003,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.selectedPathsMap.clear();
       this.indeterminateSet.clear();
       this.value = [];
-      this.displayTags = [];
     } else {
       this.selectedOptions = [];
       this.value = [];
@@ -1049,6 +1016,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param value 值
    */
   public removeItem(value: any): void {
+    value = value?.[value.length - 1]?.[this.valueProperty] || value;
     if (!this.isMultiple) {
       this.clear();
       return;
@@ -1080,14 +1048,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     } else {
       this.setSingleValue(value, emitChange);
     }
-  }
-
-  /**
-   * 处理中文输入法
-   * @param event 事件
-   */
-  public onCompositionChange(event: string): void {
-    this.compositionValue = event;
   }
 
   /**
@@ -1125,7 +1085,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     if (!values || values.length === 0) {
       this.updateSelectedPathsMap();
       this.value = [];
-      this.displayTags = [];
       return;
     }
     // 处理值格式
@@ -1295,31 +1254,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public focusSearch(): void {
     this.searchInput && this.searchInput.focusSearchInput();
-  }
-
-
-  /**
-   * 是否显示占位符
-   * @returns 是否显示占位符
-   */
-  public showPlaceHolder(): boolean {
-    return (!this.value || (this.isArray(this.value) && this.value.length === 0)) && !this.searchValue && !this.compositionValue
-  }
-
-  /**
-   * 是否显示单选数据
-   * @returns 是否显示单选数据
-   */
-  public showSingalData(): boolean {
-    return !this.isMultiple && this.displayLabels.length > 0 && !this.searchValue && !this.compositionValue
-  }
-
-  /**
-   * 是否显示多选数据
-   * @returns 是否显示多选数据
-   */
-  public showMultData(): boolean {
-    return this.isMultiple && this.displayTags.length > 0
   }
 
   /**

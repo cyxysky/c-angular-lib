@@ -38,7 +38,7 @@ export class SelectBoxComponent {
   /** 选项标签模板 */
   @Input() optionLabelTemplate: TemplateRef<any> | null = null;
   /** 获取标签 */
-  @Input() getLabel: (value: any) => string = (value: any) => value;
+  @Input() getLabel: (value: any) => any = (value: any) => value;
   /** 搜索值 */
   @Input() searchValue: string = '';
   /** 搜索值变化 */
@@ -65,7 +65,7 @@ export class SelectBoxComponent {
    * @returns 标签
    */
   getDisplayTags(data: any): string {
-    return this.getLabel && this.getLabel(data) || data;
+    return this.getLabel && this.getLabel(data) !== null && this.getLabel(data) !== undefined ? this.getLabel(data) : null;
   }
 
   /**
@@ -148,7 +148,7 @@ export class SelectBoxComponent {
    * @returns 是否显示占位符
    */
   showPlaceholder() {
-    return (this.data === undefined || this.data === null || (this.data && this.data.length === 0)) && !this.searchOnCompositionValue;
+    return !(this.showSingalData() || this.showMultipleData()) && !this.searchOnCompositionValue;
   }
 
   /**
@@ -156,7 +156,7 @@ export class SelectBoxComponent {
    * @returns 是否显示单选数据
    */
   showSingalData() {
-    return this.selectMode === 'single' && this.searchOnCompositionValue === '' && this.data !== undefined && this.data !== null;
+    return this.selectMode === 'single' && this.searchOnCompositionValue === '' && this.data && this.data.length > 0 && this.getDisplayTags(this.data[0]) !== null;
   }
 
   /**
