@@ -659,12 +659,10 @@ export class TreeComponent implements OnInit, OnChanges {
   public getMergedCheckedKeys(): string[] {
     const result: string[] = [];
     const checkedKeysArray = Array.from(this.checkedKeys);
-    
     // 创建一个映射，记录每个父节点下已选中的子节点数量
     const parentCheckedCountMap: Map<string, number> = new Map();
     // 创建一个映射，记录每个父节点下可选中的子节点总数（排除禁用的节点）
     const parentTotalSelectableCountMap: Map<string, number> = new Map();
-    
     // 初始化计数映射
     this.flattenNodes.forEach((node, key) => {
       if (node?.[this.childrenProperty]?.length) {
@@ -675,16 +673,14 @@ export class TreeComponent implements OnInit, OnChanges {
         parentCheckedCountMap.set(key, 0);
       }
     });
-    
     // 计算每个父节点的已选中子节点数
     checkedKeysArray.forEach(key => {
       const node = this.flattenNodes.get(key);
       if (node) {
         // 获取当前节点的父节点
-        const parentKey = this.isVirtualScroll ? 
-          this.virtualFlattenNodesParentMap.get(key) : 
+        const parentKey = this.isVirtualScroll ?
+          this.virtualFlattenNodesParentMap.get(key) :
           this.flattenNodesParentMap.get(key);
-          
         if (parentKey) {
           // 如果父节点存在，且当前节点未禁用，则增加父节点下已选中子节点计数
           if (!node.disabled && !node.disableCheckbox) {
@@ -694,16 +690,13 @@ export class TreeComponent implements OnInit, OnChanges {
         }
       }
     });
-    
     // 检查哪些节点应该包含在结果中
     checkedKeysArray.forEach(key => {
       const node = this.flattenNodes.get(key);
       if (!node) return;
-      
-      const parentKey = this.isVirtualScroll ? 
-        this.virtualFlattenNodesParentMap.get(key) : 
+      const parentKey = this.isVirtualScroll ?
+        this.virtualFlattenNodesParentMap.get(key) :
         this.flattenNodesParentMap.get(key);
-      
       // 如果没有父节点，或者父节点的选中状态不完整，则将该节点添加到结果中
       if (!parentKey) {
         // 根节点，直接添加
@@ -714,7 +707,6 @@ export class TreeComponent implements OnInit, OnChanges {
           // 检查父节点是否已经选中了所有可选子节点
           const totalSelectableCount = parentTotalSelectableCountMap.get(parentKey) || 0;
           const checkedCount = parentCheckedCountMap.get(parentKey) || 0;
-          
           // 如果父节点未选中所有可选子节点，或者父节点已被跳过（父节点未被选中），则添加当前节点
           if (checkedCount < totalSelectableCount || !this.checkedKeys.has(parentKey)) {
             result.push(key);
@@ -723,7 +715,6 @@ export class TreeComponent implements OnInit, OnChanges {
         }
       }
     });
-    
     return result;
   }
 

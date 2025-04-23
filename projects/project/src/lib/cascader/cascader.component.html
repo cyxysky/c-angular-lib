@@ -24,8 +24,6 @@
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
     <div class="c-lib-cascader-dropdown"
-        (mouseenter)="enterDropdown()"
-        (mouseleave)="leaveDropdown()"
         [class.c-lib-cascader-open]="isDropdownOpen" 
         [class.c-lib-cascader-closed]="!isDropdownOpen"
         [style.min-width]="menuWidth + 'px'">

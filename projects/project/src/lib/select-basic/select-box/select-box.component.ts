@@ -57,7 +57,9 @@ export class SelectBoxComponent {
   /** 搜索值 */
   public searchOnCompositionValue = '';
 
-  ngOnChanges(changes: any): void {}
+  ngOnChanges(changes: any): void {
+    
+  }
 
   /**
    * 获取标签

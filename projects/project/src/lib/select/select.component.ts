@@ -513,7 +513,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     // 移除键盘事件监听
     document.removeEventListener('keydown', this.onKeyboardNavigate);
     this.cdr.detectChanges();
-
     // 使用setTimeout确保CSS过渡动画有时间完成
     this.utilsService.delayExecution(() => {
       if (overlayRef) {

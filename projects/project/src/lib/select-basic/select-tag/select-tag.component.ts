@@ -12,6 +12,7 @@ export class SelectTagComponent {
   @Output() remove = new EventEmitter<MouseEvent>();
   
   public removeSelf($event: MouseEvent): void {
+    $event.stopPropagation();
     this.remove.emit($event);
   }
 }

@@ -268,20 +268,20 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   closeDropdown(): void {
     if (!this.isDropdownOpen) return;
     this.isDropdownOpen = false;
-    this.treeUseExpandAnimation = false;
     this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
     this.utilsService.delayExecution(() => {
       this.visibleChange.emit(false);
       this.isOpenOverlay = false;
+      this.treeUseExpandAnimation = false;
       if (this.overlayRef) {
         this.overlayRef.detach();
         this.overlayRef.dispose();
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-    }, 200)
+    }, 150)
   }
 
   /**
@@ -390,23 +390,12 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.updateData();
   }
 
-
-
   /**
    * 重置所有状态
    */
   private resetAllState(): void {
     this.value = [];
     this.parentNodeKeys.clear();
-    // 重置所有节点状态
-    this.nodeMap.forEach(node => {
-      if (this.treeCheckable) {
-        node.checked = false;
-        node.indeterminate = false;
-      } else {
-        node.selected = false;
-      }
-    });
     // 重置defaultCheckedKeys和defaultSelectedKeys
     this.defaultCheckedKeys = [];
     this.defaultSelectedKeys = [];
@@ -433,14 +422,25 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.cdr.detectChanges();
   }
 
+  /**
+   * 加载数据
+   * @param node 节点
+   */
   onLoadData(node: TreeNodeOptions): void {
     this.loadData.emit(node);
   }
 
+  /**
+   * 获取所有节点
+   * @returns 所有节点
+   */
   getAllNodes(): Map<string, TreeNodeOptions> {
     return this.nodeMap;
   }
 
+  /**
+   * 初始化树节点
+   */
   initTreeKeys(): void {
     this.defaultExpandedKeys = [...this.value];
     if (this.treeCheckable) {
@@ -448,9 +448,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     } else {
       this.defaultSelectedKeys = [...this.value];
     }
-    console.log(this.defaultExpandedKeys);
-    console.log(this.defaultCheckedKeys);
-    console.log(this.defaultSelectedKeys);
   }
 
   /**

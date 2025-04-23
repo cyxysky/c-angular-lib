@@ -22,10 +22,6 @@ import * as _ from 'lodash';
     }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '(mouseenter)': 'enterDropdown()',
-    '(mouseleave)': 'leaveDropdown()'
-  }
 })
 export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccessor {
   // 视图引用
@@ -287,29 +283,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   }
 
   /**
-   * 进入下拉菜单
-   */
-  public enterDropdown = () => {
-    if (this.actionTrigger === 'hover') {
-      if (!this.isDropdownOpen) {
-        this.openDropdown();
-      }
-      clearTimeout(this.hoverCloseTimer);
-    }
-  }
-
-  /**
-   * 离开下拉菜单
-   */
-  public leaveDropdown = () => {
-    if (this.actionTrigger === 'hover') {
-      this.hoverCloseTimer = setTimeout(() => {
-        this.closeDropdown();
-      }, 100);
-    }
-  }
-
-  /**
    * 关闭下拉菜单
    */
   closeDropdown(): void {
@@ -330,7 +303,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-    }, 300)
+    }, 150)
   }
 
   /**
@@ -541,7 +514,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.updateMultipleValues();
     // 触发事件
     this.emitValueChange();
-    this.focusSearch();
+    this.isDropdownOpen && this.focusSearch();
   }
 
   /**
@@ -832,11 +805,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.selectedOptions = [...option.path];
       this.value = this.selectedOptions.map(opt => this.getOptionValue(opt));
       this.emitValueChange();
-      this.resetSearch();
-      let timer = setTimeout(() => {
-        this.closeDropdown();
-        clearTimeout(timer);
-      }, 100);
+      this.closeDropdown();
     }
     // 清空搜索状态
     // this.resetSearch();
