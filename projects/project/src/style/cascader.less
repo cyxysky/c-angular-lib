@@ -4,15 +4,12 @@
     border-radius: 4px;
     overflow: hidden;
     transform-origin: 0 0;
-    transition: all 0.2s;
+    transition: all @visible-animation-duration;
     z-index: 1000;
+    opacity: 0;
+    transform: scaleY(0.1);
 
-    &.c-lib-cascader-closed {
-        opacity: 0;
-        transform: scaleY(0);
-    }
-
-    &.c-lib-cascader-open {
+    &.c-lib-cascader-dropdown-visible {
         opacity: 1;
         transform: scaleY(1);
     }

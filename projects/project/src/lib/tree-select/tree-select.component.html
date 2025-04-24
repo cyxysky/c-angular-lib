@@ -26,8 +26,7 @@
 <ng-template #dropdownTemplate>
     <div 
         class="c-lib-tree-select-dropdown"
-        [class.c-lib-tree-select-dropdown-open]="isDropdownOpen" 
-        [class.c-lib-tree-select-dropdown-closed]="!isDropdownOpen"
+        [class.c-lib-tree-select-dropdown-visible]="isDropdownOpen"
         [style.min-width]="dropdownWidth"
         >
         <div class="c-lib-tree-select-container" [style.max-height.px]="dropdownHeight">

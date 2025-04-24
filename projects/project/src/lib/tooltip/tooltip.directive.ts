@@ -43,8 +43,6 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   private enterTimer: any;
   /** 离开计时器 */
   private leaveTimer: any;
-  /** 组件 */
-  private portal: ComponentPortal<TooltipComponent> | null = null;
   /** 提示组件引用 */
   private tooltipComponentRef: ComponentRef<TooltipComponent> | null = null;
   /** 组件悬停 */
@@ -62,20 +60,11 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       this.updateContent(this.tooltipContent);
     }
     if (changes['visible']) {
-      if (this.visible) {
-        this.show();
-      } else {
-        this.hide();
-      }
+      this.visible ? this.show() : this.hide();
     }
   }
 
-  ngOnInit(): void {
-    // 初始化时如果visible为true，则显示tooltip
-    if (this.visible) {
-      this.show();
-    }
-  }
+  ngOnInit(): void { }
 
   ngOnDestroy(): void {
     this.closeTooltip();
@@ -97,9 +86,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   onClick(): void {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
-    if (this.trigger === 'click') {
-      this.visible ? this.hide() : this.show();
-    }
+    this.trigger === 'click' && this.visible ? this.hide() : this.show();
   }
 
   /**
@@ -150,13 +137,12 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       positions,
       (ref) => {
         if (this.strictVisiable) return;
-        this.closeTooltip();
+        this.utilsService.delayExecution(() => {
+          this.closeTooltip();
+        }, 10);
       }
     );
-
-    // 创建并附加组件
-    this.portal = new ComponentPortal(TooltipComponent);
-    const componentRef = this.overlayRef.attach(this.portal);
+    const componentRef = this.overlayRef.attach(new ComponentPortal(TooltipComponent));
     // 设置tooltip内容和位置
     componentRef.setInput('content', this.tooltipContent);
     componentRef.setInput('placement', this.placement);
@@ -187,9 +173,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 更新tooltip位置
    */
   public updatePosition(): void {
-    if (this.overlayRef) {
-      this.overlayRef.updatePosition();
-    }
+    this.overlayRef && this.overlayRef.updatePosition();
   }
 
   /**

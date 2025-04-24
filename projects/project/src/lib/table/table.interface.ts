@@ -2,10 +2,11 @@ import { TemplateRef } from '@angular/core';
 
 // 表格列筛选项接口
 export interface TableColumnFilter {
-  text: string;
-  value: any;
-  byDefault?: boolean;
-  checked?: boolean; // 添加checked属性用于跟踪选中状态
+  type: 'text' | 'number' | 'date' | 'select' | 'select-multiple' | 'cascader' | 'cascader-multiple' | 'tree-select' | 'tree-select-multiple' | 'tree-select-checkable';
+  name: string;
+  defaultValue?: any | { start: any, end: any };
+  options?: any[];
+  checked?: boolean;
 }
 
 // 表格列接口
@@ -29,19 +30,11 @@ export interface TableColumn {
   // 列是否可筛选
   filterable?: boolean;
   // 筛选项
-  filters?: TableColumnFilter[];
-  // 已选择的筛选值
-  selectedFilters?: any[];
-  // 是否多选筛选
-  filterMultiple?: boolean;
-  // 筛选下拉框是否显示
-  showFilterDropdown?: boolean;
+  filters?: TableColumnFilter;
   // 自定义单元格渲染
   customCell?: TemplateRef<{ $implicit: any; text: any; record: any; index: number }> | null;
   // 自定义筛选模板
   filterTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
-  // 操作列模板，用于渲染操作列的内容
-  operationTemplate?: TemplateRef<{ $implicit: any; record: any; index: number }> | null;
   // 是否固定列 (true/'left' 表示左固定，'right' 表示右固定)
   fixed?: boolean | 'left' | 'right';
 }
@@ -51,4 +44,3 @@ export interface TableSize {
   middle: 'middle';
   small: 'small';
 }
-  

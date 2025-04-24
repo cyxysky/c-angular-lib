@@ -29,7 +29,6 @@ import { Subject } from 'rxjs';
   animations: [drawerAnimations.drawerMotion, drawerAnimations.maskMotion],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[class.c-lib-drawer-open]': 'visible',
     '[style.zIndex]': 'zIndex'
   }
 })
@@ -92,15 +91,9 @@ export class DrawerComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     const { visible, placement, data } = changes;
-    if (visible) {
-      this.handleVisibleChange(this.visible);
-    }
-    if (placement) {
-      this.updateAnimationState();
-    }
-    if (data) {
-      this.updateContentContext();
-    }
+    visible && this.handleVisibleChange(this.visible);
+    placement && this.updateAnimationState();
+    data && this.updateContentContext();
   }
 
   ngOnDestroy(): void {

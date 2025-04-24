@@ -12,6 +12,48 @@ export class OverlayService {
     public overlay: Overlay,
   ) { }
 
+  /** 浮层显示动画时间 */
+  public static overlayVisiableDuration = 150;
+  public selectOverlayPosition: ConnectedPosition[] = [{
+    originX: 'start',
+    originY: 'bottom',
+    overlayX: 'start',
+    overlayY: 'top',
+    offsetY: 4
+  },
+  {
+    originX: 'start',
+    originY: 'top',
+    overlayX: 'start',
+    overlayY: 'bottom',
+    offsetY: -4
+  }];
+
+  /**
+   * 获取选择框的定位策略
+   * @param origin 元素引用
+   * @returns 定位策略
+   */
+  public getSelectOverlayBasicConfig(origin: ElementRef | Element | any): any {
+    return {
+      config: {
+        hasBackdrop: false,
+        width: origin.getBoundingClientRect().width,
+        backdropClass: 'transparent-backdrop',
+        maxHeight: '80vh',
+        disposeOnNavigation: true,
+        positionStrategy: this.overlay.position().
+          flexibleConnectedTo(origin).
+          withPositions(this.selectOverlayPosition).
+          withPush(true).
+          withGrowAfterOpen(true).
+          withLockedPosition(false)
+      },
+      origin: origin,
+      position: this.selectOverlayPosition,
+    }
+  }
+
   /**
    * 创建一个overlay并监听位置变化
    * @param configs 配置
@@ -22,20 +64,20 @@ export class OverlayService {
    * @returns overlayRef
    */
   createOverlay(
-    configs: OverlayConfig, 
-    elementRef: ElementRef | Element | any, 
-    position: ConnectedPosition[], 
+    configs: OverlayConfig,
+    elementRef: ElementRef | Element | any,
+    position: ConnectedPosition[],
     closeModal: (overlayRef: OverlayRef, event: Event) => void,
     positionCallback?: (position: ConnectedPosition, isBackupUsed: boolean) => void
   ): OverlayRef {
     let config = new OverlayConfig();
     // 定位策略
     let positionStrategy = this.overlay.position().
-                                        flexibleConnectedTo(elementRef).
-                                        withPositions(position).
-                                        withPush(false).
-                                        withGrowAfterOpen(true).
-                                        withLockedPosition(false);
+      flexibleConnectedTo(elementRef).
+      withPositions(position).
+      withPush(false).
+      withGrowAfterOpen(true).
+      withLockedPosition(false);
     // 滚动策略
     config.scrollStrategy = this.overlay.scrollStrategies.reposition();
     // 定位策略
@@ -48,30 +90,30 @@ export class OverlayService {
     }
     // 创建overlay
     let overlayRef = this.overlay.create(config);
-    
+
     // 监听位置变化
     if (positionCallback) {
       const strategy = overlayRef.getConfig().positionStrategy as FlexibleConnectedPositionStrategy;
       strategy.positionChanges.subscribe((positionChange: ConnectedOverlayPositionChange) => {
         // 判断使用的是主位置还是备用位置
-        const currentPositionIndex = positionChange.connectionPair ? 
-          position.findIndex(p => 
+        const currentPositionIndex = positionChange.connectionPair ?
+          position.findIndex(p =>
             p.originX === positionChange.connectionPair.originX &&
             p.originY === positionChange.connectionPair.originY &&
             p.overlayX === positionChange.connectionPair.overlayX &&
             p.overlayY === positionChange.connectionPair.overlayY
           ) : -1;
-          
+
         const isBackupPosition = currentPositionIndex > 0; // 索引0是主位置，其他是备用位置
         positionCallback(positionChange.connectionPair, isBackupPosition);
       });
     }
-    
+
     // 点击背景，关闭浮层
     overlayRef.outsidePointerEvents().subscribe((event) => {
       closeModal(overlayRef, event);
     });
-    
+
     return overlayRef;
   }
 
@@ -116,7 +158,7 @@ export class OverlayService {
    * @param overlayRef 浮层引用
    * @param time 延迟时间
    */
-  public asyncUpdateOverlayPosition(overlayRef: OverlayRef | null, time: number = 10  ) {
+  public asyncUpdateOverlayPosition(overlayRef: OverlayRef | null, time: number = 10) {
     let timer = setTimeout(() => {
       overlayRef && overlayRef.updatePosition();
       clearTimeout(timer);
@@ -156,8 +198,8 @@ export class OverlayService {
       draggable: false
     };
     // 合并配置
-    const mergedConfig = {...defaultConfig, ...config};
-    
+    const mergedConfig = { ...defaultConfig, ...config };
+
     // 处理拖动时的面板类
     let panelClass = mergedConfig.panelClass;
     if (mergedConfig.draggable) {
@@ -169,7 +211,7 @@ export class OverlayService {
         panelClass = ['border-draggable-modal'];
       }
     }
-    
+
     // 创建overlay配置
     const overlayConfig = new OverlayConfig({
       width: mergedConfig.width,
@@ -179,7 +221,7 @@ export class OverlayService {
       panelClass: panelClass,
       disposeOnNavigation: mergedConfig.disposeOnNavigation
     });
-    
+
     // 确定位置策略
     let positionStrategy;
     if (mergedConfig.position === 'center') {
@@ -196,44 +238,44 @@ export class OverlayService {
         .withPositions(positions)
         .withGrowAfterOpen(true);
     }
-    
+
     overlayConfig.positionStrategy = positionStrategy;
     overlayConfig.scrollStrategy = this.overlay.scrollStrategies.block();
-    
+
     // 创建overlay
     const overlayRef = this.overlay.create(overlayConfig);
-    
+
     // 关联模板
     this.attachTemplate(overlayRef, modalTemplate, viewContainerRef);
-    
+
     // 点击背景关闭
     if (mergedConfig.hasBackdrop) {
       overlayRef.backdropClick().subscribe(() => {
         overlayRef.dispose();
       });
     }
-    
+
     // 如果需要拖动，添加边框拖动功能
     if (mergedConfig.draggable) {
       this.enableBorderDragging(overlayRef);
     }
-    
+
     return overlayRef;
   }
-  
+
   /**
    * 启用边框拖动功能
    * @param overlayRef 浮层引用
    */
   private enableBorderDragging(overlayRef: OverlayRef): void {
     const overlayElement = overlayRef.overlayElement;
-    
+
     // 创建边框拖动区域
     const createBorderElement = (position: 'top' | 'right' | 'bottom' | 'left' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
       const border = document.createElement('div');
       border.className = `modal-drag-border modal-drag-border-${position}`;
       border.style.position = 'absolute';
-      
+
       // 设置不同位置的样式
       switch (position) {
         case 'top':
@@ -293,78 +335,78 @@ export class OverlayService {
           border.style.cursor = 'se-resize';
           break;
       }
-      
+
       return border;
     };
-    
+
     // 创建拖动边框
     const borders = [
       'top', 'right', 'bottom', 'left',
       'top-left', 'top-right', 'bottom-left', 'bottom-right'
     ].map(pos => createBorderElement(pos as any));
-    
+
     // 将边框添加到浮层元素
     borders.forEach(border => {
       overlayElement.appendChild(border);
     });
-    
+
     // 拖动状态变量
     let isDragging = false;
     let startPosition = { x: 0, y: 0 };
     let currentBorder: HTMLElement | null = null;
-    
+
     // 启动拖动
     const startDrag = (event: MouseEvent) => {
       if (!(event.target instanceof HTMLElement)) return;
-      
+
       const target = event.target as HTMLElement;
       if (!target.classList.contains('modal-drag-border')) return;
-      
+
       currentBorder = target;
       isDragging = true;
       startPosition = { x: event.clientX, y: event.clientY };
-      
+
       document.addEventListener('mousemove', onDrag);
       document.addEventListener('mouseup', stopDrag);
-      
+
       // 阻止文本选择
       event.preventDefault();
     };
-    
+
     // 拖动过程
     const onDrag = (event: MouseEvent) => {
       if (!isDragging || !currentBorder) return;
-      
+
       // 获取当前位置
       const currentPosition = { x: event.clientX, y: event.clientY };
       const deltaX = currentPosition.x - startPosition.x;
       const deltaY = currentPosition.y - startPosition.y;
-      
+
       // 更新位置
       const borderPosition = currentBorder.className.replace('modal-drag-border modal-drag-border-', '');
-      
+
       // 获取当前模态框位置和大小
       const rect = overlayElement.getBoundingClientRect();
       let newLeft = rect.left;
       let newTop = rect.top;
-      
+
       // 根据边框位置移动整个模态框
       if (['top', 'top-left', 'top-right'].includes(borderPosition)) {
         newTop += deltaY;
       }
-      
+
       if (['bottom', 'bottom-left', 'bottom-right'].includes(borderPosition)) {
         // 底部拖动不改变位置
       }
-      
+
       if (['left', 'top-left', 'bottom-left'].includes(borderPosition)) {
         newLeft += deltaX;
       }
-      
+
       if (['right', 'top-right', 'bottom-right'].includes(borderPosition)) {
         // 右侧拖动不改变位置
       }
-      
+
       // 更新模态框位置
       overlayElement.style.position = 'fixed';
       overlayElement.style.left = `${newLeft}px`;
@@ -373,11 +415,11 @@ export class OverlayService {
       overlayElement.style.bottom = 'auto';
       overlayElement.style.margin = '0';
       overlayElement.style.transform = 'none';
-      
+
       // 更新起始位置为当前位置
       startPosition = currentPosition;
     };
-    
+
     // 停止拖动
     const stopDrag = () => {
       isDragging = false;
@@ -385,16 +427,16 @@ export class OverlayService {
       document.removeEventListener('mousemove', onDrag);
       document.removeEventListener('mouseup', stopDrag);
     };
-    
+
     // 绑定事件监听器
     overlayElement.addEventListener('mousedown', startDrag);
-    
+
     // 确保在浮层销毁时移除事件监听器和边框元素
     overlayRef.detachments().subscribe(() => {
       overlayElement.removeEventListener('mousedown', startDrag);
       document.removeEventListener('mousemove', onDrag);
       document.removeEventListener('mouseup', stopDrag);
-      
+
       // 移除边框元素
       borders.forEach(border => {
         if (border.parentNode) {

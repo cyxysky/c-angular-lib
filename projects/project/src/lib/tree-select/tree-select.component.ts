@@ -211,38 +211,12 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     if (this.disabled || this.isOpenOverlay) return;
     this.initTreeKeys();
     this.visibleChange.emit(true);
-    this.cdr.detectChanges();
     const origin = this.overlayOrigin.elementRef.nativeElement;
-    const positions: ConnectedPosition[] = [
-      {
-        originX: 'start',
-        originY: 'bottom',
-        overlayX: 'start',
-        overlayY: 'top',
-        offsetY: 4
-      },
-      {
-        originX: 'start',
-        originY: 'top',
-        overlayX: 'start',
-        overlayY: 'bottom',
-        offsetY: -4
-      }
-    ];
-    let positionStrategy = this.overlay.position().
-      flexibleConnectedTo(origin).
-      withPositions(positions).
-      withPush(true).
-      withGrowAfterOpen(true).
-      withLockedPosition(false);
-    this.overlayRef = this.overlayService.createOverlay({
-      hasBackdrop: false,
-      width: origin.getBoundingClientRect().width,
-      backdropClass: 'transparent-backdrop',
-      maxHeight: '80vh',
-      disposeOnNavigation: true,
-      positionStrategy: positionStrategy
-    }, origin, positions,
+    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(origin);
+    this.overlayRef = this.overlayService.createOverlay(
+      basicConfig.config,
+      basicConfig.origin,
+      basicConfig.position,
       (ref, event) => {
         if (this.isDropdownOpen) {
           const target = event.target as HTMLElement;
@@ -252,7 +226,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
           this.closeDropdown();
         }
       },
-      undefined);
+      undefined
+    );
     if (this.overlayRef) {
       this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
       this.focusSearch();
@@ -268,10 +243,10 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   closeDropdown(): void {
     if (!this.isDropdownOpen) return;
     this.isDropdownOpen = false;
-    this.resetSearch();
     this.blurSearch();
     this.cdr.detectChanges();
     this.utilsService.delayExecution(() => {
+      this.resetSearch();
       this.visibleChange.emit(false);
       this.isOpenOverlay = false;
       this.treeUseExpandAnimation = false;
@@ -281,7 +256,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-    }, 150)
+    }, OverlayService.overlayVisiableDuration)
   }
 
   /**

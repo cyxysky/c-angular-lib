@@ -8,7 +8,7 @@
     [disabled]="disabled"
     [placeholder]="placeHolder"
     [status]="status"
-    [isActive]="modalState === 'open'"
+    [isActive]="isDropdownOpen"
     [allowSearch]="showSearch"
     [allowClear]="allowClear"
     [optionLabelTemplate]="optionLabelTemplate"
@@ -25,9 +25,9 @@
 
 <ng-template #overlay>
     <div 
-        class="c-lib-select-overlay-option-box" 
-        [class.c-lib-select-overlay-option-box-open]="modalState === 'open'" 
-        [class.c-lib-select-overlay-option-box-closed]="modalState === 'closed'">
+        class="c-lib-select-dropdown" 
+        [class.c-lib-select-dropdown-visible]="isDropdownOpen"
+        >
         <div 
             [style.max-height]="optionPanelMaxHeight" 
             class="c-lib-select-option-list-container" 

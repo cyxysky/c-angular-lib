@@ -36,8 +36,8 @@
                 class="c-lib-drop-menu-submenu" 
                 *ngIf="item.children?.length"
                 [class.c-lib-drop-menu-submenu-visible]="hoveredItemIndex === i && !isItemDisabled(item)"
-                (mouseenter)="onMouseEnterSubmenu(i)" 
-                (mouseleave)="onMouseLeaveSubmenu()"
+                (mouseenter)="onMouseEnterItem(i)" 
+                (mouseleave)="onMouseLeaveItem()"
                 (click)="$event.stopPropagation()">
                 <lib-drop-menu 
                     [items]="item.children || []" 
@@ -47,6 +47,7 @@
                     [autoClose]="autoClose"
                     [isSubMenu]="true"
                     [selectedItem]="selectedItem"
+                    (menuClose)="onSubMenuClose()"
                     [parentDisabled]="isItemDisabled(item)"
                     (itemClick)="onSubMenuItemClick($event)">
                 </lib-drop-menu>

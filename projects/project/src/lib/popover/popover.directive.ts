@@ -32,7 +32,6 @@ export class PopoverDirective implements OverlayBasicDirective {
   private overlayRef: OverlayRef | null = null;
   private enterTimer: any;
   private leaveTimer: any;
-  private portal: ComponentPortal<PopoverComponent> | null = null;
   private popoverComponentRef: ComponentRef<PopoverComponent> | null = null;
   private componentHover: boolean = false;
 
@@ -51,20 +50,11 @@ export class PopoverDirective implements OverlayBasicDirective {
       this.updateComponent('content', this.popoverContent);
     }
     if (changes['visible']) {
-      if (this.visible) {
-        this.show();
-      } else {
-        this.hide();
-      }
+      this.visible ? this.show() : this.hide();
     }
   }
 
-  ngOnInit(): void {
-    // 初始化时如果visible为true，则显示tooltip
-    if (this.visible) {
-      this.show();
-    }
-  }
+  ngOnInit(): void { }
 
   ngOnDestroy(): void {
     this.closePopover();
@@ -86,9 +76,7 @@ export class PopoverDirective implements OverlayBasicDirective {
   onClick(): void {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
-    if (this.trigger === 'click') {
-      this.visible ? this.hide() : this.show();
-    }
+    this.trigger === 'click' && this.visible ? this.hide() : this.show();
   }
 
   /**
@@ -125,11 +113,8 @@ export class PopoverDirective implements OverlayBasicDirective {
    */
   public show(): void {
     if (!this.strictVisiable && this.visible) return;
-    this.visible = true;
-    this.visibleChange.emit(this.visible);
     this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
-    // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
       {
         positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false)
@@ -138,33 +123,28 @@ export class PopoverDirective implements OverlayBasicDirective {
       positions,
       (ref) => {
         if (this.strictVisiable) return;
-        this.hide();
+        this.utilsService.delayExecution(() => {
+          this.hide();
+        }, 10);
       },
       (position, isBackupUsed) => {
-        if (isBackupUsed) {
-          for (const key in OverlayBasicPositionConfigs) {
-            if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
-              if (this.popoverComponentRef) {
-                this.popoverComponentRef.setInput('placement', key as OverlayBasicPosition);
-                this.popoverComponentRef.instance?.getMargin();
-                this.popoverComponentRef.instance?.cdr?.detectChanges();
-              }
-              break;
+        for (const key in OverlayBasicPositionConfigs) {
+          if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
+            if (this.popoverComponentRef) {
+              this.popoverComponentRef.setInput('placement', key as OverlayBasicPosition);
+              this.popoverComponentRef.instance?.getMargin();
+              this.popoverComponentRef.instance?.cdr?.detectChanges();
             }
+            break;
           }
         }
-        // 根据使用的位置进行UI调整
       }
     );
-
     // 创建并附加组件
-    this.portal = new ComponentPortal(PopoverComponent);
-    const componentRef = this.overlayRef.attach(this.portal);
-
+    const componentRef = this.overlayRef.attach(new ComponentPortal(PopoverComponent));
     componentRef.setInput('title', this.popoverTitle);
     componentRef.setInput('content', this.popoverContent);
     componentRef.setInput('placement', this.placement);
-
     componentRef.location.nativeElement.addEventListener('mouseenter', () => {
       this.componentHover = true;
       this.hoverOpen();
@@ -173,12 +153,11 @@ export class PopoverDirective implements OverlayBasicDirective {
       this.componentHover = false;
       this.hoverClose();
     });
-
     this.popoverComponentRef = componentRef;
     // 设置CSS类以添加动画效果
     this.utilsService.delayExecution(() => {
-      this.popoverComponentRef && this.popoverComponentRef.setInput('isVisible', true);
-    }, 10);
+      this.changeVisible(true);
+    }, 0);
   }
 
   /**
@@ -187,10 +166,9 @@ export class PopoverDirective implements OverlayBasicDirective {
   public hide(): void {
     if (!this.visible || this.componentHover) return;
     this.changeVisible(false);
-    this.popoverComponentRef?.setInput('isVisible', false);
     this.utilsService.delayExecution(() => {
       this.closePopover();
-    }, 150);
+    }, OverlayService.overlayVisiableDuration);
   }
 
   /**
@@ -200,15 +178,14 @@ export class PopoverDirective implements OverlayBasicDirective {
   changeVisible(visible: boolean): void {
     this.visible = visible;
     this.visibleChange.emit(this.visible);
+    this.popoverComponentRef?.setInput('isVisible', visible);
   }
 
   /**
    * 更新位置
    */
   public updatePosition(): void {
-    if (this.overlayRef) {
-      this.overlayRef.updatePosition();
-    }
+    this.overlayRef && this.overlayRef.updatePosition();
   }
 
   /**
@@ -224,11 +201,9 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 关闭
    */
   private closePopover(): void {
-    if (this.overlayRef) {
-      this.visible = false;
-      this.overlayRef.dispose();
-      this.overlayRef = null;
-    }
+    this.visible = false;
+    this.overlayRef && this.overlayRef.dispose();
+    this.overlayRef = null;
   }
 
 }

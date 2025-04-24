@@ -109,22 +109,21 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       positions,
       (ref) => {
         if (this.strictVisiable) return;
-        this.hide()
+        this.utilsService.delayExecution(() => {
+          this.hide();
+        }, 10);
       },
       (position, isBackupUsed) => {
-        if (isBackupUsed) {
-          for (const key in OverlayBasicPositionConfigs) {
-            if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
-              if (this.popconfirmComponentRef) {
-                this.popconfirmComponentRef.setInput('placement', key as OverlayBasicPosition);
-                this.popconfirmComponentRef.instance?.getMargin();
-                this.popconfirmComponentRef.instance?.cdr?.detectChanges();
-              }
-              break;
+        for (const key in OverlayBasicPositionConfigs) {
+          if (_.isEqual(OverlayBasicPositionConfigs[key], position)) {
+            if (this.popconfirmComponentRef) {
+              this.popconfirmComponentRef.setInput('placement', key as OverlayBasicPosition);
+              this.popconfirmComponentRef.instance?.getMargin();
+              this.popconfirmComponentRef.instance?.cdr?.detectChanges();
             }
+            break;
           }
         }
-        // 根据使用的位置进行UI调整
       }
     );
 
@@ -169,7 +168,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
     this.popconfirmComponentRef?.setInput('isVisible', false);
     this.utilsService.delayExecution(() => {
       this.closePopover();
-    }, 150);
+    }, OverlayService.overlayVisiableDuration);
   }
 
   /**

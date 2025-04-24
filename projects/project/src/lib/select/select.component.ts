@@ -78,7 +78,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 浮层引用 */
   public overlayRef: OverlayRef | null = null;
   /** 模态框状态 */
-  public modalState: 'open' | 'closed' = 'closed';
+  public isDropdownOpen: boolean = false;
   /** 搜索值 */
   public searchValue = '';
   /** 选项分组 */
@@ -161,7 +161,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   private initializeOptions(): void {
     this.initOptionMap();
     this.initOptionsGroups();
-    this.filteredOptions = [...this.optionList];
   }
 
   /**
@@ -397,7 +396,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   }
 
   /**
-   * 聚焦搜索输入
+   * 聚焦搜索框
    */
   public focusSearchInput(): void {
     if (this.showSearch && this.searchInput) {
@@ -458,7 +457,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.resetOptionList();
     this.initOptionsGroups();
     this.createAndSetupOverlay(this._overlayOrigin.elementRef.nativeElement);
-    this.modalState = 'open';
+    this.isDropdownOpen = true;
     this.cdr.detectChanges();
   }
 
@@ -466,23 +465,12 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 创建并设置浮层
    */
   private createAndSetupOverlay(selectElement: any): void {
-    // 配置
-    const config = {
-      hasBackdrop: true,
-      backdropClass: 'transparent-backdrop',
-      width: selectElement.clientWidth
-    };
-    // 位置配置
-    const positions: ConnectedPosition[] = [
-      { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-      { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' }
-    ];
-
+    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(selectElement);
     // 创建浮层
     this.overlayRef = this.overlayService.createOverlay(
-      config,
-      selectElement,
-      positions,
+      basicConfig.config,
+      basicConfig.origin,
+      basicConfig.position,
       (ref, event) => {
         const target = event.target as HTMLElement;
         if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
@@ -506,8 +494,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param overlayRef 浮层引用
    */
   async closeModal(overlayRef: OverlayRef | null): Promise<void> {
-    this.modalState = 'closed';
-    this.resetSearchState();
+    this.isDropdownOpen = false;
     // 重置激活索引
     this.activeOptionIndex = -1;
     // 移除键盘事件监听
@@ -515,13 +502,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.cdr.detectChanges();
     // 使用setTimeout确保CSS过渡动画有时间完成
     this.utilsService.delayExecution(() => {
+      this.resetSearchState();
       if (overlayRef) {
         overlayRef.detach(); // 先分离内容
         overlayRef.dispose(); // 再完全销毁浮层
         this.overlayRef = null;
         this.cdr.detectChanges();
       }
-    }, 150);
+    }, OverlayService.overlayVisiableDuration);
   }
 
   /**
@@ -578,11 +566,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 添加键盘导航方法
    */
   private onKeyboardNavigate = (event: KeyboardEvent): void => {
-    if (this.modalState !== 'open') return;
-
+    if (!this.isDropdownOpen) return;
     const options = this.getFilteredOptionsWithHideSelected();
     const hasGroups = this.getObjectKeys(this.optionsGroups).length > 0;
-
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -604,12 +590,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
         }
         break;
       case 'Backspace':
-        if (this.searchValue === '' &&
-          this.modalState === 'open' &&
-          this.selectMode === 'multiple' &&
-          Array.isArray(this._data) &&
-          this._data.length > 0) {
-
+        if (this.searchValue === '' && this.isDropdownOpen && this.selectMode === 'multiple' && Array.isArray(this._data) && this._data.length > 0) {
           event.preventDefault();
           const lastItem = this._data[this._data.length - 1];
           this.handleSelectionChange(lastItem, 'remove');

@@ -24,8 +24,7 @@
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
     <div class="c-lib-cascader-dropdown"
-        [class.c-lib-cascader-open]="isDropdownOpen" 
-        [class.c-lib-cascader-closed]="!isDropdownOpen"
+        [class.c-lib-cascader-dropdown-visible]="isDropdownOpen"
         [style.min-width]="menuWidth + 'px'">
         <!-- 搜索结果列表 -->
         <div *ngIf="showSearch && searchValue" class="c-lib-cascader-search-result-list">

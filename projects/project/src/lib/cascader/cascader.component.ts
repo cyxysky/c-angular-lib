@@ -117,8 +117,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public hoverCloseTimer: any = null;
   // 添加临时选中数组
   tempSelectedOptions: CascaderOption[] = [];
-  /** 目前浮层是否打开 */
-  public isNowDropdownOpen: boolean = false;
   /** 选项数据 */
   public options: CascaderOption[] = [];
 
@@ -220,53 +218,24 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   openDropdown(): void {
     if (this.disabled || this.isDropdownOpen) return;
-    this.isNowDropdownOpen = true;
     document.addEventListener('keydown', this.enhancedKeyboardHandler);
-    this.visibleChange.emit(true);
     // 重置临时选中路径为当前实际选中路径
     this.tempSelectedOptions = [...this.selectedOptions];
     // 准备列数据
     this.prepareColumnsFromSelection();
-    this.cdr.detectChanges();
     // 创建浮层
     const origin = this.overlayOrigin.elementRef.nativeElement;
-    const positions: ConnectedPosition[] = [
-      {
-        originX: 'start',
-        originY: 'bottom',
-        overlayX: 'start',
-        overlayY: 'top',
-        offsetY: 4
-      },
-      {
-        originX: 'start',
-        originY: 'top',
-        overlayX: 'start',
-        overlayY: 'bottom',
-        offsetY: -4
-      }
-    ];
-    let positionStrategy = this.overlay.position().
-      flexibleConnectedTo(origin).
-      withPositions(positions).
-      withPush(true).
-      withGrowAfterOpen(true).
-      withLockedPosition(false);
+    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(origin);
     // 创建浮层（添加错误处理）
-    this.overlayRef = this.overlayService.createOverlay({
-      hasBackdrop: true,
-      backdropClass: 'transparent-backdrop',
-      maxHeight: '80vh',         // 限制最大高度
-      disposeOnNavigation: true,  // 导航时自动销毁,
-      positionStrategy: positionStrategy
-    }, origin, positions,
+    this.overlayRef = this.overlayService.createOverlay(
+      basicConfig.config,
+      basicConfig.origin,
+      basicConfig.position,
       (ref, event) => {
         // 点击背景关闭
         if (this.isDropdownOpen) {
           const target = event.target as HTMLElement;
-          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
-            return;
-          }
+          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
           this.closeDropdown();
         }
       },
@@ -277,7 +246,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       // 聚焦搜索框
       this.focusSearch();
     }
-    this.isDropdownOpen = true;
+    this.changeDropdownVisiable(true);
     // 设置键盘导航索引
     this.keyboardNavIndex = -1;
   }
@@ -287,14 +256,12 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   closeDropdown(): void {
     if (!this.isDropdownOpen) return;
-    this.isDropdownOpen = false;
-    this.isNowDropdownOpen = false;
-    this.resetSearch();
+    this.changeDropdownVisiable(false);
     this.blurSearch();
     this.cdr.detectChanges();
     this.utilsService.delayExecution(() => {
       document.removeEventListener('keydown', this.enhancedKeyboardHandler);
-      this.visibleChange.emit(false);
+      this.resetSearch();
       this.keyboardNavIndex = -1;
       // 安全地销毁浮层
       if (this.overlayRef) {
@@ -303,7 +270,17 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.overlayRef = null;
       }
       this.cdr.detectChanges();
-    }, 150)
+    }, OverlayService.overlayVisiableDuration)
+  }
+
+  /**
+   * 改变下拉菜单的显示状态
+   * @param visiable 显示状态
+   */
+  changeDropdownVisiable(visiable: boolean): void {
+    this.isDropdownOpen = visiable;
+    this.visibleChange.emit(visiable);
+    this.cdr.detectChanges();
   }
 
   /**
@@ -647,6 +624,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param value 搜索值
    */
   public onSearch(value: string): void {
+    console.log('搜索', value);
     this.searchValue = value;
     this.loading = true;
     this.debouncedSearch(value).then(() => { });

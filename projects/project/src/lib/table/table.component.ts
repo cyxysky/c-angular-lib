@@ -23,9 +23,9 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
 @Component({
   selector: 'lib-table',
   imports: [
-    CommonModule, 
-    DropMenuDirective, 
-    SelectComponent, 
+    CommonModule,
+    DropMenuDirective,
+    SelectComponent,
     NumberInputComponent,
     FormsModule,
     PageSizeOptionsFormatPipe
@@ -83,7 +83,7 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() showTotal: boolean = true;
   @Input() fixedPagination: boolean = false;
   @Input() paginationTemplate: TemplateRef<any> | null = null;
-  
+
   // 是否前端分页
   @Input() frontPagination: boolean = true;
 
@@ -130,14 +130,25 @@ export class TableComponent implements OnInit, OnChanges {
     this.originalData = [...this.data];
     this.refreshData();
     this.checkFixedColumns();
-    
-    // 初始化设置滚动状态为起始状态（显示右侧阴影）
+
+    // 初始化设置滚动状态，只有在有水平滚动条时才添加阴影效果
     setTimeout(() => {
       const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
-      if (tableElement) {
-        this.renderer.addClass(tableElement, 'lib-table-scroll-start');
-        this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
-        this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+      const container = this.elementRef.nativeElement.querySelector('.lib-table-container');
+      if (tableElement && container) {
+        // 检查是否有水平滚动条
+        const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
+
+        if (hasHorizontalScroll) {
+          this.renderer.addClass(tableElement, 'lib-table-scroll-start');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+        } else {
+          // 没有滚动条时移除所有滚动相关类
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+        }
       }
     }, 0);
   }
@@ -147,11 +158,11 @@ export class TableComponent implements OnInit, OnChanges {
       // 当数据源变化时，备份原始数据
       this.originalData = [...this.data];
     }
-    
+
     if (changes['data'] || changes['pageIndex'] || changes['pageSize'] || changes['columns']) {
       this.refreshData();
     }
-    
+
     if (changes['columns']) {
       this.checkFixedColumns();
     }
@@ -163,25 +174,36 @@ export class TableComponent implements OnInit, OnChanges {
   onTableScroll(event: Event): void {
     const container = event.target as HTMLElement;
     if (!container) return;
-    
+
     const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
     if (!tableElement) return;
-    
+
+    // 检查是否有水平滚动条
+    const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
+
+    // 如果没有水平滚动条，移除所有滚动相关类名
+    if (!hasHorizontalScroll) {
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+      return;
+    }
+
     const scrollLeft = container.scrollLeft;
     const maxScrollLeft = container.scrollWidth - container.clientWidth;
-    
+
     // 在最左侧时，左侧无阴影，右侧有阴影
     if (scrollLeft === 0) {
       this.renderer.addClass(tableElement, 'lib-table-scroll-start');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
-    } 
+    }
     // 在最右侧时，左侧有阴影，右侧无阴影
     else if (Math.abs(scrollLeft - maxScrollLeft) < 1) {
       this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
       this.renderer.addClass(tableElement, 'lib-table-scroll-end');
-    } 
+    }
     // 在中间位置时，两侧都显示阴影
     else {
       this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
@@ -221,7 +243,7 @@ export class TableComponent implements OnInit, OnChanges {
    */
   onSortClick(field: string, currentOrder: 'ascend' | 'descend' | null): void {
     let newOrder: 'ascend' | 'descend' | null;
-    
+
     // 排序顺序：null -> ascend -> descend -> null
     if (currentOrder === null) {
       newOrder = 'ascend';
@@ -230,7 +252,7 @@ export class TableComponent implements OnInit, OnChanges {
     } else {
       newOrder = null;
     }
-    
+
     this.onSortChange(field, newOrder);
   }
 
@@ -253,7 +275,7 @@ export class TableComponent implements OnInit, OnChanges {
       this.data = [...this.data].sort((a, b) => {
         const aValue = a[field];
         const bValue = b[field];
-        
+
         // 处理不同类型的值
         if (typeof aValue === 'string' && typeof bValue === 'string') {
           return isAscend ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
@@ -275,37 +297,8 @@ export class TableComponent implements OnInit, OnChanges {
    * 处理过滤项点击
    */
   onFilterItemClick(column: TableColumn, item: any): void {
-    if (!column) return;
-    
-    // 防止项目为undefined
-    if (!column.selectedFilters) {
-      column.selectedFilters = [];
-    }
-    
-    if (!item || item.value === undefined) return;
-    
-    const index = column.selectedFilters.findIndex(value => value === item.value);
-    
-    // 如果是单选模式
-    if (!column.filterMultiple) {
-      column.selectedFilters = [item.value];
-    } else {
-      // 多选模式，切换选中状态
-      if (index === -1) {
-        column.selectedFilters.push(item.value);
-      } else {
-        column.selectedFilters.splice(index, 1);
-      }
-    }
-    
-    // 设置item的checked属性
-    if (column.filters) {
-      column.filters.forEach(filter => {
-        if (filter) {
-          filter.checked = column.selectedFilters?.includes(filter.value);
-        }
-      });
-    }
+
+
   }
 
   /**
@@ -332,21 +325,21 @@ export class TableComponent implements OnInit, OnChanges {
     this.pageSizeChange.emit(pageSize);
     this.refreshData();
   }
-  
+
   /**
    * 判断是否为模板引用
    */
   isTemplateRef(value: any): value is TemplateRef<void> {
     return value instanceof TemplateRef;
   }
-  
+
   /**
    * 获取总页数
    */
   getLastPage(): number {
     return Math.ceil(this.total / this.pageSize);
   }
-  
+
   /**
    * 获取分页页码数组
    */
@@ -354,10 +347,10 @@ export class TableComponent implements OnInit, OnChanges {
     const lastPage = this.getLastPage();
     const current = this.pageIndex;
     const result: number[] = [];
-    
+
     // 简单分页逻辑，最多显示5个页码
     const maxDisplayPages = 5;
-    
+
     if (lastPage <= maxDisplayPages) {
       // 少于maxDisplayPages页，全部显示
       for (let i = 1; i <= lastPage; i++) {
@@ -367,20 +360,20 @@ export class TableComponent implements OnInit, OnChanges {
       // 超过maxDisplayPages页，显示当前页附近的页码
       let start = Math.max(1, current - 2);
       let end = Math.min(lastPage, start + maxDisplayPages - 1);
-      
+
       // 调整start，确保显示maxDisplayPages个页码
       if (end - start + 1 < maxDisplayPages) {
         start = Math.max(1, end - maxDisplayPages + 1);
       }
-      
+
       for (let i = start; i <= end; i++) {
         result.push(i);
       }
     }
-    
+
     return result;
   }
-  
+
   /**
    * 处理选择器变化事件
    */
@@ -388,7 +381,7 @@ export class TableComponent implements OnInit, OnChanges {
     const target = event.target as HTMLSelectElement;
     return +target.value;
   }
-  
+
   /**
    * 处理输入框变化事件
    */
@@ -397,86 +390,12 @@ export class TableComponent implements OnInit, OnChanges {
     return +target.value;
   }
 
-  /**
-   * 关闭一个列的筛选下拉框，并打开另一个
-   */
-  toggleFilterDropdown(column: TableColumn): void {
-    // 初始化selectedFilters，如果还没有初始化的话
-    if (!column.selectedFilters) {
-      column.selectedFilters = [];
-    }
-    
-    // 先关闭其他列的筛选下拉框
-    this.columns.forEach(col => {
-      if (col !== column) {
-        col.showFilterDropdown = false;
-      }
-    });
-    
-    // 切换当前列的筛选下拉框
-    column.showFilterDropdown = column.showFilterDropdown === true ? false : true;
-  }
-
-  /**
-   * 处理过滤器可见性变化的事件
-   */
-  handleFilterVisibleChange(column: TableColumn, visible: boolean): void {
-    if (!column) return;
-
-    if (!column.selectedFilters) {
-      column.selectedFilters = [];
-    }
-    
-    // 先关闭其他列的筛选下拉框
-    if (visible) {
-      this.columns.forEach(col => {
-        if (col && col !== column) {
-          col.showFilterDropdown = false;
-        }
-      });
-    }
-    
-    column.showFilterDropdown = visible;
-  }
-
-  /**
-   * 判断筛选项是否被选中
-   */
-  isFilterChecked(column: TableColumn, value: any): boolean | undefined {
-    if (!column || !column.selectedFilters) return false;
-    return column.selectedFilters.indexOf(value) >= 0;
-  }
 
   /**
    * 处理筛选项变化
    */
   onFilterItemChange(column: TableColumn, value: any, event: Event): void {
-    if (!column) return;
-    
-    const target = event.target as HTMLInputElement;
-    const checked = target.checked;
-    
-    if (!column.selectedFilters) {
-      column.selectedFilters = [];
-    }
-    
-    if (checked) {
-      // 如果是单选模式，清空之前的选择
-      if (!column.filterMultiple) {
-        column.selectedFilters = [value];
-      } else {
-        // 多选模式，添加到已选择的数组中
-        if (column.selectedFilters.indexOf(value) < 0) {
-          column.selectedFilters.push(value);
-        }
-      }
-    } else {
-      // 从已选择的数组中移除
-      const index = column.selectedFilters.indexOf(value);
-      if (index >= 0) {
-        column.selectedFilters.splice(index, 1);
-      }
-    }
+
   }
 
   /**
@@ -484,20 +403,7 @@ export class TableComponent implements OnInit, OnChanges {
    */
   confirmFilter(column: TableColumn): void {
     if (!column) return;
-    
-    column.showFilterDropdown = false;
-    
-    // 前端过滤
-    if (this.frontPagination && column.selectedFilters && column.selectedFilters.length > 0) {
-      // 应用所有列的过滤条件
-      const filteredData = this.applyFilters(this.data);
-      this.data = filteredData;
-      
-      // 刷新数据
-      this.refreshData();
-    }
 
-    this.filterChange.emit({ field: column.field, value: column.selectedFilters || [] });
   }
 
   /**
@@ -505,51 +411,15 @@ export class TableComponent implements OnInit, OnChanges {
    */
   private applyFilters(data: any[]): any[] {
     return data.filter(item => {
-      // 检查每一列的筛选条件
-      return this.columns.every(column => {
+      // 检查每一列的筛选条件 todo 判断是否过滤
+      return this.columns.every((column: TableColumn) => {
         if (!column) return true;
-        
-        // 如果该列没有筛选或筛选值为空，则通过筛选
-        if (!column.selectedFilters || column.selectedFilters.length === 0) {
-          return true;
-        }
+
 
         const itemValue = item && column.field ? item[column.field] : undefined;
         if (itemValue === undefined) return true;
-        
-        // 根据不同类型的比较方式处理
-        if (typeof itemValue === 'string') {
-          // 字符串值，检查是否包含在筛选值中
-          return column.selectedFilters.some(filterValue => 
-            typeof filterValue === 'string' && itemValue.indexOf(filterValue) >= 0);
-        } else if (typeof itemValue === 'number') {
-          // 数字值，可能是范围或精确值
-          return column.selectedFilters.some(filterValue => {
-            if (typeof filterValue === 'number') {
-              // 精确匹配
-              return itemValue === filterValue;
-            } else if (filterValue) {
-              // 对于范围值的处理（如"30岁以下"、"30-40岁"等）
-              // 这里假设筛选值定义为分界点，例如30、40
-              // 比较方式可以根据实际需求调整
-              if (column.filters) {
-                const filterObj = column.filters.find(f => f && f.value === filterValue);
-                if (filterObj) {
-                  if (filterObj.text.indexOf('以下') >= 0) {
-                    return itemValue < filterValue;
-                  } else if (filterObj.text.indexOf('以上') >= 0) {
-                    return itemValue >= filterValue;
-                  }
-                }
-              }
-              return itemValue === filterValue;
-            }
-            return false;
-          });
-        } else {
-          // 其他类型，如布尔值等
-          return column.selectedFilters.includes(itemValue);
-        }
+
+        return true;
       });
     });
   }
@@ -559,23 +429,20 @@ export class TableComponent implements OnInit, OnChanges {
    */
   resetFilter(column: TableColumn): void {
     if (!column) return;
-    
-    column.selectedFilters = [];
-    column.showFilterDropdown = false;
-    
+
     // 如果是前端筛选，恢复为原始数据后再应用其他筛选条件
     if (this.frontPagination) {
       // 先恢复原始数据
       this.data = [...this.originalData];
-      
+
       // 然后应用其他列的筛选条件
       const filteredData = this.applyFilters(this.data);
       this.data = filteredData;
-      
+
       // 刷新数据
       this.refreshData();
     }
-    
+
     this.filterChange.emit({ field: column.field, value: [] });
   }
 
@@ -585,13 +452,12 @@ export class TableComponent implements OnInit, OnChanges {
   resetAll(): void {
     // 重置所有列的筛选和排序状态
     this.columns.forEach(column => {
-      column.selectedFilters = [];
       column.sortOrder = null;
     });
-    
+
     // 恢复原始数据
     this.data = [...this.originalData];
-    
+
     // 刷新数据
     this.refreshData();
   }
@@ -604,13 +470,13 @@ export class TableComponent implements OnInit, OnChanges {
     if (this.title) {
       return this.title;
     }
-    
+
     // 检查是否有名为'title'的模板引用
     const titleElement = document.querySelector('#title');
     if (titleElement) {
       return titleElement as any;
     }
-    
+
     return null;
   }
 
@@ -622,13 +488,13 @@ export class TableComponent implements OnInit, OnChanges {
     if (this.footer) {
       return this.footer;
     }
-    
+
     // 检查是否有名为'footer'的模板引用
     const footerElement = document.querySelector('#footer');
     if (footerElement) {
       return footerElement as any;
     }
-    
+
     return null;
   }
 

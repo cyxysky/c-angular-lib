@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, SimpleChanges, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
 @Component({
   selector: 'lib-tooltip',
@@ -10,6 +10,7 @@ import { OverlayBasicPosition } from '../core/overlay/overlay-basic.directive';
     '[style]': 'getMargin()'
   },
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TooltipComponent {
   /** 提示内容 */
@@ -20,6 +21,14 @@ export class TooltipComponent {
   @Input() isVisible: boolean = false;
   /** 提示颜色 */
   @Input() color: string = '#000';
+
+  constructor(
+    private cdr: ChangeDetectorRef
+  ) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.cdr.detectChanges();
+  }
 
   /**
    * 判断是否为模板引用
@@ -43,7 +52,6 @@ export class TooltipComponent {
       case 'bottom-left':
       case 'bottom-right':
         return 'margin: 8px 0';
-
       case 'left':
       case 'right':
       case 'left-top':
@@ -51,7 +59,6 @@ export class TooltipComponent {
       case 'right-top':
       case 'right-bottom':
         return 'margin: 0 8px';
-
       default:
         return 'margin: 0';
     }

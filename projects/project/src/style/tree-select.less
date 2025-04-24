@@ -5,15 +5,12 @@
     border-radius: 4px;
     overflow: hidden;
     transform-origin: 0 0;
-    transition: all 0.2s;
+    transition: all @visible-animation-duration;
+    opacity: 0;
+    transform: scaleY(0.1);
     z-index: 1000;
 
-    &-closed {
-        opacity: 0;
-        transform: scaleY(0);
-    }
-
-    &-open {
+    &.c-lib-tree-select-dropdown-visible {
         opacity: 1;
         transform: scaleY(1);
     }

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterVie
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { maskAnimation, modalAnimation } from '../core/animation';
 import { UtilsService } from '../core/utils/utils.service';
+import { OverlayService } from '../core/overlay/overlay.service';
 
 @Component({
   selector: 'lib-modal',
@@ -15,39 +16,70 @@ import { UtilsService } from '../core/utils/utils.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class ModalComponent implements AfterViewInit, OnDestroy {
+  /** 组件引用 */
   @ViewChild(NgComponentOutlet, { static: false }) componentsRef!: NgComponentOutlet;
+  /** 是否显示 */
   @Input({ alias: 'modalVisible', transform: booleanAttribute }) visible: boolean = false;
+  /** 宽度 */
   @Input({ alias: 'modalWidth' }) width: string | number = '520px';
+  /** 高度 */
   @Input({ alias: 'modalHeight' }) height: string | number = 'auto';
+  /** 层级 */
   @Input({ alias: 'modalZIndex' }) zIndex: number = 1000;
+  /** 是否可关闭 */
   @Input({ alias: 'modalClosable', transform: booleanAttribute }) closable: boolean = true;
+  /** 顶部偏移 */
   @Input({ alias: 'modalTop' }) top: string = '100px';
+  /** 是否居中 */
   @Input({ alias: 'modalCentered', transform: booleanAttribute }) centered: boolean = false;
+  /** 是否可点击背景关闭 */
   @Input({ alias: 'modalMaskClosable', transform: booleanAttribute }) maskClosable: boolean = true;
+  /** 头部内容 */
   @Input({ alias: 'modalHeaderContent' }) headerContent: TemplateRef<any> | null = null;
+  /** 主体内容 */
   @Input({ alias: 'modalBodyContent' }) bodyContent: TemplateRef<any> | null = null;
+  /** 底部内容 */
   @Input({ alias: 'modalFooterContent' }) footerContent: TemplateRef<any> | null = null;
+  /** 组件内容 */
   @Input({ alias: 'modalComponentContent' }) componentContent: Type<any> | null = null;
+  /** 组件输入 */
   @Input({ alias: 'modalComponentInputs' }) componentInputs: any = null;
+  /** 组件输出 */
   @Input({ alias: 'modalComponentOutputs' }) componentOutputs: any = null;
+  /** 内容上下文 */
   @Input({ alias: 'modalContentContext' }) contentContext: any = null;
+  /** 是否可拖拽 */
   @Input({ alias: 'modalDrag', transform: booleanAttribute }) drag: boolean = false;
 
+  /** 弹窗显示变化事件 */
   @Output('modalVisibleChange') visibleChange = new EventEmitter<boolean>();
+  /** 弹窗打开事件 */
   @Output('modalAfterOpen') afterOpen = new EventEmitter<void>();
+  /** 弹窗关闭事件 */
   @Output('modalAfterClose') afterClose = new EventEmitter<void>();
 
+  /** 内容 */
   @ViewChild('modalContent') modalContentRef!: ElementRef;
+  /** 主体 */
   @ViewChild('modalBody') modalBodyRef!: ElementRef;
+  /** 头部 */
   @ViewChild('modalHeader') modalHeaderRef!: ElementRef;
 
+  /** 是否拖拽中 */
   isDragging: boolean = false;
+  /** 拖拽开始X */
   dragStartX: number = 0;
+  /** 拖拽开始Y */
   dragStartY: number = 0;
+  /** 拖拽X */
   transformX: number = 0;
+  /** 拖拽Y */
   transformY: number = 0;
+  /** 初始拖拽X */
   initialTransformX: number = 0;
+  /** 初始拖拽Y */
   initialTransformY: number = 0;
+  /** 是否显示 */
   isVisible: boolean = false;
 
   constructor(
@@ -74,11 +106,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
         this.close();
       }
     }
-    if (this.visible) {
-      if (this.drag) {
-        this.resetDragPosition();
-      }
-    }
+    this.visible && this.drag && this.resetDragPosition();
     this.cdr.detectChanges();
   }
 
@@ -96,7 +124,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     this.utilsService.delayExecution(() => {
       this.closeModal();
       this.cdr.detectChanges();
-    }, 150);
+    }, OverlayService.overlayVisiableDuration);
   }
 
   /**
