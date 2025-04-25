@@ -13,7 +13,7 @@ import { UtilsService } from '../core/utils/utils.service';
   standalone: true,
   host: {
     '[class.lib-tooltip-open]': 'visible'
-  }
+  },
 })
 export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirective {
   /** 提示内容 */
@@ -92,7 +92,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   /**
    * 鼠标进入
    */
-  hoverOpen() {
+  private hoverOpen(): void {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
     if (this.trigger === 'hover') {
@@ -106,7 +106,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   /**
    * 鼠标离开
    */
-  hoverClose() {
+  private hoverClose(): void {
     // 严格由编程控制显示
     if (this.strictVisiable) return;
     if (this.trigger === 'hover') {
@@ -123,9 +123,6 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    */
   public show(): void {
     if (!this.strictVisiable && (this.visible || !this.tooltipContent)) return;
-    this.visible = true;
-    this.visibleChange.emit(this.visible);
-    this.closeTooltip();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
@@ -138,7 +135,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       (ref) => {
         if (this.strictVisiable) return;
         this.utilsService.delayExecution(() => {
-          this.closeTooltip();
+          this.hide();
         }, 10);
       }
     );
@@ -155,18 +152,20 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
       this.hoverClose();
     });
     this.tooltipComponentRef = componentRef;
-
-    // 设置CSS类以添加动画效果
     this.utilsService.delayExecution(() => {
-      this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', true);
-    }, 10);
+      this.changeVisible(true);
+    });
   }
 
   /**
    * 隐藏tooltip
    */
   public hide(): void {
-    this.closeTooltip();
+    if (!this.visible || this.componentHover) return;
+    this.changeVisible(false);
+    this.utilsService.delayExecution(() => {
+      this.closeTooltip();
+    }, OverlayService.overlayVisiableDuration);
   }
 
   /**
@@ -187,14 +186,23 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   /**
    * 关闭tooltip
    */
-  private closeTooltip(): void {
+  public closeTooltip(): void {
     if (this.overlayRef) {
-      this.visible = false;
-      this.visibleChange.emit(this.visible);
-      this.tooltipComponentRef ? this.tooltipComponentRef.destroy() : null;
+      this.overlayRef.detach();
       this.overlayRef.dispose();
-      this.overlayRef = null;
     }
+    this.overlayRef = null;
+    this.tooltipComponentRef = null;
+  }
+
+  /**
+   * 改变tooltip显示状态
+   * @param visible 显示状态
+   */
+  public changeVisible(visible: boolean): void {
+    this.visible = visible;
+    this.visibleChange.emit(this.visible);
+    this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', visible);
   }
 
 

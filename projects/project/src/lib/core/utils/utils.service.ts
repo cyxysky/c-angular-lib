@@ -84,7 +84,7 @@ export class UtilsService {
    * @param delay 延迟时间（毫秒）
    * @returns 定时器标识符
    */
-  delayExecution(callback: () => void, delay: number = 10): void {
+  delayExecution(callback: () => void, delay: number = 0): void {
     let timer = setTimeout(() => {
       callback();
       clearTimeout(timer);

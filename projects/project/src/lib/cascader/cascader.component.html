@@ -19,13 +19,15 @@
     (clear)="clear()"
     (remove)="removeItem($event)"
     (search)="onSearch($event)"
-    (inputWidthChange)="asyncUpdateDropdownPosition()">
+    (inputWidthChange)="asyncUpdateDropdownPosition()"
+    >
 </lib-select-box>
 <!-- 下拉菜单 -->
 <ng-template #dropdownTemplate>
     <div class="c-lib-cascader-dropdown"
         [class.c-lib-cascader-dropdown-visible]="isDropdownOpen"
-        [style.min-width]="menuWidth + 'px'">
+        [style.min-width]="menuWidth + 'px'"
+        >
         <!-- 搜索结果列表 -->
         <div *ngIf="showSearch && searchValue" class="c-lib-cascader-search-result-list">
             <div *ngIf="loading" class="c-lib-cascader-search-loading">
@@ -59,7 +61,6 @@
                 </ng-container>
             </div>
         </div>
-        
         <!-- 级联菜单 -->
         <div *ngIf="!searchValue" class="c-lib-cascader-menus">
             <!-- 级别菜单 -->
@@ -84,10 +85,10 @@
                                     [checkboxIndeterminate]="option.halfChecked" 
                                     [checkboxDisabled]="option.disabled || option.disableCheckbox"
                                     [checkboxSingleLabel]="''"
-                                    (click)="onCheckboxClick(option, i, $event)">
+                                    (click)="onCheckboxClick(option, i, $event)"
+                                    >
                                 </lib-checkbox>
                             </ng-container>
-                            
                             <!-- 标签 -->
                             <span class="c-lib-cascader-menu-item-label">
                                 <ng-container *ngIf="optionTemplate">
@@ -97,14 +98,12 @@
                                     {{ option[labelProperty] }}
                                 </ng-container>
                             </span>
-                            
                             <!-- 加载图标 -->
                             <span *ngIf="option.loading" class="c-lib-cascader-menu-item-loading-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" class="c-lib-cascader-loading-svg">
                                     <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
                                 </svg>
                             </span>
-                            
                             <!-- 子项指示器 -->
                             <span *ngIf="hasChildren(option)" class="c-lib-cascader-menu-item-expand-icon">
                                 <i class="bi bi-chevron-right"></i>
@@ -112,7 +111,6 @@
                         </div>
                     </li>
                 </ng-container>
-                
                 <ng-template #emptyMenu>
                     <li class="c-lib-cascader-menu-item-empty">
                         <span>暂无数据</span>

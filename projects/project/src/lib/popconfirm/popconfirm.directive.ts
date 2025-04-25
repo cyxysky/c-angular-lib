@@ -22,6 +22,8 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   @Input('popconfirmVisible') visible: boolean = false;
   /** 是否严格由编程控制显示 */
   @Input('popconfirmStrictVisiable') strictVisiable: boolean = false;
+  /** 提示类 */
+  @Input('popconfirmClass') popconfirmClass: string = '';
   /** 确认按钮类型 */
   @Input('popconfirmConfirmButtonType') confirmButtonType: ButtonType = 'default';
   /** 确认按钮颜色 */
@@ -96,13 +98,11 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    */
   public show(): void {
     if (this.visible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
-    this.visible = true;
-    this.visibleChange.emit(this.visible);
-    this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
       {
+        panelClass: [this.popconfirmClass],
         positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false)
       },
       this.elementRef,
@@ -126,11 +126,9 @@ export class PopconfirmDirective implements OverlayBasicDirective {
         }
       }
     );
-
     // 创建并附加组件
     this.portal = new ComponentPortal(PopoverComponent);
     const componentRef = this.overlayRef.attach(this.portal);
-
     componentRef.setInput('title', this.popconfirmTitle);
     componentRef.setInput('content', this.popconfirmContent);
     componentRef.setInput('placement', this.placement);
@@ -150,14 +148,12 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       this.onCancel.emit();
       this.hide();
     });
-
     // 设置tooltip内容和位置
     this.popconfirmComponentRef = componentRef;
-
     // 设置CSS类以添加动画效果
     this.utilsService.delayExecution(() => {
-      this.popconfirmComponentRef && this.popconfirmComponentRef.setInput('isVisible', true);
-    }, 10);
+      this.changeVisible(true);
+    });
   }
 
   /**
@@ -165,7 +161,6 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    */
   public hide(): void {
     this.changeVisible(false);
-    this.popconfirmComponentRef?.setInput('isVisible', false);
     this.utilsService.delayExecution(() => {
       this.closePopover();
     }, OverlayService.overlayVisiableDuration);
@@ -178,6 +173,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   changeVisible(visible: boolean): void {
     this.visible = visible;
     this.visibleChange.emit(this.visible);
+    this.popconfirmComponentRef?.setInput('isVisible', visible);
   }
 
   /**
@@ -203,11 +199,11 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    */
   private closePopover(): void {
     if (this.overlayRef) {
-      this.visible = false;
-      this.visibleChange.emit(this.visible);
+      this.overlayRef.detach();
       this.overlayRef.dispose();
-      this.overlayRef = null;
     }
+    this.overlayRef = null;
+    this.popconfirmComponentRef = null;
   }
 
 }

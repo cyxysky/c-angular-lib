@@ -77,15 +77,17 @@ export class TreeComponent implements OnInit, OnChanges {
   @Input({ alias: 'treeUseExpandAnimation', transform: booleanAttribute }) useExpandAnimation = true;
 
   /** 勾选事件 */
-  @Output() checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
+  @Output('treeCheckBoxChange') checkBoxChange = new EventEmitter<{ checked: boolean, node: TreeNodeOptions }>();
   /** 展开事件 */
-  @Output() expandChange = new EventEmitter<{ expanded: boolean, node: TreeNodeOptions }>();
+  @Output('treeExpandChange') expandChange = new EventEmitter<{ expanded: boolean, node: TreeNodeOptions }>();
   /** 选中事件 */
-  @Output() selectedChange = new EventEmitter<{ selected: boolean, node: TreeNodeOptions }>();
+  @Output('treeSelectedChange') selectedChange = new EventEmitter<{ selected: boolean, node: TreeNodeOptions }>();
   /** 搜索事件 */
-  @Output() searchChange = new EventEmitter<string>();
+  @Output('treeSearchChange') searchChange = new EventEmitter<string>();
   /** 加载数据事件 */
-  @Output() loadData = new EventEmitter<TreeNodeOptions>();
+  @Output('treeLoadData') loadData = new EventEmitter<TreeNodeOptions>();
+  /** 树渲染完成 */
+  @Output('treeFinishViewInit') treeFinishViewInit = new EventEmitter<void>();
 
   @ContentChild('iconTemplate') iconTemplate?: TemplateRef<{ $implicit: TreeNodeOptions, origin: any }>;
   @ViewChild('treeContainer') treeContainer!: ElementRef;
@@ -144,6 +146,7 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
+    this.treeFinishViewInit.emit();
     this.cdr.detectChanges();
   }
 

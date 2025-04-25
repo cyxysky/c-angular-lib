@@ -22,6 +22,7 @@ import * as _ from 'lodash';
     }
   ],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
   // 视图引用
@@ -113,14 +114,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   public isDropdownOpen: boolean = false;
   /** 搜索关键字 */
   public searchValue: string = '';
-  /** 鼠标悬停关闭定时器 */
-  public hoverCloseTimer: any = null;
-  /** 父节点集合 */
-  public parentNodeKeys: Set<string> = new Set();
-  /** 是否已初始化 */
-  public isInitialized: boolean = false;
-  /** 树组件是否已准备好 */
-  public isTreeReady: boolean = false;
   /** 默认选中节点 */
   public defaultCheckedKeys: string[] = [];
   /** 默认选中节点 */
@@ -129,8 +122,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   public treeData: TreeNodeOptions[] = [];
   /** 是否使用展开动画 */
   public treeUseExpandAnimation: boolean = true;
-  /** 是否打开浮层 */
-  public isOpenOverlay: boolean = false;
   /** 标签属性 */
   get labelProperty(): string {
     return this.customFields?.label || 'title';
@@ -146,7 +137,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private overlay: Overlay,
     private viewContainerRef: ViewContainerRef,
     private overlayService: OverlayService,
     public utilsService: UtilsService
@@ -154,76 +144,59 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
 
   // 生命周期方法
   ngOnInit(): void {
-    // 初始化节点映射
     this.initNodeMap();
   }
 
   ngAfterViewInit(): void {
-    this.isTreeReady = !!this.treeComponent;
-    if (this.isTreeReady && !this.isInitialized) {
-      this.initNodeMap();
-      this.isInitialized = true;
-    }
+    this.initNodeMap();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['originTreeData']) {
       this.treeData = _.cloneDeep(this.originTreeData);
-      // 当树数据变化时，重新初始化节点映射
       this.initNodeMap();
     }
   }
 
   ngOnDestroy(): void {
     this.closeDropdown();
-    if (this.hoverCloseTimer) {
-      clearTimeout(this.hoverCloseTimer);
-    }
   }
 
-  // 初始化节点Map
-  private initNodeMap(): void {
-    // 创建一个空的Map作为初始值
+  /**
+   * 初始化节点Map
+   */
+  public initNodeMap(): void {
     this.nodeMap = new Map<string, TreeNodeOptions>();
-    // 递归处理节点数据
-    const processNodes = (nodes: TreeNodeOptions[], parentKey?: string) => {
+    const processNodes = (nodes: TreeNodeOptions[]) => {
       nodes.forEach(node => {
-        // 设置父节点引用
-        if (parentKey) {
-          node["parentKey"] = parentKey;
-        }
-        // 添加到Map中
         this.nodeMap.set(node[this.valueProperty], node);
-        // 处理子节点
         if (node[this.childrenProperty] && node[this.childrenProperty].length > 0) {
-          processNodes(node[this.childrenProperty], node[this.valueProperty]);
+          processNodes(node[this.childrenProperty]);
         }
       });
     };
-    // 初始处理所有节点
     processNodes(this.treeData);
+    this.cdr.detectChanges();
   }
 
   /**
    * 打开下拉菜单
    */
-  openDropdown(): void {
-    if (this.disabled || this.isOpenOverlay) return;
+  public openDropdown(): void {
+    if (this.disabled || this.isDropdownOpen) return;
     this.initTreeKeys();
-    this.visibleChange.emit(true);
-    const origin = this.overlayOrigin.elementRef.nativeElement;
-    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(origin);
+    const { config, origin, position } = this.overlayService.getSelectOverlayBasicConfig(this.overlayOrigin.elementRef.nativeElement);
     this.overlayRef = this.overlayService.createOverlay(
-      basicConfig.config,
-      basicConfig.origin,
-      basicConfig.position,
+      config,
+      origin,
+      position,
       (ref, event) => {
         if (this.isDropdownOpen) {
           const target = event.target as HTMLElement;
-          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
-            return;
-          }
-          this.closeDropdown();
+          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
+          this.utilsService.delayExecution(() => {
+            this.closeDropdown();
+          }, 10);
         }
       },
       undefined
@@ -232,23 +205,22 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
       this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
       this.focusSearch();
     }
-    this.treeUseExpandAnimation = true;
-    this.isDropdownOpen = true;
-    this.isOpenOverlay = true;
+    this.utilsService.delayExecution(() => {
+      this.treeUseExpandAnimation = true;
+      this.changeDropdownVisiable(true);
+    });
   }
+
 
   /**
    * 关闭下拉菜单
    */
-  closeDropdown(): void {
+  public closeDropdown(): void {
     if (!this.isDropdownOpen) return;
-    this.isDropdownOpen = false;
     this.blurSearch();
-    this.cdr.detectChanges();
+    this.changeDropdownVisiable(false);
     this.utilsService.delayExecution(() => {
       this.resetSearch();
-      this.visibleChange.emit(false);
-      this.isOpenOverlay = false;
       this.treeUseExpandAnimation = false;
       if (this.overlayRef) {
         this.overlayRef.detach();
@@ -260,10 +232,19 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   }
 
   /**
+   * 改变下拉菜单的显示状态
+   * @param visiable 显示状态
+   */
+  public changeDropdownVisiable(visiable: boolean): void {
+    this.isDropdownOpen = visiable;
+    this.visibleChange.emit(visiable);
+  }
+
+  /**
    * 选中节点
    * @param node 节点
    */
-  onNodeSelect(node: TreeNodeOptions): void {
+  public onNodeSelect(node: TreeNodeOptions): void {
     if (node.disabled) return;
     if (this.multiple) {
       this.handleMultipleSelect(node);
@@ -278,8 +259,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 单选模式下选中节点
    * @param node 节点
    */
-  private handleSingleSelect(node: TreeNodeOptions): void {
-    node.selected = true;
+  public handleSingleSelect(node: TreeNodeOptions): void {
     this.value = [node[this.valueProperty]]; // 存储为数组
     this.closeDropdown();
   }
@@ -288,7 +268,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 多选模式下选中节点
    * @param node 节点
    */
-  private handleMultipleSelect(node: TreeNodeOptions): void {
+  public handleMultipleSelect(node: TreeNodeOptions): void {
     if (this.treeCheckable) return;
     const valueArray = Array.isArray(this.value) ? this.value : [];
     const index = valueArray.indexOf(node[this.valueProperty]);
@@ -304,7 +284,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 复选框变化事件
    * @param event 事件
    */
-  onCheckBoxChange(event: { checked: boolean, node: TreeNodeOptions }): void {
+  public onCheckBoxChange(event: { checked: boolean, node: TreeNodeOptions }): void {
     if (!this.multiple || !this.treeCheckable) return;
     this.checkBoxChange.emit(event);
     this.value = [...this.treeComponent.getMergedCheckedKeys()];
@@ -316,14 +296,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 搜索
    * @param value 搜索值
    */
-  onSearch(value: string): void {
+  public onSearch(value: string): void {
     this.searchValue = value;
   }
 
   /**
    * 重置搜索
    */
-  resetSearch(): void {
+  public resetSearch(): void {
     this.searchValue = '';
     this.searchInput && this.searchInput.clearSearchValue();
     this.cdr.detectChanges();
@@ -332,14 +312,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /**
    * 聚焦搜索
    */
-  focusSearch(): void {
+  public focusSearch(): void {
     this.searchInput && this.searchInput.focusSearchInput();
   }
 
   /**
    * 失去焦点
    */
-  blurSearch(): void {
+  public blurSearch(): void {
     this.searchInput && this.searchInput.blurSearchInput();
   }
 
@@ -347,7 +327,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 移除节点
    * @param key 节点key
    */
-  removeItem(key: string): void {
+  public removeItem(key: string): void {
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
     _.pull(this.value, key);
@@ -358,7 +338,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 清空所有状态和数据
    * @param event 事件
    */
-  clear(event?: Event): void {
+  public clear(event?: Event): void {
     if (event) event.stopPropagation();
     // 清空所有状态和数据
     this.resetAllState();
@@ -368,10 +348,8 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /**
    * 重置所有状态
    */
-  private resetAllState(): void {
+  public resetAllState(): void {
     this.value = [];
-    this.parentNodeKeys.clear();
-    // 重置defaultCheckedKeys和defaultSelectedKeys
     this.defaultCheckedKeys = [];
     this.defaultSelectedKeys = [];
     this.defaultExpandedKeys = [];
@@ -380,28 +358,28 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   /**
    * 更新下拉菜单位置
    */
-  updateOverlayPosition(): void {
+  public updateOverlayPosition(): void {
     if (this.overlayRef) this.overlayService.asyncUpdateOverlayPosition(this.overlayRef, 0);
+    this.cdr.detectChanges();
   }
 
   /**
    * 更新数据
    */
-  updateData() {
+  public updateData() {
     // 将value转换为节点列表
     const selectedNodes: TreeNodeOptions[] = this.value && this.value.length > 0 ? this.value.map(key => this.nodeMap.get(key) as TreeNodeOptions) : [];
     this.selectionChange.emit(selectedNodes);
     // 单选模式下只返回第一个元素，多选模式下返回整个数组
     this.onChange(this.multiple ? this.value : this.value.length > 0 ? this.value[0] : null);
     this.updateOverlayPosition();
-    this.cdr.detectChanges();
   }
 
   /**
    * 加载数据
    * @param node 节点
    */
-  onLoadData(node: TreeNodeOptions): void {
+  public onLoadData(node: TreeNodeOptions): void {
     this.loadData.emit(node);
   }
 
@@ -409,14 +387,14 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 获取所有节点
    * @returns 所有节点
    */
-  getAllNodes(): Map<string, TreeNodeOptions> {
+  public getAllNodes(): Map<string, TreeNodeOptions> {
     return this.nodeMap;
   }
 
   /**
    * 初始化树节点
    */
-  initTreeKeys(): void {
+  public initTreeKeys(): void {
     this.defaultExpandedKeys = [...this.value];
     if (this.treeCheckable) {
       this.defaultCheckedKeys = [...this.value];
@@ -430,7 +408,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * @param node 节点
    * @returns 节点标签
    */
-  getLabel = (node: any): string => {
+  public getLabel = (node: any): string => {
     return node && node.title !== undefined && node.title !== null ? node.title : null;
   }
 
@@ -438,7 +416,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 获取显示的选项
    * @returns 显示的选项
    */
-  getDisplayOptions(): any {
+  public getDisplayOptions(): any {
     if (this.multiple) {
       return this.value && this.value.length > 0 ? this.value.map(key => this.nodeMap.get(key)) : [];
     } else {
@@ -450,7 +428,7 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   onChange: (value: any) => void = () => { };
   onTouched: () => void = () => { };
 
-  writeValue(value: string | string[] | null): void {
+  public writeValue(value: string | string[] | null): void {
     if (value === null || value === undefined) {
       this.value = [];
       this.cdr.detectChanges();
@@ -465,11 +443,11 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
     this.cdr.detectChanges();
   }
 
-  registerOnChange(fn: any): void {
+  public registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 }

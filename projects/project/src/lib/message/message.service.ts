@@ -1,22 +1,13 @@
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
 import { ApplicationRef, ComponentRef, Injectable, Injector, NgZone, OnDestroy, TemplateRef, ViewContainerRef, createComponent, inject } from '@angular/core';
 import { MessageComponent } from './message.component';
-import { Message } from './message.interface';
 import { Subject } from 'rxjs';
-import { OverlayService } from '../core/overlay/overlay.service';
-import { ElementRef } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
+import { UtilsService } from '../core/utils/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService implements OnDestroy {
-  private overlay = inject(Overlay);
-  private injector = inject(Injector);
-  private appRef = inject(ApplicationRef);
-  private ngZone = inject(NgZone);
-  private overlayService = inject(OverlayService);
 
   private messageInstances: Map<string, ComponentRef<MessageComponent>> = new Map();
   private messageCounter = 0;
@@ -27,20 +18,24 @@ export class MessageService implements OnDestroy {
   // 消息事件
   public messageChange = new Subject<{ id: string, status: 'created' | 'removed' }>();
 
-  constructor() {
+  constructor(
+    private overlay: Overlay,
+    private injector: Injector,
+    private appRef: ApplicationRef,
+    private ngZone: NgZone,
+    private utilsService: UtilsService
+  ) {
     this.createMessageContainer();
   }
 
   ngOnDestroy(): void {
     // 清理所有消息
     this.removeAll();
-
     // 销毁overlay
     if (this.overlayRef) {
       this.overlayRef.dispose();
       this.overlayRef = null;
     }
-
     // 清理订阅
     this.destroy$.next();
     this.destroy$.complete();
@@ -70,7 +65,6 @@ export class MessageService implements OnDestroy {
         const overlayConfig = new OverlayConfig({
           width: '100%',
           height: '100%',
-          panelClass: 'c-lib-message-overlay-panel',
           hasBackdrop: false
         });
 
@@ -135,38 +129,26 @@ export class MessageService implements OnDestroy {
     messageElement.style.width = '100%';
     messageElement.style.display = 'flex';
     messageElement.style.justifyContent = 'center';
-
     // 确保容器存在
-    if (!this.messageContainerElement) {
-      this.createMessageContainer();
-    }
-
+    !this.messageContainerElement && this.createMessageContainer();
     // 添加到容器中
     this.messageContainerElement!.appendChild(messageElement);
-
     // 创建组件
     const componentRef = createComponent(MessageComponent, {
       environmentInjector: this.appRef.injector,
       elementInjector: this.injector,
       hostElement: messageElement
     });
-
     // 初始化属性
-    const instance = componentRef.instance;
-    instance.id = id;
-    instance.content = content;
-    instance.type = options.type || 'info';
-    instance.duration = options.duration !== undefined ? options.duration : 3000;
-    instance.data = options.data || null;
-    instance.closeable = options.closeable !== undefined ? options.closeable : true;
-    instance.onClose = () => this.remove(id);
-
-    // 手动触发变更检测
+    componentRef.setInput('id', id);
+    componentRef.setInput('content', content);
+    componentRef.setInput('type', options.type || 'info');
+    componentRef.setInput('duration', options.duration !== undefined ? options.duration : 3000);
+    componentRef.setInput('data', options.data || null);
+    componentRef.setInput('closeable', options.closeable !== undefined ? options.closeable : true);
+    componentRef.setInput('onClose', () => this.remove(id));
     componentRef.changeDetectorRef.detectChanges();
-
-    // 自动附加到视图
     this.appRef.attachView(componentRef.hostView);
-
     return componentRef;
   }
 
@@ -179,9 +161,8 @@ export class MessageService implements OnDestroy {
       // 关闭动画
       messageRef.instance.close();
       this.messageChange.next({ id, status: 'removed' });
-
       // 动画结束后移除DOM
-      setTimeout(() => {
+      this.utilsService.delayExecution(() => {
         try {
           // 使用选择器更安全地查找对应的元素
           const wrapperSelector = `.c-lib-message-wrapper-${id}`;
@@ -198,7 +179,7 @@ export class MessageService implements OnDestroy {
           // 确保从实例映射中移除
           this.messageInstances.delete(id);
         }
-      }, 350); // 增加一点时间确保动画完成
+      })
     }
   }
 
@@ -207,9 +188,7 @@ export class MessageService implements OnDestroy {
    */
   removeAll(): void {
     const ids = Array.from(this.messageInstances.keys());
-    ids.forEach(id => {
-      this.remove(id);
-    });
+    ids.forEach(id => this.remove(id));
   }
 
   /**

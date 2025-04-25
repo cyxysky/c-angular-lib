@@ -1,4 +1,7 @@
-import { afterNextRender, afterRender, Directive, Host, Injectable, Input, TemplateRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { afterNextRender, afterRender, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Directive, forwardRef, Host, Injectable, Input, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { CheckboxOption, CheckboxDirection } from '@project';
 @Injectable({
   providedIn: 'root'
 })
@@ -35,4 +38,3 @@ export class WidgetDirective {
   }
 
 }
-

@@ -19,7 +19,6 @@ import { CheckboxOption, CheckboxDirection } from './checkbox.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckboxComponent implements ControlValueAccessor, OnInit {
-  //#region 输入属性 (Inputs)
   /** 选项 */
   @Input({ alias: 'checkboxOptions' }) options: CheckboxOption[] = [];
   /** 方向 */
@@ -38,22 +37,18 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
   @Input({ alias: 'checkboxSingle', transform: booleanAttribute }) single: boolean = false;
   /** 单选标签 */
   @Input({ alias: 'checkboxSingleLabel' }) singleLabelContent: TemplateRef<any> | string | any = '';
-  //#endregion
 
-  //#region 内部状态变量
   /** 选中的值数组 */
   value: any[] = [];
   /** 单选值 */
   singleValue: boolean = false;
   /** 选项选中状态映射 */
   isChecked: { [key: string]: boolean } = {};
-  //#endregion
 
   constructor(
     private cdr: ChangeDetectorRef,
   ) { }
 
-  //#region 生命周期钩子
   ngOnInit(): void {
     this.updateCheckedStatus();
   }
@@ -61,9 +56,7 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
   ngOnChanges(changes: any): void {
     this.cdr.detectChanges();
   }
-  //#endregion
 
-  //#region 数据处理方法
   /**
    * 更新选中状态
    */
@@ -141,9 +134,7 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
     this.onChange(this.value);
     this.onTouched();
   }
-  //#endregion
 
-  //#region 工具方法
   /**
    * 获取选项键
    */
@@ -180,22 +171,15 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
    * 获取选项选中状态
    */
   getOptionCheckedState(option: any): boolean {
-    // 如果有唯一ID，优先使用
     if (option.id !== undefined) {
       return this.isChecked[this.getOptionKey(option.value)];
     }
-
-    // 否则尝试使用值本身作为键（如果是简单类型）
     if (typeof option.value === 'string' || typeof option.value === 'number') {
       return this.isChecked[this.getOptionKey(option.value)];
     }
-
-    // 最后才使用JSON序列化（可以添加缓存机制以提高性能）
     return this.isChecked[this.getOptionKey(option.value)];
   }
-  //#endregion
 
-  //#region ControlValueAccessor 实现
   /** 值变更回调函数 */
   onChange: any = () => { };
   /** 触摸回调函数 */
@@ -233,5 +217,4 @@ export class CheckboxComponent implements ControlValueAccessor, OnInit {
   setDisabledState(isDisabled: boolean): void {
     // this.disabled = isDisabled;
   }
-  //#endregion
 }

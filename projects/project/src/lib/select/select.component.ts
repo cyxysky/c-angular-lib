@@ -1,6 +1,6 @@
 import { CdkOverlayOrigin, Overlay, OverlayRef, OverlayConfig, ConnectedPosition } from '@angular/cdk/overlay';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import _ from 'lodash';
 import { CommonModule, } from '@angular/common';
@@ -41,7 +41,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /** 是否显示搜索框 */
   @Input({ alias: 'selectShowSearch', transform: booleanAttribute }) showSearch: boolean = true;
   /** 选项列表 */
-  @Input({ alias: 'selectOption' }) optionList: Array<any> = [];
+  @Input({ alias: 'selectOption' }) optionList: Array<{ label?: any, value?: any, disabled?: boolean, group?: string, [key: string]: any }> = [];
   /** 选项列表label */
   @Input({ alias: 'selectOptionLabel' }) optionLabel: string = 'label';
   /** 选项列表value */
@@ -66,12 +66,15 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   @Input({ alias: 'selectOptionTemplate' }) optionTemplate: TemplateRef<any> | null = null;
   /** 选择内容自定义模板 */
   @Input({ alias: 'selectOptionLabelTemplate' }) optionLabelTemplate: TemplateRef<any> | null = null;
-  /** 选项禁用属性名，默认为 disabled */
-  @Input({ alias: 'selectOptionDisabledKey' }) optionDisabledKey: string = 'disabled';
   /** 是否禁用 */
   @Input({ alias: 'selectDisabled', transform: booleanAttribute }) disabled: boolean = false;
   /** 底部操作栏 */
   @Input({ alias: 'selectBottomBar' }) bottomBar: TemplateRef<any> | null = null;
+
+  /** 组件下拉显示隐藏 */
+  @Output('selectVisibleChange') visibleChange = new EventEmitter<boolean>();
+  /** 组件视图初始化完成 */
+  @Output('selectFinishViewInit') finishViewInit = new EventEmitter<void>();
 
   /** 组件内部数据 */
   public _data: any = [];
@@ -136,9 +139,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     // 移除键盘事件监听
     document.removeEventListener('keydown', this.onKeyboardNavigate);
     // 清理防抖函数
-    if (this.debouncedSearch) {
-      this.debouncedSearch = null;
-    }
+    this.debouncedSearch = null;
     // 清理选项缓存
     this.optionMap.clear();
     this.customTags = [];
@@ -158,7 +159,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 初始化选项相关数据
    */
-  private initializeOptions(): void {
+  public initializeOptions(): void {
     this.initOptionMap();
     this.initOptionsGroups();
   }
@@ -166,7 +167,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 处理选项数据，建立映射关系
    */
-  private initOptionMap(): void {
+  public initOptionMap(): void {
     this.optionMap.clear();
     this.optionList && this.optionList.forEach(option => {
       this.optionMap.set(option[this.optionValue], option);
@@ -176,11 +177,11 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 处理分组选项
    */
-  private initOptionsGroups(): void {
+  public initOptionsGroups(): void {
     this.optionsGroups = {};
     const options = this.filteredOptions.length > 0 ? this.filteredOptions : this.optionList;
     options.forEach(option => {
-      if (option.group) {
+      if (option?.group) {
         this.optionsGroups[option.group] = this.optionsGroups[option.group] || [];
         this.optionsGroups[option.group].push(option);
       }
@@ -191,7 +192,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 将分组选项扁平化处理，用于虚拟滚动
    */
-  private flattenGroupedOptions(): void {
+  public flattenGroupedOptions(): void {
     this.flattenedGroupOptions = [];
     if (Object.keys(this.optionsGroups).length === 0) return;
     // 扁平化处理分组数据
@@ -212,6 +213,66 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   }
 
   /**
+   * 打开弹窗
+   */
+  public openModal(): void {
+    if (this.overlayRef || this.disabled) return;
+    this.focusSearchInput();
+    this.resetOptionList();
+    this.initOptionsGroups();
+    const { config, origin, position } = this.overlayService.getSelectOverlayBasicConfig(this._overlayOrigin.elementRef.nativeElement);
+    this.overlayRef = this.overlayService.createOverlay(
+      config,
+      origin,
+      position,
+      (ref, event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
+        this.utilsService.delayExecution(() => {
+          this.closeModal(ref)
+        }, 10);
+      }
+    );
+    // 附加模板
+    this.overlayService.attachTemplate(this.overlayRef, this.overlayTemplate, this.viewContainerRef);
+    // 添加键盘事件监听
+    document.addEventListener('keydown', this.onKeyboardNavigate);
+    this.utilsService.delayExecution(() => {
+      this.changeDropdownVisiable(true);
+    });
+  }
+
+  /**
+   * 关闭弹窗
+   * @param overlayRef 浮层引用
+   */
+  public closeModal(overlayRef: OverlayRef | null): void {
+    this.changeDropdownVisiable(false);
+    this.activeOptionIndex = -1;
+    document.removeEventListener('keydown', this.onKeyboardNavigate);
+    this.cdr.detectChanges();
+    this.utilsService.delayExecution(() => {
+      this.resetSearchState();
+      if (overlayRef) {
+        overlayRef.detach(); // 先分离内容
+        overlayRef.dispose(); // 再完全销毁浮层
+        this.overlayRef = null;
+        this.cdr.detectChanges();
+      }
+    }, OverlayService.overlayVisiableDuration);
+  }
+
+  /**
+   * 改变下拉菜单的显示状态
+   * @param visiable 显示状态
+   */
+  public changeDropdownVisiable(visiable: boolean): void {
+    this.isDropdownOpen = visiable;
+    this.visibleChange.emit(visiable);
+    this.cdr.detectChanges();
+  }
+
+  /**
    * 检查是否达到最大选择数量
    */
   private checkMaxCount(): void {
@@ -224,8 +285,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 重置选项列表
    */
   public resetOptionList(): void {
-    this.filteredOptions = [...this.optionList];
-    this.cdr.detectChanges();
+    this.filteredOptions = _.cloneDeep(this.optionList);
   }
 
   /**
@@ -269,7 +329,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       data = action === 'add' ? [value] : [];
     } else {
       data = [...this._data];
-
       if (action === 'add' && !data.includes(value) && data.length < this.maxMultipleCount) {
         data.push(value);
       } else if (action === 'remove') {
@@ -281,7 +340,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   }
 
   /**
-   * 选择用户
+   * 选择选项
    */
   public selectOption(value: any, disabled: boolean = false): void {
     if (disabled) return;
@@ -329,7 +388,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param option 选项
    */
   public isOptionDisabled(option: any): boolean {
-    return option[this.optionDisabledKey] === true;
+    return option?.disabled === true;
   }
 
   /**
@@ -337,11 +396,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param value 搜索值
    */
   public onSearch(value: any): void {
-    if (!this.searchFn) {
-      this.executeLocalSearch(value);
-    } else {
-      this.executeRemoteSearch(value);
-    }
+    !this.searchFn ? this.executeLocalSearch(value) : this.executeRemoteSearch(value);
   }
 
   /**
@@ -388,7 +443,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 重置搜索状态
    */
-  private resetSearchState(): void {
+  public resetSearchState(): void {
     this.searchValue = '';
     this.searchInput.clearSearchValue();
     this.filteredOptions = [...this.optionList];
@@ -399,9 +454,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 聚焦搜索框
    */
   public focusSearchInput(): void {
-    if (this.showSearch && this.searchInput) {
-      this.searchInput.focusSearchInput();
-    }
+    this.showSearch && this.searchInput && this.searchInput.focusSearchInput();
   }
 
   /**
@@ -438,78 +491,12 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param event 粘贴事件
    */
   public handlePaste(event: ClipboardEvent): void {
-    if (!this.tagMode || (this.selectMode !== 'multiple')) {
-      return;
-    }
+    if (!this.tagMode || (this.selectMode !== 'multiple')) return;
     const pastedText = event.clipboardData?.getData('text');
     if (pastedText) {
       event.preventDefault();
       this.createCustomTag(pastedText);
     }
-  }
-
-  /**
-   * 打开弹窗
-   */
-  public openModal(): void {
-    if (this.overlayRef || this.disabled) return;
-    this.focusSearchInput();
-    this.resetOptionList();
-    this.initOptionsGroups();
-    this.createAndSetupOverlay(this._overlayOrigin.elementRef.nativeElement);
-    this.isDropdownOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  /**
-   * 创建并设置浮层
-   */
-  private createAndSetupOverlay(selectElement: any): void {
-    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(selectElement);
-    // 创建浮层
-    this.overlayRef = this.overlayService.createOverlay(
-      basicConfig.config,
-      basicConfig.origin,
-      basicConfig.position,
-      (ref, event) => {
-        const target = event.target as HTMLElement;
-        if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) {
-          return;
-        }
-        this.closeModal(ref)
-      }
-    );
-    // 附加模板
-    this.overlayService.attachTemplate(
-      this.overlayRef,
-      this.overlayTemplate,
-      this.viewContainerRef
-    );
-    // 添加键盘事件监听
-    document.addEventListener('keydown', this.onKeyboardNavigate);
-  }
-
-  /**
-   * 关闭弹窗
-   * @param overlayRef 浮层引用
-   */
-  async closeModal(overlayRef: OverlayRef | null): Promise<void> {
-    this.isDropdownOpen = false;
-    // 重置激活索引
-    this.activeOptionIndex = -1;
-    // 移除键盘事件监听
-    document.removeEventListener('keydown', this.onKeyboardNavigate);
-    this.cdr.detectChanges();
-    // 使用setTimeout确保CSS过渡动画有时间完成
-    this.utilsService.delayExecution(() => {
-      this.resetSearchState();
-      if (overlayRef) {
-        overlayRef.detach(); // 先分离内容
-        overlayRef.dispose(); // 再完全销毁浮层
-        this.overlayRef = null;
-        this.cdr.detectChanges();
-      }
-    }, OverlayService.overlayVisiableDuration);
   }
 
   /**
@@ -526,7 +513,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param index 索引
    * @param item 选项
    */
-  trackByFn(index: number, item: any): any {
+  public trackByFn(index: number, item: any): any {
     return index;
   }
 
@@ -535,7 +522,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * @param obj 对象
    * @returns 键
    */
-  getObjectKeys(obj: any): string[] {
+  public getObjectKeys(obj: any): string[] {
     return this.utilsService.getObjectKeys(obj);
   }
 
@@ -565,7 +552,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 添加键盘导航方法
    */
-  private onKeyboardNavigate = (event: KeyboardEvent): void => {
+  public onKeyboardNavigate = (event: KeyboardEvent): void => {
     if (!this.isDropdownOpen) return;
     const options = this.getFilteredOptionsWithHideSelected();
     const hasGroups = this.getObjectKeys(this.optionsGroups).length > 0;
@@ -602,7 +589,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 导航选项方法
    */
-  private navigateOption(direction: 'up' | 'down', options: any[], hasGroups: boolean): void {
+  public navigateOption(direction: 'up' | 'down', options: any[], hasGroups: boolean): void {
     const totalOptions = options.length;
     if (totalOptions === 0) return;
 
@@ -658,7 +645,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 选择当前活动选项
    */
-  private selectActiveOption(options: any[], hasGroups: boolean): void {
+  public selectActiveOption(options: any[], hasGroups: boolean): void {
     if (this.activeOptionIndex < 0 || this.activeOptionIndex >= options.length) return;
 
     const activeItem = options[this.activeOptionIndex];
@@ -676,7 +663,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 选项是否禁用
    * @param option 选项
    */
-  optionDisabled(option: any): boolean {
+  public optionDisabled(option: any): boolean {
     if (this.selectMode === 'multiple') {
       return this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]));
     } else {
@@ -688,7 +675,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 选项是否选中
    * @param option 选项
    */
-  optionSelected(option: any): boolean {
+  public optionSelected(option: any): boolean {
     return this._data && this._data.includes(option[this.optionValue]);
   }
 
@@ -696,7 +683,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 选项光标样式，当选项被禁用或达到最大选择数量时，光标样式为禁用
    * @param option 选项
    */
-  optionCursor(option: any): string {
+  public optionCursor(option: any): string {
     return (this.isOptionDisabled(option) || (this.reachedMaxCount && !this._data.includes(option[this.optionValue]))) ? 'not-allowed' : 'pointer';
   }
 

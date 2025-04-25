@@ -23,7 +23,7 @@
 
 .c-lib-message-content {
     display: flex;
-    align-items: stretch;
+    align-items: baseline;
     position: relative;
     gap: 12px;
 }
@@ -35,6 +35,7 @@
 }
 
 .c-lib-message-text {
+    font-size: 14px;
     display: flex;
     align-items: center;
 }
@@ -45,12 +46,6 @@
 
     .c-lib-message-close {
         cursor: pointer;
-        padding: 2px 4px;
-        border-radius: 4px;
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.08);
-        }
     }
 }
 
@@ -60,16 +55,6 @@
     z-index: 1010;
 }
 
-// 消息Overlay样式
-.c-lib-message-overlay-panel {
-    pointer-events: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-}
-
-.c-lib-message-overlay-panel .cdk-overlay-pane {
-    pointer-events: none !important;
-}
 
 // 消息包装容器样式
 .c-lib-message-wrapper {

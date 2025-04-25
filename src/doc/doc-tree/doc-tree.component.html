@@ -25,9 +25,9 @@
           [treeDefaultSelectedKeys]="[]"
           [treeDefaultCheckedKeys]="['0']"
           [treeDefaultExpandedKeys]="['0-0-0']"
-          (selectedChange)="onNodeSelected($event)"
-          (checkBoxChange)="onNodeChecked($event)"
-          (expandChange)="onNodeExpanded($event)"
+          (treeSelectedChange)="onNodeSelected($event)"
+          (treeCheckBoxChange)="onNodeChecked($event)"
+          (treeExpandChange)="onNodeExpanded($event)"
         ></lib-tree>
         <lib-input [(ngModel)]="ExpendNodeKey" [inputPlaceholder]="'请输入节点key,多个节点用逗号隔开'" style="margin-top: 10px;"></lib-input>
         <div class="mt-3">
@@ -118,9 +118,9 @@
           [treeDefaultSelectedKeys]="['0']"
           [treeDefaultCheckedKeys]="['0']"
           [treeDefaultExpandedKeys]="['0']"
-          (selectedChange)="onNodeSelected($event)"
-          (checkBoxChange)="onNodeChecked($event)"
-          (expandChange)="onNodeExpanded($event)"
+          (treeSelectedChange)="onNodeSelected($event)"
+          (treeCheckBoxChange)="onNodeChecked($event)"
+          (treeExpandChange)="onNodeExpanded($event)"
           [treeVirtualHeight]="300"
           [treeVirtualItemSize]="24"
           [treeVirtualMinBuffer]="300"
@@ -166,7 +166,7 @@
         <lib-tree 
           [treeData]="basicTreeData2" 
           [treeSearchValue]="searchValue"
-          (searchChange)="onSearchChange($event)"
+          (treeSearchChange)="onSearchChange($event)"
         ></lib-tree>
       </div>
       <div description>
@@ -182,7 +182,7 @@
         <lib-tree 
           [treeData]="asyncTreeData" 
           [treeAsyncData]="true"
-          (loadData)="onLoadData($event)"
+          (treeLoadData)="onLoadData($event)"
         ></lib-tree>
       </div>
       <div description>

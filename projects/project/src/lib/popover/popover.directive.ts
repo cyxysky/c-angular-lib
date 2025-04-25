@@ -18,6 +18,8 @@ export class PopoverDirective implements OverlayBasicDirective {
   @Input('popoverPlacement') placement: OverlayBasicPosition = 'top';
   /** 提示触发方式 */
   @Input('popoverTrigger') trigger: OverlayBasicTrigger = 'hover';
+  /** 气泡类 */
+  @Input('popoverClass') popoverClass: string = '';
   /** 提示是否显示 */
   @Input('popoverVisible') visible: boolean = false;
   /** 是否严格由编程控制显示 */
@@ -113,10 +115,10 @@ export class PopoverDirective implements OverlayBasicDirective {
    */
   public show(): void {
     if (!this.strictVisiable && this.visible) return;
-    this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
     this.overlayRef = this.overlayService.createOverlay(
       {
+        panelClass: [this.popoverClass],
         positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false)
       },
       this.elementRef,
@@ -157,7 +159,7 @@ export class PopoverDirective implements OverlayBasicDirective {
     // 设置CSS类以添加动画效果
     this.utilsService.delayExecution(() => {
       this.changeVisible(true);
-    }, 0);
+    });
   }
 
   /**
@@ -200,10 +202,13 @@ export class PopoverDirective implements OverlayBasicDirective {
   /**
    * 关闭
    */
-  private closePopover(): void {
-    this.visible = false;
-    this.overlayRef && this.overlayRef.dispose();
+  public closePopover(): void {
+    if (this.overlayRef) {
+      this.overlayRef.detach();
+      this.overlayRef.dispose();
+    }
     this.overlayRef = null;
+    this.popoverComponentRef = null;
   }
 
 }

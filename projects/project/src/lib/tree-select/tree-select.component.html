@@ -54,10 +54,10 @@
                 [treeDefaultSelectedKeys]="defaultSelectedKeys"
                 [treeDefaultCheckedKeys]="defaultCheckedKeys"
                 [treeTemplate]="treeNodeTemplate"
-                (expandChange)="focusSearch()"
-                (selectedChange)="onNodeSelect($event.node)"
-                (checkBoxChange)="onCheckBoxChange($event)"
-                (loadData)="onLoadData($event)">
+                (treeSearchChange)="focusSearch()"
+                (treeSelectedChange)="onNodeSelect($event.node)"
+                (treeCheckBoxChange)="onCheckBoxChange($event)"
+                (treeLoadData)="onLoadData($event)">
             </lib-tree>
         </div>
     </div>

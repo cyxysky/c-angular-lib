@@ -24,6 +24,8 @@ export class DropMenuDirective implements OverlayBasicDirective {
   @Input('dropMenuVisible') visible: boolean = false;
   /** 是否严格由编程控制显示 */
   @Input('dropMenuStrictVisible') strictVisible: boolean = false;
+  /** 菜单类 */
+  @Input('dropMenuClass') dropMenuClass: string = '';
   /** 菜单宽度 */
   @Input('dropMenuWidth') width: number | string = 'auto';
   /** 菜单项模板 */
@@ -137,6 +139,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
     this.overlayRef = this.overlayService.createOverlay(
       // 配置
       {
+        panelClass: [this.dropMenuClass],
         positionStrategy: this.overlay.position().flexibleConnectedTo(this.elementRef).withPositions(positions).withPush(false).withGrowAfterOpen(true).withLockedPosition(false),
       },
       // 目标锚点元素
@@ -204,7 +207,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
     this.dropMenuComponentRef = componentRef;
     this.utilsService.delayExecution(() => {
       this.changeVisible(true);
-    }, 0);
+    });
   }
 
   /**
@@ -239,9 +242,12 @@ export class DropMenuDirective implements OverlayBasicDirective {
    * 关闭下拉菜单
    */
   private closeDropMenu(): void {
-    this.visible = false;
-    this.overlayRef && this.overlayRef.dispose();
+    if (this.overlayRef) {
+      this.overlayRef.detach();
+      this.overlayRef.dispose();
+    }
     this.overlayRef = null;
+    this.dropMenuComponentRef = null;
   }
 
   /**

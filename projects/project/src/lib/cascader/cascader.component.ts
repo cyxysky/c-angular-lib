@@ -185,17 +185,13 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.valueOptionMap.set(valueKey, option);
       this.optionValueMap.set(option, valueKey);
       // 记录父子关系
-      if (parent) {
-        this.optionParentMap.set(option, parent);
-      }
+      parent && this.optionParentMap.set(option, parent);
       // 记录选项路径
       const currentPath = [...path, option];
       const pathKey = this.getPathKey(currentPath);
       this.optionPathMap.set(pathKey, currentPath);
       // 递归处理子选项
-      if (this.hasChildren(option)) {
-        this.initOptionMaps(this.getChildren(option), option, currentPath);
-      }
+      this.hasChildren(option) && this.initOptionMaps(this.getChildren(option), option, currentPath);
     });
   }
 
@@ -205,38 +201,36 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       if (!options) return;
       for (const option of options) {
         // 设置默认状态
-        if (option.checked === undefined) option.checked = false;
-        if (option.halfChecked === undefined) option.halfChecked = false;
+        option.checked === undefined && (option.checked = false);
+        option.halfChecked === undefined && (option.halfChecked = false);
         // 递归初始化子选项
-        if (this.hasChildren(option)) {
-          initStates(this.getChildren(option));
-        }
+        this.hasChildren(option) && initStates(this.getChildren(option));
       }
     };
     initStates(this.options);
   }
 
-  openDropdown(): void {
+  public openDropdown(): void {
     if (this.disabled || this.isDropdownOpen) return;
     document.addEventListener('keydown', this.enhancedKeyboardHandler);
     // 重置临时选中路径为当前实际选中路径
     this.tempSelectedOptions = [...this.selectedOptions];
     // 准备列数据
     this.prepareColumnsFromSelection();
-    // 创建浮层
-    const origin = this.overlayOrigin.elementRef.nativeElement;
-    const basicConfig = this.overlayService.getSelectOverlayBasicConfig(origin);
+    const { config, origin, position } = this.overlayService.getSelectOverlayBasicConfig(this.overlayOrigin.elementRef.nativeElement);
     // 创建浮层（添加错误处理）
     this.overlayRef = this.overlayService.createOverlay(
-      basicConfig.config,
-      basicConfig.origin,
-      basicConfig.position,
+      config,
+      origin,
+      position,
       (ref, event) => {
         // 点击背景关闭
         if (this.isDropdownOpen) {
           const target = event.target as HTMLElement;
           if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
-          this.closeDropdown();
+          this.utilsService.delayExecution(() => {
+            this.closeDropdown();
+          }, 10);
         }
       },
       undefined); // 使用undefined代替null以符合类型要求
@@ -246,7 +240,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       // 聚焦搜索框
       this.focusSearch();
     }
-    this.changeDropdownVisiable(true);
+    this.utilsService.delayExecution(() => {
+      this.changeDropdownVisiable(true);
+    });
     // 设置键盘导航索引
     this.keyboardNavIndex = -1;
   }
@@ -254,11 +250,10 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 关闭下拉菜单
    */
-  closeDropdown(): void {
+  public closeDropdown(): void {
     if (!this.isDropdownOpen) return;
-    this.changeDropdownVisiable(false);
     this.blurSearch();
-    this.cdr.detectChanges();
+    this.changeDropdownVisiable(false);
     this.utilsService.delayExecution(() => {
       document.removeEventListener('keydown', this.enhancedKeyboardHandler);
       this.resetSearch();
@@ -277,7 +272,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 改变下拉菜单的显示状态
    * @param visiable 显示状态
    */
-  changeDropdownVisiable(visiable: boolean): void {
+  public changeDropdownVisiable(visiable: boolean): void {
     this.isDropdownOpen = visiable;
     this.visibleChange.emit(visiable);
     this.cdr.detectChanges();
@@ -291,7 +286,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   }
 
   // 列和选项管理
-  private prepareColumnsFromSelection(): void {
+  public prepareColumnsFromSelection(): void {
     // 始终从第一列开始
     this.columns = [this.options];
     this.activatedOptions = [];
@@ -366,16 +361,11 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     // 激活选项（这会更新临时选中状态）
     this.activateOption(option, columnIndex);
     // 可选择性检查
-    if (this.optionSelectFn && !this.optionSelectFn(option)) {
-      return;
-    }
+    if (this.optionSelectFn && !this.optionSelectFn(option)) return;
     // 多选模式复选框禁用检查
-    if (this.isMultiple && option.disableCheckbox) {
-      return;
-    }
+    if (this.isMultiple && option.disableCheckbox) return;
     // 判断是否可以选择
-    const canSelect = this.isLeaf(option) || this.changeOnSelect;
-    if (canSelect) {
+    if (this.isLeaf(option) || this.changeOnSelect) {
       if (this.isMultiple) {
         this.toggleMultipleSelection(option);
       } else {
@@ -432,8 +422,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public isOptionActivated(option: CascaderOption, columnIndex: number): boolean {
     if (!option) return false;
     // 确保选项在正确的位置被激活
-    return columnIndex < this.activatedOptions.length &&
-      this.activatedOptions[columnIndex] === option;
+    return columnIndex < this.activatedOptions.length && this.activatedOptions[columnIndex] === option;
   }
 
   /**
@@ -480,9 +469,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     option.checked = newCheckedState;
     option.halfChecked = false;
     // 更新子节点状态
-    if (this.hasChildren(option)) {
-      this.setChildrenCheckedState(option, newCheckedState);
-    }
+    this.hasChildren(option) && this.setChildrenCheckedState(option, newCheckedState);
     // 更新父节点状态
     this.updateParentCheckedState(option);
     // 更新选中路径映射
@@ -491,6 +478,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.updateMultipleValues();
     // 触发事件
     this.emitValueChange();
+    // 如果下拉菜单打开，则聚焦搜索
     this.isDropdownOpen && this.focusSearch();
   }
 
@@ -499,7 +487,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param option 选项
    * @param checked 选中状态
    */
-  private setChildrenCheckedState(option: CascaderOption, checked: boolean): void {
+  public setChildrenCheckedState(option: CascaderOption, checked: boolean): void {
     if (!this.hasChildren(option)) return;
     const children = this.getChildren(option);
     for (const child of children) {
@@ -518,7 +506,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 更新父节点的选中状态
    * @param option 选项
    */
-  private updateParentCheckedState(option: CascaderOption): void {
+  public updateParentCheckedState(option: CascaderOption): void {
     let currentOption = option;
     let parent = this.optionParentMap.get(currentOption);
     while (parent) {
@@ -553,7 +541,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 更新选中路径映射
    */
-  private updateSelectedPathsMap(): void {
+  public updateSelectedPathsMap(): void {
     this.selectedPathsMap.clear();
     // 递归函数，收集选中的路径
     const collectSelectedPaths = (options: CascaderOption[], parentPath: CascaderOption[] = []): void => {
@@ -584,7 +572,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param option 选项
    * @returns 是否所有子节点都被选中
    */
-  private areAllChildrenChecked(option: CascaderOption): boolean {
+  public areAllChildrenChecked(option: CascaderOption): boolean {
     if (!this.hasChildren(option)) return true;
     const children = this.getChildren(option).filter(c => !c.disabled && !c.disableCheckbox);
     return children.length > 0 && children.every(child => child.checked);
@@ -593,7 +581,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 更新多选值和显示标签
    */
-  private updateMultipleValues(): void {
+  public updateMultipleValues(): void {
     if (this.selectedPathsMap.size === 0) {
       this.value = [];
       return;
@@ -604,7 +592,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     );
   }
 
-  getDisplayOptions(): any {
+  public getDisplayOptions(): any {
     let result: any = [];
     if (this.isMultiple) {
       result = this.value && this.value.length > 0 ? this.value.map((item: any) => item.map((opt: any) => this.valueOptionMap.get(opt))) : [];
@@ -614,7 +602,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     return result;
   }
 
-  getLabel = (option: any): any => {
+  public getLabel = (option: any): any => {
     return option && option.length > 0 ? option.map((opt: any) => opt[this.labelProperty]).join(' / ') : null;
   }
 
@@ -644,7 +632,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 执行搜索
    * @param value 搜索值
    */
-  private performSearch(value: string): void {
+  public performSearch(value: string): void {
     if (!value) {
       this.filteredOptions = [];
       return;
@@ -690,7 +678,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param path 路径
    * @returns 是否过滤
    */
-  private safeFilterOption(inputValue: string, option: CascaderOption, path: CascaderOption[]): boolean {
+  public safeFilterOption(inputValue: string, option: CascaderOption, path: CascaderOption[]): boolean {
     if (!option || typeof option !== 'object') return false;
     if (this.optionFilterFn) {
       return this.optionFilterFn(inputValue, option, path);
@@ -712,7 +700,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 安全排序方法
    * @param options 选项
    */
-  private safeSort(options: CascaderOption[]): void {
+  public safeSort(options: CascaderOption[]): void {
     if (!Array.isArray(options)) return;
     options.sort((a, b) => {
       // 确保a和b都是有效对象
@@ -742,7 +730,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param option 选项
    * @returns 选项路径
    */
-  getOptionPath(option: CascaderOption | undefined): string {
+  public getOptionPath(option: CascaderOption | undefined): string {
     if (!option) return '';
     // 对于搜索结果，使用保存的路径
     if (option.path && Array.isArray(option.path)) {
@@ -886,9 +874,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public hasChildren(option: CascaderOption | undefined): boolean {
     if (!option) return false;
     // 先根据 isLeaf 判断
-    if (option.isLeaf !== undefined) {
-      return !option.isLeaf;
-    }
+    if (option.isLeaf !== undefined) return !option.isLeaf;
     // 再根据子节点数组判断
     const children = this.getChildren(option);
     return Array.isArray(children) && children.length > 0;
@@ -911,9 +897,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @returns 是否为叶子节点
    */
   public isLeaf(option: CascaderOption): boolean {
-    if (option.isLeaf !== undefined) {
-      return option.isLeaf;
-    }
+    if (option.isLeaf !== undefined) return option.isLeaf;
     return !this.hasChildren(option);
   }
 
@@ -945,15 +929,11 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param event 事件
    */
   public clear(): void {
-    if (this.isMultiple) {
-      this.resetAllCheckedStates(this.options);
-      this.selectedPathsMap.clear();
-      this.indeterminateSet.clear();
-      this.value = [];
-    } else {
-      this.selectedOptions = [];
-      this.value = [];
-    }
+    this.isMultiple && this.resetAllCheckedStates(this.options);
+    this.selectedOptions = [];
+    this.selectedPathsMap.clear();
+    this.indeterminateSet.clear();
+    this.value = [];
     this.emitValueChange();
   }
 
@@ -1232,7 +1212,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 重置所有选中状态
    * @param options 选项
    */
-  private resetAllCheckedStates(options: CascaderOption[]): void {
+  public resetAllCheckedStates(options: CascaderOption[]): void {
     if (!options) return;
     for (const option of options) {
       option.checked = false;
@@ -1246,7 +1226,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 更新半选状态
    */
-  private updateIndeterminateStatus(): void {
+  public updateIndeterminateStatus(): void {
     if (!this.isMultiple) return;
     // 清空原有的半选集合
     this.indeterminateSet.clear();
@@ -1273,7 +1253,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * @param columnIndex 列索引
    * @param event 事件
    */
-  onCheckboxClick(option: CascaderOption, columnIndex: number, event: Event | null): void {
+  public onCheckboxClick(option: CascaderOption, columnIndex: number, event: Event | null): void {
     event?.stopPropagation();
     if (option.disabled || option.disableCheckbox) return;
     this.tempSelectedOptions[columnIndex] = option;
