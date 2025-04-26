@@ -1,10 +1,12 @@
-import { Component, ChangeDetectionStrategy, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2 } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableColumn } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { SelectComponent } from '../select/select.component';
 import { NumberInputComponent } from '../number-input/number-input.component';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from "../button/button.component";
+import { InputComponent } from "../input/input.component";
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -21,15 +23,17 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
 }
 
 @Component({
-  selector: 'lib-table',
   imports: [
     CommonModule,
     DropMenuDirective,
     SelectComponent,
     NumberInputComponent,
     FormsModule,
-    PageSizeOptionsFormatPipe
+    PageSizeOptionsFormatPipe,
+    ButtonComponent,
+    InputComponent
   ],
+  selector: 'lib-table',
   standalone: true,
   templateUrl: './table.component.html',
   styleUrl: './table.component.less',
@@ -117,12 +121,16 @@ export class TableComponent implements OnInit, OnChanges {
   // 各列的宽度缓存
   private columnWidths: Map<string, number> = new Map();
 
+  // 各列的筛选状态
+  public filterVisible: boolean = false;
+
   // 原始数据备份，用于筛选和排序
   private originalData: any[] = [];
 
   constructor(
     private elementRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -402,8 +410,9 @@ export class TableComponent implements OnInit, OnChanges {
    * 确认筛选
    */
   confirmFilter(column: TableColumn): void {
-    if (!column) return;
-
+    console.log('confirmFilter', column);
+    this.filterVisible = false;
+    this.cdr.detectChanges();
   }
 
   /**
@@ -428,21 +437,18 @@ export class TableComponent implements OnInit, OnChanges {
    * 重置筛选
    */
   resetFilter(column: TableColumn): void {
+    this.filterVisible = false;
     if (!column) return;
-
     // 如果是前端筛选，恢复为原始数据后再应用其他筛选条件
     if (this.frontPagination) {
       // 先恢复原始数据
       this.data = [...this.originalData];
-
       // 然后应用其他列的筛选条件
       const filteredData = this.applyFilters(this.data);
       this.data = filteredData;
-
       // 刷新数据
       this.refreshData();
     }
-
     this.filterChange.emit({ field: column.field, value: [] });
   }
 

@@ -12,10 +12,16 @@
   </div>
 
   <!-- 表格主体 -->
-  <div class="lib-table" [class.lib-table-bordered]="bordered" [class.lib-table-small]="size === 'small'"
-    [class.lib-table-middle]="size === 'middle'" [class.lib-table-fixed-header]="scroll?.y"
-    [class.lib-table-fixed-left]="hasFixedLeft" [class.lib-table-fixed-right]="hasFixedRight"
-    [class.lib-table-loading]="loading" [class.lib-table-scrollable]="scroll?.x || scroll?.y">
+  <div 
+    class="lib-table" 
+    [class.lib-table-bordered]="bordered" 
+    [class.lib-table-small]="size === 'small'"
+    [class.lib-table-middle]="size === 'middle'" 
+    [class.lib-table-fixed-header]="scroll?.y"
+    [class.lib-table-fixed-left]="hasFixedLeft" 
+    [class.lib-table-fixed-right]="hasFixedRight"
+    [class.lib-table-loading]="loading" 
+    [class.lib-table-scrollable]="scroll?.x || scroll?.y">
 
     <!-- 正中心加载动画 -->
     <div class="lib-table-center-loading" *ngIf="loading">
@@ -33,18 +39,21 @@
         <!-- 表头 -->
         <thead class="lib-table-thead">
           <tr>
-            <th *ngFor="let column of columns" [style.textAlign]="column.align || 'left'"
+            <th 
+              *ngFor="let column of columns" 
+              [style.textAlign]="column.align || 'left'"
               [style.width]="column.width || null"
               [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
               [class.lib-table-column-fixed-right]="column.fixed === 'right'"
-              [style.position]="column.fixed || scroll?.y ? 'sticky' : null" [style.top]="scroll?.y ? '0' : null"
+              [style.position]="column.fixed || scroll?.y ? 'sticky' : null" 
+              [style.top]="scroll?.y ? '0' : null"
               [style.left]="(column.fixed === 'left' || column.fixed === true) ? getLeftPosition(column) : null"
               [style.right]="column.fixed === 'right' ? getRightPosition(column) : null"
               [style.z-index]="getZIndex(column)">
               <div class="lib-table-column-title">
-                <ng-container *ngIf="!column.titleTemplate">{{ column.title }}</ng-container>
-                <ng-container *ngIf="column.titleTemplate">
-                  <ng-container *ngTemplateOutlet="column.titleTemplate; context: { $implicit: column }"></ng-container>
+                <ng-container *ngIf="!column.headTemplate">{{ column.title }}</ng-container>
+                <ng-container *ngIf="column.headTemplate">
+                  <ng-container *ngTemplateOutlet="column.headTemplate; context: { $implicit: column }"></ng-container>
                 </ng-container>
 
                 <!-- 排序按钮 -->
@@ -72,16 +81,38 @@
                  -->
                 <!-- 过滤按钮 -->
                 <div class="lib-table-filter" *ngIf="column.filterable">
-                  <span class="lib-table-filter-icon" libDropMenu [dropMenuPlacement]="'bottom-left'"
-                    [dropMenuTrigger]="'click'" [dropMenuTemplate]="column.filterTemplate || defaultFilterTpl"
+                  <span 
+                    class="lib-table-filter-icon" 
+                    libDropMenu 
+                    [dropMenuPlacement]="'bottom-left'"
+                    [dropMenuTrigger]="'click'"
+                    [(dropMenuVisible)]="filterVisible"
+                    [dropMenuTemplate]="column.filterTemplate || defaultFilterTpl"
                     (dropMenuItemClick)="onFilterItemClick(column, $event)">
-                    <svg viewBox="64 64 896 896" focusable="false" data-icon="filter" width="1em" height="1em"
-                      fill="currentColor" aria-hidden="true">
+                    <svg viewBox="64 64 896 896" focusable="false" data-icon="filter" width="1em" height="1em" fill="currentColor" aria-hidden="true">
                       <path
                         d="M349 838c0 17.7 14.2 32 31.8 32h262.4c17.6 0 31.8-14.3 31.8-32V642H349v196zm531.1-684H143.9c-24.5 0-39.8 26.7-27.5 48l221.3 376h348.8l221.3-376c12.1-21.3-3.2-48-27.7-48z">
                       </path>
                     </svg>
                   </span>
+                  <!-- 默认筛选模板 -->
+                  <ng-template #defaultFilterTpl>
+                    <div class="lib-table-filter-popover">
+                      <!-- 筛选模板 -->
+                      <ng-container >
+                        <ng-container>
+                          <div style="padding: 10px;width: 160px;">
+                            <lib-input></lib-input>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                      <!-- 底部按钮 -->
+                      <div class="lib-table-filter-popover-btns">
+                        <button class="lib-table-filter-popover-link confirm" (click)="confirmFilter(column)">确定</button>
+                        <button class="lib-table-filter-popover-link clear" (click)="resetFilter(column)">重置</button>
+                      </div>
+                    </div>
+                  </ng-template>
                 </div>
               </div>
             </th>
@@ -91,36 +122,48 @@
         <!-- 表格内容 -->
         <tbody class="lib-table-tbody">
           <ng-container *ngIf="currentPageData.length > 0; else emptyTpl">
-            <tr *ngFor="let item of currentPageData; let i = index">
-              <td *ngFor="let column of columns; let colIndex = index" [style.textAlign]="column.align || 'left'"
+            <tr *ngFor="let data of currentPageData; let rowIndex = index">
+              <td 
+                *ngFor="let column of columns; let colIndex = index" 
+                [style.textAlign]="column.align || 'left'"
                 [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
                 [class.lib-table-column-fixed-right]="column.fixed === 'right'"
                 [style.position]="column.fixed ? 'sticky' : null"
                 [style.left]="(column.fixed === 'left' || column.fixed === true) ? getLeftPosition(column) : null"
-                [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" [style.z-index]="1">
-                <!-- 操作列模板 -->
-                <ng-container *ngIf="column.type === 'operation'; else customOrDefaultCell">
-                  <div class="lib-table-operation-cell">
-                    <button class="lib-table-btn lib-table-btn-link">编辑</button>
-                    <button class="lib-table-btn lib-table-btn-link">删除</button>
-                  </div>
-                </ng-container>
-
-                <!-- 自定义或默认单元格内容 -->
-                <ng-template #customOrDefaultCell>
-                  <!-- 自定义单元格渲染 -->
-                  <ng-container *ngIf="column.customCell as cellTemplate; else defaultCell">
-                    <ng-container [ngTemplateOutlet]="cellTemplate"
-                      [ngTemplateOutletContext]="{ $implicit: item, text: item[column.field], record: item, index: i }">
-                    </ng-container>
+                [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" [style.z-index]="1"
+                >
+                <!-- 自定义渲染 -->
+                <ng-container *ngIf="column.template as cellTemplate; else defaultCell">
+                  <ng-container   
+                    [ngTemplateOutlet]="cellTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: data, field: column, index: rowIndex }"
+                    >
                   </ng-container>
-                  <ng-template #defaultCell>
-                    {{ item[column.field] }}
-                  </ng-template>
+                </ng-container>
+                <!-- 默认渲染 -->
+                <ng-template #defaultCell>
+                  {{ data[column.field] ? data[column.field] : '--' }}
                 </ng-template>
+                <!-- 按钮 -->
+                <div class="lib-table-operation-cell">
+                  <ng-container *ngFor="let button of column.buttons">
+                      <lib-button 
+                        *ngIf="button.show ? button.show(data, rowIndex) : true" 
+                        [buttonType]="button.type || 'default'"
+                        [buttonShape]="button.shape || 'default'" 
+                        [buttonSize]="button.size || 'middle'" 
+                        [buttonColor]="button.color || 'primary'"
+                        [buttonContent]="button.text" 
+                        [buttonIcon]="button.icon" 
+                        [buttonDisabled]="button.disabled"
+                        (click)="button.click(data, rowIndex)">
+                      </lib-button>
+                  </ng-container>
+                </div>
               </td>
             </tr>
           </ng-container>
+          <!-- 空数据 -->
           <ng-template #emptyTpl>
             <tr>
               <td [attr.colspan]="columns.length" class="lib-table-empty">
@@ -134,6 +177,8 @@
         </tbody>
       </table>
     </div>
+
+
 
     <!-- 表格底部 -->
     <div class="lib-table-footer" *ngIf="footer">
@@ -222,23 +267,4 @@
   </div>
 </div>
 
-<!-- 默认筛选模板 -->
-<ng-template #defaultFilterTpl let-column>
-  <div class="lib-table-filter-popover">
-    <!-- 筛选模板 -->
 
-    <!-- 底部按钮 -->
-    <div class="lib-table-filter-popover-btns">
-      <button class="lib-table-filter-popover-link confirm" (click)="confirmFilter(column)">确定</button>
-      <button class="lib-table-filter-popover-link clear" (click)="resetFilter(column)">重置</button>
-    </div>
-  </div>
-</ng-template>
-
-<!-- 筛选项模板 -->
-<ng-template #filterItemTpl let-item>
-  <label class="lib-table-filter-popover-item-label">
-    <input type="checkbox" [checked]="item.checked">
-    <span>{{ item.text }}</span>
-  </label>
-</ng-template>

@@ -1,4 +1,5 @@
 import { TemplateRef } from '@angular/core';
+import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from '../button';
 
 // 表格列筛选项接口
 export interface TableColumnFilter {
@@ -13,8 +14,8 @@ export interface TableColumnFilter {
 export interface TableColumn {
   // 列标题
   title: string;
-  // 列标题模板
-  titleTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
+  // 列头模板
+  headTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
   // 字段名，对应数据对象的属性
   field: string;
   // 列类型，operation表示操作列
@@ -31,12 +32,24 @@ export interface TableColumn {
   filterable?: boolean;
   // 筛选项
   filters?: TableColumnFilter;
-  // 自定义单元格渲染
-  customCell?: TemplateRef<{ $implicit: any; text: any; record: any; index: number }> | null;
   // 自定义筛选模板
   filterTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
+  // 表身模板
+  template?: TemplateRef<{ $implicit: any; field: TableColumn; index: number }> | null;
   // 是否固定列 (true/'left' 表示左固定，'right' 表示右固定)
   fixed?: boolean | 'left' | 'right';
+  // 按钮配置
+  buttons?: Array<{
+    type?: ButtonType;
+    shape?: ButtonShape;
+    size?: ButtonSize;
+    color?: ButtonColor;
+    text: string;
+    icon?: string;
+    disabled?: boolean;
+    show?: (data: any, rowIndex: number) => boolean;
+    click: (data: any, rowIndex: number) => void;
+  }>;
 }
 
 export interface TableSize {

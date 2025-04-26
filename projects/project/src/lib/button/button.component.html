@@ -26,6 +26,9 @@
 
     [class.c-lib-button-block]="block"
     >
+    @if(icon){
+        <i class="c-lib-button-icon" [class]="icon"></i>
+    }
     {{ content }}
     <ng-content></ng-content>
     @if(ripple.x){

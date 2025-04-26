@@ -36,12 +36,13 @@ export class DropMenuDirective implements OverlayBasicDirective {
   @Input('dropMenuMouseLeaveDelay') mouseLeaveDelay: number = 500;
   /** 是否自动关闭菜单 */
   @Input('dropMenuAutoClose') autoClose: boolean = true;
+  /** 当前选中的菜单项 */
+  @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
+  
   /** 菜单显示状态改变事件 */
   @Output('dropMenuVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** 菜单项点击事件 */
   @Output('dropMenuItemClick') itemClick: EventEmitter<DropMenu> = new EventEmitter<DropMenu>();
-  /** 当前选中的菜单项 */
-  @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
   /** 纯模板 */
   @Input('dropMenuTemplate') template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 菜单项选中事件 */

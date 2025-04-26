@@ -37,6 +37,8 @@ export class ButtonComponent {
 	@Input({ alias: 'buttonContent' }) content: string | undefined;
 	/** 是否撑满父元素 */
 	@Input({ alias: 'buttonBlock', transform: booleanAttribute }) block: boolean = false;
+	/** 按钮图标 */
+	@Input({ alias: 'buttonIcon' }) icon: string | undefined;
 	
 	/** 波纹 */
 	public ripple: { x?: number; y?: number; size?: number } = {};
