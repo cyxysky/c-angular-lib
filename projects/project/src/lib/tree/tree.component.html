@@ -136,7 +136,11 @@
     >
     <ng-container *ngTemplateOutlet="expandedIcon || defaultExpandedIconTpl; context: { $implicit: node }"></ng-container>
     <ng-template #defaultExpandedIconTpl>
-      <i class="c-lib-tree-switcher-icon" [@rotate]="node.expanded ? 'end' : 'start'"></i>
+      @if (useExpandAnimation) {
+        <i class="c-lib-tree-switcher-icon" [@rotate]="node.expanded ? 'end' : 'start'"></i>
+      } @else {
+        <i class="c-lib-tree-switcher-icon" [ngClass]="node.expanded ? 'folder-open-icon' : 'folder-icon'"></i>
+      }
     </ng-template>
   </span>
   <!-- 异步加载 -->
@@ -144,12 +148,13 @@
     <div class="c-lib-tree-loading-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="c-lib-tree-loading-svg" color="rgba(23, 184, 199, 0.6)" fill="currentColor">
         <path d="M8 0a8 8 0 0 1 8 8h-2A6 6 0 0 0 8 2V0z" />
-    </svg>
+      </svg>
     </div>
   </span>
   <!-- 没有子节点的 -->
   <span 
-    *ngIf="!node.children || (!node.children.length && !asyncData) || node.isLeaf" class="c-lib-tree-switcher" 
+    *ngIf="!node.children || (!node.children.length && !asyncData) || node.isLeaf" 
+    class="c-lib-tree-switcher" 
     [class.c-lib-tree-flat-line]="showLine">
   </span>
 </ng-template>

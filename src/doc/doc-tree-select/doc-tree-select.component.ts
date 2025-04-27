@@ -380,10 +380,10 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'请选择'"
-      [treeMultiple]="false">
+      [treeSelectPlaceholder]="'请选择'"
+      [treeSelectIsMultiple]="false">
     </lib-tree-select>
     <p>当前值: {{ value }}</p>
   \`,
@@ -433,11 +433,11 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'请选择'"
-      [treeMultiple]="true"
-      [treeCheckable]="true">
+      [treeSelectPlaceholder]="'请选择'"
+      [treeSelectIsMultiple]="true"
+      [treeSelectCheckable]="true">
     </lib-tree-select>
     <p>当前值: {{ value | json }}</p>
   \`,
@@ -493,11 +493,11 @@ import { TreeSelectComponent, SegmentedComponent, TreeNodeOptions } from 'your-l
       </lib-segmented>
     </div>
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'请选择'"
-      [treeSize]="currentSize"
-      [treeMultiple]="false">
+      [treeSelectPlaceholder]="'请选择'"
+      [treeSelectSize]="currentSize"
+      [treeSelectIsMultiple]="false">
     </lib-tree-select>
     <p>当前尺寸: {{ currentSize }}</p>
   \`,
@@ -528,11 +528,11 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treeNodeTemplate]="customNodeTemplate"
-      [treePlaceholder]="'请选择自定义节点'"
-      [treeMultiple]="true">
+      [treeSelectNodeTemplate]="customNodeTemplate"
+      [treeSelectPlaceholder]="'请选择自定义节点'"
+      [treeSelectIsMultiple]="true">
     </lib-tree-select>
     <ng-template #customNodeTemplate let-node>
       <span class="custom-node">
@@ -590,11 +590,11 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'搜索节点'"
-      [treeShowSearch]="true"
-      [treeMultiple]="true">
+      [treeSelectPlaceholder]="'搜索节点'"
+      [treeSelectShowSearch]="true"
+      [treeSelectIsMultiple]="true">
     </lib-tree-select>
     <p>当前值: {{ value | json }}</p>
   \`,
@@ -635,12 +635,12 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'大数据量虚拟滚动'"
-      [treeVirtualScroll]="true"
-      [treeDropdownHeight]="300"
-      [treeMultiple]="true">
+      [treeSelectPlaceholder]="'大数据量虚拟滚动'"
+      [treeSelectVirtualScroll]="true"
+      [treeSelectDropdownHeight]="300"
+      [treeSelectIsMultiple]="true">
     </lib-tree-select>
     <p>已选择 {{ value?.length || 0 }} 个节点</p>
   \`,
@@ -685,11 +685,11 @@ import { TreeSelectComponent, TreeNodeOptions } from 'your-lib';
   imports: [TreeSelectComponent],
   template: \`
     <lib-tree-select
-      [treeData]="treeData"
+      [treeSelectOptions]="treeData"
       [(ngModel)]="value"
-      [treePlaceholder]="'自定义标签显示'"
-      [treeLabelTemplate]="customLabelTemplate"
-      [treeMultiple]="true">
+      [treeSelectPlaceholder]="'自定义标签显示'"
+      [treeSelectLabelTemplate]="customLabelTemplate"
+      [treeSelectIsMultiple]="true">
     </lib-tree-select>
     <ng-template #customLabelTemplate let-node>
       <span class="custom-label">

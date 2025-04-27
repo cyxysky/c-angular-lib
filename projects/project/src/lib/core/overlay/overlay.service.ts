@@ -14,7 +14,7 @@ export class OverlayService {
 
   /** 浮层显示动画时间 */
   public static overlayVisiableDuration = 150;
-  public selectOverlayPosition: ConnectedPosition[] = [{
+  public static selectOverlayPosition: ConnectedPosition[] = [{
     originX: 'start',
     originY: 'bottom',
     overlayX: 'start',
@@ -44,13 +44,13 @@ export class OverlayService {
         disposeOnNavigation: true,
         positionStrategy: this.overlay.position().
           flexibleConnectedTo(origin).
-          withPositions(this.selectOverlayPosition).
+          withPositions(OverlayService.selectOverlayPosition).
           withPush(true).
           withGrowAfterOpen(true).
           withLockedPosition(false)
       },
       origin: origin,
-      position: this.selectOverlayPosition,
+      position: OverlayService.selectOverlayPosition,
     }
   }
 

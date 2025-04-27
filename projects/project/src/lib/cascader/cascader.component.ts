@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayService } from '../core/overlay/overlay.service';
-import { CdkOverlayOrigin, OverlayRef, Overlay, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin, OverlayRef, Overlay, CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { CascaderExpandTrigger, CascaderOption, CascaderSize, CascaderTriggerType } from './cascader.interface';
@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 @Component({
   selector: 'lib-cascader',
   standalone: true,
-  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectBoxComponent],
+  imports: [CommonModule, FormsModule, CdkOverlayOrigin, CheckboxComponent, SelectBoxComponent, CdkConnectedOverlay],
   templateUrl: './cascader.component.html',
   encapsulation: ViewEncapsulation.None,
   providers: [
@@ -26,7 +26,9 @@ import * as _ from 'lodash';
 export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccessor {
   // 视图引用
   @ViewChild(CdkOverlayOrigin, { static: false }) overlayOrigin!: CdkOverlayOrigin;
-  @ViewChild('dropdownTemplate', { static: false }) dropdownTemplate!: TemplateRef<any>;
+  /** 浮层 */
+  @ViewChild(CdkConnectedOverlay, { static: false }) overlay!: CdkConnectedOverlay;
+  /** 搜索框 */
   @ViewChild('searchInput', { static: false }) searchInput!: SelectBoxComponent;
 
   // 输入属性
@@ -86,8 +88,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   activatedOptions: CascaderOption[] = [];
   /** 选中值 - 单选时为值数组，多选时为值数组的数组 */
   value: any[] | any[][] = [];
-  /** 浮层引用 */
-  overlayRef: OverlayRef | null = null;
   /** 下拉状态 */
   isDropdownOpen: boolean = false;
   /** 搜索关键字 */
@@ -116,10 +116,13 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /** 鼠标悬停关闭定时器 */
   public hoverCloseTimer: any = null;
   // 添加临时选中数组
-  tempSelectedOptions: CascaderOption[] = [];
+  public tempSelectedOptions: CascaderOption[] = [];
   /** 选项数据 */
   public options: CascaderOption[] = [];
-
+  /** 下拉菜单位置 */
+  public selectOverlayPosition: ConnectedPosition[] = OverlayService.selectOverlayPosition;
+  /** 下拉菜单是否打开 */
+  public isOverlayOpen: boolean = false;
   /** 标签属性 */
   get labelProperty(): string {
     return this.fieldNames.label;
@@ -135,9 +138,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private renderer: Renderer2,
-    private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef,
     private overlayService: OverlayService,
     private elementRef: ElementRef,
     public utilsService: UtilsService
@@ -210,41 +210,21 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     initStates(this.options);
   }
 
+  /**
+   * 打开下拉菜单
+   */
   public openDropdown(): void {
+    this.focusSearch();
     if (this.disabled || this.isDropdownOpen) return;
     document.addEventListener('keydown', this.enhancedKeyboardHandler);
     // 重置临时选中路径为当前实际选中路径
     this.tempSelectedOptions = [...this.selectedOptions];
     // 准备列数据
     this.prepareColumnsFromSelection();
-    const { config, origin, position } = this.overlayService.getSelectOverlayBasicConfig(this.overlayOrigin.elementRef.nativeElement);
-    // 创建浮层（添加错误处理）
-    this.overlayRef = this.overlayService.createOverlay(
-      config,
-      origin,
-      position,
-      (ref, event) => {
-        // 点击背景关闭
-        if (this.isDropdownOpen) {
-          const target = event.target as HTMLElement;
-          if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
-          this.utilsService.delayExecution(() => {
-            this.closeDropdown();
-          }, 10);
-        }
-      },
-      undefined); // 使用undefined代替null以符合类型要求
-    // 附加模板
-    if (this.overlayRef) {
-      this.overlayService.attachTemplate(this.overlayRef, this.dropdownTemplate, this.viewContainerRef);
-      // 聚焦搜索框
-      this.focusSearch();
-    }
-    this.utilsService.delayExecution(() => {
-      this.changeDropdownVisiable(true);
-    });
-    // 设置键盘导航索引
     this.keyboardNavIndex = -1;
+    this.isOverlayOpen = true;
+    this.cdr.detectChanges();
+    this.changeDropdownVisiable(true);
   }
 
   /**
@@ -258,12 +238,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       document.removeEventListener('keydown', this.enhancedKeyboardHandler);
       this.resetSearch();
       this.keyboardNavIndex = -1;
-      // 安全地销毁浮层
-      if (this.overlayRef) {
-        this.overlayRef.detach();
-        this.overlayRef.dispose();
-        this.overlayRef = null;
-      }
+      this.isOverlayOpen = false;
       this.cdr.detectChanges();
     }, OverlayService.overlayVisiableDuration)
   }
@@ -344,13 +319,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   /**
    * 异步更新下拉菜单位置
    */
-  public asyncUpdateDropdownPosition(): void {
-    if (!this.overlayRef) return;
-    this.utilsService.delayExecution(() => {
-      if (this.overlayRef && this.isDropdownOpen) {
-        this.overlayRef.updatePosition();
-      }
-    }, 0);
+  public updateOverlayPosition(): void {
+    if (this.overlay.overlayRef) this.overlayService.asyncUpdateOverlayPosition(this.overlay.overlayRef, 0);
+    this.cdr.detectChanges();
   }
 
   // 选项操作方法
@@ -409,7 +380,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
       this.columns.push(this.getChildren(option));
     }
     // 更新下拉位置和UI
-    this.asyncUpdateDropdownPosition();
+    this.updateOverlayPosition();
     this.cdr.markForCheck();
   }
 
@@ -1142,7 +1113,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
           this.activatedOptions.pop();
           this.tempSelectedOptions.pop();
           this.columns.pop();
-          this.asyncUpdateDropdownPosition();
+          this.updateOverlayPosition();
           this.cdr.markForCheck();
         }
         break;

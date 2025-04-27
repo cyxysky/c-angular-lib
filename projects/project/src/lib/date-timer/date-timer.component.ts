@@ -47,7 +47,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   @Output('dateTimerPanelModeChange') panelModeChange = new EventEmitter<DateTimerMode>();
   @Output('dateTimerCalendarChange') calendarChange = new EventEmitter<Date[] | null>();
-  @Output('dateTimerOpenChange') openChange = new EventEmitter<boolean>();
+  @Output('dateTimerVisibleChange') visibleChange = new EventEmitter<boolean>();
   @Output('dateTimerOk') ok = new EventEmitter<Date | RangeValue<Date> | null>();
 
   @ViewChild('inputElement') inputElement?: ElementRef;
@@ -62,7 +62,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
   value: Date | [Date, Date] | null = null;
 
   // UI状态
-  showDropdown = false;
+  isDropdownOpen = false;
   currentPanelMode: DateTimerMode = 'date';
   isFocused = false;
   selectedValue: Date | RangeValue<Date> | null = null;
@@ -285,39 +285,36 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
 
   // 打开下拉框
   openDropdown(): void {
-    if (this.disabled || this.showDropdown) return;
-
-    // 每次打开时，重置为选择开始时间
+    console.log(this.isDropdownOpen)
+    if (this.disabled || this.isDropdownOpen) return;
     this.rangePart = 'start';
-
-    // 如果是时间范围选择模式且已经完成选择，重置为选择开始时间
     if (this.selectType === 'range' && this.mode === 'time' && this.timeSelectStep === 'complete') {
       this.timeSelectStep = 'hour';
     }
-
-    this.showDropdown = true;
     this.isFocused = true;
-
     if (this.mode !== this.currentPanelMode) {
       this.currentPanelMode = this.mode;
     }
-
-    // 根据当前模式生成初始数据
     if (this.currentPanelMode === 'date') {
       this.generateDateMatrix();
     } else if (this.currentPanelMode === 'month') {
-      // 月份选择不需要特殊处理
     } else if (this.currentPanelMode === 'year') {
       this.updateYears();
     }
-
     this.createDropdownOverlay();
-    this.openChange.emit(true);
-    
-    // 在下一个渲染周期滚动到选中的时间选项
+    this.changeDropdownVisiable(true);
     setTimeout(() => {
       this.scrollToSelectedTime();
     }, 0);
+  }
+
+  /**
+ * 改变下拉菜单的显示状态
+ * @param visiable 显示状态
+ */
+  public changeDropdownVisiable(visiable: boolean): void {
+    this.isDropdownOpen = visiable;
+    this.visibleChange.emit(visiable);
   }
 
   /**
@@ -333,35 +330,20 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       return;
     }
     // 获取原始元素
-    const origin = this.overlayOrigin.elementRef.nativeElement;
-    // 定义位置策略
-    const positions: ConnectedPosition[] = [
-      {
-        originX: 'start',
-        originY: 'bottom',
-        overlayX: 'start',
-        overlayY: 'top',
-        offsetY: 4
-      },
-      {
-        originX: 'start',
-        originY: 'top',
-        overlayX: 'start',
-        overlayY: 'bottom',
-        offsetY: -4
-      }
-    ];
+    const { config, position, origin } = this.overlayService.getSelectOverlayBasicConfig(this.overlayOrigin.elementRef.nativeElement);
     // 创建浮层
     this.overlayRef = this.overlayService.createOverlay(
       {
+        ...config,
         minWidth: this.elementRef.nativeElement.getBoundingClientRect().width,
         panelClass: ['date-timer-dropdown-panel', this.showTime || this.mode === 'time' ? 'date-timer-dropdown-panel-time' : '']
       },
       origin,
-      positions,
+      position,
       (overlayRef: OverlayRef, event: Event) => {
-        // 点击外部关闭
-        this.closeDropdown();
+        this.utilsService.delayExecution(() => {
+          this.closeDropdown();
+        }, 10);
       },
       (position, isBackupUsed) => {
         // 位置变化回调，添加额外的样式类来应对不同位置的变化
@@ -389,28 +371,21 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         this.overlayRef?.updatePosition();
       }, 0);
     }
-    // 监听浮层关闭
-    this.overlayRef.detachments().subscribe(() => {
-      this.ngZone.run(() => {
-        this.showDropdown = false;
-        this.openChange.emit(false);
-        this.overlayRef = null;
-      });
-    });
   }
 
   // 关闭下拉框
   closeDropdown(): void {
-    this.showDropdown = false;
     this.isFocused = false;
-    // 关闭时将rangePart重置为'start'，以便下次打开时从开始选择
     this.rangePart = 'start';
-    if (this.overlayRef) {
-      this.overlayRef.dispose();
-      this.overlayRef = null;
-    }
-    this.openChange.emit(false);
-    this.cdr.markForCheck();
+    this.changeDropdownVisiable(false);
+    this.utilsService.delayExecution(() => {
+      if (this.overlayRef) {
+        this.overlayRef.detach();
+        this.overlayRef.dispose();
+        this.overlayRef = null;
+      }
+      this.cdr.detectChanges();
+    }, OverlayService.overlayVisiableDuration);
   }
 
   // 清除选择
@@ -1024,7 +999,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 单选模式，更新小时值
       this.updateTimeValue('hour', hour);
       this.cdr.markForCheck();
-      
+
       // 在选择小时后滚动到选中的分钟
       setTimeout(() => {
         if (this.minuteListRef && this.minuteListRef.nativeElement) {
@@ -1032,7 +1007,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           this.minuteListRef.nativeElement.scrollTop = minuteValue * 32;
         }
       }, 0);
-      
+
       return;
     }
     if (this.selectType === 'range') {
@@ -1055,7 +1030,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 更新小时值
       this.updateTimeRangeValue('hour', hour);
       this.cdr.markForCheck();
-      
+
       // 在选择小时后滚动到选中的分钟
       setTimeout(() => {
         if (this.minuteListRef && this.minuteListRef.nativeElement) {
@@ -1075,7 +1050,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 单选模式，更新分钟值
       this.updateTimeValue('minute', minute);
       this.cdr.markForCheck();
-      
+
       // 在选择分钟后滚动到选中的秒钟
       setTimeout(() => {
         if (this.secondListRef && this.secondListRef.nativeElement) {
@@ -1083,7 +1058,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           this.secondListRef.nativeElement.scrollTop = secondValue * 32;
         }
       }, 0);
-      
+
       return;
     }
     if (this.selectType === 'range') {
@@ -1106,7 +1081,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
       // 更新分钟值
       this.updateTimeRangeValue('minute', minute);
       this.cdr.markForCheck();
-      
+
       // 在选择分钟后滚动到选中的秒钟
       setTimeout(() => {
         if (this.secondListRef && this.secondListRef.nativeElement) {
@@ -2201,7 +2176,7 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
     // 更新onChange
     this._onChange(this.selectedValue);
     this.cdr.markForCheck();
-    
+
     // 切换范围选择部分后，滚动到新选择部分的选中时间
     setTimeout(() => {
       this.scrollToSelectedTime();
@@ -2213,10 +2188,10 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
    */
   scrollToSelectedTime(): void {
     if (!this.selectedValue) return;
-    
+
     const getSelectedTimeValue = (unit: 'hour' | 'minute' | 'second'): number => {
       let date: Date | null = null;
-      
+
       if (this.selectType === 'single') {
         if (this.isSingleDate(this.selectedValue)) {
           date = this.selectedValue as Date;
@@ -2235,9 +2210,9 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
           }
         }
       }
-      
+
       if (!date) return 0;
-      
+
       switch (unit) {
         case 'hour': return getHours(date);
         case 'minute': return getMinutes(date);
@@ -2245,22 +2220,22 @@ export class DateTimerComponent implements OnInit, ControlValueAccessor {
         default: return 0;
       }
     };
-    
+
     // 获取每个时间列表项的高度，默认是32px
     const itemHeight = 32;
-    
+
     // 滚动小时列表
     if (this.hourListRef && this.hourListRef.nativeElement) {
       const hourValue = getSelectedTimeValue('hour');
       this.hourListRef.nativeElement.scrollTop = hourValue * itemHeight;
     }
-    
+
     // 滚动分钟列表
     if (this.minuteListRef && this.minuteListRef.nativeElement) {
       const minuteValue = getSelectedTimeValue('minute');
       this.minuteListRef.nativeElement.scrollTop = minuteValue * itemHeight;
     }
-    
+
     // 滚动秒钟列表
     if (this.secondListRef && this.secondListRef.nativeElement) {
       const secondValue = getSelectedTimeValue('second');

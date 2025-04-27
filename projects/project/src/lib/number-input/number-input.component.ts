@@ -189,7 +189,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * @param value 值
    */
   private updateValue(value: number | null): void {
-    if (value === null) {
+    if (value === null || value === undefined) {
       this.value.set(null);
       this.onChange(null);
       return;
@@ -212,7 +212,7 @@ export class NumberInputComponent implements ControlValueAccessor {
    * 写入值
    */
   writeValue(value: number | null): void {
-    if (value === null) {
+    if (value === null || value === undefined) {
       this.value.set(null);
       return;
     }

@@ -60,6 +60,6 @@
         <!-- 下拉 -->
         <i *ngIf="!loading && !search && data && !disabled" class="bi bi-caret-down-fill c-lib-select-basic-box-icon"  [ngClass]="{'c-lib-select-basic-box-icon-clear': allowClear}" [style.transform]="isActive ? 'rotate(180deg)' : 'rotate(0deg)'"></i>
         <!-- 清空 -->
-        <i *ngIf="!loading && allowClear && !isActive && !disabled" class="bi-x-circle-fill c-lib-select-basic-box-clear-icon" (click)="clearValue($event)"></i>
+        <i *ngIf="!loading && allowClear && !isActive && !disabled && data && data.length > 0" class="bi-x-circle-fill c-lib-select-basic-box-clear-icon" (click)="clearValue($event)"></i>
     </div>
 </div>

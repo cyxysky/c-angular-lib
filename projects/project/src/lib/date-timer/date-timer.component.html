@@ -58,6 +58,7 @@
 <ng-template #dropdownTemplate>
   <div 
     class="c-lib-date-timer-dropdown"
+    [class.c-lib-date-timer-dropdown-visible]="isDropdownOpen"
     [class.c-lib-date-timer-dropdown-time]="currentPanelMode === 'time' && !showTime"
     [class.c-lib-date-timer-dropdown-date-time]="showTime && ['date', 'week'].includes(mode)"
   >

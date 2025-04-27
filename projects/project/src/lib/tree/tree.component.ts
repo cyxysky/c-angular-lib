@@ -100,7 +100,7 @@ export class TreeComponent implements OnInit, OnChanges {
   selectedKeys: Set<string> = new Set();
   /** 选中的节点 */
   checkedKeys: Set<string> = new Set();
-  /** 不确定的节点 */
+  /** 半选的节点 */
   indeterminateKeys: Set<string> = new Set();
   /** 搜索结果 */
   searchResults: TreeNodeOptions[] = [];
@@ -142,8 +142,7 @@ export class TreeComponent implements OnInit, OnChanges {
     return Array(level).fill(0).map((_, i) => i);
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   ngAfterViewInit(): void {
     this.treeFinishViewInit.emit();
@@ -151,6 +150,7 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('changes', changes);
     if (changes['searchValue'] && !changes['searchValue'].firstChange) {
       this.searching = true;
       this.handleSearch();
@@ -182,12 +182,13 @@ export class TreeComponent implements OnInit, OnChanges {
    */
   initDefaultExpandedKeys(): void {
     this.expendByNodes(this.defaultExpandedKeys, true, true);
+    this.cdr.detectChanges();
   }
 
   /**
    * 初始化默认选中的节点
    */
-  initDefaultSelectedKeys(): void {
+  public initDefaultSelectedKeys(): void {
     this.defaultSelectedKeys.forEach(key => {
       const node = this.flattenNodes.get(key);
       if (node && !node.disabled && node.selectable !== false) {
@@ -196,12 +197,13 @@ export class TreeComponent implements OnInit, OnChanges {
       }
     });
     this.expendByNodes(this.defaultSelectedKeys, false, false);
+    this.cdr.detectChanges();
   }
 
   /**
    * 初始化checkbox默认选中的节点
    */
-  initDefaultCheckedKeys(): void {
+  public initDefaultCheckedKeys(): void {
     // 先处理所有直接被指定要选中的节点
     this.defaultCheckedKeys.forEach(key => {
       const node = this.flattenNodes.get(key);
@@ -210,7 +212,6 @@ export class TreeComponent implements OnInit, OnChanges {
         node.checked = true;
       }
     });
-
     // 第二次遍历，确保父子节点状态一致
     this.defaultCheckedKeys.forEach(key => {
       const node = this.flattenNodes.get(key);
@@ -221,6 +222,8 @@ export class TreeComponent implements OnInit, OnChanges {
         this.updateParentCheckState(node);
       }
     });
+    console.log(this.treeData);
+    this.cdr.detectChanges();
   }
 
   /**
@@ -247,9 +250,7 @@ export class TreeComponent implements OnInit, OnChanges {
           isLast: index === nodes.length - 1,
           level
         });
-        if (parent) {
-          this.virtualFlattenNodesParentMap.set(node[this.valueProperty], parent[this.valueProperty]);
-        }
+        parent && this.virtualFlattenNodesParentMap.set(node[this.valueProperty], parent[this.valueProperty]);
       }
       // 将多个条件判断合并成一个循环
       this.flattenNodes.set(node[this.valueProperty], node);
@@ -270,7 +271,7 @@ export class TreeComponent implements OnInit, OnChanges {
   /**
    * 展开所有节点
    */
-  handleExpandAll(): void {
+  public handleExpandAll(): void {
     this.expandedKeys = new Set();
     this.traverseNodesForExpandAll(this.treeData);
     this.cdr.detectChanges();
@@ -294,7 +295,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * 节点展开事件
    * @param node 节点
    */
-  onNodeExpand(node: TreeNodeOptions): void {
+  public onNodeExpand(node: TreeNodeOptions): void {
     if (this.asyncData && (!node?.[this.childrenProperty] || node?.[this.childrenProperty]?.length === 0) && !node.isLeaf) {
       // 异步加载数据
       node.changeChildren = (children: TreeNodeOptions[]) => {
@@ -325,7 +326,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 节点
    * @param event 事件
    */
-  onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
+  public onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
     if (node.disabled || node.selectable === false) return;
     if (this.checkable) {
       this.onNodeCheck(node, !node.checked);
@@ -351,7 +352,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 节点
    * @param checked 是否选中
    */
-  onNodeCheck(node: TreeNodeOptions, checked: boolean): void {
+  public onNodeCheck(node: TreeNodeOptions, checked: boolean): void {
     if (node.disabled || node.disableCheckbox) {
       return;
     }
@@ -381,13 +382,8 @@ export class TreeComponent implements OnInit, OnChanges {
         if (!child.disabled && !child.disableCheckbox) {
           child.checked = checked;
           child.indeterminate = false;
-          if (checked) {
-            this.checkedKeys.add(child[this.valueProperty]);
-            this.indeterminateKeys.delete(child[this.valueProperty]);
-          } else {
-            this.checkedKeys.delete(child[this.valueProperty]);
-            this.indeterminateKeys.delete(child[this.valueProperty]);
-          }
+          checked ? this.checkedKeys.add(child[this.valueProperty]) : this.checkedKeys.delete(child[this.valueProperty]);
+          this.indeterminateKeys.delete(child[this.valueProperty]);
           this.updateChildrenCheckState(child, checked);
         }
       });
@@ -439,7 +435,7 @@ export class TreeComponent implements OnInit, OnChanges {
   /**
    * 处理搜索
    */
-  handleSearch(): void {
+  public handleSearch(): void {
     // 简化搜索逻辑
     if (!this.searchValue) {
       this.searchResults = [];
@@ -470,6 +466,8 @@ export class TreeComponent implements OnInit, OnChanges {
   /**
    * 展开节点
    * @param nodes 节点
+   * @param resetExpanded 是否重置展开状态
+   * @param expandSelf 是否展开自身
    */
   private expendByNodes(keys: string[], resetExpanded: boolean = true, expandSelf: boolean = true): void {
     if (resetExpanded) {
@@ -541,7 +539,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * 判断是否显示空状态
    * @returns 
    */
-  showEmptyState(): boolean {
+  public showEmptyState(): boolean {
     return this.searchValue !== undefined &&
       this.searchValue !== '' &&
       this.searchResults.length === 0 &&
@@ -601,7 +599,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 节点
    * @returns 索引
    */
-  trackBy(index: number, node: any): number {
+  public trackBy(index: number, node: any): number {
     return index;
   }
 
@@ -609,7 +607,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * 获取可见的虚拟节点，用于虚拟滚动
    * @returns 可见的虚拟节点
    */
-  getVisibleVirtualNodes(): Array<any> {
+  public getVisibleVirtualNodes(): Array<any> {
     return !this.flattenVirtualNodes?.length ? [] : this.flattenVirtualNodes.filter(item => item.node && this.isNodeVisible(item.node[this.valueProperty]));
   }
 
@@ -618,7 +616,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param nodeKey 节点key
    * @returns 是否可见
    */
-  isNodeVisible(nodeKey: string): boolean {
+  public isNodeVisible(nodeKey: string): boolean {
     if (!this.virtualFlattenNodesParentMap.has(nodeKey)) return true;
 
     let currentKey = nodeKey;

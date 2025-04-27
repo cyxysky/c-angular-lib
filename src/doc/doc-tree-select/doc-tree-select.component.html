@@ -20,12 +20,12 @@
       <div demo>
         <lib-tree-select
           name="basicTreeSelect"
-          [treeData]="basicTreeData"
+          [treeSelectOptions]="basicTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="basicValue"
-          [treePlaceholder]="'请选择'"
+          [treeSelectPlaceholder]="'请选择'"
           (ngModelChange)="con($event)"
-          [treeMultiple]="false">
+          [treeSelectIsMultiple]="false">
         </lib-tree-select>
         <p class="example-value">当前值: {{ basicValue }}</p>
       </div>
@@ -41,13 +41,13 @@
       <div demo>
         <lib-tree-select
           name="multipleTreeSelect"
-          [treeData]="multipleTreeData"
+          [treeSelectOptions]="multipleTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="multipleValue"
-          [treePlaceholder]="'请选择'"
+          [treeSelectPlaceholder]="'请选择'"
           (ngModelChange)="con($event)"
-          [treeMultiple]="true"
-          [treeCheckable]="true">
+          [treeSelectIsMultiple]="true"
+          [treeSelectCheckable]="true">
         </lib-tree-select>
         <p class="example-value">当前值: {{ multipleValue | json }}</p>
       </div>
@@ -70,13 +70,13 @@
         </div>
         <lib-tree-select
           name="sizeTreeSelect"
-          [treeData]="basicTreeData"
+          [treeSelectOptions]="basicTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="basicValue"
-          [treeMultiple]="true"
-          [treeCheckable]="true"
-          [treePlaceholder]="'请选择'"
-          [treeSize]="currentSize">
+          [treeSelectIsMultiple]="true"
+          [treeSelectCheckable]="true"
+          [treeSelectPlaceholder]="'请选择'"
+          [treeSelectSize]="currentSize">
         </lib-tree-select>
         <p class="example-value">当前尺寸: {{ currentSize }}</p>
       </div>
@@ -92,12 +92,12 @@
       <div demo>
         <lib-tree-select
           name="customNodeTreeSelect"
-          [treeData]="stateTreeData"
+          [treeSelectOptions]="stateTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="stateValue"
-          [treeNodeTemplate]="customNodeTemplate"
-          [treePlaceholder]="'请选择自定义节点'"
-          [treeMultiple]="true">
+          [treeSelectNodeTemplate]="customNodeTemplate"
+          [treeSelectPlaceholder]="'请选择自定义节点'"
+          [treeSelectIsMultiple]="true">
         </lib-tree-select>
         <ng-template #customNodeTemplate let-node>
           <span class="custom-node">
@@ -119,12 +119,12 @@
       <div demo>
         <lib-tree-select
           name="searchTreeSelect"
-          [treeData]="searchTreeData"
+          [treeSelectOptions]="searchTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="searchValue"
-          [treePlaceholder]="'搜索节点'"
-          [treeShowSearch]="true"
-          [treeMultiple]="true">
+          [treeSelectPlaceholder]="'搜索节点'"
+          [treeSelectShowSearch]="true"
+          [treeSelectIsMultiple]="true">
         </lib-tree-select>
         <p class="example-value">当前值: {{ searchValue | json }}</p>
       </div>
@@ -140,13 +140,13 @@
       <div demo>
         <lib-tree-select
           name="virtualTreeSelect"
-          [treeData]="virtualTreeData"
+          [treeSelectOptions]="virtualTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="virtualValue"
-          [treePlaceholder]="'大数据量虚拟滚动'"
-          [treeVirtualScroll]="true"
-          [treeDropdownHeight]="300"
-          [treeMultiple]="true">
+          [treeSelectPlaceholder]="'大数据量虚拟滚动'"
+          [treeSelectVirtualScroll]="true"
+          [treeSelectDropdownHeight]="300"
+          [treeSelectIsMultiple]="true">
         </lib-tree-select>
         <p class="example-value">已选择 {{ virtualValue && virtualValue.length || 0 }} 个节点</p>
       </div>
@@ -162,12 +162,12 @@
       <div demo>
         <lib-tree-select
           name="customLabelTreeSelect"
-          [treeData]="searchTreeData"
+          [treeSelectOptions]="searchTreeData"
           [treeSelectCustomFields]="customFieldNames"
           [(ngModel)]="labelValue"
-          [treePlaceholder]="'自定义标签显示'"
-          [treeLabelTemplate]="customLabelTemplate"
-          [treeMultiple]="true">
+          [treeSelectPlaceholder]="'自定义标签显示'"
+          [treeSelectLabelTemplate]="customLabelTemplate"
+          [treeSelectIsMultiple]="true">
         </lib-tree-select>
         <ng-template #customLabelTemplate let-node>
           <span class="custom-label">

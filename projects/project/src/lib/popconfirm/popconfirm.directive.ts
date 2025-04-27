@@ -97,6 +97,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
+    this.closePopover();
     if (this.visible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay

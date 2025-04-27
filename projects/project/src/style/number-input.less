@@ -1,11 +1,7 @@
 .c-lib-number-input-error {
     border-color: #c5000f !important;
 
-    &:active {
-        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
-    }
-
-    &.focused {
+    &.c-lib-number-input-focused {
         box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
     }
 
@@ -20,20 +16,12 @@
             }
         }
     }
-
-    .c-lib-number-input-container:hover & {
-        border-color: #c5000f !important;
-    }
 }
 
 .c-lib-number-input-warning {
     border-color: #ffc409 !important;
 
-    &:active {
-        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2) !important;
-    }
-
-    &.focused {
+    &.c-lib-number-input-focused {
         box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2) !important;
     }
 
@@ -48,28 +36,25 @@
             }
         }
     }
-
-    .c-lib-number-input-container:hover & {
-        border-color: #ffc409 !important;
-    }
 }
 
 .c-lib-number-input-container {
     position: relative;
     display: flex;
-    align-items: center;
-    padding: 4px 11px;
+    align-items: stretch;
+    padding: 0 11px;
     border: 1px solid #d9d9d9;
     border-radius: 2px;
     transition: all 0.3s;
     box-sizing: border-box;
     height: 32px;
+    font-size: 14px;
 
     &:hover {
         border-color: #1890ff;
     }
 
-    &-focused {
+    &.c-lib-number-input-focused {
         border-color: #1890ff;
         box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
     }
@@ -101,6 +86,7 @@
     padding: 0;
     font-size: 14px;
     background: transparent;
+    height: 100%;
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -114,12 +100,10 @@
     display: flex;
     flex: none;
     align-items: center;
+    height: calc(100% + 2px);
     color: rgba(0, 0, 0, 0.65);
 }
 
-.c-lib-number-input-prefix {
-    margin-right: 4px;
-}
 
 .c-lib-number-input-suffix {
     margin-left: 4px;
@@ -128,6 +112,7 @@
 
 .c-lib-number-input-content {
     width: calc(100% - 16px);
+    height: 100%;
     display: flex;
     align-items: center;
     overflow: hidden;

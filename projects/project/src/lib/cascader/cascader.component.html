@@ -1,6 +1,7 @@
 <lib-select-box 
-    cdkOverlayOrigin
     #searchInput
+    cdkOverlayOrigin
+    #overlayOrigin="cdkOverlayOrigin"
     [selectMode]="isMultiple ? 'multiple' : 'single'"
     [loading]="loading"
     [size]="size"
@@ -19,11 +20,20 @@
     (clear)="clear()"
     (remove)="removeItem($event)"
     (search)="onSearch($event)"
-    (inputWidthChange)="asyncUpdateDropdownPosition()"
+    (inputWidthChange)="updateOverlayPosition()"
     >
 </lib-select-box>
 <!-- 下拉菜单 -->
-<ng-template #dropdownTemplate>
+<ng-template 
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="overlayOrigin"
+    [cdkConnectedOverlayPush]="true"
+    [cdkConnectedOverlayPositions]="selectOverlayPosition"
+    [cdkConnectedOverlayGrowAfterOpen]="true"
+    [cdkConnectedOverlayHasBackdrop]="false"
+    [cdkConnectedOverlayWidth]="overlayOrigin.elementRef.nativeElement.getBoundingClientRect().width"
+    [cdkConnectedOverlayOpen]="isOverlayOpen"
+    (overlayOutsideClick)="closeDropdown()">
     <div class="c-lib-cascader-dropdown"
         [class.c-lib-cascader-dropdown-visible]="isDropdownOpen"
         [style.min-width]="menuWidth + 'px'"

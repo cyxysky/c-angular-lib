@@ -1,4 +1,4 @@
-import { CdkOverlayOrigin, Overlay, OverlayRef, OverlayConfig, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin, Overlay, OverlayRef, ConnectedPosition, CdkConnectedOverlay } from '@angular/cdk/overlay';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -10,7 +10,7 @@ import { UtilsService } from '../core/utils/utils.service';
 import { SelectBoxComponent } from '../select-basic/select-box/select-box.component';
 @Component({
   selector: 'lib-select',
-  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectBoxComponent],
+  imports: [CommonModule, FormsModule, ScrollingModule, CdkVirtualScrollViewport, CdkOverlayOrigin, SelectBoxComponent, CdkConnectedOverlay],
   templateUrl: './select.component.html',
   providers: [
     {
@@ -25,8 +25,8 @@ import { SelectBoxComponent } from '../select-basic/select-box/select-box.compon
 export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit {
   /** 浮层初始位置 */
   @ViewChild(CdkOverlayOrigin, { static: false }) _overlayOrigin!: CdkOverlayOrigin;
-  /** 浮层tamplet对象 */
-  @ViewChild('overlay', { static: false }) overlayTemplate!: TemplateRef<any>;
+  /** 浮层 */
+  @ViewChild(CdkConnectedOverlay, { static: false }) overlay!: CdkConnectedOverlay;
   /** 搜索盒子 */
   @ViewChild('searchInput', { static: false }) searchInput!: SelectBoxComponent;
 
@@ -78,8 +78,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
 
   /** 组件内部数据 */
   public _data: any = [];
-  /** 浮层引用 */
-  public overlayRef: OverlayRef | null = null;
   /** 模态框状态 */
   public isDropdownOpen: boolean = false;
   /** 搜索值 */
@@ -104,12 +102,14 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public flattenedGroupOptions: Array<{ type: 'group' | 'option', label?: string, option?: any }> = [];
   /** 当前激活选项的索引 */
   public activeOptionIndex: number = -1;
+  /** 下拉菜单位置 */
+  public selectOverlayPosition: ConnectedPosition[] = OverlayService.selectOverlayPosition;
+  /** 下拉菜单是否打开 */
+  public isOverlayOpen: boolean = false;
 
   constructor(
-    public overlay: Overlay,
     public viewContainerRef: ViewContainerRef,
     public cdr: ChangeDetectorRef,
-    public renderer: Renderer2,
     public overlayService: OverlayService,
     private utilsService: UtilsService
   ) {
@@ -143,12 +143,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     // 清理选项缓存
     this.optionMap.clear();
     this.customTags = [];
-    // 清理浮层
-    if (this.overlayRef) {
-      this.overlayRef.detach();
-      this.overlayRef.dispose();
-      this.overlayRef = null;
-    }
     // 确保所有引用置空
     this._data = null;
     this.filteredOptions = [];
@@ -215,50 +209,29 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 打开弹窗
    */
-  public openModal(): void {
-    if (this.overlayRef || this.disabled) return;
+  public openDropdown(): void {
     this.focusSearchInput();
+    if (this.disabled || this.isDropdownOpen) return;
     this.resetOptionList();
     this.initOptionsGroups();
-    const { config, origin, position } = this.overlayService.getSelectOverlayBasicConfig(this._overlayOrigin.elementRef.nativeElement);
-    this.overlayRef = this.overlayService.createOverlay(
-      config,
-      origin,
-      position,
-      (ref, event) => {
-        const target = event.target as HTMLElement;
-        if (target.closest('[data-role="tag-close-button"]') || target.closest('.select-tag-close-icon')) return;
-        this.utilsService.delayExecution(() => {
-          this.closeModal(ref)
-        }, 10);
-      }
-    );
-    // 附加模板
-    this.overlayService.attachTemplate(this.overlayRef, this.overlayTemplate, this.viewContainerRef);
     // 添加键盘事件监听
     document.addEventListener('keydown', this.onKeyboardNavigate);
-    this.utilsService.delayExecution(() => {
-      this.changeDropdownVisiable(true);
-    });
+    this.isOverlayOpen = true;
+    this.cdr.detectChanges();
+    this.changeDropdownVisiable(true);
   }
 
   /**
    * 关闭弹窗
-   * @param overlayRef 浮层引用
    */
-  public closeModal(overlayRef: OverlayRef | null): void {
+  public closeDropdown(): void {
     this.changeDropdownVisiable(false);
     this.activeOptionIndex = -1;
     document.removeEventListener('keydown', this.onKeyboardNavigate);
     this.cdr.detectChanges();
     this.utilsService.delayExecution(() => {
       this.resetSearchState();
-      if (overlayRef) {
-        overlayRef.detach(); // 先分离内容
-        overlayRef.dispose(); // 再完全销毁浮层
-        this.overlayRef = null;
-        this.cdr.detectChanges();
-      }
+      this.isOverlayOpen = false;
     }, OverlayService.overlayVisiableDuration);
   }
 
@@ -346,7 +319,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     if (disabled) return;
     if (this.selectMode === 'single') {
       this.handleSelectionChange(value, 'add');
-      this.closeModal(this.overlayRef);
+      this.closeDropdown();
       return;
     }
     // 多选
@@ -371,7 +344,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this._data = Array.isArray(data) ? data : data !== null && data !== undefined ? [data] : [];
     // 单选模式输出第一个元素，多选模式输出整个数组
     this.onChange(this.selectMode === 'multiple' ? this._data : this._data.length > 0 ? this._data[0] : null);
-    this.updateOverlayRefPosition();
+    this.updateOverlayPosition();
     this.cdr.detectChanges();
   }
 
@@ -502,10 +475,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 异步更新浮层位置
    */
-  public updateOverlayRefPosition(): void {
-    this.utilsService.delayExecution(() => {
-      this.overlayRef && this.overlayRef.updatePosition();
-    }, 0);
+  public updateOverlayPosition(): void {
+    if (this.overlay.overlayRef) this.overlayService.asyncUpdateOverlayPosition(this.overlay.overlayRef, 0);
+    this.cdr.detectChanges();
   }
 
   /**
@@ -540,7 +512,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       this._data = Array.isArray(obj) ? (obj.length > 0 ? [obj[0]] : []) : [obj];
     }
     this.cdr.detectChanges();
-    this.updateOverlayRefPosition();
+    this.updateOverlayPosition();
   }
   public registerOnChange(fn: any): void {
     this.onChange = fn;

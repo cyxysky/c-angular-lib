@@ -133,8 +133,8 @@ export class DropMenuDirective implements OverlayBasicDirective {
    * 显示下拉菜单
    */
   public show(): void {
-    if (!this.strictVisible && this.visible) return;
     this.closeDropMenu();
+    if (!this.strictVisible && this.visible) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(

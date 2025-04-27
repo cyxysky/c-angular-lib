@@ -122,6 +122,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 显示tooltip
    */
   public show(): void {
+    this.closeTooltip();
     if (!this.strictVisiable && (this.visible || !this.tooltipContent)) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay

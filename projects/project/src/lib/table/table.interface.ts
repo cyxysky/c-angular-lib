@@ -3,11 +3,10 @@ import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from '../button';
 
 // 表格列筛选项接口
 export interface TableColumnFilter {
-  type: 'text' | 'number' | 'date' | 'select' | 'select-multiple' | 'cascader' | 'cascader-multiple' | 'tree-select' | 'tree-select-multiple' | 'tree-select-checkable';
-  name: string;
+  type: 'text' | 'number' | 'date' | 'select' | 'select-multiple' | 'cascader' | 'cascader-multiple' | 'tree-select' | 'tree-select-multiple' | 'tree-select-checkable' | 'date-range' | 'radio' | 'checkbox';
   defaultValue?: any | { start: any, end: any };
   options?: any[];
-  checked?: boolean;
+  condition?: TableColumnFilterCondition[];
 }
 
 // 表格列接口
@@ -52,8 +51,36 @@ export interface TableColumn {
   }>;
 }
 
-export interface TableSize {
-  default: 'default';
-  middle: 'middle';
-  small: 'small';
+/**
+ * 表格大小
+ */
+export type TableSize = 'default' | 'middle' | 'small';
+
+/**
+ * 表格列筛选条件
+ */
+export interface TableColumnFilterCondition {
+  value: TableFiltterCondition;
+  label: string;
 }
+
+/**
+ * 筛选条件
+ */
+export enum TableFiltterCondition {
+  EQUAL = 'equal',
+  NOT_EQUAL = 'notEqual',
+  GREATER_THAN = 'greaterThan',
+  LESS_THAN = 'lessThan',
+  GREATER_THAN_OR_EQUAL = 'greaterThanOrEqual',
+  LESS_THAN_OR_EQUAL = 'lessThanOrEqual',
+  IN = 'in',
+  NOT_IN = 'notIn',
+  BETWEEN = 'between',
+  NOT_BETWEEN = 'notBetween',
+  CONTAINS = 'contains',
+  NOT_CONTAINS = 'notContains',
+  IS_NULL = 'isNull',
+  IS_NOT_NULL = 'isNotNull',
+}
+

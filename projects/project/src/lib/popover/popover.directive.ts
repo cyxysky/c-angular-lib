@@ -114,6 +114,7 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
+    this.closePopover();
     if (!this.strictVisiable && this.visible) return;
     const positions = this.overlayService.getPositions(this.placement);
     this.overlayRef = this.overlayService.createOverlay(

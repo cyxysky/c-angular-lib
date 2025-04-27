@@ -47,7 +47,9 @@
         <p>{{ htmlPreCode }}</p>
         <lib-number-input
           [(ngModel)]="prefixSuffixValue">
-          <ng-container prefix>$</ng-container>
+          <ng-container prefix>
+            ¥
+          </ng-container>
           <ng-container suffix>美元</ng-container>
         </lib-number-input>
       </div>

@@ -6,13 +6,13 @@
   [class.c-lib-number-input-error]="status === 'error'" 
   [class.c-lib-number-input-warning]="status === 'warning'"
   >
-  <span class="c-lib-number-input-prefix">
+  <div class="c-lib-number-input-prefix">
     <ng-content select="[prefix], prefix"></ng-content>
     <ng-container *ngIf="prefix">{{ prefix }}</ng-container>
     <ng-container *ngIf="prefixIcon">
       <i [class]="prefixIcon"></i>
     </ng-container>
-  </span>
+  </div>
   <div class="c-lib-number-input-content">
     <input 
       type="number" 
@@ -27,13 +27,13 @@
       (blur)="onBlur()"
       >
   </div>
-  <span class="c-lib-number-input-suffix">
+  <div class="c-lib-number-input-suffix">
     <ng-content select="[suffix], suffix"></ng-content>
     <ng-container *ngIf="suffix">{{ suffix }}</ng-container>
     <ng-container *ngIf="suffixIcon">
       <i [class]="suffixIcon"></i>
     </ng-container>
-  </span>
+  </div>
   <div class="c-lib-number-input-handler-wrap" *ngIf="!readonly">
     <button 
       type="button" 

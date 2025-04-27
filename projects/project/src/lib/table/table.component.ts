@@ -1,12 +1,15 @@
 import { Component, ChangeDetectionStrategy, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableColumn } from './table.interface';
+import { TableColumn, TableSize } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { SelectComponent } from '../select/select.component';
 import { NumberInputComponent } from '../number-input/number-input.component';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from "../button/button.component";
 import { InputComponent } from "../input/input.component";
+import { DateTimerComponent } from '../date-timer/date-timer.component';
+import { CascaderComponent } from '../cascader/cascader.component';
+import { TreeSelectComponent } from '../tree-select/tree-select.component';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -31,7 +34,10 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
     FormsModule,
     PageSizeOptionsFormatPipe,
     ButtonComponent,
-    InputComponent
+    InputComponent,
+    DateTimerComponent,
+    CascaderComponent,
+    TreeSelectComponent
   ],
   selector: 'lib-table',
   standalone: true,
@@ -48,7 +54,7 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() columns: TableColumn[] = [];
 
   // 表格大小
-  @Input() size: 'default' | 'middle' | 'small' = 'default';
+  @Input() size: TableSize = 'default';
 
   // 是否显示边框
   @Input() bordered: boolean = false;
@@ -126,6 +132,9 @@ export class TableComponent implements OnInit, OnChanges {
 
   // 原始数据备份，用于筛选和排序
   private originalData: any[] = [];
+
+  // 各列的筛选值
+  public filterValueMap: { [key: string]: any } = {};
 
   constructor(
     private elementRef: ElementRef,
@@ -575,5 +584,28 @@ export class TableComponent implements OnInit, OnChanges {
       return 1; // 普通固定列
     }
     return 0;
+  }
+
+  /**
+   * 获取列的筛选类型
+   */
+  getFilterType(column: TableColumn, type: 'select' | 'cascader' | 'tree-select'): string {
+    switch (type) {
+      case 'select':
+        if (column.filters?.type === 'select-multiple' || column.filters?.type === 'select') {
+          return column.filters?.type;
+        }
+        return '';
+      case 'cascader':
+        if (column.filters?.type === 'cascader-multiple' || column.filters?.type === 'cascader') {
+          return column.filters?.type;
+        }
+        return '';
+      case 'tree-select':
+        if (column.filters?.type === 'tree-select-multiple' || column.filters?.type === 'tree-select' || column.filters?.type === 'tree-select-checkable') {
+          return column.filters?.type;
+        }
+        return '';
+    }
   }
 }

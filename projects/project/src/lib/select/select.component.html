@@ -1,5 +1,6 @@
 <lib-select-box 
     #searchInput
+    #overlayOrigin="cdkOverlayOrigin"
     cdkOverlayOrigin
     [selectMode]="selectMode"
     [loading]="loading"
@@ -15,15 +16,26 @@
     [(searchValue)]="searchValue"
     [data]="getDisplayOptions()"
     [getLabel]="getLabel"
-    (click)="openModal()" 
+    (click)="openDropdown()" 
     (clear)="clear()"
     (remove)="removeOption($event[optionValue])"
     (search)="onSearch($event)"
     (paste)="handlePaste($event)"
-    (inputWidthChange)="updateOverlayRefPosition()">
+    (inputWidthChange)="updateOverlayPosition()">
 </lib-select-box>
 
-<ng-template #overlay>
+<ng-template 
+    #overlay
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="overlayOrigin"
+    [cdkConnectedOverlayPush]="true"
+    [cdkConnectedOverlayPositions]="selectOverlayPosition"
+    [cdkConnectedOverlayGrowAfterOpen]="true"
+    [cdkConnectedOverlayHasBackdrop]="false"
+    [cdkConnectedOverlayWidth]="overlayOrigin.elementRef.nativeElement.getBoundingClientRect().width"
+    [cdkConnectedOverlayOpen]="isOverlayOpen"
+    (overlayOutsideClick)="closeDropdown()"
+    >
     <div 
         class="c-lib-select-dropdown" 
         [class.c-lib-select-dropdown-visible]="isDropdownOpen"
