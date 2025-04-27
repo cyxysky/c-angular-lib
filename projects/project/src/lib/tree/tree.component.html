@@ -65,7 +65,7 @@
           class="c-lib-tree-title" 
           [class.c-lib-tree-title-disabled]="node.disabled" 
           [class.c-lib-tree-title-selected]="node.selected" 
-          (click)="onNodeSelect(node, $event)">
+          (click)="onNodeSelect(node)">
           <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, origin: node, node: node }"></ng-container>
           <ng-template #defaultNodeTpl>
             {{ node[labelProperty] }}
@@ -113,7 +113,7 @@
       <div class="c-lib-tree-title" 
           [class.c-lib-tree-title-disabled]="node.disabled" 
           [class.c-lib-tree-title-selected]="node.selected" 
-          (click)="onNodeSelect(node, $event)">
+          (click)="onNodeSelect(node)">
           <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
           <ng-template #defaultNodeTpl let-node>
             {{ node[labelProperty] }}

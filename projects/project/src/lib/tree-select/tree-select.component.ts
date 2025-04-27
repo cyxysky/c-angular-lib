@@ -187,7 +187,6 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 打开下拉菜单
    */
   public openDropdown(): void {
-    this.defaultExpandedKeys = [...this.value];
     this.focusSearch();
     if (this.disabled || this.isDropdownOpen) return;
     this.initTreeKeys();
@@ -310,10 +309,15 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
   public removeItem(key: string): void {
     if (!Array.isArray(this.value)) return;
     if (this.value.indexOf(key) === -1) return;
-    _.pull(this.value, key);
+    if (this.isDropdownOpen) {
+      if (this.treeComponent && this.treeComponent.flattenNodes.has(key)) {
+        this.treeComponent.onNodeSelect(this.treeComponent.flattenNodes.get(key)!);
+      }
+    } else {
+      _.pull(this.value, key);
+      this.updateData();
+    }
     this.focusSearch();
-    this.updateData();
-    this.initTreeKeys();
   }
 
   /**
@@ -377,11 +381,9 @@ export class TreeSelectComponent implements OnInit, OnDestroy, ControlValueAcces
    * 初始化树节点
    */
   public initTreeKeys(): void {
-    if (this.treeCheckable) {
-      this.defaultCheckedKeys = [...this.value];
-    } else {
-      this.defaultSelectedKeys = [...this.value];
-    }
+    this.defaultExpandedKeys = [...this.value];
+    this.treeCheckable && (this.defaultCheckedKeys = [...this.value]);
+    !this.treeCheckable && (this.defaultSelectedKeys = [...this.value]);
     this.cdr.detectChanges();
   }
 

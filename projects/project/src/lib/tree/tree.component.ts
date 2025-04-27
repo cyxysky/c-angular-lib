@@ -150,7 +150,6 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('changes', changes);
     if (changes['searchValue'] && !changes['searchValue'].firstChange) {
       this.searching = true;
       this.handleSearch();
@@ -169,9 +168,11 @@ export class TreeComponent implements OnInit, OnChanges {
       this.initDefaultExpandedKeys();
     }
     if (changes['defaultSelectedKeys']) {
+      this.selectedKeys.clear();
       this.initDefaultSelectedKeys();
     }
     if (changes['defaultCheckedKeys']) {
+      this.checkedKeys.clear();
       this.initDefaultCheckedKeys();
     }
     this.cdr.detectChanges();
@@ -326,7 +327,7 @@ export class TreeComponent implements OnInit, OnChanges {
    * @param node 节点
    * @param event 事件
    */
-  public onNodeSelect(node: TreeNodeOptions, event: MouseEvent): void {
+  public onNodeSelect(node: TreeNodeOptions): void {
     if (node.disabled || node.selectable === false) return;
     if (this.checkable) {
       this.onNodeCheck(node, !node.checked);
