@@ -1,5 +1,10 @@
 <!-- 基础输入框 -->
-<div class="c-lib-date-timer-container" [class.c-lib-date-timer-disabled]="disabled" cdkOverlayOrigin>
+<div 
+  class="c-lib-date-timer-container" 
+  [class.c-lib-date-timer-disabled]="disabled" 
+  cdkOverlayOrigin
+  #overlayOrigin="cdkOverlayOrigin"
+  >
   <!-- 单个日期/时间选择 -->
   <div *ngIf="selectType === 'single'" class="c-lib-date-timer-single" (click)="openDropdown()">
     <div class="c-lib-date-timer-input" 
@@ -23,7 +28,6 @@
       <ng-container *ngTemplateOutlet="dateTimerIcon"></ng-container>
     </div>
   </div>
-
   <!-- 日期范围选择 -->
   <div *ngIf="selectType === 'range'" class="c-lib-date-timer-range" (click)="openDropdown()">
     <div class="c-lib-date-timer-input" 
@@ -55,7 +59,17 @@
 </div>
 
 <!-- 下拉面板模板 -->
-<ng-template #dropdownTemplate>
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="overlayOrigin"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayPositions]="selectOverlayPosition"
+  [cdkConnectedOverlayGrowAfterOpen]="true"
+  [cdkConnectedOverlayHasBackdrop]="false"
+  [cdkConnectedOverlayWidth]="getDropdownWidth()"
+  [cdkConnectedOverlayOpen]="isOverlayOpen"
+  (overlayOutsideClick)="closeDropdown()"
+  >
   <div 
     class="c-lib-date-timer-dropdown"
     [class.c-lib-date-timer-dropdown-visible]="isDropdownOpen"
@@ -362,9 +376,9 @@
 <!-- 时间选择器图标 -->
 <ng-template #dateTimerIcon>
   <div class="c-lib-date-timer-suffix">
-    <span *ngIf="allowClear && displayValue" class="c-lib-date-timer-clear-btn" (click)="clearValue($event)">
-      <i class="bi-x-lg"></i>
+    <span *ngIf="allowClear && displayValue" (click)="clearValue($event)">
+      <i class="bi-x-circle-fill c-lib-date-timer-clear-btn"></i>
     </span>
-    <i class="bi-calendar-week"></i>
+    <i *ngIf="!displayValue" class="bi-calendar-week"></i>
   </div>
 </ng-template>

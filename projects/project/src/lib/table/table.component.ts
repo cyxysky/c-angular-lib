@@ -10,6 +10,9 @@ import { InputComponent } from "../input/input.component";
 import { DateTimerComponent } from '../date-timer/date-timer.component';
 import { CascaderComponent } from '../cascader/cascader.component';
 import { TreeSelectComponent } from '../tree-select/tree-select.component';
+import { RadioComponent } from '../radio/radio.component';
+import { CheckboxComponent } from '../checkbox/checkbox.component';
+import * as _ from 'lodash';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -37,7 +40,9 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
     InputComponent,
     DateTimerComponent,
     CascaderComponent,
-    TreeSelectComponent
+    TreeSelectComponent,
+    RadioComponent,
+    CheckboxComponent
   ],
   selector: 'lib-table',
   standalone: true,
@@ -128,13 +133,14 @@ export class TableComponent implements OnInit, OnChanges {
   private columnWidths: Map<string, number> = new Map();
 
   // 各列的筛选状态
-  public filterVisible: boolean = false;
+  public filterVisibleMap: { [key: string]: boolean } = {};
 
   // 原始数据备份，用于筛选和排序
   private originalData: any[] = [];
 
   // 各列的筛选值
   public filterValueMap: { [key: string]: any } = {};
+  public filterValueMapTemplate: { [key: string]: any } = {};
 
   constructor(
     private elementRef: ElementRef,
@@ -147,7 +153,6 @@ export class TableComponent implements OnInit, OnChanges {
     this.originalData = [...this.data];
     this.refreshData();
     this.checkFixedColumns();
-
     // 初始化设置滚动状态，只有在有水平滚动条时才添加阴影效果
     setTimeout(() => {
       const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
@@ -175,11 +180,9 @@ export class TableComponent implements OnInit, OnChanges {
       // 当数据源变化时，备份原始数据
       this.originalData = [...this.data];
     }
-
     if (changes['data'] || changes['pageIndex'] || changes['pageSize'] || changes['columns']) {
       this.refreshData();
     }
-
     if (changes['columns']) {
       this.checkFixedColumns();
     }
@@ -191,13 +194,10 @@ export class TableComponent implements OnInit, OnChanges {
   onTableScroll(event: Event): void {
     const container = event.target as HTMLElement;
     if (!container) return;
-
     const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
     if (!tableElement) return;
-
     // 检查是否有水平滚动条
     const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
-
     // 如果没有水平滚动条，移除所有滚动相关类名
     if (!hasHorizontalScroll) {
       this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
@@ -205,10 +205,8 @@ export class TableComponent implements OnInit, OnChanges {
       this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
       return;
     }
-
     const scrollLeft = container.scrollLeft;
     const maxScrollLeft = container.scrollWidth - container.clientWidth;
-
     // 在最左侧时，左侧无阴影，右侧有阴影
     if (scrollLeft === 0) {
       this.renderer.addClass(tableElement, 'lib-table-scroll-start');
@@ -260,7 +258,6 @@ export class TableComponent implements OnInit, OnChanges {
    */
   onSortClick(field: string, currentOrder: 'ascend' | 'descend' | null): void {
     let newOrder: 'ascend' | 'descend' | null;
-
     // 排序顺序：null -> ascend -> descend -> null
     if (currentOrder === null) {
       newOrder = 'ascend';
@@ -269,7 +266,6 @@ export class TableComponent implements OnInit, OnChanges {
     } else {
       newOrder = null;
     }
-
     this.onSortChange(field, newOrder);
   }
 
@@ -285,14 +281,12 @@ export class TableComponent implements OnInit, OnChanges {
         column.sortOrder = null;
       }
     });
-
     // 如果是前端排序，则直接排序数据
     if (this.frontPagination && order) {
       const isAscend = order === 'ascend';
       this.data = [...this.data].sort((a, b) => {
         const aValue = a[field];
         const bValue = b[field];
-
         // 处理不同类型的值
         if (typeof aValue === 'string' && typeof bValue === 'string') {
           return isAscend ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
@@ -301,28 +295,18 @@ export class TableComponent implements OnInit, OnChanges {
           return isAscend ? (aValue > bValue ? 1 : -1) : (aValue > bValue ? -1 : 1);
         }
       });
-
       // 刷新数据
       this.refreshData();
     }
-
     // 发送排序事件
     this.sortChange.emit({ field, order });
   }
 
   /**
-   * 处理过滤项点击
+   * 打开过滤弹窗
    */
-  onFilterItemClick(column: TableColumn, item: any): void {
-
-
-  }
-
-  /**
-   * 处理过滤变化
-   */
-  onFilterChange(field: string, value: any[]): void {
-    this.filterChange.emit({ field, value });
+  openFilter(column: TableColumn): void {
+    this.filterValueMapTemplate = _.cloneDeep(this.filterValueMap);
   }
 
   /**
@@ -364,10 +348,8 @@ export class TableComponent implements OnInit, OnChanges {
     const lastPage = this.getLastPage();
     const current = this.pageIndex;
     const result: number[] = [];
-
     // 简单分页逻辑，最多显示5个页码
     const maxDisplayPages = 5;
-
     if (lastPage <= maxDisplayPages) {
       // 少于maxDisplayPages页，全部显示
       for (let i = 1; i <= lastPage; i++) {
@@ -377,17 +359,14 @@ export class TableComponent implements OnInit, OnChanges {
       // 超过maxDisplayPages页，显示当前页附近的页码
       let start = Math.max(1, current - 2);
       let end = Math.min(lastPage, start + maxDisplayPages - 1);
-
       // 调整start，确保显示maxDisplayPages个页码
       if (end - start + 1 < maxDisplayPages) {
         start = Math.max(1, end - maxDisplayPages + 1);
       }
-
       for (let i = start; i <= end; i++) {
         result.push(i);
       }
     }
-
     return result;
   }
 
@@ -419,8 +398,8 @@ export class TableComponent implements OnInit, OnChanges {
    * 确认筛选
    */
   confirmFilter(column: TableColumn): void {
-    console.log('confirmFilter', column);
-    this.filterVisible = false;
+    this.filterVisibleMap[column.field] = false;
+    this.filterValueMap[column.field] = this.filterValueMapTemplate[column.field];
     this.cdr.detectChanges();
   }
 
@@ -429,16 +408,6 @@ export class TableComponent implements OnInit, OnChanges {
    */
   private applyFilters(data: any[]): any[] {
     return data.filter(item => {
-      // 检查每一列的筛选条件 todo 判断是否过滤
-      return this.columns.every((column: TableColumn) => {
-        if (!column) return true;
-
-
-        const itemValue = item && column.field ? item[column.field] : undefined;
-        if (itemValue === undefined) return true;
-
-        return true;
-      });
     });
   }
 
@@ -446,18 +415,9 @@ export class TableComponent implements OnInit, OnChanges {
    * 重置筛选
    */
   resetFilter(column: TableColumn): void {
-    this.filterVisible = false;
-    if (!column) return;
-    // 如果是前端筛选，恢复为原始数据后再应用其他筛选条件
-    if (this.frontPagination) {
-      // 先恢复原始数据
-      this.data = [...this.originalData];
-      // 然后应用其他列的筛选条件
-      const filteredData = this.applyFilters(this.data);
-      this.data = filteredData;
-      // 刷新数据
-      this.refreshData();
-    }
+    this.filterVisibleMap[column.field] = false;
+    delete this.filterValueMap[column.field];
+    delete this.filterValueMapTemplate[column.field];
     this.filterChange.emit({ field: column.field, value: [] });
   }
 
@@ -469,48 +429,10 @@ export class TableComponent implements OnInit, OnChanges {
     this.columns.forEach(column => {
       column.sortOrder = null;
     });
-
     // 恢复原始数据
     this.data = [...this.originalData];
-
     // 刷新数据
     this.refreshData();
-  }
-
-  /**
-   * 获取表头内容
-   */
-  getTitleContent(): string | TemplateRef<void> | null {
-    // 检查是否有标题内容
-    if (this.title) {
-      return this.title;
-    }
-
-    // 检查是否有名为'title'的模板引用
-    const titleElement = document.querySelector('#title');
-    if (titleElement) {
-      return titleElement as any;
-    }
-
-    return null;
-  }
-
-  /**
-   * 获取表尾内容
-   */
-  getFooterContent(): string | TemplateRef<void> | null {
-    // 检查是否有底部内容
-    if (this.footer) {
-      return this.footer;
-    }
-
-    // 检查是否有名为'footer'的模板引用
-    const footerElement = document.querySelector('#footer');
-    if (footerElement) {
-      return footerElement as any;
-    }
-
-    return null;
   }
 
   /**
@@ -520,7 +442,6 @@ export class TableComponent implements OnInit, OnChanges {
     if (column.fixed !== 'left' && column.fixed !== true) {
       return null;
     }
-
     let position = 0;
     for (let i = 0; i < this.columns.length; i++) {
       const col = this.columns[i];
@@ -542,7 +463,6 @@ export class TableComponent implements OnInit, OnChanges {
     if (column.fixed !== 'right') {
       return null;
     }
-
     let position = 0;
     for (let i = this.columns.length - 1; i >= 0; i--) {
       const col = this.columns[i];
@@ -589,7 +509,7 @@ export class TableComponent implements OnInit, OnChanges {
   /**
    * 获取列的筛选类型
    */
-  getFilterType(column: TableColumn, type: 'select' | 'cascader' | 'tree-select'): string {
+  getFilterType(column: TableColumn, type: 'select' | 'cascader' | 'tree-select' | 'date'): string {
     switch (type) {
       case 'select':
         if (column.filters?.type === 'select-multiple' || column.filters?.type === 'select') {
@@ -603,6 +523,11 @@ export class TableComponent implements OnInit, OnChanges {
         return '';
       case 'tree-select':
         if (column.filters?.type === 'tree-select-multiple' || column.filters?.type === 'tree-select' || column.filters?.type === 'tree-select-checkable') {
+          return column.filters?.type;
+        }
+        return '';
+      case 'date':
+        if (column.filters?.type === 'date-range' || column.filters?.type === 'date') {
           return column.filters?.type;
         }
         return '';

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayService } from '../core/overlay/overlay.service';
-import { CdkOverlayOrigin, OverlayRef, Overlay, CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin, CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { UtilsService } from '../core/utils/utils.service';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { CascaderExpandTrigger, CascaderOption, CascaderSize, CascaderTriggerType } from './cascader.interface';

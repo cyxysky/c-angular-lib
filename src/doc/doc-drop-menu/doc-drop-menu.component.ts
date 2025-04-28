@@ -83,7 +83,6 @@ export class DocDropMenuComponent {
   // 菜单可见性变化处理
   onVisibleChange(visible: boolean): void {
     console.log('菜单可见性变化:', visible);
-    this.controlledVisible = visible;
   }
 
   // 菜单项点击处理

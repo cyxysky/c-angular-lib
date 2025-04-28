@@ -31,12 +31,12 @@
     [cdkConnectedOverlayPositions]="selectOverlayPosition"
     [cdkConnectedOverlayGrowAfterOpen]="true"
     [cdkConnectedOverlayHasBackdrop]="false"
-    [cdkConnectedOverlayWidth]="overlayOrigin.elementRef.nativeElement.getBoundingClientRect().width"
+    [cdkConnectedOverlayWidth]="columns.length && menuWidth ? columns.length * menuWidth : menuWidth"
     [cdkConnectedOverlayOpen]="isOverlayOpen"
     (overlayOutsideClick)="closeDropdown()">
-    <div class="c-lib-cascader-dropdown"
+    <div 
+        class="c-lib-cascader-dropdown"
         [class.c-lib-cascader-dropdown-visible]="isDropdownOpen"
-        [style.min-width]="menuWidth + 'px'"
         >
         <!-- 搜索结果列表 -->
         <div *ngIf="showSearch && searchValue" class="c-lib-cascader-search-result-list">
@@ -74,7 +74,11 @@
         <!-- 级联菜单 -->
         <div *ngIf="!searchValue" class="c-lib-cascader-menus">
             <!-- 级别菜单 -->
-            <ul *ngFor="let column of columns; index as i" class="c-lib-cascader-menu">
+            <ul 
+                *ngFor="let column of columns; index as i" 
+                class="c-lib-cascader-menu"
+                [style.min-width]="menuWidth + 'px'"
+                >
                 <ng-container *ngIf="column && column.length > 0; else emptyMenu">
                     <!-- 当前级别菜单的选项 -->
                     <li *ngFor="let option of column; index as j" 

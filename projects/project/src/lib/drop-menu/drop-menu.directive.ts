@@ -53,6 +53,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
   private leaveTimer: any;
   private dropMenuComponentRef: ComponentRef<DropMenuComponent> | null = null;
   private componentHover: boolean = false;
+  public isDropDownVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -133,8 +134,8 @@ export class DropMenuDirective implements OverlayBasicDirective {
    * 显示下拉菜单
    */
   public show(): void {
+    if (!this.strictVisible && this.isDropDownVisible) return;
     this.closeDropMenu();
-    if (!this.strictVisible && this.visible) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
@@ -228,6 +229,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
    */
   changeVisible(visible: boolean): void {
     this.visible = visible;
+    this.isDropDownVisible = visible;
     this.visibleChange.emit(this.visible);
     this.dropMenuComponentRef?.setInput('isVisible', visible);
   }

@@ -36,6 +36,7 @@ export class PopoverDirective implements OverlayBasicDirective {
   private leaveTimer: any;
   private popoverComponentRef: ComponentRef<PopoverComponent> | null = null;
   private componentHover: boolean = false;
+  public isDropDownVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -114,8 +115,8 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
+    if (!this.strictVisiable && this.isDropDownVisible) return;
     this.closePopover();
-    if (!this.strictVisiable && this.visible) return;
     const positions = this.overlayService.getPositions(this.placement);
     this.overlayRef = this.overlayService.createOverlay(
       {
@@ -180,6 +181,7 @@ export class PopoverDirective implements OverlayBasicDirective {
    */
   changeVisible(visible: boolean): void {
     this.visible = visible;
+    this.isDropDownVisible = visible;
     this.visibleChange.emit(this.visible);
     this.popoverComponentRef?.setInput('isVisible', visible);
   }

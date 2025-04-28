@@ -65,6 +65,9 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
     if (changes['selectedItem']) {
       this.findSelectedPath();
     }
+    if (changes['template']) {
+      this.cdr.detectChanges();
+    }
   }
 
   ngOnDestroy(): void {

@@ -163,8 +163,7 @@
             <lib-button 
               libDropMenu 
               [dropMenuItems]="basicItems" 
-              [dropMenuVisible]="controlledVisible"
-              [dropMenuStrictVisible]="true"
+              [(dropMenuVisible)]="controlledVisible"
               (dropMenuVisibleChange)="onVisibleChange($event)"
               [buttonContent]="'受控的菜单'"
               [buttonType]="'default'">
@@ -258,6 +257,7 @@
       title="完全自定义模板"
       [sourceCode]="fullTemplateSource">
       <div demo>
+        {{ fullCustomVisible }}
         <lib-button 
           libDropMenu 
           [dropMenuTemplate]="fullCustomTpl"

@@ -6,14 +6,10 @@ import { TooltipComponent } from './tooltip.component';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { UtilsService } from '../core/utils/utils.service';
 
-
 @Directive({
   selector: '[libTooltip]',
   exportAs: 'libTooltip',
   standalone: true,
-  host: {
-    '[class.lib-tooltip-open]': 'visible'
-  },
 })
 export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirective {
   /** 提示内容 */
@@ -47,6 +43,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   private tooltipComponentRef: ComponentRef<TooltipComponent> | null = null;
   /** 组件悬停 */
   private componentHover: boolean = false;
+  public isDropDownVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -122,8 +119,8 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 显示tooltip
    */
   public show(): void {
+    if (!this.strictVisiable && (this.isDropDownVisible || !this.tooltipContent)) return;
     this.closeTooltip();
-    if (!this.strictVisiable && (this.visible || !this.tooltipContent)) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
@@ -202,6 +199,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    */
   public changeVisible(visible: boolean): void {
     this.visible = visible;
+    this.isDropDownVisible = visible;
     this.visibleChange.emit(this.visible);
     this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', visible);
   }

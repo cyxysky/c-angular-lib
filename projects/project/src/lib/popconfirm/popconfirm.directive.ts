@@ -50,6 +50,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   private leaveTimer: any;
   private portal: ComponentPortal<PopoverComponent> | null = null;
   private popconfirmComponentRef: ComponentRef<PopoverComponent> | null = null;
+  public isDropDownVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -66,11 +67,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
       this.updateComponent('title', this.popconfirmTitle);
     }
     if (changes['visible']) {
-      if (this.visible) {
-        this.show();
-      } else {
-        this.hide();
-      }
+      this.visible ? this.show() : this.hide();
     }
   }
 
@@ -97,8 +94,8 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
+    if (this.isDropDownVisible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
     this.closePopover();
-    if (this.visible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
     this.overlayRef = this.overlayService.createOverlay(
@@ -173,6 +170,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    */
   changeVisible(visible: boolean): void {
     this.visible = visible;
+    this.isDropDownVisible = visible;
     this.visibleChange.emit(this.visible);
     this.popconfirmComponentRef?.setInput('isVisible', visible);
   }
