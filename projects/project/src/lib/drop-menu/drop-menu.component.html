@@ -3,11 +3,10 @@
     [class.c-lib-drop-menu-visible]="isVisible" 
     [class]="'c-lib-drop-menu-' + placement"
     [class.c-lib-drop-menu-submenu-mode]="isSubMenu"
-    [style.width]="getString(width)">
+    [style.width]="getString(width)"
+    >
     <ul class="c-lib-drop-menu-list">
-        <ng-container *ngIf="template; else defaultTemplate">
-            <ng-container [ngTemplateOutlet]="template"></ng-container>
-        </ng-container>
+        <ng-container *ngTemplateOutlet="template || defaultTemplate; context: { $implicit: items }"></ng-container>
     </ul>
 </div>
 
@@ -39,7 +38,8 @@
                 [class.c-lib-drop-menu-submenu-visible]="hoveredItemIndex === i && !isItemDisabled(item)"
                 (mouseenter)="onMouseEnterItem(i)" 
                 (mouseleave)="onMouseLeaveItem()"
-                (click)="$event.stopPropagation()">
+                (click)="$event.stopPropagation()"
+                >
                 <lib-drop-menu 
                     [items]="item.children || []" 
                     [isVisible]="true" 
@@ -50,7 +50,8 @@
                     [selectedItem]="selectedItem"
                     (menuClose)="onSubMenuClose()"
                     [parentDisabled]="isItemDisabled(item)"
-                    (itemClick)="onSubMenuItemClick($event)">
+                    (itemClick)="onSubMenuItemClick($event)"
+                    >
                 </lib-drop-menu>
             </div>
         </li>

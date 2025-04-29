@@ -14,7 +14,7 @@ export interface TableColumn {
   // 列标题
   title: string;
   // 列头模板
-  headTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
+  headTemplate?: string;
   // 字段名，对应数据对象的属性
   field: string;
   // 列类型，operation表示操作列
@@ -32,9 +32,9 @@ export interface TableColumn {
   // 筛选项
   filters?: TableColumnFilter;
   // 自定义筛选模板
-  filterTemplate?: TemplateRef<{ $implicit: TableColumn }> | null;
+  filterTemplate?: string;
   // 表身模板
-  template?: TemplateRef<{ $implicit: any; field: TableColumn; index: number }> | null;
+  template?: string;
   // 是否固定列 (true/'left' 表示左固定，'right' 表示右固定)
   fixed?: boolean | 'left' | 'right';
   // 按钮配置

@@ -1,12 +1,9 @@
-import { CommonModule } from '@angular/common';
-import { afterNextRender, afterRender, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Directive, forwardRef, Host, Injectable, Input, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { CheckboxOption, CheckboxDirection } from '@project';
+import { afterNextRender, Directive, Host, Injectable, Input, Optional, TemplateRef } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
 export class WidgetSource {
-  private SourceMap: Map<string, TemplateRef<void>> = new Map();
+  public SourceMap: Map<string, TemplateRef<void>> = new Map();
   constructor() { }
 
   public set(templateString: string, templateRef: TemplateRef<void>): void {
@@ -20,21 +17,16 @@ export class WidgetSource {
 
 @Directive({
   selector: '[widget]',
-  providers: [WidgetSource]
 })
 export class WidgetDirective {
   @Input() widget!: string;
+
   constructor(
-    @Host() source: WidgetSource,
-    private ref: TemplateRef<void>
+    private ref: TemplateRef<void>,
+    @Optional() source: WidgetSource
   ) {
     afterNextRender(() => {
       source.set(this.widget, this.ref);
     })
   }
-
-  ngOnInit() {
-
-  }
-
 }

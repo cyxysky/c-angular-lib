@@ -28,51 +28,50 @@
       <div class="lib-table-loading-spinner"></div>
     </div>
 
-    <div class="lib-table-container" [ngStyle]="{
+    <div 
+      class="lib-table-container" 
+      [ngStyle]="{
         'max-height': scroll?.y, 
         'overflow-y': scroll?.y ? 'auto' : null,
         'overflow-x': scroll?.x ? 'auto' : null,
         'width': '100%',
         'position': 'relative'
-      }" (scroll)="onTableScroll($event)">
+      }" 
+      (scroll)="onTableScroll($event)"
+      >
       <table [ngStyle]="{'min-width': scroll?.x || null, 'width': '100%'}">
         <!-- 表头 -->
         <thead class="lib-table-thead">
           <tr>
             <th 
               *ngFor="let column of columns" 
-              [style.textAlign]="column.align || 'left'"
-              [style.width]="column.width || null"
               [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
               [class.lib-table-column-fixed-right]="column.fixed === 'right'"
+              [style.textAlign]="column.align || 'left'"
+              [style.width]="column.width || null"
               [style.position]="column.fixed || scroll?.y ? 'sticky' : null" 
               [style.top]="scroll?.y ? '0' : null"
               [style.left]="(column.fixed === 'left' || column.fixed === true) ? getLeftPosition(column) : null"
               [style.right]="column.fixed === 'right' ? getRightPosition(column) : null"
-              [style.z-index]="getZIndex(column)">
+              [style.z-index]="getZIndex(column)"
+              >
               <div class="lib-table-column-title">
-                <ng-container *ngIf="!column.headTemplate">{{ column.title }}</ng-container>
-                <ng-container *ngIf="column.headTemplate">
-                  <ng-container *ngTemplateOutlet="column.headTemplate; context: { $implicit: column }"></ng-container>
-                </ng-container>
-
+                <!-- 自定义列头模板 -->
+                <ng-container *ngTemplateOutlet="column.headTemplate && widgetSource.get(column.headTemplate) || defaultHeadTpl; context: { $implicit: column }"></ng-container>
+                <!-- 默认列头模板 -->
+                <ng-template #defaultHeadTpl>{{ column.title }}</ng-template>
                 <!-- 排序按钮 -->
-                <div class="lib-table-sorter" *ngIf="column.sortable"
-                  (click)="onSortClick(column.field, column.sortOrder || null)">
+                <div 
+                  *ngIf="column.sortable"
+                  class="lib-table-sorter" 
+                  (click)="onSortClick(column.field, column.sortOrder || null)"
+                  >
                   <div class="lib-table-sorter-inner">
                     <span class="lib-table-sorter-up" [class.active]="column.sortOrder === 'ascend'">
-                      <svg viewBox="0 0 1024 1024" width="1em" height="1em" fill="currentColor">
-                        <path
-                          d="M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z">
-                        </path>
-                      </svg>
+                      <i class="bi bi-caret-up-fill"></i>
                     </span>
                     <span class="lib-table-sorter-down" [class.active]="column.sortOrder === 'descend'">
-                      <svg viewBox="0 0 1024 1024" width="1em" height="1em" fill="currentColor">
-                        <path
-                          d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z">
-                        </path>
-                      </svg>
+                      <i class="bi bi-caret-down-fill"></i>
                     </span>
                   </div>
                 </div>
@@ -84,8 +83,9 @@
                     [dropMenuPlacement]="'bottom-left'"
                     [dropMenuTrigger]="'click'"
                     [(dropMenuVisible)]="filterVisibleMap[column.field]"
-                    [dropMenuTemplate]="column.filterTemplate || defaultFilterTpl"
-                    (click)="openFilter(column)">
+                    [dropMenuTemplate]="column.filterTemplate && widgetSource.get(column.filterTemplate) || defaultFilterTpl"
+                    (click)="openFilter(column)"
+                    >
                     <i class="bi bi-funnel-fill" [style.color]="filterValueMap[column.field] !== undefined ? '#1890ff' : '#bfbfbf'"></i>
                   </span>
                   <!-- 默认筛选模板 -->
@@ -186,17 +186,13 @@
                 [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" [style.z-index]="1"
                 >
                 <!-- 自定义渲染 -->
-                <ng-container *ngIf="column.template as cellTemplate; else defaultCell">
+                <ng-container *ngIf="!column.buttons">
                   <ng-container   
-                    [ngTemplateOutlet]="cellTemplate"
-                    [ngTemplateOutletContext]="{ $implicit: data, field: column, index: rowIndex }"
+                    [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
+                    [ngTemplateOutletContext]="{ $implicit: data, column: column, index: rowIndex }"
                     >
                   </ng-container>
                 </ng-container>
-                <!-- 默认渲染 -->
-                <ng-template #defaultCell>
-                  {{ data[column.field] ? data[column.field] : '--' }}
-                </ng-template>
                 <!-- 按钮 -->
                 <div class="lib-table-operation-cell">
                   <ng-container *ngFor="let button of column.buttons">
@@ -321,3 +317,6 @@
 </div>
 
 
+<ng-template #defaultCell let-data let-column="column" let-index="index">
+  {{ data[column.field] ? data[column.field] : '--' }}
+</ng-template>

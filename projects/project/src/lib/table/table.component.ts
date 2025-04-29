@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableColumn, TableSize } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
@@ -13,6 +13,7 @@ import { TreeSelectComponent } from '../tree-select/tree-select.component';
 import { RadioComponent } from '../radio/radio.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import * as _ from 'lodash';
+import { WidgetSource } from '../core';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -48,8 +49,8 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
   standalone: true,
   templateUrl: './table.component.html',
   styleUrl: './table.component.less',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit, OnChanges {
   // 表格数据
@@ -145,8 +146,13 @@ export class TableComponent implements OnInit, OnChanges {
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    public cdr: ChangeDetectorRef
-  ) { }
+    public cdr: ChangeDetectorRef,
+    @Optional() public widgetSource: WidgetSource
+  ) {
+    afterNextRender(() => {
+
+    })
+  }
 
   ngOnInit(): void {
     // 备份原始数据

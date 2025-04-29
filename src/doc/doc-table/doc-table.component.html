@@ -16,13 +16,25 @@
     </div>
   </app-doc-box>
 
+  <!-- 自定义单元格 -->
+  <app-doc-box title="自定义单元格" [sourceCode]="customCellTableSource">
+    <div demo>
+      <div class="custom-cell-demo">
+        <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要在组件中设置模板引用</p>
+        <lib-table [data]="customData" [columns]="customColumns">
+
+        </lib-table>
+      </div>
+    </div>
+    <div description>
+      可以自定义单元格内容，通过在组件中设置模板引用并赋值给列配置。需要在ngAfterViewInit生命周期中将模板引用赋值给列配置的customCell属性。
+    </div>
+  </app-doc-box>
+
   <!-- 带边框表格 -->
   <app-doc-box title="带边框表格" [sourceCode]="borderedTableSource">
     <div demo>
-      <lib-table 
-        [data]="borderedData" 
-        [columns]="borderedColumns"
-        [bordered]="true">
+      <lib-table [data]="borderedData" [columns]="borderedColumns" [bordered]="true">
       </lib-table>
     </div>
     <div description>
@@ -33,10 +45,7 @@
   <!-- 排序表格 -->
   <app-doc-box title="排序表格" [sourceCode]="sortableTableSource">
     <div demo>
-      <lib-table 
-        [data]="sortableData" 
-        [columns]="sortableColumns"
-        (sortChange)="onSortChange($event)">
+      <lib-table [data]="sortableData" [columns]="sortableColumns" (sortChange)="onSortChange($event)">
       </lib-table>
     </div>
     <div description>
@@ -47,10 +56,7 @@
   <!-- 筛选表格 -->
   <app-doc-box title="筛选表格" [sourceCode]="filterTableSource">
     <div demo>
-      <lib-table 
-        [data]="filterData" 
-        [columns]="filterColumns"
-        (filterChange)="onFilterChange($event)">
+      <lib-table [data]="filterData" [columns]="filterColumns" (filterChange)="onFilterChange($event)">
       </lib-table>
     </div>
     <div description>
@@ -61,10 +67,7 @@
   <!-- 固定列 -->
   <app-doc-box title="固定列" [sourceCode]="fixedColumnsTableSource">
     <div demo>
-      <lib-table 
-        [data]="fixedColumnsData" 
-        [columns]="fixedColumnsColumns"
-        [scroll]="fixedColumnsScroll">
+      <lib-table [data]="fixedColumnsData" [columns]="fixedColumnsColumns" [scroll]="fixedColumnsScroll">
         <ng-template #actionTemplate let-row>
           <button class="action-button" (click)="onAction(row)">查看</button>
         </ng-template>
@@ -80,26 +83,17 @@
     <div demo>
       <div style="margin-bottom: 16px;">
         <p style="margin-bottom: 8px;">默认大小</p>
-        <lib-table 
-          [data]="sizeData" 
-          [columns]="sizeColumns"
-          [size]="'default'">
+        <lib-table [data]="sizeData" [columns]="sizeColumns" [size]="'default'">
         </lib-table>
       </div>
       <div style="margin-bottom: 16px;">
         <p style="margin-bottom: 8px;">中等大小</p>
-        <lib-table 
-          [data]="sizeData" 
-          [columns]="sizeColumns"
-          [size]="'middle'">
+        <lib-table [data]="sizeData" [columns]="sizeColumns" [size]="'middle'">
         </lib-table>
       </div>
       <div>
         <p style="margin-bottom: 8px;">小尺寸</p>
-        <lib-table 
-          [data]="sizeData" 
-          [columns]="sizeColumns"
-          [size]="'small'">
+        <lib-table [data]="sizeData" [columns]="sizeColumns" [size]="'small'">
         </lib-table>
       </div>
     </div>
@@ -108,27 +102,12 @@
     </div>
   </app-doc-box>
 
-  <!-- 自定义单元格 -->
-  <app-doc-box title="自定义单元格" [sourceCode]="customCellTableSource">
-    <div demo>
-      <div class="custom-cell-demo">
-        <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要在组件中设置模板引用</p>
-        <lib-table [data]="customData" [columns]="customColumns">
-        </lib-table>
-      </div>
-    </div>
-    <div description>
-      可以自定义单元格内容，通过在组件中设置模板引用并赋值给列配置。需要在ngAfterViewInit生命周期中将模板引用赋值给列配置的customCell属性。
-    </div>
-  </app-doc-box>
+
 
   <!-- 异步加载数据 -->
   <app-doc-box title="异步加载数据" [sourceCode]="asyncTableSource">
     <div demo>
-      <lib-table 
-        [data]="asyncData" 
-        [columns]="asyncColumns"
-        [loading]="asyncLoading">
+      <lib-table [data]="asyncData" [columns]="asyncColumns" [loading]="asyncLoading">
       </lib-table>
       <button style="margin-top: 8px;" (click)="reloadAsyncData()">重新加载</button>
     </div>
@@ -143,22 +122,15 @@
       <!-- 字符串方式 -->
       <div style="margin-bottom: 16px;">
         <p style="margin-bottom: 8px;">字符串方式</p>
-        <lib-table 
-          [data]="headerFooterData" 
-          [columns]="headerFooterColumns"
-          [title]="tableTitle"
+        <lib-table [data]="headerFooterData" [columns]="headerFooterColumns" [title]="tableTitle"
           [footer]="tableFooter">
         </lib-table>
       </div>
-      
+
       <!-- 模板方式 -->
       <div>
         <p style="margin-bottom: 8px;">模板方式</p>
-        <lib-table 
-          [data]="headerFooterData" 
-          [title]="title"
-          [footer]="footer"
-          [columns]="headerFooterColumns">
+        <lib-table [data]="headerFooterData" [title]="title" [footer]="footer" [columns]="headerFooterColumns">
           <ng-template #title>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span>用户列表</span>
@@ -179,14 +151,8 @@
   <!-- 分页表格 -->
   <app-doc-box title="分页表格" [sourceCode]="paginationTableSource">
     <div demo>
-      <lib-table 
-        [data]="paginationData" 
-        [columns]="paginationColumns"
-        [showPagination]="true"
-        [pageIndex]="pageIndex"
-        [pageSize]="pageSize"
-        [total]="total"
-        (pageIndexChange)="onPageIndexChange($event)"
+      <lib-table [data]="paginationData" [columns]="paginationColumns" [showPagination]="true" [pageIndex]="pageIndex"
+        [pageSize]="pageSize" [total]="total" (pageIndexChange)="onPageIndexChange($event)"
         (pageSizeChange)="onPageSizeChange($event)">
       </lib-table>
     </div>
@@ -198,10 +164,7 @@
   <!-- 加载状态 -->
   <app-doc-box title="加载状态" [sourceCode]="loadingTableSource">
     <div demo>
-      <lib-table 
-        [data]="loadingData" 
-        [columns]="loadingColumns"
-        [loading]="true">
+      <lib-table [data]="loadingData" [columns]="loadingColumns" [loading]="true">
       </lib-table>
     </div>
     <div description>
@@ -211,3 +174,8 @@
 </div>
 
 <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
+
+
+<ng-template widget="addressTemplate" let-data let-column="column" let-index="index">
+  自定义内容-{{ data?.[column.field] }}
+</ng-template>
