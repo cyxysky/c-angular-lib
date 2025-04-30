@@ -24,45 +24,45 @@ import { ProjectModule, DropMenu, DropMenuDirective, OverlayBasicPosition, Butto
 export class DocDropMenuComponent {
   // 基本菜单项
   basicItems: DropMenu[] = [
-    { label: '菜单项 1', icon: 'icon-user', children: [] },
-    { label: '菜单项 2', icon: 'icon-setting', children: [], disabled: true },
-    { label: '菜单项 3', icon: 'icon-folder', children: [] },
-    { label: '菜单项 4', icon: 'icon-file', children: [] }
+    { title: '菜单项 1', icon: 'icon-user', children: [] },
+    { title: '菜单项 2', icon: 'icon-setting', children: [], disabled: true },
+    { title: '菜单项 3', icon: 'icon-folder', children: [] },
+    { title: '菜单项 4', icon: 'icon-file', children: [] }
   ];
 
   // 嵌套菜单项
   nestedItems: DropMenu[] = [
     { 
-      label: '一级菜单 1', 
+      title: '一级菜单 1', 
       icon: 'icon-folder', 
       children: [
-        { label: '二级菜单 1-1', icon: 'icon-file', children: [] },
-        { label: '二级菜单 1-2', icon: 'icon-file', children: [] }
+        { title: '二级菜单 1-1', icon: 'icon-file', children: [] },
+        { title: '二级菜单 1-2', icon: 'icon-file', children: [] }
       ] 
     },
     { 
-      label: '一级菜单 2', 
+      title: '一级菜单 2', 
       icon: 'icon-folder', 
       children: [
-        { label: '二级菜单 2-1', icon: 'icon-file', children: [] },
+        { title: '二级菜单 2-1', icon: 'icon-file', children: [] },
         { 
-          label: '二级菜单 2-2', 
+          title: '二级菜单 2-2', 
           icon: 'icon-folder', 
           children: [
-            { label: '三级菜单 2-2-1', icon: 'icon-file', children: [] },
-            { label: '三级菜单 2-2-2', icon: 'icon-file', children: [] }
+            { title: '三级菜单 2-2-1', icon: 'icon-file', children: [] },
+            { title: '三级菜单 2-2-2', icon: 'icon-file', children: [] }
           ] 
         }
       ] 
     },
-    { label: '一级菜单 3', icon: 'icon-setting', children: [] }
+    { title: '一级菜单 3', icon: 'icon-setting', children: [] }
   ];
 
   // 自定义菜单项
   customItems: DropMenu[] = [
-    { label: '自定义菜单项 1', icon: 'icon-star', children: [] },
-    { label: '自定义菜单项 2', icon: 'icon-heart', children: [] },
-    { label: '自定义菜单项 3', icon: 'icon-bell', children: [] }
+    { title: '自定义菜单项 1', icon: 'icon-star', children: [] },
+    { title: '自定义菜单项 2', icon: 'icon-heart', children: [] },
+    { title: '自定义菜单项 3', icon: 'icon-bell', children: [] }
   ];
 
   // 所有位置选项
@@ -152,7 +152,7 @@ export class DocDropMenuComponent {
     {
       title: 'DropMenu接口',
       items: [
-        { name: 'label', description: '菜单项文本', type: 'string', default: '-' },
+        { name: 'title', description: '菜单项文本', type: 'string', default: '-' },
         { name: 'icon', description: '菜单项图标', type: 'string', default: '-' },
         { name: 'children', description: '子菜单项列表', type: 'DropMenu[]', default: '[]' },
         { name: 'disabled', description: '菜单项是否禁用', type: 'boolean', default: 'false' }
@@ -179,9 +179,9 @@ import { DropMenu } from 'your-lib';
 })
 export class DemoComponent {
   menuItems: DropMenu[] = [
-    { label: '菜单项 1', icon: 'icon-user', children: [] },
-    { label: '菜单项 2', icon: 'icon-setting', children: [] },
-    { label: '菜单项 3', icon: 'icon-folder', children: [] }
+    { title: '菜单项 1', icon: 'icon-user', children: [] },
+    { title: '菜单项 2', icon: 'icon-setting', children: [] },
+    { title: '菜单项 3', icon: 'icon-folder', children: [] }
   ];
 }`;
 
@@ -211,8 +211,8 @@ import { DropMenu } from 'your-lib';
 })
 export class DemoComponent {
   menuItems: DropMenu[] = [
-    { label: '菜单项 1', icon: 'icon-user', children: [] },
-    { label: '菜单项 2', icon: 'icon-setting', children: [] }
+    { title: '菜单项 1', icon: 'icon-user', children: [] },
+    { title: '菜单项 2', icon: 'icon-setting', children: [] }
   ];
 }`;
 
@@ -285,24 +285,24 @@ import { DropMenu } from 'your-lib';
 export class DemoComponent {
   nestedItems: DropMenu[] = [
     { 
-      label: '一级菜单 1', 
+      title: '一级菜单 1', 
       icon: 'icon-folder', 
       children: [
-        { label: '二级菜单 1-1', icon: 'icon-file', children: [] },
-        { label: '二级菜单 1-2', icon: 'icon-file', children: [] }
+        { title: '二级菜单 1-1', icon: 'icon-file', children: [] },
+        { title: '二级菜单 1-2', icon: 'icon-file', children: [] }
       ] 
     },
     { 
-      label: '一级菜单 2', 
+      title: '一级菜单 2', 
       icon: 'icon-folder', 
       children: [
-        { label: '二级菜单 2-1', icon: 'icon-file', children: [] },
+        { title: '二级菜单 2-1', icon: 'icon-file', children: [] },
         { 
-          label: '二级菜单 2-2', 
+          title: '二级菜单 2-2', 
           icon: 'icon-folder', 
           children: [
-            { label: '三级菜单 2-2-1', icon: 'icon-file', children: [] },
-            { label: '三级菜单 2-2-2', icon: 'icon-file', children: [] }
+            { title: '三级菜单 2-2-1', icon: 'icon-file', children: [] },
+            { title: '三级菜单 2-2-2', icon: 'icon-file', children: [] }
           ] 
         }
       ] 
@@ -331,8 +331,8 @@ import { DropMenu } from 'your-lib';
         <span class="custom-menu-item-icon" *ngIf="item.icon">
           <i [class]="item.icon"></i>
         </span>
-        <span class="custom-menu-item-label">
-          {{ index + 1 }}. {{ item.label }}
+        <span class="custom-menu-item-title">
+          {{ index + 1 }}. {{ item.title }}
         </span>
       </li>
     </ng-template>
@@ -340,9 +340,9 @@ import { DropMenu } from 'your-lib';
 })
 export class DemoComponent {
   customItems: DropMenu[] = [
-    { label: '自定义菜单项 1', icon: 'icon-star', children: [] },
-    { label: '自定义菜单项 2', icon: 'icon-heart', children: [] },
-    { label: '自定义菜单项 3', icon: 'icon-bell', children: [] }
+    { title: '自定义菜单项 1', icon: 'icon-star', children: [] },
+    { title: '自定义菜单项 2', icon: 'icon-heart', children: [] },
+    { title: '自定义菜单项 3', icon: 'icon-bell', children: [] }
   ];
   
   onItemClick(item: DropMenu): void {
@@ -401,7 +401,7 @@ import { DropMenu } from 'your-lib';
     </lib-button>
     
     <div *ngIf="selectedItem" class="example-value">
-      已选择: {{ selectedItem.label }}
+      已选择: {{ selectedItem.title }}
     </div>
   \`
 })
@@ -443,14 +443,14 @@ import { DropMenu } from 'your-lib';
 })
 export class DemoComponent {
   menuItems: DropMenu[] = [
-    { label: '菜单项 1', icon: 'icon-user', children: [] },
-    { label: '菜单项 2', icon: 'icon-setting', children: [] },
+    { title: '菜单项 1', icon: 'icon-user', children: [] },
+    { title: '菜单项 2', icon: 'icon-setting', children: [] },
     { 
-      label: '多级菜单', 
+      title: '多级菜单', 
       icon: 'icon-folder', 
       children: [
-        { label: '子菜单项 1', icon: 'icon-file', children: [] },
-        { label: '子菜单项 2', icon: 'icon-file', children: [] }
+        { title: '子菜单项 1', icon: 'icon-file', children: [] },
+        { title: '子菜单项 2', icon: 'icon-file', children: [] }
       ] 
     }
   ];
@@ -474,7 +474,7 @@ import { DropMenu } from 'your-lib';
     </lib-button>
     
     <div *ngIf="selectedItem" class="example-value">
-      当前选中: {{ selectedItem.label }}
+      当前选中: {{ selectedItem.title }}
     </div>
   \`
 })

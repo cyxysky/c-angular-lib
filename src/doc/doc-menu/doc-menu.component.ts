@@ -29,7 +29,14 @@ export class DocMenuComponent {
         {
           key: '1-1',
           title: '选项1',
-          icon: 'bi-2-circle'
+          icon: 'bi-2-circle',
+          children: [
+            {
+              key: '1-1-1',
+              title: '选项1-1',
+              icon: 'bi-3-circle'
+            }
+          ]
         },
         {
           key: '1-2',
@@ -41,6 +48,26 @@ export class DocMenuComponent {
     {
       key: '2',
       title: '导航二',
+      icon: 'bi-4-circle'
+    },
+    {
+      key: '4',
+      title: '导航四',
+      icon: 'bi-4-circle'
+    },
+    {
+      key: '5',
+      title: '导航五',
+      icon: 'bi-4-circle'
+    },
+    {
+      key: '6',
+      title: '导航六',
+      icon: 'bi-4-circle'
+    },    
+    {
+      key: '7',
+      title: '导航七',
       icon: 'bi-4-circle'
     },
     {

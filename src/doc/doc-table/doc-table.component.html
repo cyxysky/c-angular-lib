@@ -3,6 +3,9 @@
 <p>表格组件，用于展示大量结构化数据。</p>
 
 <h2>代码演示</h2>
+<ng-template widget="addressTemplate" let-data let-column="column" let-index="index">
+  自定义内容-{{ data?.[column.field] }}
+</ng-template>
 
 <div class="table-docs-grid">
   <!-- 基础用法 -->
@@ -175,7 +178,3 @@
 
 <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>
 
-
-<ng-template widget="addressTemplate" let-data let-column="column" let-index="index">
-  自定义内容-{{ data?.[column.field] }}
-</ng-template>

@@ -23,10 +23,11 @@ export class WidgetDirective {
 
   constructor(
     private ref: TemplateRef<void>,
-    @Optional() source: WidgetSource
+    @Optional() public source: WidgetSource
   ) {
-    afterNextRender(() => {
-      source.set(this.widget, this.ref);
-    })
+  }
+
+  ngOnInit() {
+    this.source.set(this.widget, this.ref);
   }
 }

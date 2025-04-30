@@ -4,6 +4,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { cloneDeep, isEqual } from 'lodash';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../core/overlay/overlay.service';
+import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 
 // 定义菜单项接口
 export interface MenuItem {
@@ -20,7 +21,7 @@ export interface MenuItem {
 @Component({
   selector: 'lib-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DropMenuDirective],
   templateUrl: './menu.component.html',
   encapsulation: ViewEncapsulation.None,
   animations: [
@@ -68,7 +69,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private elementRef: ElementRef,
     private viewContainerRef: ViewContainerRef,
     private overlayService: OverlayService
   ) { }
@@ -86,11 +86,9 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (changes['items']) {
       this.internalItems = cloneDeep(this.items);
     }
-
     if (changes['selectedKeys'] && !changes['selectedKeys'].firstChange) {
       this.updateSelectedItems();
     }
-
     if (changes['mode'] || changes['inlineCollapsed']) {
       // 在水平模式或折叠模式下关闭所有展开的子菜单
       if (this.mode === 'horizontal' || this.inlineCollapsed) {
@@ -129,7 +127,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (item.disabled || !item.children || item.children.length === 0 || !(this.mode === 'inline' && !this.inlineCollapsed)) {
       return;
     }
-
     // 内联模式：切换当前子菜单的展开/折叠状态
     item.isOpen = !item.isOpen;
     this.openChange.emit({ item, open: !!item.isOpen });
@@ -138,17 +135,14 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
   // 关闭指定的子菜单
   private closeSubMenu(item: MenuItem): void {
     if (!item.isOpen) return;
-
     item.isOpen = false;
     this.openChange.emit({ item, open: false });
-
     // 关闭overlay
     const overlayRef = this.overlayRefs.get(item.key);
     if (overlayRef) {
       overlayRef.dispose();
       this.overlayRefs.delete(item.key);
     }
-
     // 如果有子菜单，递归关闭
     if (item.children) {
       item.children.forEach(child => {
@@ -164,19 +158,14 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (!element || item.disabled || !item.children || item.children.length === 0) {
       return;
     }
-
     // 如果已经有overlay，不需要再次打开
     if (item.isOpen && this.overlayRefs.has(item.key)) {
       return;
     }
-
     // 清除所有离开定时器，防止子菜单被意外关闭
     this.clearAllLeaveTimers();
-
     // 决定子菜单的位置
-    let placement: string;
     let positions;
-
     if (this.mode === 'horizontal') {
       // 水平模式的位置策略
       // 先尝试向下展开，然后向上展开
@@ -190,13 +179,11 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       // 添加备用位置
       positions.push(...this.overlayService.getPositions('left-top'));
     }
-
     // 创建overlay配置
     const overlayConfig = {
       // 使用阻塞滚动策略，避免滚动时菜单位置异常
       scrollStrategy: this.overlayService.overlay.scrollStrategies.reposition()
     };
-
     // 创建overlay
     const overlayRef = this.overlayService.createOverlay(
       overlayConfig,
@@ -210,17 +197,13 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
         }
       }
     );
-
     // 记录overlayRef
     this.overlayRefs.set(item.key, overlayRef);
-
     // 将子菜单内容附加到overlay
     this.overlayService.attachTemplate(overlayRef, this.menuItemTpl, this.viewContainerRef);
-
     // 更新菜单项状态
     item.isOpen = true;
     this.openChange.emit({ item, open: true });
-
     // 获取菜单元素以便添加鼠标事件
     setTimeout(() => {
       if (overlayRef.hasAttached()) {
@@ -238,7 +221,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
         }
       }
     }, 0);
-
     // 设置子菜单关闭时的处理
     overlayRef.detachments().subscribe(() => {
       if (item.isOpen) {
@@ -255,15 +237,12 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (item.disabled || !item.children || item.children.length === 0) {
       return;
     }
-
     // 内联模式不使用hover显示子菜单
     if (this.mode === 'inline' && !this.inlineCollapsed) {
       return;
     }
-
     // 清除可能存在的离开定时器
     this.clearLeaveTimer(item.key);
-
     // 设置进入定时器
     this.setEnterTimer(item, event);
   }
@@ -273,15 +252,12 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (item.disabled || !item.children || item.children.length === 0) {
       return;
     }
-
     // 内联模式不使用hover关闭子菜单
     if (this.mode === 'inline' && !this.inlineCollapsed) {
       return;
     }
-
     // 清除可能存在的进入定时器
     this.clearEnterTimer(item.key);
-
     // 设置离开定时器
     this.setLeaveTimer(item);
   }
@@ -291,7 +267,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (item.disabled || !item.children || item.children.length === 0) {
       return;
     }
-
     // 清除可能存在的离开定时器
     this.clearLeaveTimer(item.key);
   }
@@ -301,7 +276,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (item.disabled || !item.children || item.children.length === 0 || (this.mode === 'inline' && !this.inlineCollapsed)) {
       return;
     }
-
     // 设置离开定时器
     this.setLeaveTimer(item);
   }
@@ -309,18 +283,15 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
   // 设置进入定时器
   private setEnterTimer(item: MenuItem, event: MouseEvent): void {
     this.clearEnterTimer(item.key);
-
     // 直接执行，不使用定时器
     // 关闭同级的其他子菜单
     const parentItems = this.findParentItems(item);
     const siblings = this.getSiblingItems(item, parentItems);
-
     siblings.forEach(sibling => {
       if (sibling !== item && sibling.isOpen) {
         this.closeSubMenu(sibling);
       }
     });
-
     // 打开当前子菜单
     this.openSubMenuWithOverlay(item, event.currentTarget as HTMLElement);
     this.cdr.detectChanges();
@@ -329,7 +300,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
   // 设置离开定时器
   private setLeaveTimer(item: MenuItem): void {
     this.clearLeaveTimer(item.key);
-
     // 延迟更长时间关闭，避免用户移动鼠标时的闪烁问题
     const timerId = setTimeout(() => {
       if (item.isOpen) {
@@ -338,7 +308,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       }
       this.leaveTimers.delete(item.key);
     }, 400); // 更长的延迟时间
-
     this.leaveTimers.set(item.key, timerId);
   }
 
@@ -371,22 +340,18 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       this.clearSelectedState(this.internalItems);
       // 设置当前选中
       item.selected = true;
-
       // 如果是子菜单项，确保父菜单项展开
       if (this.mode === 'inline' && !this.inlineCollapsed) {
         this.openParentMenus(this.internalItems, item);
       }
-
       // 通过找到原始数据中对应的项发送事件，保持输入输出数据一致性
       const originalItem = this.findOriginalItem(item.key, this.items);
       this.menuItemClick.emit(originalItem || item);
-
       // 阻止事件冒泡
       if (event) {
         event.stopPropagation();
         event.preventDefault();
       }
-
       // 如果不是内联模式，点击后关闭所有菜单
       if (this.mode !== 'inline' || this.inlineCollapsed) {
         // 给一个小延迟，确保点击事件完成
@@ -427,13 +392,11 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (!item.children) {
       return false;
     }
-
     // 直接检查该项的子菜单项是否有选中状态
     const hasDirectSelectedChild = item.children.some(child => child.selected);
     if (hasDirectSelectedChild) {
       return true;
     }
-
     // 递归检查子级的子级是否有选中项
     return item.children.some(child => {
       if (child.children && child.children.length > 0) {
@@ -453,7 +416,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
           item.isOpen = true;
           return;
         }
-
         // 递归检查更深层次的子项
         const hasSelectedChild = this.hasSelectedChildInTree(item, selectedItem);
         if (hasSelectedChild) {
@@ -469,19 +431,16 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     if (!parent.children) {
       return false;
     }
-
     for (const child of parent.children) {
       if (child === targetItem) {
         return true;
       }
-
       if (child.children && child.children.length > 0) {
         if (this.hasSelectedChildInTree(child, targetItem)) {
           return true;
         }
       }
     }
-
     return false;
   }
 
@@ -502,14 +461,11 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       this.clearSelectedState(this.internalItems);
       return;
     }
-
     // 先清除所有选中状态
     this.clearSelectedState(this.internalItems);
-
     // 只使用第一个选中键 (如果有多个，只选中第一个)
     const selectedKey = this.selectedKeys[0];
     this.setSelectedByKey(this.internalItems, selectedKey);
-
     // 确保所有选中项的父菜单是展开的
     if (this.mode === 'inline' && !this.inlineCollapsed) {
       this.ensureParentMenusOpen(this.internalItems);
@@ -523,7 +479,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
         item.selected = true;
         return; // 找到第一个匹配项就返回
       }
-
       if (item.children && item.children.length > 0) {
         this.setSelectedByKey(item.children, key);
       }
@@ -561,7 +516,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
           if (item.children.includes(target)) {
             return [...path, item];
           }
-
           const result = findParent(item.children, target, [...path, item]);
           if (result) {
             return result;
@@ -570,7 +524,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       }
       return null;
     };
-
     return findParent(this.internalItems, targetItem, []) || [];
   }
 
@@ -580,7 +533,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
       // 顶级菜单项
       return this.internalItems.filter(i => i !== item);
     }
-
     // 获取直接父级
     const parent = parentPath[parentPath.length - 1];
     return parent.children?.filter(child => child !== item) || [];
@@ -594,7 +546,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
         return item.children;
       }
     }
-
     // 如果没有找到开启的顶级菜单，查找嵌套的打开菜单
     const searchOpenItem = (items: MenuItem[]): MenuItem[] | null => {
       for (const item of items) {
@@ -602,7 +553,6 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
           if (item.isOpen) {
             return item.children;
           }
-
           // 递归查找
           const found = searchOpenItem(item.children);
           if (found) {
@@ -622,8 +572,9 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     this.enterTimers.forEach((timer) => clearTimeout(timer));
     this.leaveTimers.clear();
     this.enterTimers.clear();
-
     // 关闭所有overlay
     this.closeAllOverlays();
   }
 }
+
+

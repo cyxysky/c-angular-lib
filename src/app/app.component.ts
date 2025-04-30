@@ -1,5 +1,5 @@
 import { Component, effect, resource, signal, ViewChild } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ProjectModule } from '../../projects/project/src/public-api';
 import { of, delay, interval } from 'rxjs';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
@@ -50,7 +50,11 @@ export class AppComponent {
     //     console.log(id);
     //   }
     // })
-
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.nowComponent.set(event.urlAfterRedirects.split('/').pop() || '');
+      }
+    });
     // 初始化菜单数据
     this.initMenuItems();
   }
@@ -102,10 +106,6 @@ export class AppComponent {
     }
   }
 
-  test(value: any) {
-    return value === '' ? false : true;
-  }
-
   ngOnInit() {
     of(true).pipe(delay(2000)).subscribe((data) => {
       console.log(data)
@@ -118,10 +118,6 @@ export class AppComponent {
     // mySignal.set(2);
     // mySignal.set(3);
 
-  }
-
-  cons(any: any) {
-    console.log(any)
   }
 
   nav(path: string) {

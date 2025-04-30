@@ -21,16 +21,18 @@
                     class="c-lib-menu-submenu-title"
                     [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
                     (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item, $event) : onMenuItemClick(item.children[0], $event)"
-                    (mouseenter)="(mode !== 'inline' || inlineCollapsed) && onMouseEnterSubmenu(item, $event)"
-                    (mouseleave)="(mode !== 'inline' || inlineCollapsed) && onMouseLeaveSubmenu(item)"
+                    libDropMenu
+                    [dropMenuItems]="item.children"
+                    [dropMenuPlacement]="mode !== 'horizontal' ? 'right-top' : 'bottom-left'"
+                    [dropMenuTrigger]="'hover'"
+
                     >
                     <i *ngIf="item.icon" class="c-lib-menu-icon" [class]="item.icon"></i>
-                    <span class="c-lib-menu-title-content" *ngIf="!inlineCollapsed || mode !== 'inline'">{{ item.title }}</span>
-                    <i class="c-lib-menu-submenu-arrow"
-                        *ngIf="(mode !== 'horizontal') && (!inlineCollapsed || mode !== 'inline')"></i>
+                    <span *ngIf="!inlineCollapsed || mode !== 'inline'" class="c-lib-menu-title-content">{{ item.title }}</span>
+                    <i *ngIf="(mode !== 'horizontal') && (!inlineCollapsed || mode !== 'inline')" class="c-lib-menu-submenu-arrow"></i>
                 </div>
                 <div *ngIf="mode === 'inline' && !inlineCollapsed">
-                    <ul class="c-lib-menu-sub c-lib-menu-inline" *ngIf="item.isOpen" [@expandCollapse]>
+                    <ul *ngIf="item.isOpen" class="c-lib-menu-sub c-lib-menu-inline" [@expandCollapse]>
                         <ng-container *ngFor="let child of item.children">
                             <li 
                                 *ngIf="child.children && child.children.length > 0" 
@@ -40,7 +42,8 @@
                                 [class.c-lib-menu-submenu-disabled]="child.disabled"
                                 >
                                 <div 
-                                    class="c-lib-menu-submenu-title" [style.paddingLeft.px]="inlineIndent * 2"
+                                    class="c-lib-menu-submenu-title" 
+                                    [style.paddingLeft.px]="inlineIndent * 2"
                                     (click)="toggleSubMenu(child, $event)"
                                     >
                                     <i *ngIf="child.icon" class="c-lib-menu-icon" [class]="child.icon"></i>
@@ -94,10 +97,11 @@
 </div>
 
 <ng-template #menuItemTpl>
-    <div class="c-lib-menu-overlay-container"
-         [class.c-lib-menu-light]="theme === 'light'"
-         [class.c-lib-menu-dark]="theme === 'dark'"
-         >
+    <div 
+        class="c-lib-menu-overlay-container"
+        [class.c-lib-menu-light]="theme === 'light'"
+        [class.c-lib-menu-dark]="theme === 'dark'"
+        >
         <ul class="c-lib-menu-sub" [class.c-lib-menu-vertical-sub]="true">
             <ng-container *ngFor="let child of getCurrentSubmenuItems()">
                 <li 
