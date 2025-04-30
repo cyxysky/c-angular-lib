@@ -4,6 +4,7 @@
     [class]="'c-lib-drop-menu-' + placement"
     [class.c-lib-drop-menu-submenu-mode]="isSubMenu"
     [style.width]="getString(width)"
+
     >
     <ul class="c-lib-drop-menu-list">
         <ng-container *ngTemplateOutlet="template || defaultTemplate; context: { $implicit: items }"></ng-container>

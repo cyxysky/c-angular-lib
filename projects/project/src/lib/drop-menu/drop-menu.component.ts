@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation, ViewChildren, QueryList, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
 import { UtilsService } from '../core/utils/utils.service';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef, CdkOverlayOrigin, CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { Subject, Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { Subject, Subscription } from 'rxjs';
 @Component({
   selector: 'lib-drop-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CdkOverlayOrigin, CdkConnectedOverlay],
   templateUrl: './drop-menu.component.html',
   encapsulation: ViewEncapsulation.None // 确保嵌套样式可以渗透到子组件
 })
@@ -45,11 +45,15 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /** 菜单关闭事件 */
   @Output() menuClose = new EventEmitter<void>();
 
-  /** 订阅集合 */
-  private subscriptions = new Subscription();
+  /** 悬浮元素引用 */
+  @ViewChild(CdkOverlayOrigin, { static: false }) overlayOrigin!: CdkOverlayOrigin;
+  /** 悬浮层引用 */
+  @ViewChild(CdkConnectedOverlay, { static: false }) cdkOverlay!: CdkConnectedOverlay;
   /** 获取所有菜单项元素 */
   @ViewChildren('menuItemEl') menuItemElements!: QueryList<ElementRef>;
 
+  /** 订阅集合 */
+  private subscriptions = new Subscription();
   /** 跟踪当前悬停的子菜单 */
   hoveredItemIndex: number = -1;
   /** 鼠标离开计时器 */
@@ -61,6 +65,10 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   private menuItemRefs = new Map<number, ElementRef>();
   /** 当前菜单是否处于悬停状态 */
   private isMenuHovered = false;
+  /** 下拉菜单位置 */
+  public dropMenuOverlayPosition: ConnectedPosition[] = [];
+  /** 下拉菜单是否打开 */
+  public isOverlayOpen: boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -68,12 +76,15 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
     private overlay: Overlay,
     private overlayService: OverlayService,
     private elementRef: ElementRef
-  ) { }
+  ) {
+    this.dropMenuOverlayPosition = OverlayService.selectOverlayPosition;
+  }
 
   ngOnInit(): void {
     // 子菜单立即可见
     if (this.isSubMenu) {
       this.isVisible = true;
+      this.isOverlayOpen = true;
       this.cdr.detectChanges();
     }
     // 订阅悬停状态变化
@@ -115,6 +126,10 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       this.findSelectedPath();
     }
     if (changes['template']) {
+      this.cdr.detectChanges();
+    }
+    if (changes['isVisible']) {
+      this.isOverlayOpen = this.isVisible;
       this.cdr.detectChanges();
     }
   }
@@ -197,6 +212,27 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   /**
+   * 打开菜单
+   */
+  openMenu(): void {
+    if (this.isOverlayOpen) return;
+    this.isOverlayOpen = true;
+    this.isVisible = true;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * 关闭菜单
+   */
+  closeMenu(): void {
+    this.closeAllSubMenus();
+    this.menuClose.emit();
+    this.isOverlayOpen = false;
+    this.isVisible = false;
+    this.cdr.detectChanges();
+  }
+
+  /**
    * 点击菜单项
    */
   onItemClick(item: DropMenu, event?: MouseEvent): void {
@@ -212,7 +248,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
     // 如果没有子菜单且启用了自动关闭，则关闭菜单
     if (this.autoClose && (!item.children || item.children.length === 0)) {
-      this.menuClose.emit();
+      this.closeMenu();
     }
   }
 
@@ -292,13 +328,10 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   private showSubMenu(item: DropMenu, index: number): void {
     // 如果子菜单已打开且索引相同，不重复操作
     if (this.subMenuOverlayRef && this.hoveredItemIndex === index) return;
-
     // 关闭当前子菜单
     this.closeSubMenu();
-
     const itemElement = this.menuItemRefs.get(index);
     if (!itemElement) return;
-
     // 创建子菜单位置策略
     const positions = this.getSubMenuPositions('right');
     this.subMenuOverlayRef = this.overlayService.createOverlay(
@@ -402,5 +435,15 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    */
   getString(value: any): string {
     return this.utilsService.getString(value);
+  }
+
+  /**
+   * 更新浮层位置
+   */
+  updateOverlayPosition(): void {
+    if (this.cdkOverlay?.overlayRef) {
+      this.overlayService.asyncUpdateOverlayPosition(this.cdkOverlay.overlayRef, 0);
+    }
+    this.cdr.detectChanges();
   }
 }
