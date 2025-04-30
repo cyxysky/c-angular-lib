@@ -55,7 +55,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /** 订阅集合 */
   private subscriptions = new Subscription();
   /** 跟踪当前悬停的子菜单 */
-  hoveredItemIndex: number = -1;
+  public hoveredItemIndex: number = -1;
   /** 鼠标离开计时器 */
   private leaveTimer: any = null;
   /** 子菜单引用 */
@@ -65,26 +65,19 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   private menuItemRefs = new Map<number, ElementRef>();
   /** 当前菜单是否处于悬停状态 */
   private isMenuHovered = false;
-  /** 下拉菜单位置 */
-  public dropMenuOverlayPosition: ConnectedPosition[] = [];
-  /** 下拉菜单是否打开 */
-  public isOverlayOpen: boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private utilsService: UtilsService,
     private overlay: Overlay,
     private overlayService: OverlayService,
-    private elementRef: ElementRef
   ) {
-    this.dropMenuOverlayPosition = OverlayService.selectOverlayPosition;
   }
 
   ngOnInit(): void {
     // 子菜单立即可见
     if (this.isSubMenu) {
       this.isVisible = true;
-      this.isOverlayOpen = true;
       this.cdr.detectChanges();
     }
     // 订阅悬停状态变化
@@ -100,7 +93,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
           } else {
             // 如果菜单链中的任何菜单都没有悬停，则准备关闭子菜单
             this.leaveTimer = setTimeout(() => {
-              this.closeAllSubMenus();
+              this.closeSubMenu();
               this.hoveredItemIndex = -1;
               this.cdr.detectChanges();
             }, 150);
@@ -129,7 +122,6 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       this.cdr.detectChanges();
     }
     if (changes['isVisible']) {
-      this.isOverlayOpen = this.isVisible;
       this.cdr.detectChanges();
     }
   }
@@ -139,7 +131,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-    this.closeAllSubMenus();
+    this.closeSubMenu();
     this.subscriptions.unsubscribe();
   }
 
@@ -167,11 +159,9 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    */
   private findSelectedPath(): void {
     if (!this.selectedItem) return;
-
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
       if (item === this.selectedItem) return;
-
       if (item.children && item.children.length > 0 && this.containsItem(item.children, this.selectedItem)) {
         // 将包含选中项的菜单项设为展开状态
         this.hoveredItemIndex = i;
@@ -186,22 +176,13 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    */
   private containsItem(items: DropMenu[], targetItem: DropMenu): boolean {
     if (!targetItem) return false;
-
     for (const item of items) {
       if (item === targetItem) return true;
       if (item.children && item.children.length > 0) {
         if (this.containsItem(item.children, targetItem)) return true;
       }
     }
-
     return false;
-  }
-
-  /**
-   * 判断是否为模板引用
-   */
-  isTemplateRef(value: any): value is TemplateRef<any> {
-    return value instanceof TemplateRef;
   }
 
   /**
@@ -212,22 +193,11 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   /**
-   * 打开菜单
-   */
-  openMenu(): void {
-    if (this.isOverlayOpen) return;
-    this.isOverlayOpen = true;
-    this.isVisible = true;
-    this.cdr.detectChanges();
-  }
-
-  /**
    * 关闭菜单
    */
   closeMenu(): void {
-    this.closeAllSubMenus();
+    this.closeSubMenu();
     this.menuClose.emit();
-    this.isOverlayOpen = false;
     this.isVisible = false;
     this.cdr.detectChanges();
   }
@@ -241,11 +211,9 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       event?.stopPropagation();
       return;
     }
-
     // 阻止事件冒泡
     event?.stopPropagation();
     this.itemClick.emit(item);
-
     // 如果没有子菜单且启用了自动关闭，则关闭菜单
     if (this.autoClose && (!item.children || item.children.length === 0)) {
       this.closeMenu();
@@ -266,27 +234,16 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   /**
-   * 处理子菜单项点击
-   */
-  onSubMenuItemClick(item: DropMenu): void {
-    this.itemClick.emit(item);
-  }
-
-  /**
    * 鼠标进入菜单项
    */
   onMouseEnterItem(index: number): void {
     // 检查菜单项是否禁用
-    if (this.isItemDisabled(this.items[index])) {
-      return;
-    }
-
+    if (this.isItemDisabled(this.items[index])) return;
     // 清除任何现有的离开计时器
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-
     // 如果悬停在不同的菜单项上
     if (this.hoveredItemIndex !== index) {
       // 关闭当前打开的子菜单
@@ -294,13 +251,11 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       this.hoveredItemIndex = index;
       this.cdr.detectChanges();
     }
-
     // 展示子菜单
     const item = this.items[index];
     if (item.children?.length && this.menuItemRefs.has(index)) {
       this.showSubMenu(item, index);
     }
-
     // 通知悬停状态变化
     this.notifyHoverState(true);
   }
@@ -373,7 +328,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
     componentRef.setInput('hoverStateSubject', this.hoverStateSubject);
     // 订阅子菜单事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((clickedItem: DropMenu) => {
-      this.onSubMenuItemClick(clickedItem);
+      this.itemClick.emit(clickedItem);
     });
     const menuCloseSub = componentRef.instance.menuClose.subscribe(() => {
       this.onSubMenuClose();
@@ -400,13 +355,6 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   /**
-   * 关闭所有子菜单
-   */
-  private closeAllSubMenus(): void {
-    this.closeSubMenu();
-  }
-
-  /**
    * 获取子菜单位置配置
    */
   private getSubMenuPositions(preferredPlacement: string): any[] {
@@ -421,13 +369,6 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
         { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }  // 右侧(备选)
       ];
     }
-  }
-
-  /**
-   * 判断是否显示子菜单
-   */
-  shouldShowSubMenu(index: number): boolean {
-    return this.hoveredItemIndex === index && !this.isItemDisabled(this.items[index]);
   }
 
   /**

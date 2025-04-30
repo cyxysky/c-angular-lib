@@ -34,7 +34,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
   /** 菜单鼠标进入延迟 */
   @Input('dropMenuMouseEnterDelay') mouseEnterDelay: number = 50;
   /** 菜单鼠标离开延迟 */
-  @Input('dropMenuMouseLeaveDelay') mouseLeaveDelay: number = 500;
+  @Input('dropMenuMouseLeaveDelay') mouseLeaveDelay: number = 200;
   /** 是否自动关闭菜单 */
   @Input('dropMenuAutoClose') autoClose: boolean = true;
   /** 当前选中的菜单项 */
@@ -276,8 +276,6 @@ export class DropMenuDirective implements OverlayBasicDirective {
       itemClickSub.unsubscribe();
       menuCloseSub.unsubscribe();
     });
-    // 处理组件鼠标事件
-    const nativeElement = componentRef.location.nativeElement;
     // 保存组件引用
     this.dropMenuComponentRef = componentRef;
     // 更新状态并通知变化
