@@ -2,6 +2,7 @@
     position: relative;
     min-width: 160px;
     border-radius: 4px;
+    height: 100%;
     box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
     background-color: white;
     transform: scale(0.1);
@@ -15,21 +16,19 @@
         transform: scale(1);
     }
 
-    &.c-lib-drop-menu-submenu-mode {
-        transform: none;
-        opacity: 1;
-        overflow: visible;
-    }
+
 
     .c-lib-drop-menu-list {
         margin: 0;
         padding: 0;
         list-style: none;
-        max-height: 300px;
+        max-height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
 
         &::-webkit-scrollbar {
             width: 6px;
-            height: 6px;
+            height: 0;
         }
 
         &::-webkit-scrollbar-thumb {
@@ -53,6 +52,8 @@
         position: relative;
         transition: all 0.2s;
         border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
 
         &:hover {
             color: rgba(0, 0, 0, 0.85);
@@ -100,34 +101,33 @@
             border-right: 1.5px solid currentColor;
             transform: rotate(45deg);
         }
+    }
 
-        .c-lib-drop-menu-submenu {
+    .c-lib-drop-menu-submenu {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-left: 4px;
+        z-index: 1051;
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0.3s, opacity 0.3s;
+        pointer-events: none;
+
+        &:before {
+            content: '';
             position: absolute;
-            top: -8px;
-            left: 100%;
-            margin-left: 4px;
-            padding: 5px 0;
-            z-index: 1050 + 1;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.3s, opacity 0.3s;
-            pointer-events: none;
-
-            &:before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -20px;
-                width: 20px;
-                height: 100%;
-            }
+            top: 0;
+            left: -20px;
+            width: 20px;
+            height: 100%;
         }
+    }
 
-        .c-lib-drop-menu-submenu-visible {
-            visibility: visible;
-            opacity: 1;
-            pointer-events: auto;
-        }
+    .c-lib-drop-menu-submenu-visible {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .c-lib-drop-menu-empty {

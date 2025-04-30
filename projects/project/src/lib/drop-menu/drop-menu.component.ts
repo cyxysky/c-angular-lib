@@ -1,7 +1,11 @@
-import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
 import { UtilsService } from '../core/utils/utils.service';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { OverlayService } from '../core/overlay/overlay.service';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'lib-drop-menu',
@@ -10,7 +14,7 @@ import { UtilsService } from '../core/utils/utils.service';
   templateUrl: './drop-menu.component.html',
   encapsulation: ViewEncapsulation.None // 确保嵌套样式可以渗透到子组件
 })
-export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
+export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   /** 菜单数据 */
   @Input() items: DropMenu[] = [];
   /** 是否可见 */
@@ -31,37 +35,82 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
   @Input() parentDisabled: boolean = false;
   /** 纯模板 */
   @Input() template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  /** 父菜单组件 */
+  @Input() parentMenu: DropMenuComponent | null = null;
+  /** 菜单悬停状态流 */
+  @Input() hoverStateSubject: Subject<boolean> | null = null;
+
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
   /** 菜单关闭事件 */
   @Output() menuClose = new EventEmitter<void>();
 
+  /** 订阅集合 */
+  private subscriptions = new Subscription();
+  /** 获取所有菜单项元素 */
+  @ViewChildren('menuItemEl') menuItemElements!: QueryList<ElementRef>;
+
   /** 跟踪当前悬停的子菜单 */
   hoveredItemIndex: number = -1;
   /** 鼠标离开计时器 */
   private leaveTimer: any = null;
-  /** 鼠标进入计时器 */
-  private enterTimer: any = null;
+  /** 子菜单引用 */
+  private subMenuOverlayRef: OverlayRef | null = null;
+  private subMenuComponentRef: any = null;
+  /** 菜单项DOM引用 */
+  private menuItemRefs = new Map<number, ElementRef>();
+  /** 当前菜单是否处于悬停状态 */
+  private isMenuHovered = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private utilsService: UtilsService
+    private utilsService: UtilsService,
+    private overlay: Overlay,
+    private overlayService: OverlayService,
+    private elementRef: ElementRef
   ) { }
 
   ngOnInit(): void {
-    // 子菜单需要立即可见
+    // 子菜单立即可见
     if (this.isSubMenu) {
-      this.utilsService.delayExecution(() => {
-        this.isVisible = true;
-        this.cdr.detectChanges();
-      }, 0);
+      this.isVisible = true;
+      this.cdr.detectChanges();
     }
-    // 初始时如果有选中项，检查是否在当前菜单层级
+    // 订阅悬停状态变化
+    if (this.hoverStateSubject) {
+      this.subscriptions.add(
+        this.hoverStateSubject.subscribe(isHovered => {
+          if (isHovered) {
+            // 清除离开计时器
+            if (this.leaveTimer) {
+              clearTimeout(this.leaveTimer);
+              this.leaveTimer = null;
+            }
+          } else {
+            // 如果菜单链中的任何菜单都没有悬停，则准备关闭子菜单
+            this.leaveTimer = setTimeout(() => {
+              this.closeAllSubMenus();
+              this.hoveredItemIndex = -1;
+              this.cdr.detectChanges();
+            }, 150);
+          }
+        })
+      );
+    }
+    // 初始检查选中路径
     this.findSelectedPath();
   }
 
+  ngAfterViewInit(): void {
+    // 更新菜单项DOM引用
+    this.updateMenuItemRefs();
+    // 监听菜单项变化
+    this.menuItemElements.changes.subscribe(() => {
+      this.updateMenuItemRefs();
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    // 当选中项变化时，查找选中路径
     if (changes['selectedItem']) {
       this.findSelectedPath();
     }
@@ -71,21 +120,43 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.enterTimer && clearTimeout(this.enterTimer);
-    this.leaveTimer && clearTimeout(this.leaveTimer);
+    if (this.leaveTimer) {
+      clearTimeout(this.leaveTimer);
+      this.leaveTimer = null;
+    }
+    this.closeAllSubMenus();
+    this.subscriptions.unsubscribe();
+  }
+
+  /**
+   * 通知悬停状态变化
+   */
+  private notifyHoverState(isHovered: boolean): void {
+    if (this.hoverStateSubject) {
+      this.hoverStateSubject.next(isHovered);
+    }
+  }
+
+  /**
+   * 更新菜单项DOM引用
+   */
+  private updateMenuItemRefs(): void {
+    this.menuItemRefs.clear();
+    this.menuItemElements.forEach((item, index) => {
+      this.menuItemRefs.set(index, item);
+    });
   }
 
   /**
    * 查找选中项的路径，初始化时调用
    */
-  findSelectedPath(): void {
+  private findSelectedPath(): void {
     if (!this.selectedItem) return;
-    // 检查选中项是否在当前菜单或子菜单中
+
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
-      // 如果当前项就是选中项
       if (item === this.selectedItem) return;
-      // 检查子菜单是否包含选中项
+
       if (item.children && item.children.length > 0 && this.containsItem(item.children, this.selectedItem)) {
         // 将包含选中项的菜单项设为展开状态
         this.hoveredItemIndex = i;
@@ -100,12 +171,14 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
    */
   private containsItem(items: DropMenu[], targetItem: DropMenu): boolean {
     if (!targetItem) return false;
+
     for (const item of items) {
       if (item === targetItem) return true;
       if (item.children && item.children.length > 0) {
         if (this.containsItem(item.children, targetItem)) return true;
       }
     }
+
     return false;
   }
 
@@ -117,7 +190,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * 检查菜单项是否真正禁用（自身禁用或父级禁用）
+   * 检查菜单项是否禁用（自身或父级禁用）
    */
   isItemDisabled(item: DropMenu): boolean {
     return this.parentDisabled || !!item.disabled;
@@ -127,15 +200,17 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
    * 点击菜单项
    */
   onItemClick(item: DropMenu, event?: MouseEvent): void {
-    // 如果菜单项被禁用，则不执行任何操作
+    // 禁用项不响应点击
     if (this.isItemDisabled(item)) {
-      event && event.stopPropagation();
+      event?.stopPropagation();
       return;
     }
-    // 阻止事件冒泡，防止触发上级菜单的点击事件
-    event && event.stopPropagation();
+
+    // 阻止事件冒泡
+    event?.stopPropagation();
     this.itemClick.emit(item);
-    // 只在没有子菜单或子菜单为空且启用了自动关闭时才关闭菜单
+
+    // 如果没有子菜单且启用了自动关闭，则关闭菜单
     if (this.autoClose && (!item.children || item.children.length === 0)) {
       this.menuClose.emit();
     }
@@ -146,6 +221,12 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
    */
   onSubMenuClose(): void {
     this.menuClose.emit();
+    this.subMenuComponentRef?.setInput('isVisible', false);
+    this.subMenuOverlayRef?.detach();
+    this.subMenuOverlayRef?.dispose();
+    this.subMenuOverlayRef = null;
+    this.subMenuComponentRef = null;
+    this.cdr.detectChanges();
   }
 
   /**
@@ -159,35 +240,158 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
    * 鼠标进入菜单项
    */
   onMouseEnterItem(index: number): void {
-    // 检查对应索引的菜单项是否被禁用
-    if (this.isItemDisabled(this.items[index])) return;
+    // 检查菜单项是否禁用
+    if (this.isItemDisabled(this.items[index])) {
+      return;
+    }
+
     // 清除任何现有的离开计时器
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
       this.leaveTimer = null;
     }
-    // 直接设置索引，不使用延迟
-    this.hoveredItemIndex = index;
-    this.cdr.detectChanges();
+
+    // 如果悬停在不同的菜单项上
+    if (this.hoveredItemIndex !== index) {
+      // 关闭当前打开的子菜单
+      this.closeSubMenu();
+      this.hoveredItemIndex = index;
+      this.cdr.detectChanges();
+    }
+
+    // 展示子菜单
+    const item = this.items[index];
+    if (item.children?.length && this.menuItemRefs.has(index)) {
+      this.showSubMenu(item, index);
+    }
+
+    // 通知悬停状态变化
+    this.notifyHoverState(true);
   }
 
   /**
    * 鼠标离开菜单项
    */
   onMouseLeaveItem(): void {
-    // 添加足够长的延时，不要立即关闭子菜单
+    // 启动离开计时器
     if (this.leaveTimer) {
       clearTimeout(this.leaveTimer);
     }
     this.leaveTimer = setTimeout(() => {
-      this.hoveredItemIndex = -1;
-      this.cdr.detectChanges();
-    }, 50); // 更长的延迟，给用户足够时间移动到子菜单
+      if (!this.isMenuHovered) {
+        // 没有悬停在菜单上，发送状态变化
+        this.notifyHoverState(false);
+        this.cdr.detectChanges();
+      }
+    }, OverlayService.overlayVisiableDuration); // 使用统一的延迟时间
+  }
+
+  /**
+   * 显示子菜单
+   */
+  private showSubMenu(item: DropMenu, index: number): void {
+    // 如果子菜单已打开且索引相同，不重复操作
+    if (this.subMenuOverlayRef && this.hoveredItemIndex === index) return;
+
+    // 关闭当前子菜单
+    this.closeSubMenu();
+
+    const itemElement = this.menuItemRefs.get(index);
+    if (!itemElement) return;
+
+    // 创建子菜单位置策略
+    const positions = this.getSubMenuPositions('right');
+    this.subMenuOverlayRef = this.overlayService.createOverlay(
+      {
+        panelClass: ['c-lib-drop-menu-panel', 'c-lib-drop-menu-submenu-panel'],
+        positionStrategy: this.overlay.position()
+          .flexibleConnectedTo(itemElement)
+          .withPositions(positions)
+          .withPush(true)
+          .withGrowAfterOpen(true)
+      },
+      itemElement,
+      positions,
+      // 外部点击不处理
+      () => { },
+      // 位置变化处理
+      (position, isBackupUsed) => {
+        if (isBackupUsed && this.subMenuComponentRef) {
+          const isLeftPosition = position.overlayX === 'end' && position.originX === 'start';
+          this.subMenuComponentRef.setInput('placement', isLeftPosition ? 'left' : 'right');
+          this.subMenuComponentRef.changeDetectorRef.detectChanges();
+        }
+      }
+    );
+    // 创建子菜单组件
+    const componentRef = this.subMenuOverlayRef.attach(new ComponentPortal(DropMenuComponent));
+    // 设置子菜单属性
+    componentRef.setInput('items', item.children || []);
+    componentRef.setInput('isVisible', true);
+    componentRef.setInput('placement', 'right');
+    componentRef.setInput('width', this.width);
+    componentRef.setInput('itemTemplate', this.itemTemplate);
+    componentRef.setInput('autoClose', this.autoClose);
+    componentRef.setInput('isSubMenu', true);
+    componentRef.setInput('selectedItem', this.selectedItem);
+    componentRef.setInput('parentDisabled', this.isItemDisabled(item));
+    componentRef.setInput('template', this.template);
+    componentRef.setInput('parentMenu', this);
+    componentRef.setInput('hoverStateSubject', this.hoverStateSubject);
+    // 订阅子菜单事件
+    const itemClickSub = componentRef.instance.itemClick.subscribe((clickedItem: DropMenu) => {
+      this.onSubMenuItemClick(clickedItem);
+    });
+    const menuCloseSub = componentRef.instance.menuClose.subscribe(() => {
+      this.onSubMenuClose();
+    });
+    // 组件销毁时清理
+    componentRef.onDestroy(() => {
+      itemClickSub.unsubscribe();
+      menuCloseSub.unsubscribe();
+    });
+    // 保存子菜单引用
+    this.subMenuComponentRef = componentRef;
+  }
+
+  /**
+   * 关闭当前子菜单
+   */
+  private closeSubMenu(): void {
+    if (this.subMenuOverlayRef) {
+      this.subMenuOverlayRef.detach();
+      this.subMenuOverlayRef.dispose();
+      this.subMenuOverlayRef = null;
+      this.subMenuComponentRef = null;
+    }
+  }
+
+  /**
+   * 关闭所有子菜单
+   */
+  private closeAllSubMenus(): void {
+    this.closeSubMenu();
+  }
+
+  /**
+   * 获取子菜单位置配置
+   */
+  private getSubMenuPositions(preferredPlacement: string): any[] {
+    if (preferredPlacement === 'right') {
+      return [
+        { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }, // 右侧
+        { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top' }  // 左侧(备选)
+      ];
+    } else {
+      return [
+        { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top' }, // 左侧
+        { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }  // 右侧(备选)
+      ];
+    }
   }
 
   /**
    * 判断是否显示子菜单
-   * @param index 菜单项索引
    */
   shouldShowSubMenu(index: number): boolean {
     return this.hoveredItemIndex === index && !this.isItemDisabled(this.items[index]);
@@ -195,8 +399,6 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy {
 
   /**
    * 获取字符串
-   * @param value 值
-   * @returns 字符串
    */
   getString(value: any): string {
     return this.utilsService.getString(value);
