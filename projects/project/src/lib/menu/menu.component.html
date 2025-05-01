@@ -20,12 +20,12 @@
                 <div 
                     class="c-lib-menu-submenu-title"
                     [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
-                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item, $event) : onMenuItemClick(item.children[0], $event)"
+                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item, $event) : toggleSubMenu(item, $event)"
                     libDropMenu
                     [dropMenuItems]="item.children"
                     [dropMenuPlacement]="mode !== 'horizontal' ? 'right-top' : 'bottom-left'"
                     [dropMenuTrigger]="'hover'"
-
+                    (dropMenuItemClick)="onDropMenuItemClick($event, null)"
                     >
                     <i *ngIf="item.icon" class="c-lib-menu-icon" [class]="item.icon"></i>
                     <span *ngIf="!inlineCollapsed || mode !== 'inline'" class="c-lib-menu-title-content">{{ item.title }}</span>
@@ -114,7 +114,12 @@
                     <div 
                         class="c-lib-menu-submenu-title"
                         (mouseenter)="onMouseEnterSubmenu(child, $event)" 
-                        (click)="onMenuItemClick(child.children[0], $event)"
+                        (click)="toggleSubMenu(child, $event)"
+                        libDropMenu
+                        [dropMenuItems]="child.children"
+                        [dropMenuPlacement]="'right-top'"
+                        [dropMenuTrigger]="'hover'"
+                        (dropMenuItemClick)="onDropMenuItemClick($event, null)"
                         >
                         <i *ngIf="child.icon" class="c-lib-menu-icon" [class]="child.icon"></i>
                         <span class="c-lib-menu-title-content">{{ child.title }}</span>

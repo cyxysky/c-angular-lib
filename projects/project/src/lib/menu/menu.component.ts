@@ -5,6 +5,7 @@ import { cloneDeep, isEqual } from 'lodash';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../core/overlay/overlay.service';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
+import { DropMenu } from '../drop-menu/drop-menu.interface';
 
 // 定义菜单项接口
 export interface MenuItem {
@@ -334,7 +335,7 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   // 点击菜单项
-  onMenuItemClick(item: MenuItem, event?: MouseEvent): void {
+  onMenuItemClick(item: MenuItem, event?: MouseEvent | null): void {
     if (this.selectable && !item.disabled) {
       // 先取消所有选中状态
       this.clearSelectedState(this.internalItems);
@@ -574,6 +575,31 @@ export class MenuComponent implements OnInit, OnChanges, OnDestroy {
     this.enterTimers.clear();
     // 关闭所有overlay
     this.closeAllOverlays();
+  }
+
+  // 处理从DropMenu指令传递过来的菜单项点击
+  onDropMenuItemClick(dropMenuItem: DropMenu, event?: MouseEvent | null): void {
+    // 查找对应的MenuItem
+    const menuItem = this.findMenuItemByTitle(dropMenuItem.title, this.internalItems);
+    if (menuItem) {
+      this.onMenuItemClick(menuItem, event as MouseEvent);
+    }
+  }
+
+  // 根据标题查找菜单项
+  private findMenuItemByTitle(title: string, items: MenuItem[]): MenuItem | null {
+    for (const item of items) {
+      if (item.title === title) {
+        return item;
+      }
+      if (item.children && item.children.length > 0) {
+        const found = this.findMenuItemByTitle(title, item.children);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 }
 
