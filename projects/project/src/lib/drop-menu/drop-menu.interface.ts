@@ -5,5 +5,3 @@ export interface DropMenu {
   disabled?: boolean;
   data?: any;
 }
-
-

@@ -34,7 +34,7 @@ export class DocMenuComponent {
             {
               key: '1-1-1',
               title: '选项1-1',
-              icon: 'bi-3-circle'
+              icon: 'bi-3-circle',
             }
           ]
         },
@@ -64,7 +64,7 @@ export class DocMenuComponent {
       key: '6',
       title: '导航六',
       icon: 'bi-4-circle'
-    },    
+    },
     {
       key: '7',
       title: '导航七',
@@ -91,15 +91,15 @@ export class DocMenuComponent {
 
   // 主题模式示例
   darkThemeItems: MenuItem[] = [...this.basicMenuItems];
-  
+
   // 菜单模式示例
   verticalMenuItems: MenuItem[] = [...this.basicMenuItems];
   horizontalMenuItems: MenuItem[] = [...this.basicMenuItems];
-  
+
   // 折叠示例
   collapsedMenuItems: MenuItem[] = [...this.basicMenuItems];
   isCollapsed = false;
-  
+
   // 禁用示例
   disabledMenuItems: MenuItem[] = [
     {

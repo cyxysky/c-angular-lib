@@ -3,6 +3,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { Injectable, TemplateRef, Injector, EnvironmentInjector, inject, ComponentRef } from '@angular/core';
 import { DrawerComponent } from './drawer.component';
 import { DrawerOptions } from './drawer.interface';
+import { OverlayService } from '../core';
 
 @Injectable({
   providedIn: 'root'
@@ -109,7 +110,7 @@ export class DrawerService {
       setTimeout(() => {
         overlayRef.dispose();
         this.drawerInstances.delete(instance);
-      }, 150);
+      }, OverlayService.overlayVisiableDuration);
     }
   }
 } 

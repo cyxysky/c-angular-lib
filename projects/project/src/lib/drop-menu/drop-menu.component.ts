@@ -40,6 +40,8 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @Input() parentMenu: DropMenuComponent | null = null;
   /** 菜单悬停状态流 */
   @Input() hoverStateSubject: Subject<boolean> | null = null;
+  /** 是否允许选中父级 */
+  @Input() allowParentSelect: boolean = false;
 
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
@@ -61,6 +63,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   private leaveTimer: any = null;
   /** 子菜单引用 */
   private subMenuOverlayRef: OverlayRef | null = null;
+  /** 子菜单组件引用 */
   private subMenuComponentRef: any = null;
   /** 菜单项DOM引用 */
   private menuItemRefs = new Map<number, ElementRef>();
@@ -92,7 +95,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
               this.closeSubMenu();
               this.hoveredItemIndex = -1;
               this.cdr.detectChanges();
-            }, 150);
+            }, OverlayService.overlayVisiableDuration);
           }
         })
       );
@@ -123,6 +126,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       this.leaveTimer = null;
     }
     this.closeSubMenu();
+    this.menuItemRefs.clear();
     this.subscriptions.unsubscribe();
   }
 
@@ -164,12 +168,8 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    * 点击菜单项
    */
   onItemClick(item: DropMenu, event?: MouseEvent): void {
-    // 禁用项不响应点击
-    if (this.isItemDisabled(item)) {
-      event?.stopPropagation();
-      return;
-    }
-    // 阻止事件冒泡
+    if (this.isItemDisabled(item)) return;
+    if (!this.allowParentSelect && item.children) return;
     event?.stopPropagation();
     this.itemClick.emit(item);
     // 如果没有子菜单且启用了自动关闭，则关闭菜单
@@ -196,18 +196,19 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    */
   onMouseEnterItem(index: number): void {
     // 检查菜单项是否禁用
-    if (this.isItemDisabled(this.items[index])) return;
-    // 如果悬停在不同的菜单项上
-    if (this.hoveredItemIndex !== index) {
-      // 关闭当前打开的子菜单
-      this.closeSubMenu();
-      this.hoveredItemIndex = index;
-      this.cdr.detectChanges();
-    }
-    // 展示子菜单
-    const item = this.items[index];
-    if (item.children?.length && this.menuItemRefs.has(index)) {
-      this.showSubMenu(item, index);
+    if (!this.isItemDisabled(this.items[index])) {
+      // 如果悬停在不同的菜单项上
+      if (this.hoveredItemIndex !== index) {
+        // 关闭当前打开的子菜单
+        this.closeSubMenu();
+        this.hoveredItemIndex = index;
+        this.cdr.detectChanges();
+      }
+      // 展示子菜单
+      const item = this.items[index];
+      if (item.children?.length && this.menuItemRefs.has(index)) {
+        this.showSubMenu(item, index);
+      }
     }
     // 通知悬停状态变化
     this.notifyHoverState(true);
@@ -240,7 +241,6 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
     const positions = this.getSubMenuPositions('right');
     this.subMenuOverlayRef = this.overlayService.createOverlay(
       {
-        panelClass: ['c-lib-drop-menu-panel', 'c-lib-drop-menu-submenu-panel'],
         positionStrategy: this.overlay.position()
           .flexibleConnectedTo(itemElement)
           .withPositions(positions)
@@ -274,6 +274,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
     componentRef.setInput('template', this.template);
     componentRef.setInput('parentMenu', this);
     componentRef.setInput('hoverStateSubject', this.hoverStateSubject);
+    componentRef.setInput('allowParentSelect', this.allowParentSelect);
     // 订阅子菜单事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((clickedItem: DropMenu) => {
       this.itemClick.emit(clickedItem);
@@ -314,12 +315,12 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
     if (preferredPlacement === 'right') {
       return [
         { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }, // 右侧
-        { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top' }  // 左侧(备选)
+        { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top' }  // 左侧(最后)
       ];
     } else {
       return [
         { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top' }, // 左侧
-        { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }  // 右侧(备选)
+        { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }  // 右侧(最后)
       ];
     }
   }

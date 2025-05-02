@@ -20,11 +20,13 @@
                 <div 
                     class="c-lib-menu-submenu-title"
                     [style.paddingLeft.px]="(mode === 'inline' && !inlineCollapsed) ? inlineIndent : 24"
-                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item, $event) : toggleSubMenu(item, $event)"
+                    (click)="(mode === 'inline' && !inlineCollapsed) ? toggleSubMenu(item) : toggleSubMenu(item)"
                     libDropMenu
                     [dropMenuItems]="item.children"
+                    [dropMenuStrictVisible]="showDropMenu()"
                     [dropMenuPlacement]="mode !== 'horizontal' ? 'right-top' : 'bottom-left'"
                     [dropMenuTrigger]="'hover'"
+                    [dropMenuSelected]="currentSelectedItem"
                     (dropMenuItemClick)="onDropMenuItemClick($event, null)"
                     >
                     <i *ngIf="item.icon" class="c-lib-menu-icon" [class]="item.icon"></i>
@@ -32,7 +34,7 @@
                     <i *ngIf="(mode !== 'horizontal') && (!inlineCollapsed || mode !== 'inline')" class="c-lib-menu-submenu-arrow"></i>
                 </div>
                 <div *ngIf="mode === 'inline' && !inlineCollapsed">
-                    <ul *ngIf="item.isOpen" class="c-lib-menu-sub c-lib-menu-inline" [@expandCollapse]>
+                    <ul *ngIf="item.isOpen" class="c-lib-menu-sub c-lib-menu-inline" @expandCollapse>
                         <ng-container *ngFor="let child of item.children">
                             <li 
                                 *ngIf="child.children && child.children.length > 0" 
@@ -44,27 +46,25 @@
                                 <div 
                                     class="c-lib-menu-submenu-title" 
                                     [style.paddingLeft.px]="inlineIndent * 2"
-                                    (click)="toggleSubMenu(child, $event)"
+                                    (click)="toggleSubMenu(child)"
                                     >
                                     <i *ngIf="child.icon" class="c-lib-menu-icon" [class]="child.icon"></i>
                                     <span class="c-lib-menu-title-content">{{ child.title }}</span>
                                     <i class="c-lib-menu-submenu-arrow"></i>
                                 </div>
-                                <div *ngIf="child.isOpen">
-                                    <ul class="c-lib-menu-sub c-lib-menu-inline" [@expandCollapse]>
-                                        <li 
-                                            *ngFor="let subChild of child.children" 
-                                            class="c-lib-menu-item"
-                                            [class.c-lib-menu-item-selected]="subChild.selected"
-                                            [class.c-lib-menu-item-disabled]="subChild.disabled"
-                                            [style.paddingLeft.px]="inlineIndent * 3"
-                                            (click)="onMenuItemClick(subChild, $event)"
-                                            >
-                                            <i *ngIf="subChild.icon" class="c-lib-menu-icon" [class]="subChild.icon"></i>
-                                            <span class="c-lib-menu-title-content">{{ subChild.title }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <ul *ngIf="child.isOpen" class="c-lib-menu-sub c-lib-menu-inline" @expandCollapse>
+                                    <li 
+                                        *ngFor="let subChild of child.children" 
+                                        class="c-lib-menu-item"
+                                        [class.c-lib-menu-item-selected]="subChild.selected"
+                                        [class.c-lib-menu-item-disabled]="subChild.disabled"
+                                        [style.paddingLeft.px]="inlineIndent * 3"
+                                        (click)="onMenuItemClick(subChild, $event)"
+                                        >
+                                        <i *ngIf="subChild.icon" class="c-lib-menu-icon" [class]="subChild.icon"></i>
+                                        <span class="c-lib-menu-title-content">{{ subChild.title }}</span>
+                                    </li>
+                                </ul>
                             </li>
                             <li 
                                 *ngIf="!child.children || child.children.length === 0" 
@@ -95,48 +95,3 @@
         </ng-container>
     </ul>
 </div>
-
-<ng-template #menuItemTpl>
-    <div 
-        class="c-lib-menu-overlay-container"
-        [class.c-lib-menu-light]="theme === 'light'"
-        [class.c-lib-menu-dark]="theme === 'dark'"
-        >
-        <ul class="c-lib-menu-sub" [class.c-lib-menu-vertical-sub]="true">
-            <ng-container *ngFor="let child of getCurrentSubmenuItems()">
-                <li 
-                    *ngIf="child.children && child.children.length > 0" 
-                    class="c-lib-menu-submenu"
-                    [class.c-lib-menu-submenu-open]="child.isOpen"
-                    [class.c-lib-menu-submenu-selected]="hasSelectedChild(child)"
-                    [class.c-lib-menu-submenu-disabled]="child.disabled"
-                    >
-                    <div 
-                        class="c-lib-menu-submenu-title"
-                        (mouseenter)="onMouseEnterSubmenu(child, $event)" 
-                        (click)="toggleSubMenu(child, $event)"
-                        libDropMenu
-                        [dropMenuItems]="child.children"
-                        [dropMenuPlacement]="'right-top'"
-                        [dropMenuTrigger]="'hover'"
-                        (dropMenuItemClick)="onDropMenuItemClick($event, null)"
-                        >
-                        <i *ngIf="child.icon" class="c-lib-menu-icon" [class]="child.icon"></i>
-                        <span class="c-lib-menu-title-content">{{ child.title }}</span>
-                        <i class="c-lib-menu-submenu-arrow"></i>
-                    </div>
-                </li>
-                <li 
-                    *ngIf="!child.children || child.children.length === 0" 
-                    class="c-lib-menu-item"
-                    [class.c-lib-menu-item-selected]="child.selected"
-                    [class.c-lib-menu-item-disabled]="child.disabled" 
-                    (click)="onMenuItemClick(child, $event)"
-                    >
-                    <i *ngIf="child.icon" class="c-lib-menu-icon" [class]="child.icon"></i>
-                    <span class="c-lib-menu-title-content">{{ child.title }}</span>
-                </li>
-            </ng-container>
-        </ul>
-    </div>
-</ng-template>

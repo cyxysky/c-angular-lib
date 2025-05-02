@@ -41,6 +41,8 @@ export class DropMenuDirective implements OverlayBasicDirective {
   @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
   /** 纯模板 */
   @Input('dropMenuTemplate') template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  /** 是否允许选中父级 */
+  @Input('dropMenuAllowParentSelect') allowParentSelect: boolean = false;
 
   /** 菜单显示状态改变事件 */
   @Output('dropMenuVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -256,12 +258,13 @@ export class DropMenuDirective implements OverlayBasicDirective {
     componentRef.setInput('autoClose', this.autoClose);
     componentRef.setInput('selectedItem', this.selectedItem);
     componentRef.setInput('template', this.template);
+    componentRef.setInput('allowParentSelect', this.allowParentSelect);
     // 传递悬停状态Subject
     componentRef.setInput('hoverStateSubject', this.hoverStateSubject);
     // 订阅组件事件
     const itemClickSub = componentRef.instance.itemClick.subscribe((item: DropMenu) => {
-      this.itemClick.emit(item);
       if (!item.disabled) {
+        this.itemClick.emit(item);
         this.selectedItem = item;
         this.selectedChange.emit(this.selectedItem);
         // 更新组件的选中项

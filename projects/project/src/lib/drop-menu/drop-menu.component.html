@@ -14,13 +14,13 @@
 <ng-template #defaultTemplate>
     <ng-container *ngFor="let item of items; let i = index">
         <li 
+            #menuItemEl
             class="c-lib-drop-menu-item"
             [class.c-lib-drop-menu-item-disabled]="isItemDisabled(item)" 
             [class.c-lib-drop-menu-item-selected]="selectedItem === item"
-            (mouseenter)="!isItemDisabled(item) && onMouseEnterItem(i)"
-            (mouseleave)="!isItemDisabled(item) && onMouseLeaveItem()" 
+            (mouseenter)="onMouseEnterItem(i)"
+            (mouseleave)="onMouseLeaveItem()" 
             (click)="!isItemDisabled(item) && onItemClick(item, $event)"
-            #menuItemEl
             >
             <ng-container *ngIf="itemTemplate; else defaultItemTemplate">
                 <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{ $implicit: item, index: i }"></ng-container>
