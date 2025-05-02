@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableColumn, TableSize } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
@@ -13,7 +13,7 @@ import { TreeSelectComponent } from '../tree-select/tree-select.component';
 import { RadioComponent } from '../radio/radio.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import * as _ from 'lodash';
-import { WidgetSource } from '../core';
+import { UtilsService, WidgetSource } from '../core';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -53,41 +53,35 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit, OnChanges {
-  // 表格数据
-  @Input() data: any[] = [];
+  /** 表格数据 */
+  @Input({ alias: 'tableData' }) data: any[] = [];
 
-  // 表格列配置
-  @Input() columns: TableColumn[] = [];
+  /** 表格列配置 */
+  @Input({ alias: 'tableColumns' }) columns: TableColumn[] = [];
 
-  // 表格大小
-  @Input() size: TableSize = 'default';
+  /** 表格大小 */
+  @Input({ alias: 'tableSize' }) size: TableSize = 'default';
 
-  // 是否显示边框
-  @Input() bordered: boolean = false;
+  /** 是否显示边框 */
+  @Input({ alias: 'tableBordered', transform: booleanAttribute }) bordered: boolean = false;
 
-  // 是否显示loading状态
-  @Input() loading: boolean = false;
+  /** 是否显示loading状态 */
+  @Input({ alias: 'tableLoading', transform: booleanAttribute }) loading: boolean = false;
 
-  // 自定义loading模板
-  @Input() loadingIndicator: TemplateRef<void> | null = null;
+  /** 表格标题 */
+  @Input({ alias: 'tableTitle' }) title: string | TemplateRef<void> | null = null;
 
-  // 表格标题
-  @Input() title: string | TemplateRef<void> | null = null;
+  /** 表格底部 */
+  @Input({ alias: 'tableFooter' }) footer: string | TemplateRef<void> | null = null;
 
-  // 表格底部
-  @Input() footer: string | TemplateRef<void> | null = null;
-
-  // 是否显示工具栏
-  @Input() showToolbar: boolean = false;
-
-  // 工具栏模板
-  @Input() toolbarTemplate: TemplateRef<void> | null = null;
-
-  // 工具栏操作区域模板
-  @Input() toolbarActionsTemplate: TemplateRef<void> | null = null;
+  /** 是否显示工具栏 */
+  @Input({ alias: 'tableShowToolbar', transform: booleanAttribute }) showToolbar: boolean = false;
 
   // 自定义空数据模板
   @Input() emptyTemplate: TemplateRef<void> | null = null;
+
+  /** 是否为树形表格 */
+  @Input({ alias: 'tableIsTree', transform: booleanAttribute }) isTree: boolean = false;
 
   // 分页相关
   @Input() showPagination: boolean = true;
@@ -136,17 +130,20 @@ export class TableComponent implements OnInit, OnChanges {
   // 各列的筛选状态
   public filterVisibleMap: { [key: string]: boolean } = {};
 
-  // 原始数据备份，用于筛选和排序
-  private originalData: any[] = [];
-
   // 各列的筛选值
   public filterValueMap: { [key: string]: any } = {};
-  public filterValueMapTemplate: { [key: string]: any } = {};
+
+  // 各列的显示筛选值
+  public displayFilterValueMap: { [key: string]: any } = {};
+
+  // 表格数据
+  public tableData: Array<any> = [];
 
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
     public cdr: ChangeDetectorRef,
+    private utilsService: UtilsService,
     @Optional() public widgetSource: WidgetSource
   ) {
     afterNextRender(() => {
@@ -156,7 +153,7 @@ export class TableComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     // 备份原始数据
-    this.originalData = [...this.data];
+    this.tableData = _.cloneDeep(this.data);
     this.refreshData();
     this.checkFixedColumns();
     // 初始化设置滚动状态，只有在有水平滚动条时才添加阴影效果
@@ -166,7 +163,6 @@ export class TableComponent implements OnInit, OnChanges {
       if (tableElement && container) {
         // 检查是否有水平滚动条
         const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
-
         if (hasHorizontalScroll) {
           this.renderer.addClass(tableElement, 'lib-table-scroll-start');
           this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
@@ -184,13 +180,16 @@ export class TableComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
       // 当数据源变化时，备份原始数据
-      this.originalData = [...this.data];
+      this.tableData = _.cloneDeep(this.data);
     }
     if (changes['data'] || changes['pageIndex'] || changes['pageSize'] || changes['columns']) {
       this.refreshData();
     }
     if (changes['columns']) {
       this.checkFixedColumns();
+    }
+    if (changes['isTree'] && this.isTree) {
+      this.tableData = this.flatTableData();
     }
   }
 
@@ -231,6 +230,23 @@ export class TableComponent implements OnInit, OnChanges {
       this.renderer.addClass(tableElement, 'lib-table-scroll-middle');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
     }
+  }
+
+  /**
+   * 扁平化表格数据
+   */
+  flatTableData(): Array<any> {
+    let flattenNodes: any[] = [];
+    this.utilsService.flattenTreeNodes(this.tableData, (node, nowLevel, parentNode, index) => {
+      flattenNodes.push({
+        node,
+        nowLevel,
+        parentNode,
+        isLast: index === parentNode?.children?.length - 1,
+        index
+      });
+    });
+    return flattenNodes;
   }
 
   /**
@@ -312,7 +328,7 @@ export class TableComponent implements OnInit, OnChanges {
    * 打开过滤弹窗
    */
   openFilter(column: TableColumn): void {
-    this.filterValueMapTemplate = _.cloneDeep(this.filterValueMap);
+    this.displayFilterValueMap = _.cloneDeep(this.filterValueMap);
   }
 
   /**
@@ -405,7 +421,7 @@ export class TableComponent implements OnInit, OnChanges {
    */
   confirmFilter(column: TableColumn): void {
     this.filterVisibleMap[column.field] = false;
-    this.filterValueMap[column.field] = this.filterValueMapTemplate[column.field];
+    this.filterValueMap[column.field] = this.displayFilterValueMap[column.field];
     this.cdr.detectChanges();
   }
 
@@ -423,7 +439,7 @@ export class TableComponent implements OnInit, OnChanges {
   resetFilter(column: TableColumn): void {
     this.filterVisibleMap[column.field] = false;
     delete this.filterValueMap[column.field];
-    delete this.filterValueMapTemplate[column.field];
+    delete this.displayFilterValueMap[column.field];
     this.filterChange.emit({ field: column.field, value: [] });
   }
 
@@ -436,7 +452,7 @@ export class TableComponent implements OnInit, OnChanges {
       column.sortOrder = null;
     });
     // 恢复原始数据
-    this.data = [...this.originalData];
+    this.tableData = _.cloneDeep(this.data);
     // 刷新数据
     this.refreshData();
   }

@@ -266,4 +266,19 @@ export class UtilsService {
     return svg;
   }
 
+  /**
+   * 扁平化树节点
+   * @param nodes 节点
+   * @param callback 回调函数
+   * @param nowLevel 当前层级
+   * @param parentNode 父节点
+   */
+  public flattenTreeNodes(nodes: any[], callback: (node: any, nowLevel: number, parentNode: any, index: number) => void, nowLevel: number = 0, parentNode: any = null): void {
+    nodes.forEach((node, index) => {
+      callback(node, nowLevel, parentNode, index);
+      if (node?.children && node?.children?.length) {
+        this.flattenTreeNodes(node.children, callback, nowLevel + 1, node);
+      }
+    });
+  }
 }

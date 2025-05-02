@@ -49,6 +49,10 @@ export interface TableColumn {
     show?: (data: any, rowIndex: number) => boolean;
     click: (data: any, rowIndex: number) => void;
   }>;
+  // td样式
+  tdStyle?: (data: any, rowIndex: number, column: TableColumn) => { [key: string]: string };
+  // th样式
+  thStyle?: (column: TableColumn) => { [key: string]: string };
 }
 
 /**

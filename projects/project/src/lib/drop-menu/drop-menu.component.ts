@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation, ViewChildren, QueryList, AfterViewInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, ChangeDetectorRef, ElementRef, OnInit, OnChanges, SimpleChanges, OnDestroy, ViewEncapsulation, ViewChildren, QueryList, AfterViewInit, ViewChild, ChangeDetectionStrategy, booleanAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropMenu } from './drop-menu.interface';
 import { UtilsService } from '../core/utils/utils.service';
@@ -17,31 +17,31 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   /** 菜单数据 */
-  @Input() items: DropMenu[] = [];
+  @Input({ alias: 'items' }) items: DropMenu[] = [];
   /** 是否可见 */
-  @Input() isVisible: boolean = false;
+  @Input({ alias: 'isVisible', transform: booleanAttribute }) isVisible: boolean = false;
   /** 菜单位置 */
-  @Input() placement: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
+  @Input({ alias: 'placement' }) placement: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
   /** 菜单宽度 */
-  @Input() width: number | string = 'auto';
+  @Input({ alias: 'width', transform: (value: any) => typeof value === 'string' ? value : value + 'px' }) width: number | string = 'auto';
   /** 自定义菜单项模板 */
-  @Input() itemTemplate: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  @Input({ alias: 'itemTemplate' }) itemTemplate: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 是否自动关闭菜单 */
-  @Input() autoClose: boolean = true;
+  @Input({ alias: 'autoClose', transform: booleanAttribute }) autoClose: boolean = true;
   /** 是否为子菜单 */
-  @Input() isSubMenu: boolean = false;
+  @Input({ alias: 'isSubMenu', transform: booleanAttribute }) isSubMenu: boolean = false;
   /** 是否选中 */
-  @Input() selectedItem: DropMenu | null = null;
+  @Input({ alias: 'selectedItem' }) selectedItem: DropMenu | null = null;
   /** 父级是否禁用 */
-  @Input() parentDisabled: boolean = false;
+  @Input({ alias: 'parentDisabled', transform: booleanAttribute }) parentDisabled: boolean = false;
   /** 纯模板 */
-  @Input() template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  @Input({ alias: 'template' }) template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 父菜单组件 */
-  @Input() parentMenu: DropMenuComponent | null = null;
+  @Input({ alias: 'parentMenu' }) parentMenu: DropMenuComponent | null = null;
   /** 菜单悬停状态流 */
-  @Input() hoverStateSubject: Subject<boolean> | null = null;
+  @Input({ alias: 'hoverStateSubject' }) hoverStateSubject: Subject<boolean> | null = null;
   /** 是否允许选中父级 */
-  @Input() allowParentSelect: boolean = false;
+  @Input({ alias: 'allowParentSelect', transform: booleanAttribute }) allowParentSelect: boolean = false;
 
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
@@ -112,12 +112,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['template']) {
-      this.cdr.detectChanges();
-    }
-    if (changes['isVisible']) {
-      this.cdr.detectChanges();
-    }
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -133,14 +128,14 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 通知悬停状态变化
    */
-  private notifyHoverState(isHovered: boolean): void {
+  public notifyHoverState(isHovered: boolean): void {
     this.hoverStateSubject && this.hoverStateSubject.next(isHovered);
   }
 
   /**
    * 更新菜单项DOM引用
    */
-  private updateMenuItemRefs(): void {
+  public updateMenuItemRefs(): void {
     this.menuItemRefs.clear();
     this.menuItemElements.forEach((item, index) => {
       this.menuItemRefs.set(index, item);
@@ -150,14 +145,14 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 检查菜单项是否禁用（自身或父级禁用）
    */
-  isItemDisabled(item: DropMenu): boolean {
+  public isItemDisabled(item: DropMenu): boolean {
     return this.parentDisabled || !!item.disabled;
   }
 
   /**
    * 关闭菜单
    */
-  closeMenu(): void {
+  public closeMenu(): void {
     this.closeSubMenu();
     this.menuClose.emit();
     this.isVisible = false;
@@ -167,7 +162,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 点击菜单项
    */
-  onItemClick(item: DropMenu, event?: MouseEvent): void {
+  public onItemClick(item: DropMenu, event?: MouseEvent): void {
     if (this.isItemDisabled(item)) return;
     if (!this.allowParentSelect && item.children) return;
     event?.stopPropagation();
@@ -181,7 +176,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 子菜单关闭
    */
-  onSubMenuClose(): void {
+  public onSubMenuClose(): void {
     this.menuClose.emit();
     this.subMenuComponentRef?.setInput('isVisible', false);
     this.subMenuOverlayRef?.detach();
@@ -194,7 +189,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 鼠标进入菜单项
    */
-  onMouseEnterItem(index: number): void {
+  public onMouseEnterItem(index: number): void {
     // 检查菜单项是否禁用
     if (!this.isItemDisabled(this.items[index])) {
       // 如果悬停在不同的菜单项上
@@ -217,7 +212,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   /**
    * 鼠标离开菜单项
    */
-  onMouseLeaveItem(): void {
+  public onMouseLeaveItem(): void {
     this.leaveTimer = setTimeout(() => {
       if (!this.isMenuHovered) {
         // 没有悬停在菜单上，发送状态变化
@@ -326,16 +321,9 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   /**
-   * 获取字符串
-   */
-  getString(value: any): string {
-    return this.utilsService.getString(value);
-  }
-
-  /**
    * 更新浮层位置
    */
-  updateOverlayPosition(): void {
+  public updateOverlayPosition(): void {
     if (this.cdkOverlay?.overlayRef) {
       this.overlayService.asyncUpdateOverlayPosition(this.cdkOverlay.overlayRef, 0);
     }
