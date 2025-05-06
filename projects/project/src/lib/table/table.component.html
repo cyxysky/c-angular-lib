@@ -1,12 +1,17 @@
 <div class="lib-table-wrapper">
   <!-- 表格操作区（顶部工具栏） -->
-  <div class="lib-table-toolbar" *ngIf="title">
+  <div class="lib-table-toolbar" *ngIf="title || showToolbar">
     <div class="lib-table-toolbar-default">
       <div class="lib-table-toolbar-title">
         <ng-container *ngIf="!isTemplateRef(title)">{{ title }}</ng-container>
         <ng-container *ngIf="isTemplateRef(title)">
           <ng-container *ngTemplateOutlet="title"></ng-container>
         </ng-container>
+      </div>
+      <!-- 树表格展开折叠控制按钮 -->
+      <div class="lib-table-toolbar-actions" *ngIf="isTree">
+        <lib-button buttonType="link" buttonContent="展开全部" (click)="expandAllTreeNodes()"></lib-button>
+        <lib-button buttonType="link" buttonContent="折叠全部" (click)="collapseAllTreeNodes()"></lib-button>
       </div>
     </div>
   </div>
@@ -179,39 +184,64 @@
         <!-- 表格内容 -->
         <tbody class="lib-table-tbody">
           <ng-container *ngIf="currentPageData.length > 0; else emptyTpl">
-            <tr *ngFor="let data of currentPageData; let rowIndex = index">
+            <tr 
+              *ngFor="let data of currentPageData; let rowIndex = index" 
+              [attr.data-node-id]="isTree ? data.node.id : null">
               <td 
-                *ngFor="let column of columns; let colIndex = index" 
-                [style.textAlign]="column.align || 'left'"
+                *ngFor="let column of columns; let colIndex = index"
+                class="lib-table-td"
                 [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
                 [class.lib-table-column-fixed-right]="column.fixed === 'right'"
+                [style.textAlign]="column.align || 'left'"
                 [style.position]="column.fixed ? 'sticky' : null"
                 [style.left]="(column.fixed === 'left' || column.fixed === true) ? getLeftPosition(column) : null"
                 [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" [style.z-index]="1"
                 >
-                <!-- 自定义渲染 -->
-                <ng-container *ngIf="!column.buttons">
-                  <ng-container   
-                    [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
-                    [ngTemplateOutletContext]="{ $implicit: data, column: column, index: rowIndex }"
-                    >
+                <div class="lib-table-td-wrapper">
+                  <!-- 树形展开区域 -->
+                  <div *ngIf="column.treeExpand && isTree" class="lib-table-tree-expand">
+                    <span *ngFor="let item of getIndentArray(isTree && data.nowLevel || 0); let i = index" class="lib-table-tree-expand-indent"></span>
+                    <span 
+                      *ngIf="isTree && data.node?.children && data.node?.children?.length" 
+                      class="lib-table-tree-switcher" 
+                      (click)="$event.stopPropagation(); toggleTreeNode(data.node)">
+                      <i class="bi" [ngClass]="data.node.expanded ? 'bi-caret-down-fill' : 'bi-caret-right-fill'"></i>
+                    </span>
+                    <span *ngIf="isTree && (!data.node?.children || !data.node?.children?.length)" class="lib-table-tree-switcher-noop"></span>
+                  </div>
+                  <!-- 自定义渲染 -->
+                  <ng-container *ngIf="!column.buttons">
+                    <ng-container   
+                      [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
+                      [ngTemplateOutletContext]="{ $implicit: isTree ? data.node : data, column: column, index: rowIndex }"
+                      >
+                    </ng-container>
                   </ng-container>
-                </ng-container>
-                <!-- 按钮 -->
-                <div class="lib-table-operation-cell">
-                  <ng-container *ngFor="let button of column.buttons">
-                      <lib-button 
-                        *ngIf="button.show ? button.show(data, rowIndex) : true" 
-                        [buttonType]="button.type || 'link'"
-                        [buttonShape]="button.shape || 'default'" 
-                        [buttonSize]="button.size || 'middle'" 
-                        [buttonColor]="button.color || 'primary'"
-                        [buttonContent]="button.text" 
-                        [buttonIcon]="button.icon" 
-                        [buttonDisabled]="button.disabled"
-                        (click)="button.click(data, rowIndex)">
-                      </lib-button>
-                  </ng-container>
+                  <!-- 按钮 -->
+                  <div class="lib-table-operation-cell">
+                    <ng-container *ngFor="let button of getVisibleButtons(column, isTree ? data.node : data, rowIndex)">
+                      <span
+                        class="lib-table-operation-cell-button"
+                        (click)="button.click(isTree ? data.node : data, rowIndex)">
+                        <i *ngIf="button.icon" [ngClass]="button.icon"></i>
+                        {{ button.text }}
+                      </span>
+                    </ng-container>
+                    <!-- 更多按钮下拉菜单 -->
+                    <ng-container *ngIf="getMoreButtons(column, isTree ? data.node : data, rowIndex).length > 0">
+                      <span 
+                        class="lib-table-operation-cell-button lib-table-operation-cell-more-button"
+                        libDropMenu
+                        [dropMenuTrigger]="'hover'"
+                        [dropMenuPlacement]="'bottom-left'"
+                        [dropMenuItems]="convertButtonsToMenuItems(getMoreButtons(column, isTree ? data.node : data, rowIndex), isTree ? data.node : data, rowIndex)"
+                        (dropMenuItemClick)="onMenuItemClick($event)"
+                        >
+                        <i class="bi bi-three-dots"></i>
+                        更多
+                      </span>
+                    </ng-container>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -230,8 +260,6 @@
         </tbody>
       </table>
     </div>
-
-
 
     <!-- 表格底部 -->
     <div class="lib-table-footer" *ngIf="footer">
@@ -319,7 +347,6 @@
     </div>
   </div>
 </div>
-
 
 <ng-template #defaultCell let-data let-column="column" let-index="index">
   {{ data[column.field] ? data[column.field] : '--' }}

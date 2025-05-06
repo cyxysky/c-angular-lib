@@ -105,7 +105,20 @@
     </div>
   </app-doc-box>
 
-
+  <!-- 树形表格 -->
+  <app-doc-box title="树形表格" [sourceCode]="treeTableSource">
+    <div demo>
+      <lib-table #treeTable [tableData]="treeData" [tableColumns]="treeColumns" [tableIsTree]="true">
+      </lib-table>
+      <div style="margin-top: 16px;">
+        <button class="action-button" style="margin-right: 8px;" (click)="expandAllTreeNodes()">展开所有</button>
+        <button class="action-button" (click)="collapseAllTreeNodes()">收起所有</button>
+      </div>
+    </div>
+    <div description>
+      树形表格可以展示具有层级关系的数据，通过设置 isTree 属性为 true 启用树形表格功能，同时需要在列配置中设置 treeExpand 属性为 true 来指定哪一列展示树形结构。
+    </div>
+  </app-doc-box>
 
   <!-- 异步加载数据 -->
   <app-doc-box title="异步加载数据" [sourceCode]="asyncTableSource">

@@ -39,16 +39,16 @@ export interface TableColumn {
   fixed?: boolean | 'left' | 'right';
   // 按钮配置
   buttons?: Array<{
-    type?: ButtonType;
-    shape?: ButtonShape;
-    size?: ButtonSize;
-    color?: ButtonColor;
     text: string;
     icon?: string;
     disabled?: boolean;
     show?: (data: any, rowIndex: number) => boolean;
     click: (data: any, rowIndex: number) => void;
   }>;
+  // 最大按钮数，超出以下拉显示
+  maxButtons?: number;
+  // 是否为树形展开td
+  treeExpand?: boolean;
   // td样式
   tdStyle?: (data: any, rowIndex: number, column: TableColumn) => { [key: string]: string };
   // th样式

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute } from '@angular/core';
+import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableColumn, TableSize } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
@@ -14,6 +14,7 @@ import { RadioComponent } from '../radio/radio.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import * as _ from 'lodash';
 import { UtilsService, WidgetSource } from '../core';
+import { DropMenu } from '../drop-menu/drop-menu.interface';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -154,6 +155,8 @@ export class TableComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     // 备份原始数据
     this.tableData = _.cloneDeep(this.data);
+    
+    // 刷新数据
     this.refreshData();
     this.checkFixedColumns();
     // 初始化设置滚动状态，只有在有水平滚动条时才添加阴影效果
@@ -182,15 +185,15 @@ export class TableComponent implements OnInit, OnChanges {
       // 当数据源变化时，备份原始数据
       this.tableData = _.cloneDeep(this.data);
     }
-    if (changes['data'] || changes['pageIndex'] || changes['pageSize'] || changes['columns']) {
-      this.refreshData();
-    }
+    
+    // 无论是树形数据变化还是普通数据变化，都刷新数据
+    this.refreshData();
+    
     if (changes['columns']) {
       this.checkFixedColumns();
     }
-    if (changes['isTree'] && this.isTree) {
-      this.tableData = this.flatTableData();
-    }
+    
+    this.cdr.detectChanges();
   }
 
   /**
@@ -234,26 +237,58 @@ export class TableComponent implements OnInit, OnChanges {
 
   /**
    * 扁平化表格数据
+   * @returns 扁平化的树形数据数组
    */
   flatTableData(): Array<any> {
     let flattenNodes: any[] = [];
-    this.utilsService.flattenTreeNodes(this.tableData, (node, nowLevel, parentNode, index) => {
-      flattenNodes.push({
-        node,
-        nowLevel,
-        parentNode,
-        isLast: index === parentNode?.children?.length - 1,
-        index
-      });
-    });
+    // 递归处理树形数据，只处理可见的节点
+    const processTree = (nodes: any[], level: number = 0, parent: any = null): void => {
+      if (!nodes || !Array.isArray(nodes)) return;
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        // 初始化展开状态
+        if (node.expanded === undefined) {
+          node.expanded = false;
+        }
+        // 添加当前节点
+        flattenNodes.push({
+          node,
+          nowLevel: level,
+          parentNode: parent,
+          isLast: i === nodes.length - 1,
+          index: i
+        });
+        // 如果节点已展开且有子节点，则递归处理子节点
+        if (node.expanded && node.children && node.children.length) {
+          processTree(node.children, level + 1, node);
+        }
+      }
+    };
+    // 从根节点开始处理
+    processTree(this.isTree ? this.data : this.tableData);
     return flattenNodes;
+  }
+  
+  /**
+   * 切换树节点展开/折叠状态
+   * @param node 树节点
+   */
+  toggleTreeNode(node: any): void {
+    // 切换展开状态
+    node.expanded = !node.expanded;
+    // 重新扁平化树形数据
+    this.currentPageData = this.flatTableData();
+    this.cdr.detectChanges();
   }
 
   /**
    * 刷新表格数据
    */
   refreshData(): void {
-    if (this.frontPagination) {
+    // 如果是树形表格，直接使用扁平化后的树形数据
+    if (this.isTree) {
+      this.currentPageData = this.flatTableData();
+    } else if (this.frontPagination) {
       // 前端分页
       const start = (this.pageIndex - 1) * this.pageSize;
       const end = start + this.pageSize;
@@ -262,6 +297,7 @@ export class TableComponent implements OnInit, OnChanges {
       // 服务端分页
       this.currentPageData = this.data;
     }
+    this.cdr.detectChanges();
     // 触发当前页数据变化事件
     this.currentPageDataChange.emit(this.currentPageData);
   }
@@ -554,5 +590,185 @@ export class TableComponent implements OnInit, OnChanges {
         }
         return '';
     }
+  }
+
+  /**
+   * 生成缩进数组
+   * @param level 层级
+   * @returns 缩进数组
+   */
+  getIndentArray(level: number): number[] {
+    return Array(level).fill(0).map((_, i) => i);
+  }
+
+  /**
+   * 展开所有树节点
+   */
+  expandAllTreeNodes(): void {
+    if (!this.isTree) return;
+    // 递归设置所有节点为展开状态
+    const expandNodes = (nodes: any[]): void => {
+      if (!nodes || !Array.isArray(nodes)) return;
+      for (const node of nodes) {
+        node.expanded = true;
+        if (node.children && node.children.length) {
+          expandNodes(node.children);
+        }
+      }
+    };
+    expandNodes(this.data);
+    this.refreshData();
+  }
+
+  /**
+   * 折叠所有树节点
+   */
+  collapseAllTreeNodes(): void {
+    if (!this.isTree) return;
+    // 递归设置所有节点为折叠状态
+    const collapseNodes = (nodes: any[]): void => {
+      if (!nodes || !Array.isArray(nodes)) return;
+      for (const node of nodes) {
+        node.expanded = false;
+        if (node.children && node.children.length) {
+          collapseNodes(node.children);
+        }
+      }
+    };
+    collapseNodes(this.data);
+    this.refreshData();
+  }
+
+  /**
+   * 根据ID数组展开指定节点及其所有父节点
+   * @param ids 要展开的节点ID数组
+   */
+  expandByIds(ids: string[]): void {
+    if (!this.isTree) return;
+    // 建立节点父子关系映射
+    const parentMap = new Map<string, any>();
+    const findParents = (nodes: any[], parent: any = null): void => {
+      if (!nodes || !Array.isArray(nodes)) return;
+      for (const node of nodes) {
+        if (parent) {
+          parentMap.set(node.id, parent);
+        }
+        if (node.children && node.children.length) {
+          findParents(node.children, node);
+        }
+      }
+    };
+    findParents(this.data);
+    // 找到所有需要展开的路径
+    const nodesToExpand = new Set<string>();
+    ids.forEach(id => {
+      nodesToExpand.add(id);
+      let currentId = id;
+      let parentNode = parentMap.get(currentId);
+      while (parentNode) {
+        nodesToExpand.add(parentNode.id);
+        currentId = parentNode.id;
+        parentNode = parentMap.get(currentId);
+      }
+    });
+    // 展开所有需要展开的节点
+    const expandNodes = (nodes: any[]): void => {
+      if (!nodes || !Array.isArray(nodes)) return;
+      for (const node of nodes) {
+        if (nodesToExpand.has(node.id)) {
+          node.expanded = true;
+        }
+        if (node.children && node.children.length) {
+          expandNodes(node.children);
+        }
+      }
+    };
+    expandNodes(this.data);
+    this.refreshData();
+  }
+
+  /**
+   * 获取可见按钮
+   * @param column 表格列配置
+   */
+  getVisibleButtons(column: TableColumn, data: any, rowIndex: number): any[] {
+    if (!column.buttons || !column.buttons.length) {
+      return [];
+    }
+    
+    // 过滤出应该显示的按钮
+    const visibleButtons = column.buttons.filter(button => 
+      button.show ? button.show(data, rowIndex) : true
+    );
+    
+    // 如果设置了最大按钮数，则只返回前maxButtons个按钮
+    if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
+      return visibleButtons.slice(0, column.maxButtons);
+    }
+    
+    return visibleButtons;
+  }
+
+  /**
+   * 获取更多按钮（超出显示限制的按钮）
+   * @param column 表格列配置
+   */
+  getMoreButtons(column: TableColumn, data: any, rowIndex: number): any[] {
+    if (!column.buttons || !column.buttons.length || !column.maxButtons) {
+      return [];
+    }
+    
+    // 过滤出应该显示的按钮
+    const visibleButtons = column.buttons.filter(button => 
+      button.show ? button.show(data, rowIndex) : true
+    );
+    
+    // 如果可见按钮数量超过最大按钮数，返回超出的部分
+    if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
+      return visibleButtons.slice(column.maxButtons);
+    }
+    
+    return [];
+  }
+
+  /**
+   * 将普通按钮转换为下拉菜单项
+   * @param buttons 按钮数组
+   * @param data 行数据
+   * @param rowIndex 行索引
+   */
+  convertButtonsToMenuItems(buttons: any[], data: any, rowIndex: number): DropMenu[] {
+    return buttons.map(button => ({
+      title: button.text,
+      icon: button.icon,
+      disabled: button.disabled,
+      data: {
+        originalButton: button,
+        rowData: data,
+        rowIndex: rowIndex
+      }
+    }));
+  }
+
+  /**
+   * 处理下拉菜单项点击
+   * @param item 下拉菜单项
+   */
+  onMenuItemClick(item: DropMenu): void {
+    if (item.data && item.data.originalButton && item.data.originalButton.click) {
+      item.data.originalButton.click(item.data.rowData, item.data.rowIndex);
+    }
+  }
+
+  /**
+   * 获取列的最大按钮数量
+   * @param column 表格列配置
+   */
+  getMaxButtons(column: TableColumn): number {
+    if (column.maxButtons !== undefined) {
+      return column.maxButtons;
+    }
+    // 默认显示所有按钮
+    return column.buttons ? column.buttons.length : 0;
   }
 }

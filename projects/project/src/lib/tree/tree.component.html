@@ -110,14 +110,16 @@
       <!-- 复选框 -->
       <ng-container *ngTemplateOutlet="checkboxTemplate; context: { $implicit: node, level: level }"></ng-container>
       <!-- 节点内容 -->
-      <div class="c-lib-tree-title" 
-          [class.c-lib-tree-title-disabled]="node.disabled" 
-          [class.c-lib-tree-title-selected]="node.selected" 
-          (click)="onNodeSelect(node)">
-          <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
-          <ng-template #defaultNodeTpl let-node>
-            {{ node[labelProperty] }}
-          </ng-template>
+      <div 
+        class="c-lib-tree-title" 
+        [class.c-lib-tree-title-disabled]="node.disabled" 
+        [class.c-lib-tree-title-selected]="node.selected" 
+        (click)="onNodeSelect(node)"
+        >
+        <ng-container *ngTemplateOutlet="treeTemplate || defaultNodeTpl; context: { $implicit: node, isLast: isLast, level: level }"></ng-container>
+        <ng-template #defaultNodeTpl let-node>
+          {{ node[labelProperty] }}
+        </ng-template>
       </div>
     </div>
   </li>
