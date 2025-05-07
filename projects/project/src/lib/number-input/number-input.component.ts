@@ -32,7 +32,7 @@ export class NumberInputComponent implements ControlValueAccessor {
   /** 是否只读 */
   @Input({ alias: 'numberInputReadonly', transform: booleanAttribute }) readonly: boolean = false;
   /** 颜色 */
-  @Input({ alias: 'numberInputColor' }) color: string = 'black';
+  @Input({ alias: 'numberInputColor' }) color: string = '';
   /** 前缀 */
   @Input({ alias: 'numberInputPrefix' }) prefix: string = '';
   /** 后缀 */

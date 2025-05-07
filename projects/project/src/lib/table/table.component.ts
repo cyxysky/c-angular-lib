@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableColumn, TableSize } from './table.interface';
+import { defaultTableFilterConditions, TableCheckedSelections, TableColumn, TableColumnFilterCondition, TableSize } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { SelectComponent } from '../select/select.component';
 import { NumberInputComponent } from '../number-input/number-input.component';
@@ -38,7 +38,6 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
     NumberInputComponent,
     FormsModule,
     PageSizeOptionsFormatPipe,
-    ButtonComponent,
     InputComponent,
     DateTimerComponent,
     CascaderComponent,
@@ -56,34 +55,32 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
 export class TableComponent implements OnInit, OnChanges {
   /** 表格数据 */
   @Input({ alias: 'tableData' }) data: any[] = [];
-
   /** 表格列配置 */
   @Input({ alias: 'tableColumns' }) columns: TableColumn[] = [];
-
+  /** 是否允许选择 */
+  @Input({ alias: 'tableCheckable', transform: booleanAttribute }) checkable: boolean = false;
+  /** 选择的key */
+  @Input({ alias: 'tableCheckedKey' }) checkedKey: string = 'id';
+  /** 自定义选择项 */
+  @Input({ alias: 'tableCheckedSelections' }) checkedSelections: Array<TableCheckedSelections> = [];
+  /** 选择的内容 */
+  @Input({ alias: 'tableCheckedRows' }) checkedRows: any[] = [];
   /** 表格大小 */
   @Input({ alias: 'tableSize' }) size: TableSize = 'default';
-
   /** 是否显示边框 */
   @Input({ alias: 'tableBordered', transform: booleanAttribute }) bordered: boolean = false;
-
   /** 是否显示loading状态 */
   @Input({ alias: 'tableLoading', transform: booleanAttribute }) loading: boolean = false;
-
   /** 表格标题 */
   @Input({ alias: 'tableTitle' }) title: string | TemplateRef<void> | null = null;
-
   /** 表格底部 */
   @Input({ alias: 'tableFooter' }) footer: string | TemplateRef<void> | null = null;
-
   /** 是否显示工具栏 */
   @Input({ alias: 'tableShowToolbar', transform: booleanAttribute }) showToolbar: boolean = false;
-
   // 自定义空数据模板
   @Input() emptyTemplate: TemplateRef<void> | null = null;
-
   /** 是否为树形表格 */
   @Input({ alias: 'tableIsTree', transform: booleanAttribute }) isTree: boolean = false;
-
   // 分页相关
   @Input() showPagination: boolean = true;
   @Input() pageIndex: number = 1;
@@ -94,51 +91,46 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() showTotal: boolean = true;
   @Input() fixedPagination: boolean = false;
   @Input() paginationTemplate: TemplateRef<any> | null = null;
-
   // 是否前端分页
   @Input() frontPagination: boolean = true;
-
   // 用于表格滚动的配置
   @Input() scroll: { x?: string | null; y?: string | null } = { x: null, y: null };
-
+  // 选择变化事件
+  @Output() tableCheckedRowsChange = new EventEmitter<any[]>();
   // 排序变化事件
   @Output() sortChange = new EventEmitter<{ field: string; order: 'ascend' | 'descend' | null }>();
-
   // 过滤变化事件
   @Output() filterChange = new EventEmitter<{ field: string; value: any[] }>();
-
   // 页码变化事件
   @Output() pageIndexChange = new EventEmitter<number>();
-
   // 每页条数变化事件
   @Output() pageSizeChange = new EventEmitter<number>();
-
   // 当前页数据变化事件
   @Output() currentPageDataChange = new EventEmitter<any[]>();
-
   // 当前页数据
   currentPageData: any[] = [];
-
   // 是否有左侧固定列
   hasFixedLeft: boolean = false;
-
   // 是否有右侧固定列
   hasFixedRight: boolean = false;
-
   // 各列的宽度缓存
   private columnWidths: Map<string, number> = new Map();
-
   // 各列的筛选状态
   public filterVisibleMap: { [key: string]: boolean } = {};
-
   // 各列的筛选值
   public filterValueMap: { [key: string]: any } = {};
-
+  // 各列的筛选条件
+  public filterConditionMap: { [key: string]: any } = {};
   // 各列的显示筛选值
   public displayFilterValueMap: { [key: string]: any } = {};
+  // 各列的显示筛选条件
+  public displayFilterConditionMap: { [key: string]: any } = {};
 
   // 表格数据
   public tableData: Array<any> = [];
+
+  // 筛选条件
+  public filterConditions: TableColumnFilterCondition[] = defaultTableFilterConditions;
 
   constructor(
     private elementRef: ElementRef,
@@ -155,7 +147,6 @@ export class TableComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     // 备份原始数据
     this.tableData = _.cloneDeep(this.data);
-    
     // 刷新数据
     this.refreshData();
     this.checkFixedColumns();
@@ -185,14 +176,14 @@ export class TableComponent implements OnInit, OnChanges {
       // 当数据源变化时，备份原始数据
       this.tableData = _.cloneDeep(this.data);
     }
-    
+
     // 无论是树形数据变化还是普通数据变化，都刷新数据
     this.refreshData();
-    
+
     if (changes['columns']) {
       this.checkFixedColumns();
     }
-    
+
     this.cdr.detectChanges();
   }
 
@@ -268,7 +259,7 @@ export class TableComponent implements OnInit, OnChanges {
     processTree(this.isTree ? this.data : this.tableData);
     return flattenNodes;
   }
-  
+
   /**
    * 切换树节点展开/折叠状态
    * @param node 树节点
@@ -328,7 +319,7 @@ export class TableComponent implements OnInit, OnChanges {
   }
 
   /**
-   * 处理排序变化
+   * 处理排序变化 todo
    */
   onSortChange(field: string, order: 'ascend' | 'descend' | null): void {
     // 更新所有列的排序状态
@@ -365,6 +356,7 @@ export class TableComponent implements OnInit, OnChanges {
    */
   openFilter(column: TableColumn): void {
     this.displayFilterValueMap = _.cloneDeep(this.filterValueMap);
+    this.displayFilterConditionMap = _.cloneDeep(this.filterConditionMap);
   }
 
   /**
@@ -458,6 +450,7 @@ export class TableComponent implements OnInit, OnChanges {
   confirmFilter(column: TableColumn): void {
     this.filterVisibleMap[column.field] = false;
     this.filterValueMap[column.field] = this.displayFilterValueMap[column.field];
+    this.filterConditionMap[column.field] = this.displayFilterConditionMap[column.field];
     this.cdr.detectChanges();
   }
 
@@ -695,17 +688,17 @@ export class TableComponent implements OnInit, OnChanges {
     if (!column.buttons || !column.buttons.length) {
       return [];
     }
-    
+
     // 过滤出应该显示的按钮
-    const visibleButtons = column.buttons.filter(button => 
+    const visibleButtons = column.buttons.filter(button =>
       button.show ? button.show(data, rowIndex) : true
     );
-    
+
     // 如果设置了最大按钮数，则只返回前maxButtons个按钮
     if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
       return visibleButtons.slice(0, column.maxButtons);
     }
-    
+
     return visibleButtons;
   }
 
@@ -717,17 +710,17 @@ export class TableComponent implements OnInit, OnChanges {
     if (!column.buttons || !column.buttons.length || !column.maxButtons) {
       return [];
     }
-    
+
     // 过滤出应该显示的按钮
-    const visibleButtons = column.buttons.filter(button => 
+    const visibleButtons = column.buttons.filter(button =>
       button.show ? button.show(data, rowIndex) : true
     );
-    
+
     // 如果可见按钮数量超过最大按钮数，返回超出的部分
     if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
       return visibleButtons.slice(column.maxButtons);
     }
-    
+
     return [];
   }
 
@@ -770,5 +763,46 @@ export class TableComponent implements OnInit, OnChanges {
     }
     // 默认显示所有按钮
     return column.buttons ? column.buttons.length : 0;
+  }
+
+  /**
+   * 获取选中状态
+   * @param row 行数据
+   */
+  getCheckedStatus(row: any): boolean {
+    return this.checkedRows.some(r => r[this.checkedKey] === row[this.checkedKey]);
+  }
+
+  /**
+   * 选中行变化
+   */
+  checkedChange(checked: boolean, row: any): void {
+    checked ? this.addCheckedRow(row) : this.removeCheckedRow(row);
+  }
+
+  /**
+   * 添加选中行
+   * @param row 行数据
+   */
+  addCheckedRow(row: any): void {
+    this.checkedRows.push(row);
+    this.tableCheckedRowsChange.emit(this.checkedRows);
+  }
+
+  /**
+   * 移除选中行
+   * @param row 行数据
+   */
+  removeCheckedRow(row: any): void {
+    this.checkedRows = this.checkedRows.filter(r => r[this.checkedKey] !== row[this.checkedKey]);
+    this.tableCheckedRowsChange.emit(this.checkedRows);
+  }
+
+  /**
+   * 选择自定义选择项
+   * @param selection 自定义选择项
+   */
+  selectCheckedSelection(selection: any): void {
+    selection.onSelect(this.checkedRows);
   }
 }

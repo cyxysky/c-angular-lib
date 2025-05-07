@@ -3,43 +3,29 @@ lib-number-input {
     display: inline-block;
 }
 
-.c-lib-number-input-error {
-    border-color: #c5000f !important;
+.c-lib-number-input-container.c-lib-number-input-error {
+    border-color: #c5000f;
 
-    &.c-lib-number-input-focused {
-        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
+    &:hover {
+        border-color: #c5000f;
     }
 
-    .c-lib-number-input-handler {
-        &:hover {
-            .c-lib-number-input-handler-up-inner {
-                border-bottom-color: #c5000f !important;
-            }
-
-            .c-lib-number-input-handler-down-inner {
-                border-top-color: #c5000f !important;
-            }
-        }
+    &.c-lib-number-input-focused {
+        border-color: #c5000f;
+        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
     }
 }
 
-.c-lib-number-input-warning {
-    border-color: #ffc409 !important;
+.c-lib-number-input-container.c-lib-number-input-warning {
+    border-color: #ffc409;
 
-    &.c-lib-number-input-focused {
-        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2) !important;
+    &:hover {
+        border-color: #ffc409;
     }
 
-    .c-lib-number-input-handler {
-        &:hover {
-            .c-lib-number-input-handler-up-inner {
-                border-bottom-color: #ffc409 !important;
-            }
-
-            .c-lib-number-input-handler-down-inner {
-                border-top-color: #ffc409 !important;
-            }
-        }
+    &.c-lib-number-input-focused {
+        border-color: #ffc409;
+        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
     }
 }
 
@@ -64,20 +50,20 @@ lib-number-input {
         box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
     }
 
-    &-disabled {
-        background-color: #f5f5f5;
-        border-color: #d9d9d9;
-        color: rgba(0, 0, 0, 0.25);
+    &.c-lib-number-input-disabled {
+        background-color: #f5f5f5 !important;
+        border-color: #d9d9d9 !important;
+        color: rgba(0, 0, 0, 0.25) !important;
         cursor: not-allowed;
 
         input {
-            background-color: #f5f5f5;
-            color: rgba(0, 0, 0, 0.25);
+            background-color: #f5f5f5 !important;
+            color: rgba(0, 0, 0, 0.25) !important;
             cursor: not-allowed;
         }
     }
 
-    &-readonly {
+    &.c-lib-number-input-readonly {
         .c-lib-number-input-handler-wrap {
             display: none;
         }
@@ -105,7 +91,6 @@ lib-number-input {
     display: flex;
     flex: none;
     align-items: center;
-    height: calc(100% - 2px);
     padding-right: 2px;
     color: rgba(0, 0, 0, 0.65);
 }

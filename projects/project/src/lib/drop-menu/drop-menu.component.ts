@@ -42,7 +42,8 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @Input({ alias: 'hoverStateSubject' }) hoverStateSubject: Subject<boolean> | null = null;
   /** 是否允许选中父级 */
   @Input({ alias: 'allowParentSelect', transform: booleanAttribute }) allowParentSelect: boolean = false;
-
+  /** 是否允许选中 */
+  @Input({ alias: 'allowSelected', transform: booleanAttribute }) allowSelected: boolean = true;
   /** 点击菜单项事件 */
   @Output() itemClick = new EventEmitter<DropMenu>();
   /** 菜单关闭事件 */
@@ -164,7 +165,7 @@ export class DropMenuComponent implements OnInit, OnChanges, OnDestroy, AfterVie
    */
   public onItemClick(item: DropMenu, event?: MouseEvent): void {
     if (this.isItemDisabled(item)) return;
-    if (!this.allowParentSelect && item.children) return;
+    if (!this.allowParentSelect && item.children && item.children.length) return;
     event?.stopPropagation();
     this.itemClick.emit(item);
     // 如果没有子菜单且启用了自动关闭，则关闭菜单

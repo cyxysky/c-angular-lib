@@ -1,4 +1,4 @@
-import { Directive, TemplateRef, Input, ElementRef, HostListener, SimpleChanges, ComponentRef, EventEmitter, Output, ViewContainerRef, Injector, Optional, SkipSelf } from '@angular/core';
+import { Directive, TemplateRef, Input, ElementRef, HostListener, SimpleChanges, ComponentRef, EventEmitter, Output, ViewContainerRef, Injector, Optional, SkipSelf, booleanAttribute } from '@angular/core';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -16,33 +16,35 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class DropMenuDirective implements OverlayBasicDirective {
   /** 菜单项 */
-  @Input('dropMenuItems') menuItems: DropMenu[] = [];
+  @Input({ alias: 'dropMenuItems' }) menuItems: DropMenu[] = [];
   /** 菜单位置 */
-  @Input('dropMenuPlacement') placement: OverlayBasicPosition = 'bottom-left';
+  @Input({ alias: 'dropMenuPlacement' }) placement: OverlayBasicPosition = 'bottom-left';
   /** 菜单触发方式 */
-  @Input('dropMenuTrigger') trigger: OverlayBasicTrigger = 'click';
+  @Input({ alias: 'dropMenuTrigger' }) trigger: OverlayBasicTrigger = 'click';
   /** 菜单是否显示 */
-  @Input('dropMenuVisible') visible: boolean = false;
+  @Input({ alias: 'dropMenuVisible', transform: booleanAttribute }) visible: boolean = false;
   /** 是否严格由编程控制显示 */
-  @Input('dropMenuStrictVisible') strictVisible: boolean = false;
+  @Input({ alias: 'dropMenuStrictVisible', transform: booleanAttribute }) strictVisible: boolean = false;
   /** 菜单类 */
-  @Input('dropMenuClass') dropMenuClass: string = '';
+  @Input({ alias: 'dropMenuClass' }) dropMenuClass: string = '';
   /** 菜单宽度 */
-  @Input('dropMenuWidth') width: number | string = 'auto';
+  @Input({ alias: 'dropMenuWidth', transform: (value: any) => typeof value === 'string' ? value : value + 'px' }) width: number | string = 'auto';
   /** 菜单项模板 */
-  @Input('dropMenuItemTemplate') itemTemplate: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  @Input({ alias: 'dropMenuItemTemplate' }) itemTemplate: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 菜单鼠标进入延迟 */
-  @Input('dropMenuMouseEnterDelay') mouseEnterDelay: number = 50;
+  @Input({ alias: 'dropMenuMouseEnterDelay', transform: (value: any) => typeof value === 'string' ? parseInt(value) : value }) mouseEnterDelay: number = 50;
   /** 菜单鼠标离开延迟 */
-  @Input('dropMenuMouseLeaveDelay') mouseLeaveDelay: number = 200;
+  @Input({ alias: 'dropMenuMouseLeaveDelay', transform: (value: any) => typeof value === 'string' ? parseInt(value) : value }) mouseLeaveDelay: number = 200;
   /** 是否自动关闭菜单 */
-  @Input('dropMenuAutoClose') autoClose: boolean = true;
+  @Input({ alias: 'dropMenuAutoClose', transform: booleanAttribute }) autoClose: boolean = true;
   /** 当前选中的菜单项 */
-  @Input('dropMenuSelected') selectedItem: DropMenu | null = null;
+  @Input({ alias: 'dropMenuSelected' }) selectedItem: DropMenu | null = null;
   /** 纯模板 */
-  @Input('dropMenuTemplate') template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
+  @Input({ alias: 'dropMenuTemplate' }) template: TemplateRef<{ $implicit: DropMenu, index: number }> | null = null;
   /** 是否允许选中父级 */
-  @Input('dropMenuAllowParentSelect') allowParentSelect: boolean = false;
+  @Input({ alias: 'dropMenuAllowParentSelect', transform: booleanAttribute }) allowParentSelect: boolean = false;
+  /** 是否允许有选中效果 */
+  @Input({ alias: 'dropMenuAllowSelected', transform: booleanAttribute }) allowSelected: boolean = true;
 
   /** 菜单显示状态改变事件 */
   @Output('dropMenuVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -259,6 +261,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
     componentRef.setInput('selectedItem', this.selectedItem);
     componentRef.setInput('template', this.template);
     componentRef.setInput('allowParentSelect', this.allowParentSelect);
+    componentRef.setInput('allowSelected', this.allowSelected);
     // 传递悬停状态Subject
     componentRef.setInput('hoverStateSubject', this.hoverStateSubject);
     // 订阅组件事件

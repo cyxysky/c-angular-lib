@@ -8,11 +8,6 @@
           <ng-container *ngTemplateOutlet="title"></ng-container>
         </ng-container>
       </div>
-      <!-- 树表格展开折叠控制按钮 -->
-      <div class="lib-table-toolbar-actions" *ngIf="isTree">
-        <lib-button buttonType="link" buttonContent="展开全部" (click)="expandAllTreeNodes()"></lib-button>
-        <lib-button buttonType="link" buttonContent="折叠全部" (click)="collapseAllTreeNodes()"></lib-button>
-      </div>
     </div>
   </div>
 
@@ -48,6 +43,26 @@
         <!-- 表头 -->
         <thead class="lib-table-thead">
           <tr>
+            <th 
+              *ngIf="checkable" 
+              class="lib-table-checkable-cell"
+              >
+              <div
+                class="lib-table-checkable-cell-menu"  
+                libDropMenu
+                [dropMenuTrigger]="'hover'"
+                [dropMenuItems]="checkedSelections"
+                [dropMenuAllowSelected]="false"
+                (dropMenuItemClick)="selectCheckedSelection($event)"
+                >
+                <div>
+                  {{ checkedKey }}
+                </div>
+                <div class="lib-table-checkable-cell-menu-icon">
+                  <i class="bi-chevron-down"></i>
+                </div>
+              </div>
+            </th>
             <th 
               *ngFor="let column of columns" 
               [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
@@ -98,74 +113,88 @@
                     <div class="lib-table-filter-popover">
                       <!-- 筛选模板 -->
                       <ng-container>
-                        <div style="padding: 10px;">
-                          <ng-container [ngSwitch]="column.filters?.type">
-                            <ng-container *ngSwitchCase="'text'">
-                              <lib-input [(ngModel)]="displayFilterValueMap[column.field]" [inputAllowClear]="true" style="width: 144px;"></lib-input>
+                        <div style="padding: 16px;">
+                          <div class="lib-table-filter-popover-title-field">字段</div>
+                          <div>
+                            <lib-input [ngModel]="column.filters?.title || column.title" [inputDisabled]="true"></lib-input>
+                          </div>
+                          <!-- 筛选条件 -->
+                          <div class="lib-table-filter-popover-condition">
+                            <div class="lib-table-filter-popover-title">筛选条件</div>
+                            <lib-select 
+                              [(ngModel)]="displayFilterConditionMap[column.field]"
+                              [selectOption]="filterConditions" 
+                              [selectShowSearch]="true" 
+                              [selectAllowClear]="true">
+                            </lib-select>
+                          </div>
+                          <!-- 筛选值 -->
+                          <div class="lib-table-filter-popover-title">值</div>
+                          <div class="lib-table-filter-popover-value">
+                            <ng-container [ngSwitch]="column.filters?.type">
+                              <ng-container *ngSwitchCase="'text'">
+                                <lib-input [(ngModel)]="displayFilterValueMap[column.field]" [inputAllowClear]="true"></lib-input>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'number'">
+                                <lib-number-input [(ngModel)]="displayFilterValueMap[column.field]"></lib-number-input>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="getFilterType(column, 'date')">
+                                <lib-date-timer 
+                                  [(ngModel)]="displayFilterValueMap[column.field]" 
+                                  [dateTimerAllowClear]="true"
+                                  [dateTimerSelectType]="column.filters?.type === 'date-range' ? 'range' : 'single'"
+                                  >
+                                </lib-date-timer>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'radio'">
+                                <lib-radio 
+                                  [(ngModel)]="displayFilterValueMap[column.field]" 
+                                  [radioOptions]="column.filters?.options || []" 
+                                  [radioDirection]="'vertical'"
+                                  >
+                                </lib-radio>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'checkbox'">
+                                <lib-checkbox 
+                                  [(ngModel)]="displayFilterValueMap[column.field]" 
+                                  [checkboxOptions]="column.filters?.options || []" 
+                                  [checkboxDirection]="'vertical'"
+                                  >
+                                </lib-checkbox>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="getFilterType(column, 'select')">
+                                <lib-select 
+                                  [(ngModel)]="displayFilterValueMap[column.field]"
+                                  [selectOption]="column.filters?.options || []"
+                                  [selectMode]="column.filters?.type === 'select-multiple' ? 'multiple' : 'single'"
+                                  [selectShowSearch]="true"
+                                  [selectAllowClear]="true"
+                                  >
+                                </lib-select>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="getFilterType(column, 'cascader')">
+                                <lib-cascader 
+                                  [(ngModel)]="displayFilterValueMap[column.field]"
+                                  [cascaderOptions]="column.filters?.options || []"
+                                  [cascaderIsMultiple]="column.filters?.type === 'cascader-multiple'"
+                                  [cascaderShowSearch]="true"
+                                  [cascaderAllowClear]="true"
+                                  >
+                                </lib-cascader>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="getFilterType(column, 'tree-select')">
+                                <lib-tree-select
+                                  [(ngModel)]="displayFilterValueMap[column.field]"
+                                  [treeSelectOptions]="column.filters?.options || []"
+                                  [treeSelectIsMultiple]="column.filters?.type === 'tree-select-multiple'"
+                                  [treeSelectCheckable]="column.filters?.type === 'tree-select-checkable'"
+                                  [treeSelectShowSearch]="true"
+                                  [treeSelectAllowClear]="true"
+                                  >
+                                </lib-tree-select>
+                              </ng-container>
                             </ng-container>
-                            <ng-container *ngSwitchCase="'number'">
-                              <lib-number-input [(ngModel)]="displayFilterValueMap[column.field]" style="width: 144px;"></lib-number-input>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="getFilterType(column, 'date')">
-                              <lib-date-timer 
-                                [(ngModel)]="displayFilterValueMap[column.field]" 
-                                [dateTimerAllowClear]="true"
-                                [dateTimerSelectType]="column.filters?.type === 'date-range' ? 'range' : 'single'"
-                                [style.width]="column.filters?.type === 'date-range' ? '220px' : '144px'"
-                                >
-                              </lib-date-timer>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'radio'">
-                              <lib-radio 
-                                [(ngModel)]="displayFilterValueMap[column.field]" 
-                                [radioOptions]="column.filters?.options || []" 
-                                [radioDirection]="'vertical'"
-                                >
-                              </lib-radio>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'checkbox'">
-                              <lib-checkbox 
-                                [(ngModel)]="displayFilterValueMap[column.field]" 
-                                [checkboxOptions]="column.filters?.options || []" 
-                                [checkboxDirection]="'vertical'"
-                                >
-                              </lib-checkbox>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="getFilterType(column, 'select')">
-                              <lib-select 
-                                [(ngModel)]="displayFilterValueMap[column.field]"
-                                [selectOption]="column.filters?.options || []"
-                                [selectMode]="column.filters?.type === 'select-multiple' ? 'multiple' : 'single'"
-                                [selectShowSearch]="true"
-                                [selectAllowClear]="true"
-                                [style.width.px]="220"
-                                >
-                              </lib-select>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="getFilterType(column, 'cascader')">
-                              <lib-cascader 
-                                [(ngModel)]="displayFilterValueMap[column.field]"
-                                [cascaderOptions]="column.filters?.options || []"
-                                [cascaderIsMultiple]="column.filters?.type === 'cascader-multiple'"
-                                [cascaderShowSearch]="true"
-                                [cascaderAllowClear]="true"
-                                [style.width.px]="220"
-                                >
-                              </lib-cascader>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="getFilterType(column, 'tree-select')">
-                              <lib-tree-select
-                                [(ngModel)]="displayFilterValueMap[column.field]"
-                                [treeSelectOptions]="column.filters?.options || []"
-                                [treeSelectIsMultiple]="column.filters?.type === 'tree-select-multiple'"
-                                [treeSelectCheckable]="column.filters?.type === 'tree-select-checkable'"
-                                [treeSelectShowSearch]="true"
-                                [treeSelectAllowClear]="true"
-                                [style.width.px]="220"
-                                >
-                              </lib-tree-select>
-                            </ng-container>
-                          </ng-container>
+                          </div>
                         </div>
                       </ng-container>
                       <!-- 底部按钮 -->
@@ -187,6 +216,10 @@
             <tr 
               *ngFor="let data of currentPageData; let rowIndex = index" 
               [attr.data-node-id]="isTree ? data.node.id : null">
+              <td *ngIf="checkable" class="lib-table-checkable-cell">
+                <lib-checkbox  [ngModel]="getCheckedStatus(data)" checkboxSingle (ngModelChange)="checkedChange($event, data)">
+                </lib-checkbox>
+              </td>
               <td 
                 *ngFor="let column of columns; let colIndex = index"
                 class="lib-table-td"

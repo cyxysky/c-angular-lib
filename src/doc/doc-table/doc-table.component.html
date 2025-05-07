@@ -48,11 +48,20 @@
   <!-- 排序表格 -->
   <app-doc-box title="排序表格" [sourceCode]="sortableTableSource">
     <div demo>
-      <lib-table [tableData]="sortableData" [tableColumns]="sortableColumns" (sortChange)="onSortChange($event)">
+      <lib-table 
+        [tableData]="sortableData" 
+        [tableColumns]="sortableColumns" 
+        (sortChange)="onSortChange($event)" 
+        [tableCheckable]="true" 
+        [tableCheckedKey]="'id'" 
+        [(tableCheckedRows)]="checkedRows"
+        [tableCheckedSelections]="checkedSelections"
+        >
       </lib-table>
     </div>
     <div description>
       支持排序功能的表格，点击表头可以对数据进行排序。通过在列配置中设置 sortable 为 true 启用排序功能。
+      {{ checkedRows | json }}
     </div>
   </app-doc-box>
 

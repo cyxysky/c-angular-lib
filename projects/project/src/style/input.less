@@ -6,37 +6,20 @@ lib-input {
 .c-lib-input-container {
     position: relative;
     display: inline-flex;
-    align-items: stretch;
     width: 100%;
     box-sizing: border-box;
     font-size: 14px;
-    line-height: 1.5715;
 }
 
 .c-lib-input-control {
     height: 32px;
+    line-height: 32px;
     box-sizing: border-box;
-    margin: 0;
-    padding: 4px 0px;
-    color: rgba(0, 0, 0, 0.85);
     font-size: 14px;
-    line-height: 1.5715;
     background-color: #fff;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
     transition: all 0.3s;
     width: 100%;
     outline: none;
-
-    &:hover {
-        border-color: #1890ff;
-    }
-
-    &:focus {
-        border-color: #1890ff;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-        outline: 0;
-    }
 
     &::placeholder {
         color: rgba(0, 0, 0, 0.25);
@@ -55,11 +38,6 @@ lib-input {
     .c-lib-input-control {
         border: none;
         box-shadow: none;
-
-        &:hover,
-        &:focus {
-            box-shadow: none;
-        }
     }
 
     &:hover {
@@ -107,13 +85,13 @@ lib-input {
 
 .c-lib-input-char-count {
     color: rgba(0, 0, 0, 0.45);
-    font-size: 12px;
     margin-left: 8px;
 }
 
 .c-lib-input-lg {
     .c-lib-input-control {
         height: 40px;
+        line-height: 40px;
         padding: 6.5px 0px;
         font-size: 16px;
     }
@@ -122,6 +100,7 @@ lib-input {
 .c-lib-input-sm {
     .c-lib-input-control {
         height: 24px;
+        line-height: 24px;
         padding: 0 0px;
         font-size: 12px;
     }
@@ -174,24 +153,20 @@ lib-input {
 }
 
 .c-lib-input-disabled {
-    background-color: #f5f5f5;
-    border-color: #d9d9d9;
-    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+    color: rgba(0, 0, 0, 0.25) !important;
     cursor: not-allowed;
 
     .c-lib-input-control {
-        background-color: #f5f5f5;
-        color: rgba(0, 0, 0, 0.25);
+        background-color: #f5f5f5 !important;
+        color: rgba(0, 0, 0, 0.25) !important;
         cursor: not-allowed;
-
-        &:hover {
-            border-color: #d9d9d9;
-        }
     }
 
     .c-lib-input-prefix,
     .c-lib-input-suffix {
-        color: rgba(0, 0, 0, 0.25);
+        color: rgba(0, 0, 0, 0.25) !important;
     }
 }
 

@@ -728,11 +728,11 @@
   color: @primary-color;
   cursor: pointer;
   transition: all 0.3s;
-  
+
   &:hover {
     opacity: 0.8;
   }
-  
+
   i {
     margin-right: 4px;
   }
@@ -748,5 +748,48 @@
   i {
     font-size: 12px;
     margin-right: 4px;
+  }
+}
+
+.lib-table-filter-popover {
+  width: 300px;
+}
+
+.lib-table-filter-popover-condition {}
+
+.lib-table-filter-popover-title {
+  font-size: 14px;
+  font-weight: 400;
+  padding: 8px 0;
+}
+
+.lib-table-filter-popover-title-field {
+  font-size: 14px;
+  font-weight: 400;
+  padding-bottom: 8px;
+}
+
+.lib-table-filter-popover-value {}
+
+.lib-table-checkable-cell {
+  width: 48px;
+
+  .lib-table-checkable-cell-menu {
+    display: inline-flex;
+
+    .lib-table-checkable-cell-menu-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      color: #bfbfbf;
+      transition: all 0.3s;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
   }
 }

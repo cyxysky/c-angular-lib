@@ -7,11 +7,11 @@
   [class.c-lib-input-status-error]="status === 'error' || error"
   [class.c-lib-input-status-warning]="status === 'warning'"
   [class.c-lib-input-focused]="hasFocus()">
-  <span class="c-lib-input-prefix" *ngIf="prefix || prefixIcon">
+  <div class="c-lib-input-prefix" *ngIf="prefix || prefixIcon">
     <ng-content select="[prefix]"></ng-content>
     <i class="c-lib-input-prefix-icon" *ngIf="prefixIcon" [class]="prefixIcon"></i>
     <ng-container *ngIf="prefix">{{ prefix }}</ng-container>
-  </span>
+  </div>
   <input 
     class="c-lib-input-control"
     [ngModel]="_data"
@@ -32,14 +32,14 @@
     (keypress)="onKeyPress($event)"
     (click)="onClick($event)"
   />
-  <span class="c-lib-input-suffix" *ngIf="suffix || suffixIcon || (showCount && maxlength) || (allowClear && _data && !disabled && !readonly)">
+  <div class="c-lib-input-suffix" *ngIf="suffix || suffixIcon || (showCount && maxlength) || (allowClear && _data && !disabled && !readonly)">
     <ng-content select="[suffix]"></ng-content>
     <ng-container *ngIf="suffix">{{ suffix }}</ng-container>
     <i class="c-lib-input-suffix-icon" *ngIf="suffixIcon" [class]="suffixIcon"></i>
-    <span class="c-lib-input-char-count" *ngIf="showCount && maxlength">{{ getCharCount() }}</span>
-    <span class="c-lib-input-clear-icon" (click)="clear($event)" *ngIf="allowClear && _data && !disabled && !readonly">
+    <div class="c-lib-input-char-count" *ngIf="showCount && maxlength">{{ getCharCount() }}</div>
+    <div class="c-lib-input-clear-icon" (click)="clear($event)" *ngIf="allowClear && _data && !disabled && !readonly">
       <i class="bi-x-circle-fill"></i>
-    </span>
-  </span>
+    </div>
+  </div>
 </div>
 <div class="c-lib-input-error" *ngIf="error">{{ error }}</div>

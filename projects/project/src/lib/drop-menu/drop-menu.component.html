@@ -17,7 +17,7 @@
             #menuItemEl
             class="c-lib-drop-menu-item"
             [class.c-lib-drop-menu-item-disabled]="isItemDisabled(item)" 
-            [class.c-lib-drop-menu-item-selected]="selectedItem === item"
+            [class.c-lib-drop-menu-item-selected]="selectedItem === item && allowSelected"
             (mouseenter)="onMouseEnterItem(i)"
             (mouseleave)="onMouseLeaveItem()" 
             (click)="!isItemDisabled(item) && onItemClick(item, $event)"

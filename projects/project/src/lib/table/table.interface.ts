@@ -1,9 +1,20 @@
-import { TemplateRef } from '@angular/core';
-import { ButtonColor, ButtonShape, ButtonSize, ButtonType } from '../button';
-
+export type TableColumnFilterType = 'text'
+  | 'number'
+  | 'date'
+  | 'select'
+  | 'select-multiple'
+  | 'cascader'
+  | 'cascader-multiple'
+  | 'tree-select'
+  | 'tree-select-multiple'
+  | 'tree-select-checkable'
+  | 'date-range'
+  | 'radio'
+  | 'checkbox';
 // 表格列筛选项接口
 export interface TableColumnFilter {
-  type: 'text' | 'number' | 'date' | 'select' | 'select-multiple' | 'cascader' | 'cascader-multiple' | 'tree-select' | 'tree-select-multiple' | 'tree-select-checkable' | 'date-range' | 'radio' | 'checkbox';
+  title?: string;
+  type: TableColumnFilterType;
   defaultValue?: any | { start: any, end: any };
   options?: any[];
   condition?: TableColumnFilterCondition[];
@@ -72,19 +83,90 @@ export interface TableColumnFilterCondition {
  * 筛选条件
  */
 export enum TableFiltterCondition {
+  /** 等于 */
   EQUAL = 'equal',
+  /** 不等于 */
   NOT_EQUAL = 'notEqual',
+  /** 大于 */
   GREATER_THAN = 'greaterThan',
+  /** 小于 */
   LESS_THAN = 'lessThan',
+  /** 大于等于 */
   GREATER_THAN_OR_EQUAL = 'greaterThanOrEqual',
+  /** 小于等于 */
   LESS_THAN_OR_EQUAL = 'lessThanOrEqual',
+  /** 在 */
   IN = 'in',
+  /** 不在 */
   NOT_IN = 'notIn',
+  /** 在之间 */
   BETWEEN = 'between',
+  /** 不在之间 */
   NOT_BETWEEN = 'notBetween',
-  CONTAINS = 'contains',
-  NOT_CONTAINS = 'notContains',
+  /** 为空 */
   IS_NULL = 'isNull',
+  /** 不为空 */
   IS_NOT_NULL = 'isNotNull',
 }
 
+/**
+ * 默认表格筛选条件
+ */
+export const defaultTableFilterConditions = [
+  {
+    value: TableFiltterCondition.EQUAL,
+    label: '等于',
+  },
+  {
+    value: TableFiltterCondition.NOT_EQUAL,
+    label: '不等于',
+  },
+  {
+    value: TableFiltterCondition.IS_NULL,
+    label: '为空',
+  },
+  {
+    value: TableFiltterCondition.IS_NOT_NULL,
+    label: '不为空',
+  },
+  {
+    value: TableFiltterCondition.GREATER_THAN,
+    label: '大于',
+  },
+  {
+    value: TableFiltterCondition.LESS_THAN,
+    label: '小于',
+  },
+  {
+    value: TableFiltterCondition.GREATER_THAN_OR_EQUAL,
+    label: '大于等于',
+  },
+  {
+    value: TableFiltterCondition.LESS_THAN_OR_EQUAL,
+    label: '小于等于',
+  },
+  {
+    value: TableFiltterCondition.IN,
+    label: '在',
+  },
+  {
+    value: TableFiltterCondition.NOT_IN,
+    label: '不在',
+  },
+  {
+    value: TableFiltterCondition.BETWEEN,
+    label: '介于',
+  },
+  {
+    value: TableFiltterCondition.NOT_BETWEEN,
+    label: '不介于',
+  },
+]
+
+/**
+ * 自定义选择项
+ */
+export interface TableCheckedSelections {
+  title: string;
+  onSelect: (data: any) => void;
+}
