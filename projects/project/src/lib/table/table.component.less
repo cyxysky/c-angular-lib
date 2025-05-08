@@ -367,7 +367,15 @@
   &.lib-table-scrollable {
     .lib-table-container {
       overflow-y: auto;
-      overflow-x: auto;
+    }
+    
+    // 表格滚动容器
+    .table-scroll-container {
+      width: 100%;
+      // 为水平方向滚动添加样式
+      &::-webkit-scrollbar {
+        height: 0; // 隐藏原生滚动条，使用自定义滚动条
+      }
     }
 
     // 固定列基本样式
@@ -489,10 +497,10 @@
     overflow: auto;
     display: block;
     
-    // 隐藏原始滚动条，使用custom-scrollbar类的样式
+    // 隐藏原生滚动条，使用自定义滚动条
     &::-webkit-scrollbar {
       width: 6px;
-      height: 6px;
+      height: 0; // 隐藏水平滚动条，使用自定义滚动条
     }
     
     &::-webkit-scrollbar-thumb {
@@ -826,9 +834,6 @@
   table-layout: fixed;
 }
 
-.cdk-virtual-scroll-content-wrapper{
-}
-
 // 添加自定义滚动条容器样式
 .custom-scrollbar-container {
   width: 100%;
@@ -863,7 +868,6 @@
 
 // 隐藏虚拟滚动视口原生滚动条
 cdk-virtual-scroll-viewport {
-  overflow-x: hidden !important; // 隐藏横向滚动条（使用transform代替）
   overflow-y: auto !important; // 保持竖向滚动条可见
   
   // 确保内容可以完整显示
@@ -880,8 +884,6 @@ cdk-virtual-scroll-viewport {
   }
 }
 
-.lib-table-container.virtual-scroll-mode {
-  // 虚拟滚动模式下隐藏容器自身的横向滚动条
-  overflow-x: hidden !important;
+.cdk-virtual-scroll-content-wrapper {
+  contain: unset !important;
 }
-

@@ -124,13 +124,16 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   @ViewChild('tableContainer') tableContainer!: ElementRef;
   /** 自定义滚动条滑块引用 */
   @ViewChild('scrollThumb') scrollThumb!: ElementRef;
-
+  /** 表格容器盒子引用 */
+  @ViewChild('tableContainerBox') tableContainerBox!: ElementRef;
+  /** 表格滚动容器引用 */
+  @ViewChild('tableScrollContainer') tableScrollContainer!: ElementRef;
+  /** 虚拟滚动表头引用 */
+  @ViewChild('virtualScrollHeader') virtualScrollHeader!: ElementRef;
   // 滚动相关变量
   public tableWidth = 0;
   private resizeObserver: ResizeObserver | null = null;
-  // 当前滚动距离，用于transform滚动
-  public scrollDistance: number = 0;
-  
+
   // 列筛选菜单数据
   private columnFilterMenus: any[] = [];
 
@@ -233,29 +236,22 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   onTrackScroll(event: Event): void {
     const trackElement = event.target as HTMLElement;
     const scrollLeft = trackElement.scrollLeft;
-    this.scrollDistance = scrollLeft;
-    this.cdr.detectChanges();
+    !this.virtualScroll && this.tableScrollContainer && (this.tableScrollContainer.nativeElement.scrollLeft = scrollLeft);
+    this.virtualScroll && this.virtualScrollViewport && (this.virtualScrollViewport.elementRef.nativeElement.scrollLeft = scrollLeft);
+    this.virtualScroll && this.virtualScrollHeader && (this.virtualScrollHeader.nativeElement.scrollLeft = scrollLeft);
+    // 处理阴影效果
+    this.updateScrollShadow(scrollLeft, trackElement);
   }
 
   /**
-   * 处理表格滚动事件，根据滚动位置控制阴影效果，并同步滚动轨道位置
+   * 更新滚动阴影效果
    */
-  onTableScroll(event: Event): void {
-    const container = event.target as HTMLElement;
-    if (!container) return;
-    const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
+  private updateScrollShadow(scrollLeft: number, element: HTMLElement): void {
+    // 获取表格元素，用于处理阴影效果
+    const tableElement = this.tableContainer.nativeElement;
     if (!tableElement) return;
-    // 检查是否有水平滚动条
-    const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
-    // 如果没有水平滚动条，移除所有滚动相关类名
-    if (!hasHorizontalScroll) {
-      this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
-      this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
-      this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
-      return;
-    }
-    const scrollLeft = container.scrollLeft;
-    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    // 计算最大滚动距离
+    const maxScrollLeft = element.scrollWidth - element.clientWidth;
     // 在最左侧时，左侧无阴影，右侧有阴影
     if (scrollLeft === 0) {
       this.renderer.addClass(tableElement, 'lib-table-scroll-start');
@@ -274,6 +270,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.renderer.addClass(tableElement, 'lib-table-scroll-middle');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
     }
+    this.cdr.detectChanges();
   }
 
   /**
@@ -923,7 +920,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
 
   // 自定义滚动条逻辑
   private initCustomScroll(): void {
-    if (!this.virtualScroll) return;
     // 清理之前的观察器
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
@@ -935,10 +931,28 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.resizeObserver = new ResizeObserver(() => {
         this.getTableWidth();
       });
-      if (this.tableContainer) this.resizeObserver.observe(this.tableContainer.nativeElement);
+      if (this.tableHeader) this.resizeObserver.observe(this.tableHeader.nativeElement);
+
+      // 初始化滚动状态，只有在有水平滚动条时才添加阴影效果
+      const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
+      const scrollTrack = this.elementRef.nativeElement.querySelector('.scrollbar-track');
+      if (tableElement && scrollTrack) {
+        // 检查是否有水平滚动条
+        const hasHorizontalScroll = scrollTrack.scrollWidth > scrollTrack.clientWidth;
+        if (hasHorizontalScroll) {
+          this.renderer.addClass(tableElement, 'lib-table-scroll-start');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+        } else {
+          // 没有滚动条时移除所有滚动相关类
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+        }
+      }
     }, 0);
   }
-  
+
   private cleanupCustomScroll(): void {
     // 移除ResizeObserver
     if (this.resizeObserver) {

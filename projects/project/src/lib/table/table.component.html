@@ -10,7 +10,6 @@
       </div>
     </div>
   </div>
-
   <!-- 表格主体 -->
   <div 
     #tableContainer
@@ -28,28 +27,30 @@
     <ng-container *ngIf="loading">
       <ng-container *ngTemplateOutlet="centerLoadingTpl"></ng-container>
     </ng-container>
-
     <div 
+      #tableContainerBox
       class="lib-table-container"
       [class.virtual-scroll-mode]="virtualScroll"
-      [style.overflow-y]="scroll?.y && !virtualScroll ? 'auto' : null"
-      [style.overflow-x]="scroll?.x && !virtualScroll ? 'auto' : null"
-      (scroll)="onTableScroll($event)"
+      [style.overflow-y]="scroll?.y ? 'auto' : null"
+      [style.overflow-x]="scroll?.x ? 'auto' : 'hidden'"
       >
       <!-- 虚拟滚动模式 -->
       <ng-container *ngIf="virtualScroll">
         <!-- 表头 -->
-        <table [ngStyle]="{'transform': 'translateX(' + -scrollDistance + 'px)'}">
-          <ng-container *ngTemplateOutlet="theader"></ng-container>
-        </table>
+        <div style="overflow: auto;overflow-x: clip;" #virtualScrollHeader>
+          <table>
+            <ng-container *ngTemplateOutlet="theader"></ng-container>
+          </table>
+        </div>
         <!-- 虚拟滚动视图 -->
         <cdk-virtual-scroll-viewport
           [style.height.px]="getVirtualScrollConfig().height"
           [itemSize]="getVirtualScrollConfig().itemSize"
           [minBufferPx]="getVirtualScrollConfig().minBufferPx || 800"
           [maxBufferPx]="getVirtualScrollConfig().maxBufferPx || 1600"
+          [style.overflow-x]="'clip'"
           >
-          <table [ngStyle]="{'transform': 'translateX(' + -scrollDistance + 'px)'}">
+          <table>
             <!-- 表格内容 -->
             <tbody class="lib-table-tbody">
               <ng-container *ngIf="currentPageData.length > 0; else emptyTpl">
@@ -63,12 +64,14 @@
       </ng-container>
       <!-- 普通模式 -->
       <ng-container *ngIf="!virtualScroll">
-        <table [ngStyle]="{'min-width': scroll?.x || null, 'width': '100%'}">
-          <!-- 表头 -->
-          <ng-container *ngTemplateOutlet="theader"></ng-container>
-          <!-- 表格内容 -->
-          <ng-container *ngTemplateOutlet="tbody"></ng-container>
-        </table>
+        <div class="table-scroll-container" [style.overflow-x]="'auto'" #tableScrollContainer>
+          <table>
+            <!-- 表头 -->
+            <ng-container *ngTemplateOutlet="theader"></ng-container>
+            <!-- 表格内容 -->
+            <ng-container *ngTemplateOutlet="tbody"></ng-container>
+          </table>
+        </div>
       </ng-container>
       <!-- 自定义横向滚动条 -->
       <div #scrollTrack class="scrollbar-track" (scroll)="onTrackScroll($event)" style="width: 100%; overflow-x: auto; overflow-y: hidden; height: 8px;">
@@ -191,6 +194,7 @@
         *ngFor="let column of columns" 
         [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
         [class.lib-table-column-fixed-right]="column.fixed === 'right'"
+        [class.lib-table-column-scroll]="column.fixed !== 'left' && column.fixed !== true && column.fixed !== 'right'"
         [style.textAlign]="column.align || 'left'"
         [style.width]="column.width || null"
         [style.position]="column.fixed || scroll?.y ? 'sticky' : null" 
@@ -356,11 +360,13 @@
     class="lib-table-td"
     [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
     [class.lib-table-column-fixed-right]="column.fixed === 'right'"
+    [class.lib-table-column-scroll]="column.fixed !== 'left' && column.fixed !== true && column.fixed !== 'right'"
     [style.textAlign]="column.align || 'left'"
     [style.position]="column.fixed ? 'sticky' : null"
     [style.width]="column.width || null"
     [style.left]="(column.fixed === 'left' || column.fixed === true) ? getLeftPosition(column) : null"
-    [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" [style.z-index]="1"
+    [style.right]="column.fixed === 'right' ? getRightPosition(column) : null" 
+    [style.z-index]="1"
     >
     <div class="lib-table-td-wrapper">
       <!-- 树形展开区域 -->
