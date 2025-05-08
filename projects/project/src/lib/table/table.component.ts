@@ -1,11 +1,10 @@
-import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute, ViewChild } from '@angular/core';
+import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { defaultTableFilterConditions, TableCheckedSelections, TableColumn, TableColumnFilterCondition, TableSize } from './table.interface';
+import { defaultTableFilterConditions, TableCheckedSelections, TableColumn, TableColumnFilterCondition, TableSize, TableRefreshEvent, TableVirtualScrollConfig } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { SelectComponent } from '../select/select.component';
 import { NumberInputComponent } from '../number-input/number-input.component';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent } from "../button/button.component";
 import { InputComponent } from "../input/input.component";
 import { DateTimerComponent } from '../date-timer/date-timer.component';
 import { CascaderComponent } from '../cascader/cascader.component';
@@ -15,6 +14,7 @@ import { CheckboxComponent } from '../checkbox/checkbox.component';
 import * as _ from 'lodash';
 import { UtilsService, WidgetSource } from '../core';
 import { DropMenu } from '../drop-menu/drop-menu.interface';
+import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from '@angular/cdk/scrolling';
 // 创建分页大小选项格式化管道
 @Pipe({
   name: 'pageSizeOptionsFormat',
@@ -43,7 +43,10 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
     CascaderComponent,
     TreeSelectComponent,
     RadioComponent,
-    CheckboxComponent
+    CheckboxComponent,
+    CdkVirtualScrollViewport,
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualForOf,
   ],
   selector: 'lib-table',
   standalone: true,
@@ -52,7 +55,7 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TableComponent implements OnInit, OnChanges {
+export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   /** 表格数据 */
   @Input({ alias: 'tableData' }) data: any[] = [];
   /** 表格列配置 */
@@ -81,55 +84,83 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() emptyTemplate: TemplateRef<void> | null = null;
   /** 是否为树形表格 */
   @Input({ alias: 'tableIsTree', transform: booleanAttribute }) isTree: boolean = false;
-  // 分页相关
-  @Input() showPagination: boolean = true;
-  @Input() pageIndex: number = 1;
-  @Input() pageSize: number = 10;
-  @Input() total: number = 0;
-  @Input() pageSizeOptions: number[] = [10, 20, 30, 50];
-  @Input() showQuickJumper: boolean = true;
-  @Input() showTotal: boolean = true;
-  @Input() fixedPagination: boolean = false;
-  @Input() paginationTemplate: TemplateRef<any> | null = null;
-  // 是否前端分页
-  @Input() frontPagination: boolean = true;
-  // 用于表格滚动的配置
-  @Input() scroll: { x?: string | null; y?: string | null } = { x: null, y: null };
-  // 选择变化事件
+  /** 是否显示分页 */
+  @Input({ alias: 'tableShowPagination', transform: booleanAttribute }) showPagination: boolean = true;
+  /** 当前页码 */
+  @Input({ alias: 'tablePageIndex' }) pageIndex: number = 1;
+  /** 每页条数 */
+  @Input({ alias: 'tablePageSize' }) pageSize: number = 10;
+  /** 总条数 */
+  @Input({ alias: 'tableTotal' }) total: number = 0;
+  /** 分页大小选项 */
+  @Input({ alias: 'tablePageSizeOptions' }) pageSizeOptions: number[] = [10, 20, 30, 50];
+  /** 是否显示快速跳转 */
+  @Input({ alias: 'tableShowQuickJumper', transform: booleanAttribute }) showQuickJumper: boolean = true;
+  /** 是否显示总条数 */
+  @Input({ alias: 'tableShowTotal', transform: booleanAttribute }) showTotal: boolean = true;
+  /** 是否固定分页 */
+  @Input({ alias: 'tableFixedPagination', transform: booleanAttribute }) fixedPagination: boolean = false;
+  /** 分页模板 */
+  @Input({ alias: 'tablePaginationTemplate' }) paginationTemplate: TemplateRef<any> | null = null;
+  /** 是否前端分页 */
+  @Input({ alias: 'tableFrontPagination', transform: booleanAttribute }) frontPagination: boolean = false;
+  /** 用于表格滚动的配置 */
+  @Input({ alias: 'tableScroll' }) scroll: { x?: string | null; y?: string | null } = { x: null, y: null };
+  /** 虚拟滚动相关属性 */
+  @Input({ alias: 'tableVirtualScroll', transform: booleanAttribute }) virtualScroll: boolean = false;
+  /** 虚拟滚动行高 */
+  @Input({ alias: 'tableVirtualItemSize' }) virtualItemSize: number = 48;
+  /** 虚拟滚动最小缓冲区 */
+  @Input({ alias: 'tableVirtualMinBufferPx' }) virtualMinBufferPx: number = 100;
+  /** 虚拟滚动最大缓冲区 */
+  @Input({ alias: 'tableVirtualMaxBufferPx' }) virtualMaxBufferPx: number = 200;
+  /** 虚拟滚动视口引用 */
+  @ViewChild(CdkVirtualScrollViewport) virtualScrollViewport!: CdkVirtualScrollViewport;
+  /** 虚拟滚动表头引用 */
+  @ViewChild('tableHeader') tableHeader!: ElementRef;
+  /** 自定义滚动条轨道引用 */
+  @ViewChild('scrollTrack') scrollTrack!: ElementRef;
+  /** 表格容器引用 */
+  @ViewChild('tableContainer') tableContainer!: ElementRef;
+  /** 自定义滚动条滑块引用 */
+  @ViewChild('scrollThumb') scrollThumb!: ElementRef;
+
+  // 滚动相关变量
+  public tableWidth = 0;
+  private resizeObserver: ResizeObserver | null = null;
+  // 当前滚动距离，用于transform滚动
+  public scrollDistance: number = 0;
+  
+  // 列筛选菜单数据
+  private columnFilterMenus: any[] = [];
+
+  /** 选择变化事件 */
   @Output() tableCheckedRowsChange = new EventEmitter<any[]>();
-  // 排序变化事件
-  @Output() sortChange = new EventEmitter<{ field: string; order: 'ascend' | 'descend' | null }>();
-  // 过滤变化事件
-  @Output() filterChange = new EventEmitter<{ field: string; value: any[] }>();
-  // 页码变化事件
+  /** 表格筛选，排序，页码变化事件 */
+  @Output() tableRefresh = new EventEmitter<TableRefreshEvent>();
+  /** 页码变化事件 */
   @Output() pageIndexChange = new EventEmitter<number>();
-  // 每页条数变化事件
+  /** 每页条数变化事件 */
   @Output() pageSizeChange = new EventEmitter<number>();
-  // 当前页数据变化事件
-  @Output() currentPageDataChange = new EventEmitter<any[]>();
-  // 当前页数据
+  /** 当前页数据 */
   currentPageData: any[] = [];
-  // 是否有左侧固定列
+  /** 是否有左侧固定列 */
   hasFixedLeft: boolean = false;
-  // 是否有右侧固定列
+  /** 是否有右侧固定列 */
   hasFixedRight: boolean = false;
-  // 各列的宽度缓存
-  private columnWidths: Map<string, number> = new Map();
-  // 各列的筛选状态
+  /** 各列的筛选状态 */
   public filterVisibleMap: { [key: string]: boolean } = {};
-  // 各列的筛选值
+  /** 各列的筛选值 */
   public filterValueMap: { [key: string]: any } = {};
-  // 各列的筛选条件
+  /** 各列的筛选条件 */
   public filterConditionMap: { [key: string]: any } = {};
-  // 各列的显示筛选值
+  /** 各列的显示筛选值 */
   public displayFilterValueMap: { [key: string]: any } = {};
-  // 各列的显示筛选条件
+  /** 各列的显示筛选条件 */
   public displayFilterConditionMap: { [key: string]: any } = {};
-
-  // 表格数据
+  /** 表格数据 */
   public tableData: Array<any> = [];
-
-  // 筛选条件
+  /** 筛选条件 */
   public filterConditions: TableColumnFilterCondition[] = defaultTableFilterConditions;
 
   constructor(
@@ -142,6 +173,8 @@ export class TableComponent implements OnInit, OnChanges {
     afterNextRender(() => {
 
     })
+    // 初始化列筛选菜单
+    this.columnFilterMenus = [];
   }
 
   ngOnInit(): void {
@@ -176,19 +209,36 @@ export class TableComponent implements OnInit, OnChanges {
       // 当数据源变化时，备份原始数据
       this.tableData = _.cloneDeep(this.data);
     }
-
     // 无论是树形数据变化还是普通数据变化，都刷新数据
     this.refreshData();
-
     if (changes['columns']) {
       this.checkFixedColumns();
     }
+    this.cdr.detectChanges();
+  }
 
+  ngAfterViewInit(): void {
+    // 初始化自定义滚动条逻辑
+    this.initCustomScroll();
+  }
+
+  ngOnDestroy(): void {
+    // 清理自定义滚动条逻辑
+    this.cleanupCustomScroll();
+  }
+
+  /**
+   * 处理滚动轨道的滚动事件
+   */
+  onTrackScroll(event: Event): void {
+    const trackElement = event.target as HTMLElement;
+    const scrollLeft = trackElement.scrollLeft;
+    this.scrollDistance = scrollLeft;
     this.cdr.detectChanges();
   }
 
   /**
-   * 处理表格滚动事件，根据滚动位置控制阴影效果
+   * 处理表格滚动事件，根据滚动位置控制阴影效果，并同步滚动轨道位置
    */
   onTableScroll(event: Event): void {
     const container = event.target as HTMLElement;
@@ -276,6 +326,8 @@ export class TableComponent implements OnInit, OnChanges {
    * 刷新表格数据
    */
   refreshData(): void {
+    // 获取虚拟滚动配置
+    const virtualScrollConfig = this.getVirtualScrollConfig();
     // 如果是树形表格，直接使用扁平化后的树形数据
     if (this.isTree) {
       this.currentPageData = this.flatTableData();
@@ -284,13 +336,32 @@ export class TableComponent implements OnInit, OnChanges {
       const start = (this.pageIndex - 1) * this.pageSize;
       const end = start + this.pageSize;
       this.currentPageData = this.data.slice(start, end);
+      this.total = this.data.length;
     } else {
       // 服务端分页
       this.currentPageData = this.data;
     }
     this.cdr.detectChanges();
-    // 触发当前页数据变化事件
-    this.currentPageDataChange.emit(this.currentPageData);
+  }
+
+  /**
+   * 获取虚拟滚动配置
+   */
+  getVirtualScrollConfig(): TableVirtualScrollConfig {
+    return {
+      enabled: this.virtualScroll,
+      height: this.scroll?.y ? parseInt(this.scroll.y as string, 10) : 400,
+      itemSize: this.virtualItemSize,
+      minBufferPx: this.virtualMinBufferPx,
+      maxBufferPx: this.virtualMaxBufferPx
+    };
+  }
+
+  /**
+   * 追踪虚拟滚动项的变化，用于性能优化
+   */
+  trackByFn(index: number, item: any): any {
+    return index;
   }
 
   /**
@@ -347,8 +418,9 @@ export class TableComponent implements OnInit, OnChanges {
       // 刷新数据
       this.refreshData();
     }
-    // 发送排序事件
-    this.sortChange.emit({ field, order });
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -366,6 +438,9 @@ export class TableComponent implements OnInit, OnChanges {
     this.pageIndex = pageIndex;
     this.pageIndexChange.emit(pageIndex);
     this.refreshData();
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -375,6 +450,9 @@ export class TableComponent implements OnInit, OnChanges {
     this.pageSize = pageSize;
     this.pageSizeChange.emit(pageSize);
     this.refreshData();
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -452,6 +530,9 @@ export class TableComponent implements OnInit, OnChanges {
     this.filterValueMap[column.field] = this.displayFilterValueMap[column.field];
     this.filterConditionMap[column.field] = this.displayFilterConditionMap[column.field];
     this.cdr.detectChanges();
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -469,7 +550,9 @@ export class TableComponent implements OnInit, OnChanges {
     this.filterVisibleMap[column.field] = false;
     delete this.filterValueMap[column.field];
     delete this.displayFilterValueMap[column.field];
-    this.filterChange.emit({ field: column.field, value: [] });
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -484,6 +567,13 @@ export class TableComponent implements OnInit, OnChanges {
     this.tableData = _.cloneDeep(this.data);
     // 刷新数据
     this.refreshData();
+
+    // 清空所有筛选值
+    this.filterValueMap = {};
+    this.filterConditionMap = {};
+
+    // 发出刷新事件
+    this.refreshTable();
   }
 
   /**
@@ -688,17 +778,14 @@ export class TableComponent implements OnInit, OnChanges {
     if (!column.buttons || !column.buttons.length) {
       return [];
     }
-
     // 过滤出应该显示的按钮
     const visibleButtons = column.buttons.filter(button =>
       button.show ? button.show(data, rowIndex) : true
     );
-
     // 如果设置了最大按钮数，则只返回前maxButtons个按钮
     if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
       return visibleButtons.slice(0, column.maxButtons);
     }
-
     return visibleButtons;
   }
 
@@ -710,17 +797,14 @@ export class TableComponent implements OnInit, OnChanges {
     if (!column.buttons || !column.buttons.length || !column.maxButtons) {
       return [];
     }
-
     // 过滤出应该显示的按钮
     const visibleButtons = column.buttons.filter(button =>
       button.show ? button.show(data, rowIndex) : true
     );
-
     // 如果可见按钮数量超过最大按钮数，返回超出的部分
     if (column.maxButtons && column.maxButtons > 0 && visibleButtons.length > column.maxButtons) {
       return visibleButtons.slice(column.maxButtons);
     }
-
     return [];
   }
 
@@ -804,5 +888,62 @@ export class TableComponent implements OnInit, OnChanges {
    */
   selectCheckedSelection(selection: any): void {
     selection.onSelect(this.checkedRows);
+  }
+
+  /**
+   * 刷新表格
+   */
+  refreshTable(): void {
+    // 获取所有列的排序信息
+    const sortInfo = this.columns.find(column => column.sortOrder !== null);
+    const sort = sortInfo ? {
+      field: sortInfo.field,
+      order: sortInfo.sortOrder as 'ascend' | 'descend' | null
+    } : null;
+    // 创建表格刷新事件对象
+    const refreshEvent: TableRefreshEvent = {
+      pagination: {
+        pageIndex: this.pageIndex,
+        pageSize: this.pageSize,
+        total: this.total
+      },
+      sort: sort,
+      filters: this.filterValueMap
+    };
+    // 发送事件
+    this.tableRefresh.emit(refreshEvent);
+  }
+
+
+
+  getTableWidth(): void {
+    this.tableWidth = this.tableHeader.nativeElement.offsetWidth;
+    this.cdr.detectChanges();
+  }
+
+  // 自定义滚动条逻辑
+  private initCustomScroll(): void {
+    if (!this.virtualScroll) return;
+    // 清理之前的观察器
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    // 等待DOM渲染完成
+    setTimeout(() => {
+      this.getTableWidth();
+      this.resizeObserver = new ResizeObserver(() => {
+        this.getTableWidth();
+      });
+      if (this.tableContainer) this.resizeObserver.observe(this.tableContainer.nativeElement);
+    }, 0);
+  }
+  
+  private cleanupCustomScroll(): void {
+    // 移除ResizeObserver
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
   }
 }

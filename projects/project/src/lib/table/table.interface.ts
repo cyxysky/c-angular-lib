@@ -170,3 +170,40 @@ export interface TableCheckedSelections {
   title: string;
   onSelect: (data: any) => void;
 }
+
+/**
+ * 表格刷新事件接口
+ */
+export interface TableRefreshEvent {
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+    total: number;
+  };
+  sort: {
+    field: string;
+    order: 'ascend' | 'descend' | null;
+  } | null;
+  filters: { [key: string]: any };
+  virtualScroll?: {
+    enabled: boolean;
+    height: number;
+    itemSize: number;
+  } | null;
+}
+
+/**
+ * 表格虚拟滚动配置
+ */
+export interface TableVirtualScrollConfig {
+  // 是否启用虚拟滚动
+  enabled: boolean;
+  // 虚拟滚动视口高度
+  height: number;
+  // 每一行的高度
+  itemSize: number;
+  // 缓冲区最小像素值
+  minBufferPx?: number;
+  // 缓冲区最大像素值
+  maxBufferPx?: number;
+}

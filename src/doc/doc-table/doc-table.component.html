@@ -51,7 +51,6 @@
       <lib-table 
         [tableData]="sortableData" 
         [tableColumns]="sortableColumns" 
-        (sortChange)="onSortChange($event)" 
         [tableCheckable]="true" 
         [tableCheckedKey]="'id'" 
         [(tableCheckedRows)]="checkedRows"
@@ -68,7 +67,7 @@
   <!-- 筛选表格 -->
   <app-doc-box title="筛选表格" [sourceCode]="filterTableSource">
     <div demo>
-      <lib-table [tableData]="filterData" [tableColumns]="filterColumns" (filterChange)="onFilterChange($event)">
+      <lib-table [tableData]="filterData" [tableColumns]="filterColumns">
       </lib-table>
     </div>
     <div description>
@@ -79,7 +78,7 @@
   <!-- 固定列 -->
   <app-doc-box title="固定列" [sourceCode]="fixedColumnsTableSource">
     <div demo>
-      <lib-table [tableData]="fixedColumnsData" [tableColumns]="fixedColumnsColumns" [scroll]="fixedColumnsScroll">
+      <lib-table [tableData]="fixedColumnsData" [tableColumns]="fixedColumnsColumns" [tableScroll]="fixedColumnsScroll">
         <ng-template #actionTemplate let-row>
           <button class="action-button" (click)="onAction(row)">查看</button>
         </ng-template>
@@ -177,8 +176,8 @@
   <!-- 分页表格 -->
   <app-doc-box title="分页表格" [sourceCode]="paginationTableSource">
     <div demo>
-      <lib-table [tableData]="paginationData" [tableColumns]="paginationColumns" [showPagination]="true"
-        [pageIndex]="pageIndex" [pageSize]="pageSize" [total]="total" (pageIndexChange)="onPageIndexChange($event)"
+      <lib-table [tableData]="paginationData" [tableColumns]="paginationColumns" [tableShowPagination]="true"
+        [tablePageIndex]="pageIndex" [tablePageSize]="pageSize" [tableTotal]="total" (pageIndexChange)="onPageIndexChange($event)"
         (pageSizeChange)="onPageSizeChange($event)">
       </lib-table>
     </div>
@@ -195,6 +194,23 @@
     </div>
     <div description>
       表格的加载中状态，当异步获取数据时显示。
+    </div>
+  </app-doc-box>
+
+  <!-- 虚拟滚动 -->
+  <app-doc-box title="虚拟滚动" [sourceCode]="virtualScrollTableSource">
+    <div demo>
+      <lib-table 
+        [tableData]="virtualScrollData" 
+        [tableColumns]="virtualScrollColumns" 
+        [tableVirtualScroll]="true"
+        [tableScroll]="{ y: '400px' }"
+        [tableVirtualItemSize]="48"
+        (tableRefresh)="onTableRefresh($event)">
+      </lib-table>
+    </div>
+    <div description>
+      对于大量数据的表格，可以启用虚拟滚动来提高性能。通过设置 tableVirtualScroll 为 true 启用，并配置 tableScroll.y、tableVirtualItemSize、tableVirtualMinBufferPx 和 tableVirtualMaxBufferPx 等属性。
     </div>
   </app-doc-box>
 </div>

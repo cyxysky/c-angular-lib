@@ -17,10 +17,6 @@
 
 // 表格样式
 .lib-table-wrapper {
-  clear: both;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
   background: @table-bg;
   border-radius: @table-border-radius;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
@@ -485,6 +481,35 @@
   .lib-table-column-fixed-right {
     right: 0;
   }
+
+  // 添加虚拟滚动视口样式
+  .lib-table-virtual-scroll-viewport {
+    // 确保视口能正确显示表格内容
+    width: 100%;
+    overflow: auto;
+    display: block;
+    
+    // 隐藏原始滚动条，使用custom-scrollbar类的样式
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    // 确保 cdk 相关的元素正确显示
+    .cdk-virtual-scroll-content-wrapper {
+      width: 100%;
+      table-layout: fixed;
+    }
+  }
 }
 
 // 表格标题
@@ -793,3 +818,70 @@
     }
   }
 }
+
+// 保证虚拟滚动中的 tr 样式与普通表格一致
+.lib-table-virtual-scroll-viewport tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.cdk-virtual-scroll-content-wrapper{
+}
+
+// 添加自定义滚动条容器样式
+.custom-scrollbar-container {
+  width: 100%;
+  margin-top: 4px;
+  padding: 0;
+  position: relative;
+  border-radius: 4px;
+}
+
+.scrollbar-track {
+  position: relative;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+.scrollbar-track::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollbar-track::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.scrollbar-track::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+.scrollbar-content {
+  display: block;
+}
+
+// 隐藏虚拟滚动视口原生滚动条
+cdk-virtual-scroll-viewport {
+  overflow-x: hidden !important; // 隐藏横向滚动条（使用transform代替）
+  overflow-y: auto !important; // 保持竖向滚动条可见
+  
+  // 确保内容可以完整显示
+  .cdk-virtual-scroll-content-wrapper {
+    min-width: 100%;
+    width: auto !important;
+  }
+}
+
+// 虚拟滚动模式下隐藏容器横向滚动条
+.lib-table-container {
+  &.virtual-scroll-mode {
+    overflow-x: hidden !important;
+  }
+}
+
+.lib-table-container.virtual-scroll-mode {
+  // 虚拟滚动模式下隐藏容器自身的横向滚动条
+  overflow-x: hidden !important;
+}
+
