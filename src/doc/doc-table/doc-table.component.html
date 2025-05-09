@@ -213,6 +213,17 @@
       对于大量数据的表格，可以启用虚拟滚动来提高性能。通过设置 tableVirtualScroll 为 true 启用，并配置 tableScroll.y、tableVirtualItemSize、tableVirtualMinBufferPx 和 tableVirtualMaxBufferPx 等属性。
     </div>
   </app-doc-box>
+
+  <!-- 多层级表头 -->
+  <app-doc-box title="多层级表头" [sourceCode]="multiLevelHeaderTableSource">
+    <div demo>
+      <lib-table [tableData]="multiLevelHeaderData" [tableColumns]="multiLevelHeaderColumns" tableBordered>
+      </lib-table>
+    </div>
+    <div description>
+      表格支持多层级表头，可以通过在列配置中设置children属性来实现。表头可以有多层，数据展示会自动对应最后一层叶子节点的字段。
+    </div>
+  </app-doc-box>
 </div>
 
 <app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

@@ -211,6 +211,7 @@
   .lib-table-tbody>tr>td {
     border-bottom: @table-border;
     padding: @table-padding-vertical @table-padding-horizontal;
+    background-color: #fff;
     // transition: all 0.3s;
   }
 
@@ -342,11 +343,6 @@
     .lib-table-tbody>tr>td {
       border-right: @table-border;
     }
-
-    .lib-table-thead>tr>th:last-child,
-    .lib-table-tbody>tr>td:last-child {
-      border-right: none;
-    }
   }
 
   // 固定表头样式
@@ -368,14 +364,10 @@
     .lib-table-container {
       overflow-y: auto;
     }
-    
+
     // 表格滚动容器
     .table-scroll-container {
       width: 100%;
-      // 为水平方向滚动添加样式
-      &::-webkit-scrollbar {
-        height: 0; // 隐藏原生滚动条，使用自定义滚动条
-      }
     }
 
     // 固定列基本样式
@@ -387,87 +379,16 @@
       box-shadow: none; // 默认无阴影
     }
 
-    .lib-table-column-fixed-left {
-      border-right: 1px solid #e8e8e8;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: -10px;
-        bottom: 0;
-        width: 10px;
-        pointer-events: none;
-        box-shadow: none;
-        transition: box-shadow 0.3s;
-      }
-    }
-
-    .lib-table-column-fixed-right {
-      border-left: 1px solid #e8e8e8;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -10px;
-        bottom: 0;
-        width: 10px;
-        pointer-events: none;
-        box-shadow: none;
-        transition: box-shadow 0.3s;
-      }
-    }
-
-    // 滚动到中间位置 - 两侧都显示阴影
-    &.lib-table-scroll-middle {
-      .lib-table-column-fixed-left::after {
-        box-shadow: inset 10px 0 8px -8px #00000026;
-      }
-
-      .lib-table-column-fixed-right::after {
-        box-shadow: inset -10px 0 8px -8px #00000026;
-      }
-    }
-
-    // 滚动到最左侧 - 左侧无阴影，右侧有阴影
-    &.lib-table-scroll-start {
-      .lib-table-column-fixed-left::after {
-        box-shadow: none;
-      }
-
-      .lib-table-column-fixed-right::after {
-        box-shadow: inset -10px 0 8px -8px #00000026;
-      }
-    }
-
-    // 滚动到最右侧 - 右侧无阴影，左侧有阴影
-    &.lib-table-scroll-end {
-      .lib-table-column-fixed-left::after {
-        box-shadow: inset 10px 0 8px -8px #00000026;
-      }
-
-      .lib-table-column-fixed-right::after {
-        box-shadow: none;
-      }
-    }
-
     // 确保表头固定列有正确的z-index
     .lib-table-thead {
 
-      .lib-table-column-fixed-left,
-      .lib-table-column-fixed-right {
+      th.lib-table-column-fixed-left,
+      th.lib-table-column-fixed-right {
         background-color: @table-header-bg;
         z-index: 3;
       }
-
-      .lib-table-column-fixed-left::after,
-      .lib-table-column-fixed-right::after {
-        top: 0;
-        bottom: 0;
-        z-index: 3;
-      }
     }
+
   }
 
   // 固定列样式
@@ -482,42 +403,6 @@
     }
   }
 
-  .lib-table-column-fixed-left {
-    left: 0;
-  }
-
-  .lib-table-column-fixed-right {
-    right: 0;
-  }
-
-  // 添加虚拟滚动视口样式
-  .lib-table-virtual-scroll-viewport {
-    // 确保视口能正确显示表格内容
-    width: 100%;
-    overflow: auto;
-    display: block;
-    
-    // 隐藏原生滚动条，使用自定义滚动条
-    &::-webkit-scrollbar {
-      width: 6px;
-      height: 0; // 隐藏水平滚动条，使用自定义滚动条
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-    
-    // 确保 cdk 相关的元素正确显示
-    .cdk-virtual-scroll-content-wrapper {
-      width: 100%;
-      table-layout: fixed;
-    }
-  }
 }
 
 // 表格标题
@@ -788,8 +673,6 @@
   width: 300px;
 }
 
-.lib-table-filter-popover-condition {}
-
 .lib-table-filter-popover-title {
   font-size: 14px;
   font-weight: 400;
@@ -802,13 +685,12 @@
   padding-bottom: 8px;
 }
 
-.lib-table-filter-popover-value {}
-
 .lib-table-checkable-cell {
-  width: 48px;
+  width: 64px;
 
   .lib-table-checkable-cell-menu {
     display: inline-flex;
+    align-items: center;
 
     .lib-table-checkable-cell-menu-icon {
       display: inline-flex;
@@ -827,54 +709,9 @@
   }
 }
 
-// 保证虚拟滚动中的 tr 样式与普通表格一致
-.lib-table-virtual-scroll-viewport tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
 
-// 添加自定义滚动条容器样式
-.custom-scrollbar-container {
-  width: 100%;
-  margin-top: 4px;
-  padding: 0;
-  position: relative;
-  border-radius: 4px;
-}
-
-.scrollbar-track {
-  position: relative;
-  background-color: #f1f1f1;
-  border-radius: 4px;
-}
-
-.scrollbar-track::-webkit-scrollbar {
-  height: 8px;
-}
-
-.scrollbar-track::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
-
-.scrollbar-track::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa;
-}
-
-.scrollbar-content {
-  display: block;
-}
-
-// 隐藏虚拟滚动视口原生滚动条
-cdk-virtual-scroll-viewport {
-  overflow-y: auto !important; // 保持竖向滚动条可见
-  
-  // 确保内容可以完整显示
-  .cdk-virtual-scroll-content-wrapper {
-    min-width: 100%;
-    width: auto !important;
-  }
+.cdk-virtual-scroll-content-wrapper {
+  contain: unset !important;
 }
 
 // 虚拟滚动模式下隐藏容器横向滚动条
@@ -884,6 +721,46 @@ cdk-virtual-scroll-viewport {
   }
 }
 
-.cdk-virtual-scroll-content-wrapper {
-  contain: unset !important;
+// 解决多余滚动条问题
+.table-scroll-container {
+  overflow-y: hidden !important; // 确保竖向不会出现滚动条
+}
+// 为最后一个左侧固定列和第一个右侧固定列添加特殊样式
+// 默认状态下显示阴影（滚动位于中间时）
+.lib-table-column-last-left-fixed::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -10px;
+  bottom: 0;
+  width: 10px;
+  pointer-events: none;
+  transition: box-shadow 0.3s;
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+.lib-table-column-first-right-fixed::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  bottom: 0;
+  width: 10px;
+  pointer-events: none;
+  transition: box-shadow 0.3s;
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+// 在最左侧时，左侧固定列无阴影
+.lib-table-scroll-start {
+  .lib-table-column-last-left-fixed::after {
+    box-shadow: none !important;
+  }
+}
+
+// 在最右侧时，右侧固定列无阴影
+.lib-table-scroll-end {
+  .lib-table-column-first-right-fixed::after {
+    box-shadow: none !important;
+  }
 }

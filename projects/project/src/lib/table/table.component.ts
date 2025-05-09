@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, TemplateRef, Pipe, PipeTransform, ElementRef, Renderer2, ChangeDetectorRef, Optional, Host, afterNextRender, ChangeDetectionStrategy, booleanAttribute, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { defaultTableFilterConditions, TableCheckedSelections, TableColumn, TableColumnFilterCondition, TableSize, TableRefreshEvent, TableVirtualScrollConfig } from './table.interface';
+import { defaultTableFilterConditions, TableCheckedSelections, TableColumn, TableColumnFilterCondition, TableSize, TableRefreshEvent, TableVirtualScrollConfig, TableData } from './table.interface';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { SelectComponent } from '../select/select.component';
 import { NumberInputComponent } from '../number-input/number-input.component';
@@ -57,7 +57,7 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
 })
 export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   /** 表格数据 */
-  @Input({ alias: 'tableData' }) data: any[] = [];
+  @Input({ alias: 'tableData' }) data: TableData[] = [];
   /** 表格列配置 */
   @Input({ alias: 'tableColumns' }) columns: TableColumn[] = [];
   /** 是否允许选择 */
@@ -67,7 +67,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   /** 自定义选择项 */
   @Input({ alias: 'tableCheckedSelections' }) checkedSelections: Array<TableCheckedSelections> = [];
   /** 选择的内容 */
-  @Input({ alias: 'tableCheckedRows' }) checkedRows: any[] = [];
+  @Input({ alias: 'tableCheckedRows' }) checkedRows: TableData[] = [];
   /** 表格大小 */
   @Input({ alias: 'tableSize' }) size: TableSize = 'default';
   /** 是否显示边框 */
@@ -81,9 +81,11 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   /** 是否显示工具栏 */
   @Input({ alias: 'tableShowToolbar', transform: booleanAttribute }) showToolbar: boolean = false;
   // 自定义空数据模板
-  @Input() emptyTemplate: TemplateRef<void> | null = null;
+  @Input({ alias: 'tableEmptyTemplate' }) emptyTemplate: TemplateRef<void> | null = null;
   /** 是否为树形表格 */
   @Input({ alias: 'tableIsTree', transform: booleanAttribute }) isTree: boolean = false;
+  /** 是否表格单元格合并 */
+  @Input({ alias: 'tableComplex', transform: booleanAttribute }) isComplex: boolean = false;
   /** 是否显示分页 */
   @Input({ alias: 'tableShowPagination', transform: booleanAttribute }) showPagination: boolean = true;
   /** 当前页码 */
@@ -130,13 +132,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   @ViewChild('tableScrollContainer') tableScrollContainer!: ElementRef;
   /** 虚拟滚动表头引用 */
   @ViewChild('virtualScrollHeader') virtualScrollHeader!: ElementRef;
-  // 滚动相关变量
-  public tableWidth = 0;
-  private resizeObserver: ResizeObserver | null = null;
-
-  // 列筛选菜单数据
-  private columnFilterMenus: any[] = [];
-
   /** 选择变化事件 */
   @Output() tableCheckedRowsChange = new EventEmitter<any[]>();
   /** 表格筛选，排序，页码变化事件 */
@@ -146,11 +141,11 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   /** 每页条数变化事件 */
   @Output() pageSizeChange = new EventEmitter<number>();
   /** 当前页数据 */
-  currentPageData: any[] = [];
+  public currentPageData: any[] = [];
   /** 是否有左侧固定列 */
-  hasFixedLeft: boolean = false;
+  public hasFixedLeft: boolean = false;
   /** 是否有右侧固定列 */
-  hasFixedRight: boolean = false;
+  public hasFixedRight: boolean = false;
   /** 各列的筛选状态 */
   public filterVisibleMap: { [key: string]: boolean } = {};
   /** 各列的筛选值 */
@@ -165,6 +160,26 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   public tableData: Array<any> = [];
   /** 筛选条件 */
   public filterConditions: TableColumnFilterCondition[] = defaultTableFilterConditions;
+  /** 表格宽度 */
+  public tableWidth = 0;
+  /** 表格宽度观察器 */
+  private resizeObserver: ResizeObserver | null = null;
+  /** 处理后的表头数据结构 */
+  public headerRows: TableColumn[][] = [];
+  /** 表头最大深度 */
+  public maxHeaderDepth: number = 1;
+  /** 叶子节点列（用于表体数据展示） */
+  public leafColumns: TableColumn[] = [];
+  /**
+   * 表头固定列的位置信息
+   */
+  headerLeftPositions: number[][] = [];
+  headerRightPositions: number[][] = [];
+  /**
+   * 表体固定列的位置信息
+   */
+  bodyLeftPositions: Map<string, number> = new Map();
+  bodyRightPositions: Map<string, number> = new Map();
 
   constructor(
     private elementRef: ElementRef,
@@ -173,38 +188,17 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     private utilsService: UtilsService,
     @Optional() public widgetSource: WidgetSource
   ) {
-    afterNextRender(() => {
-
-    })
-    // 初始化列筛选菜单
-    this.columnFilterMenus = [];
+    afterNextRender(() => { })
   }
 
   ngOnInit(): void {
     // 备份原始数据
     this.tableData = _.cloneDeep(this.data);
+    // 初始化表头结构
+    this.initializeHeader();
     // 刷新数据
     this.refreshData();
     this.checkFixedColumns();
-    // 初始化设置滚动状态，只有在有水平滚动条时才添加阴影效果
-    setTimeout(() => {
-      const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
-      const container = this.elementRef.nativeElement.querySelector('.lib-table-container');
-      if (tableElement && container) {
-        // 检查是否有水平滚动条
-        const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
-        if (hasHorizontalScroll) {
-          this.renderer.addClass(tableElement, 'lib-table-scroll-start');
-          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
-          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
-        } else {
-          // 没有滚动条时移除所有滚动相关类
-          this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
-          this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
-          this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
-        }
-      }
-    }, 0);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -212,10 +206,10 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       // 当数据源变化时，备份原始数据
       this.tableData = _.cloneDeep(this.data);
     }
-    // 无论是树形数据变化还是普通数据变化，都刷新数据
     this.refreshData();
     if (changes['columns']) {
       this.checkFixedColumns();
+      this.initializeHeader();
     }
     this.cdr.detectChanges();
   }
@@ -236,9 +230,21 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   onTrackScroll(event: Event): void {
     const trackElement = event.target as HTMLElement;
     const scrollLeft = trackElement.scrollLeft;
-    !this.virtualScroll && this.tableScrollContainer && (this.tableScrollContainer.nativeElement.scrollLeft = scrollLeft);
-    this.virtualScroll && this.virtualScrollViewport && (this.virtualScrollViewport.elementRef.nativeElement.scrollLeft = scrollLeft);
-    this.virtualScroll && this.virtualScrollHeader && (this.virtualScrollHeader.nativeElement.scrollLeft = scrollLeft);
+    
+    // 同步所有需要滚动的容器
+    if (!this.virtualScroll && this.tableScrollContainer) {
+      this.tableScrollContainer.nativeElement.scrollLeft = scrollLeft;
+    }
+    
+    if (this.virtualScroll) {
+      if (this.virtualScrollViewport) {
+        this.virtualScrollViewport.elementRef.nativeElement.scrollLeft = scrollLeft;
+      }
+      if (this.virtualScrollHeader) {
+        this.virtualScrollHeader.nativeElement.scrollLeft = scrollLeft;
+      }
+    }
+    
     // 处理阴影效果
     this.updateScrollShadow(scrollLeft, trackElement);
   }
@@ -248,10 +254,20 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   private updateScrollShadow(scrollLeft: number, element: HTMLElement): void {
     // 获取表格元素，用于处理阴影效果
-    const tableElement = this.tableContainer.nativeElement;
+    const tableElement = this.tableContainer?.nativeElement;
     if (!tableElement) return;
+    
     // 计算最大滚动距离
     const maxScrollLeft = element.scrollWidth - element.clientWidth;
+    
+    // 没有横向滚动条时，移除所有阴影
+    if (maxScrollLeft <= 0) {
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
+      this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+      return;
+    }
+    
     // 在最左侧时，左侧无阴影，右侧有阴影
     if (scrollLeft === 0) {
       this.renderer.addClass(tableElement, 'lib-table-scroll-start');
@@ -270,6 +286,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.renderer.addClass(tableElement, 'lib-table-scroll-middle');
       this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
     }
+    
     this.cdr.detectChanges();
   }
 
@@ -323,8 +340,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    * 刷新表格数据
    */
   refreshData(): void {
-    // 获取虚拟滚动配置
-    const virtualScrollConfig = this.getVirtualScrollConfig();
     // 如果是树形表格，直接使用扁平化后的树形数据
     if (this.isTree) {
       this.currentPageData = this.flatTableData();
@@ -346,7 +361,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   getVirtualScrollConfig(): TableVirtualScrollConfig {
     return {
-      enabled: this.virtualScroll,
       height: this.scroll?.y ? parseInt(this.scroll.y as string, 10) : 400,
       itemSize: this.virtualItemSize,
       minBufferPx: this.virtualMinBufferPx,
@@ -365,8 +379,24 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    * 检查是否有固定列
    */
   checkFixedColumns(): void {
-    this.hasFixedLeft = this.columns.some(column => column.fixed === true || column.fixed === 'left');
-    this.hasFixedRight = this.columns.some(column => column.fixed === 'right');
+    // 更新叶子节点的固定状态，确保子列继承父列的固定属性
+    const updateFixedStatus = (columns: TableColumn[], parentFixed: boolean | 'left' | 'right' | null = null) => {
+      columns.forEach(column => {
+        // 如果父列是固定的，子列应该继承相同的固定属性
+        if (parentFixed && !column.fixed) {
+          column.fixed = parentFixed;
+        }
+        // 递归处理子列
+        if (column.children && column.children.length > 0) {
+          updateFixedStatus(column.children, column.fixed || parentFixed);
+        }
+      });
+    };
+    // 更新所有列的固定状态
+    updateFixedStatus(this.columns);
+    // 检查是否有左右固定列
+    this.hasFixedLeft = this.leafColumns.some(column => column.fixed === true || column.fixed === 'left');
+    this.hasFixedRight = this.leafColumns.some(column => column.fixed === 'right');
   }
 
   /**
@@ -383,24 +413,19 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     } else {
       newOrder = null;
     }
-    this.onSortChange(field, newOrder);
-  }
-
-  /**
-   * 处理排序变化 todo
-   */
-  onSortChange(field: string, order: 'ascend' | 'descend' | null): void {
-    // 更新所有列的排序状态
-    this.columns.forEach(column => {
-      if (column.field === field) {
-        column.sortOrder = order;
-      } else {
-        column.sortOrder = null;
-      }
+    // 更新 headerRows 中的排序状态
+    this.headerRows.forEach(row => {
+      row.forEach(column => {
+        if (column.field === field) {
+          column.sortOrder = newOrder;
+        } else {
+          column.sortOrder = null;
+        }
+      });
     });
     // 如果是前端排序，则直接排序数据
-    if (this.frontPagination && order) {
-      const isAscend = order === 'ascend';
+    if (this.frontPagination && newOrder) {
+      const isAscend = newOrder === 'ascend';
       this.data = [...this.data].sort((a, b) => {
         const aValue = a[field];
         const bValue = b[field];
@@ -415,7 +440,8 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       // 刷新数据
       this.refreshData();
     }
-
+    // 更新变更检测，确保视图更新
+    this.cdr.detectChanges();
     // 发出刷新事件
     this.refreshTable();
   }
@@ -435,8 +461,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.pageIndex = pageIndex;
     this.pageIndexChange.emit(pageIndex);
     this.refreshData();
-
-    // 发出刷新事件
     this.refreshTable();
   }
 
@@ -447,8 +471,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.pageSize = pageSize;
     this.pageSizeChange.emit(pageSize);
     this.refreshData();
-
-    // 发出刷新事件
     this.refreshTable();
   }
 
@@ -496,30 +518,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   }
 
   /**
-   * 处理选择器变化事件
-   */
-  handleSelectChange(event: Event): number {
-    const target = event.target as HTMLSelectElement;
-    return +target.value;
-  }
-
-  /**
-   * 处理输入框变化事件
-   */
-  handleInputChange(event: Event): number {
-    const target = event.target as HTMLInputElement;
-    return +target.value;
-  }
-
-
-  /**
-   * 处理筛选项变化
-   */
-  onFilterItemChange(column: TableColumn, value: any, event: Event): void {
-
-  }
-
-  /**
    * 确认筛选
    */
   confirmFilter(column: TableColumn): void {
@@ -527,17 +525,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.filterValueMap[column.field] = this.displayFilterValueMap[column.field];
     this.filterConditionMap[column.field] = this.displayFilterConditionMap[column.field];
     this.cdr.detectChanges();
-
-    // 发出刷新事件
     this.refreshTable();
-  }
-
-  /**
-   * 应用所有筛选条件
-   */
-  private applyFilters(data: any[]): any[] {
-    return data.filter(item => {
-    });
   }
 
   /**
@@ -547,8 +535,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.filterVisibleMap[column.field] = false;
     delete this.filterValueMap[column.field];
     delete this.displayFilterValueMap[column.field];
-
-    // 发出刷新事件
     this.refreshTable();
   }
 
@@ -556,62 +542,12 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    * 重置所有筛选和排序
    */
   resetAll(): void {
-    // 重置所有列的筛选和排序状态
-    this.columns.forEach(column => {
-      column.sortOrder = null;
-    });
-    // 恢复原始数据
+    this.columns.forEach(column => column.sortOrder = null);
     this.tableData = _.cloneDeep(this.data);
-    // 刷新数据
     this.refreshData();
-
-    // 清空所有筛选值
     this.filterValueMap = {};
     this.filterConditionMap = {};
-
-    // 发出刷新事件
     this.refreshTable();
-  }
-
-  /**
-   * 获取左侧固定列的位置
-   */
-  getLeftPosition(column: TableColumn): string | null {
-    if (column.fixed !== 'left' && column.fixed !== true) {
-      return null;
-    }
-    let position = 0;
-    for (let i = 0; i < this.columns.length; i++) {
-      const col = this.columns[i];
-      if (col === column) {
-        break;
-      }
-      if (col.fixed === 'left' || col.fixed === true) {
-        // 使用默认宽度或从DOM获取实际宽度
-        position += this.getColumnWidth(col);
-      }
-    }
-    return `${position}px`;
-  }
-
-  /**
-   * 获取右侧固定列的位置
-   */
-  getRightPosition(column: TableColumn): string | null {
-    if (column.fixed !== 'right') {
-      return null;
-    }
-    let position = 0;
-    for (let i = this.columns.length - 1; i >= 0; i--) {
-      const col = this.columns[i];
-      if (col === column) {
-        break;
-      }
-      if (col.fixed === 'right') {
-        position += this.getColumnWidth(col);
-      }
-    }
-    return `${position}px`;
   }
 
   /**
@@ -623,8 +559,9 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       const width = column.width.toString();
       if (width.endsWith('px')) {
         return parseInt(width, 10);
+      } else if (!isNaN(parseInt(width, 10))) {
+        return parseInt(width, 10);
       }
-      return 100; // 默认宽度
     }
     return 100; // 默认宽度
   }
@@ -891,10 +828,17 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    * 刷新表格
    */
   refreshTable(): void {
+    let sortInfo: any = null;
     // 获取所有列的排序信息
-    const sortInfo = this.columns.find(column => column.sortOrder !== null);
+    this.headerRows.forEach(row => {
+      row.forEach(column => {
+        if (column.sortOrder !== null && column.field) {
+          sortInfo = column;
+        }
+      });
+    });
     const sort = sortInfo ? {
-      field: sortInfo.field,
+      field: sortInfo.field as string,
       order: sortInfo.sortOrder as 'ascend' | 'descend' | null
     } : null;
     // 创建表格刷新事件对象
@@ -911,10 +855,16 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.tableRefresh.emit(refreshEvent);
   }
 
-
-
   getTableWidth(): void {
-    this.tableWidth = this.tableHeader.nativeElement.offsetWidth;
+    if (!this.tableHeader?.nativeElement) return;
+    
+    // 获取表格真实宽度
+    const headerWidth = this.tableHeader.nativeElement.offsetWidth;
+    
+    // 确保表格宽度至少是容器宽度，避免滚动条不完整
+    const containerWidth = this.tableContainer?.nativeElement?.offsetWidth || 0;
+    this.tableWidth = Math.max(headerWidth, containerWidth - 1); // +1 确保出现滚动条
+    
     this.cdr.detectChanges();
   }
 
@@ -925,24 +875,43 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
     }
+    
     // 等待DOM渲染完成
-    setTimeout(() => {
+    this.utilsService.delayExecution(() => {
+      // 计算初始宽度
       this.getTableWidth();
+      
+      // 监听表格宽度变化
       this.resizeObserver = new ResizeObserver(() => {
         this.getTableWidth();
       });
-      if (this.tableHeader) this.resizeObserver.observe(this.tableHeader.nativeElement);
-
-      // 初始化滚动状态，只有在有水平滚动条时才添加阴影效果
+      
+      if (this.tableHeader) {
+        this.resizeObserver.observe(this.tableHeader.nativeElement);
+      }
+      
+      if (this.tableContainer) {
+        this.resizeObserver.observe(this.tableContainer.nativeElement);
+      }
+      
+      // 初始化滚动状态
       const tableElement = this.elementRef.nativeElement.querySelector('.lib-table');
       const scrollTrack = this.elementRef.nativeElement.querySelector('.scrollbar-track');
+      
       if (tableElement && scrollTrack) {
         // 检查是否有水平滚动条
         const hasHorizontalScroll = scrollTrack.scrollWidth > scrollTrack.clientWidth;
+        
         if (hasHorizontalScroll) {
+          // 初始化时我们总是在最左侧
           this.renderer.addClass(tableElement, 'lib-table-scroll-start');
           this.renderer.removeClass(tableElement, 'lib-table-scroll-middle');
           this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
+          
+          // 绑定滚动事件，确保阴影状态随滚动更新
+          scrollTrack.addEventListener('scroll', (event: Event) => {
+            this.onTrackScroll(event);
+          });
         } else {
           // 没有滚动条时移除所有滚动相关类
           this.renderer.removeClass(tableElement, 'lib-table-scroll-start');
@@ -950,7 +919,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           this.renderer.removeClass(tableElement, 'lib-table-scroll-end');
         }
       }
-    }, 0);
+    });
   }
 
   private cleanupCustomScroll(): void {
@@ -960,4 +929,288 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.resizeObserver = null;
     }
   }
+
+  /**
+   * 初始化表头结构
+   * 处理嵌套表头，计算行列合并信息
+   */
+  initializeHeader(): void {
+    this.headerRows = [];
+    this.maxHeaderDepth = 0;
+    this.leafColumns = [];
+    // 一次递归中完成所有表头相关的计算和处理
+    const processHeaderTree = (columns: TableColumn[], depth: number = 0): number => {
+      // 更新最大深度
+      this.maxHeaderDepth = Math.max(this.maxHeaderDepth, depth + 1);
+      // 确保headerRows数组长度足够
+      while (this.headerRows.length <= depth) {
+        this.headerRows.push([]);
+      }
+      let totalColspan = 0;
+      for (const column of columns) {
+        // 创建列副本
+        const columnCopy: any = { ...column };
+        !columnCopy.__id && (columnCopy.__id = this.utilsService.getUUID());
+        if (column.children && column.children.length > 0) {
+          // 处理有子列的情况
+          columnCopy.colspan = processHeaderTree(column.children, depth + 1);
+          columnCopy.rowspan = 1;
+        } else {
+          // 没有子列的情况（叶子节点）
+          columnCopy.colspan = 1;
+          this.leafColumns.push(columnCopy);
+        }
+        // 将列添加到对应深度的行中
+        this.headerRows[depth].push(columnCopy);
+        // 累加列宽
+        totalColspan += columnCopy.colspan || 1;
+      }
+      return totalColspan;
+    };
+    // 开始处理表头树
+    processHeaderTree(this.columns);
+    // 计算行合并
+    for (let i = 0; i < this.headerRows.length; i++) {
+      for (let j = 0; j < this.headerRows[i].length; j++) {
+        const column = this.headerRows[i][j];
+        if (!column.children || column.children.length === 0) {
+          // 计算该列应当跨越的行数（叶子节点）
+          column.rowspan = this.maxHeaderDepth - i;
+        }
+      }
+    }
+    // 标记每行最后一个左固定列和第一个右固定列
+    this.markFixedColumnsForShadow();
+    // 计算表头固定列位置
+    this.calculateHeaderFixedPositions();
+    // 计算表体叶子节点列的固定位置
+    this.calculateBodyFixedPositions();
+    // 检查表头列的固定属性
+    this.checkFixedColumns();
+  }
+
+  /**
+   * 标记每行最后一个左固定列和第一个右固定列，用于显示阴影
+   */
+  markFixedColumnsForShadow(): void {
+    // 处理表头行
+    for (let rowIndex = 0; rowIndex < this.headerRows.length; rowIndex++) {
+      const row = this.headerRows[rowIndex];
+      
+      // 找到最后一个左固定列
+      const lastLeftFixedIndex = row.reduceRight((index, column, currentIndex) => {
+        if (index === -1 && (column.fixed === 'left' || column.fixed === true)) {
+          return currentIndex;
+        }
+        return index;
+      }, -1);
+      
+      // 找到第一个右固定列
+      const firstRightFixedIndex = row.findIndex(column => column.fixed === 'right');
+      
+      // 标记最后一个左固定列和第一个右固定列
+      row.forEach((column, colIndex) => {
+        column.isLastLeftFixed = colIndex === lastLeftFixedIndex;
+        column.isFirstRightFixed = colIndex === firstRightFixedIndex;
+      });
+    }
+    
+    // 同样处理叶子节点列
+    const lastLeftFixedLeafIndex = this.leafColumns.reduceRight((index, column, currentIndex) => {
+      if (index === -1 && (column.fixed === 'left' || column.fixed === true)) {
+        return currentIndex;
+      }
+      return index;
+    }, -1);
+    
+    const firstRightFixedLeafIndex = this.leafColumns.findIndex(column => column.fixed === 'right');
+    
+    this.leafColumns.forEach((column, index) => {
+      column.isLastLeftFixed = index === lastLeftFixedLeafIndex;
+      column.isFirstRightFixed = index === firstRightFixedLeafIndex;
+    });
+  }
+
+  /**
+   * 计算表头固定列位置
+   * 需要按行计算，考虑每行的colspan和rowspan
+   */
+  calculateHeaderFixedPositions(): void {
+    // 初始化位置数组
+    this.headerLeftPositions = Array(this.maxHeaderDepth).fill(0).map(() => []);
+    this.headerRightPositions = Array(this.maxHeaderDepth).fill(0).map(() => []);
+    
+    // 计算列宽
+    const columnWidths: Map<string, number> = new Map();
+    this.leafColumns.forEach(column => {
+      columnWidths.set(column.__id!, this.getColumnWidth(column));
+    });
+    
+    // 为每行计算左侧固定列位置
+    for (let rowIndex = 0; rowIndex < this.headerRows.length; rowIndex++) {
+      let leftPosition = 0;
+      const row = this.headerRows[rowIndex];
+      
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const column = row[colIndex];
+        
+        // 保存位置
+        this.headerLeftPositions[rowIndex][colIndex] = leftPosition;
+        
+        // 计算这个列占据的宽度（考虑colspan）
+        let columnWidth = 0;
+        
+        if (column.children && column.children.length > 0) {
+          // 父级表头宽度是所有子列宽度之和
+          columnWidth = this.calculateParentColumnWidth(column, columnWidths);
+        } else {
+          // 叶子节点直接使用自己的宽度
+          columnWidth = columnWidths.get(column.__id!) || this.getColumnWidth(column);
+        }
+        
+        // 更新下一列的起始位置
+        leftPosition += columnWidth;
+        
+        // 如果不是固定左列，后面的就不需要计算了
+        if (column.fixed !== 'left' && column.fixed !== true) {
+          break;
+        }
+      }
+    }
+    
+    // 为每行计算右侧固定列位置
+    for (let rowIndex = 0; rowIndex < this.headerRows.length; rowIndex++) {
+      let rightPosition = 0;
+      const row = this.headerRows[rowIndex];
+      
+      for (let colIndex = row.length - 1; colIndex >= 0; colIndex--) {
+        const column = row[colIndex];
+        
+        // 保存位置
+        this.headerRightPositions[rowIndex][colIndex] = rightPosition;
+        
+        // 计算这个列占据的宽度（考虑colspan）
+        let columnWidth = 0;
+        
+        if (column.children && column.children.length > 0) {
+          // 父级表头宽度是所有子列宽度之和
+          columnWidth = this.calculateParentColumnWidth(column, columnWidths);
+        } else {
+          // 叶子节点直接使用自己的宽度
+          columnWidth = columnWidths.get(column.__id!) || this.getColumnWidth(column);
+        }
+        
+        // 更新下一列的起始位置
+        rightPosition += columnWidth;
+        
+        // 如果不是固定右列，后面的就不需要计算了
+        if (column.fixed !== 'right') {
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * 计算表体叶子节点列的固定位置
+   */
+  calculateBodyFixedPositions(): void {
+    this.bodyLeftPositions.clear();
+    this.bodyRightPositions.clear();
+    
+    // 计算左固定列位置
+    let leftPosition = 0;
+    for (const column of this.leafColumns) {
+      if (column.fixed === 'left' || column.fixed === true) {
+        this.bodyLeftPositions.set(column.__id!, leftPosition);
+        leftPosition += this.getColumnWidth(column);
+      } else {
+        // 一旦遇到非左固定列，就停止计算
+        break;
+      }
+    }
+    
+    // 计算右固定列位置
+    let rightPosition = 0;
+    for (let i = this.leafColumns.length - 1; i >= 0; i--) {
+      const column = this.leafColumns[i];
+      if (column.fixed === 'right') {
+        this.bodyRightPositions.set(column.__id!, rightPosition);
+        rightPosition += this.getColumnWidth(column);
+      } else {
+        // 一旦遇到非右固定列，就停止计算
+        break;
+      }
+    }
+  }
+
+  /**
+   * 计算父列宽度（所有子列宽度之和）
+   */
+  calculateParentColumnWidth(column: TableColumn, columnWidths: Map<string, number>): number {
+    let width = 0;
+    
+    const calculateWidth = (col: TableColumn) => {
+      if (col.children && col.children.length > 0) {
+        col.children.forEach(child => calculateWidth(child));
+      } else {
+        // 叶子节点
+        width += columnWidths.get(col.__id!) || this.getColumnWidth(col);
+      }
+    };
+    
+    calculateWidth(column);
+    return width;
+  }
+
+  /**
+   * 获取表头列的左侧固定位置
+   */
+  getHeaderLeftPosition(rowIndex: number, colIndex: number): string | null {
+    const position = this.headerLeftPositions[rowIndex]?.[colIndex];
+    return position !== undefined ? `${position}px` : null;
+  }
+
+  /**
+   * 获取表头列的右侧固定位置
+   */
+  getHeaderRightPosition(rowIndex: number, colIndex: number): string | null {
+    const position = this.headerRightPositions[rowIndex]?.[colIndex];
+    return position !== undefined ? `${position}px` : null;
+  }
+
+  /**
+   * 获取表体列的左侧固定位置
+   */
+  getBodyLeftPosition(column: TableColumn): string | null {
+    if (column.fixed !== 'left' && column.fixed !== true) {
+      return null;
+    }
+    
+    const position = this.bodyLeftPositions.get(column.__id!);
+    return position !== undefined ? `${position}px` : null;
+  }
+
+  /**
+   * 获取表体列的右侧固定位置
+   */
+  getBodyRightPosition(column: TableColumn): string | null {
+    if (column.fixed !== 'right') {
+      return null;
+    }
+    
+    const position = this.bodyRightPositions.get(column.__id!);
+    return position !== undefined ? `${position}px` : null;
+  }
+
+  /**
+   * 获取嵌套值
+   * @param data 数据
+   * @param field 字段
+   * @returns 嵌套值
+   */
+  getValue(data: any, field: string): any {
+    return _.get(data, field, '--');
+  }
+
 }

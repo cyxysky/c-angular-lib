@@ -1,3 +1,6 @@
+/**
+ * 表格列筛选类型
+ */
 export type TableColumnFilterType = 'text'
   | 'number'
   | 'date'
@@ -11,7 +14,10 @@ export type TableColumnFilterType = 'text'
   | 'date-range'
   | 'radio'
   | 'checkbox';
-// 表格列筛选项接口
+
+/**
+ * 表格列筛选项接口
+ */
 export interface TableColumnFilter {
   title?: string;
   type: TableColumnFilterType;
@@ -20,14 +26,18 @@ export interface TableColumnFilter {
   condition?: TableColumnFilterCondition[];
 }
 
-// 表格列接口
+/**
+ * 表格列接口
+ */
 export interface TableColumn {
   // 列标题
   title: string;
   // 列头模板
   headTemplate?: string;
-  // 字段名，对应数据对象的属性
+  // 字段名，对应数据对象的属性，对于父级表头列可选
   field: string;
+  // 内部使用的唯一ID
+  __id?: string;
   // 列类型，operation表示操作列
   type?: 'operation' | string;
   // 列宽度
@@ -44,6 +54,12 @@ export interface TableColumn {
   filters?: TableColumnFilter;
   // 自定义筛选模板
   filterTemplate?: string;
+  // 表头合并
+  colspan?: number;
+  // 表头行合并
+  rowspan?: number;
+  // 子表头
+  children?: TableColumn[];
   // 表身模板
   template?: string;
   // 是否固定列 (true/'left' 表示左固定，'right' 表示右固定)
@@ -64,6 +80,10 @@ export interface TableColumn {
   tdStyle?: (data: any, rowIndex: number, column: TableColumn) => { [key: string]: string };
   // th样式
   thStyle?: (column: TableColumn) => { [key: string]: string };
+  // 是否是最后一个左侧固定列（用于显示阴影）
+  isLastLeftFixed?: boolean;
+  // 是否是第一个右侧固定列（用于显示阴影）
+  isFirstRightFixed?: boolean;
 }
 
 /**
@@ -196,8 +216,6 @@ export interface TableRefreshEvent {
  * 表格虚拟滚动配置
  */
 export interface TableVirtualScrollConfig {
-  // 是否启用虚拟滚动
-  enabled: boolean;
   // 虚拟滚动视口高度
   height: number;
   // 每一行的高度
@@ -207,3 +225,9 @@ export interface TableVirtualScrollConfig {
   // 缓冲区最大像素值
   maxBufferPx?: number;
 }
+
+export interface TableData {
+  [key: string]: any;
+  children?: TableData[];
+}
+
