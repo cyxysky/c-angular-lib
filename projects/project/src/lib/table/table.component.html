@@ -54,8 +54,15 @@
             <!-- 表格内容 -->
             <tbody class="lib-table-tbody">
               <ng-container *ngIf="currentPageData.length > 0; else emptyTpl">
-                <tr *cdkVirtualFor="let data of currentPageData; let rowIndex = index; trackBy: trackByFn"[attr.data-node-id]="isTree ? data.node.id : null">
-                  <ng-container *ngTemplateOutlet="td; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
+                <tr *cdkVirtualFor="let data of currentPageData; let rowIndex = index; trackBy: trackByFn">
+                  <!-- 复杂表格 -->
+                  <ng-container *ngIf="isComplex">
+                    <ng-container *ngTemplateOutlet="complexTd; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
+                  </ng-container>
+                  <!-- 普通表格 -->
+                  <ng-container *ngIf="!isComplex">
+                    <ng-container *ngTemplateOutlet="td; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
+                  </ng-container>
                 </tr>
               </ng-container>
             </tbody>
@@ -71,9 +78,16 @@
             <!-- 表格内容 -->
             <tbody class="lib-table-tbody">
               <ng-container *ngIf="currentPageData.length > 0; else emptyTpl">
-                <tr *ngFor="let data of currentPageData; let rowIndex = index" [attr.data-node-id]="isTree ? data.node.id : null">
-                  <ng-container *ngTemplateOutlet="td; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
-                </tr>
+                <tr *ngFor="let data of currentPageData; let rowIndex = index">
+                  <!-- 复杂表格 -->
+                  <ng-container *ngIf="isComplex">
+                    <ng-container *ngTemplateOutlet="complexTd; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
+                  </ng-container>
+                  <!-- 普通表格 -->
+                  <ng-container *ngIf="!isComplex">
+                    <ng-container *ngTemplateOutlet="td; context: { $implicit: data, rowIndex: rowIndex }"></ng-container>
+                  </ng-container>
+                </tr>  
               </ng-container>
             </tbody>
           </table>
@@ -107,18 +121,19 @@
           [attr.rowspan]="maxHeaderDepth"
           class="lib-table-checkable-cell"
           >
-          <div
-            class="lib-table-checkable-cell-menu"  
-            libDropMenu
-            [dropMenuTrigger]="'hover'"
-            [dropMenuItems]="checkedSelections"
-            [dropMenuAllowSelected]="false"
-            (dropMenuItemClick)="selectCheckedSelection($event)"
-            >
+          <div class="lib-table-checkable-cell-menu">
             <div>
               {{ checkedKey }}
             </div>
-            <div class="lib-table-checkable-cell-menu-icon">
+            <div 
+              *ngIf="checkedSelections.length > 0"
+              class="lib-table-checkable-cell-menu-icon"             
+              libDropMenu
+              [dropMenuTrigger]="'hover'"
+              [dropMenuItems]="checkedSelections"
+              [dropMenuAllowSelected]="false"
+              (dropMenuItemClick)="selectCheckedSelection($event)"
+              >
               <i class="bi-chevron-down"></i>
             </div>
           </div>
@@ -128,11 +143,9 @@
           *ngFor="let column of headerRow; let colIndex = index"
           [attr.colspan]="column.colspan"
           [attr.rowspan]="column.rowspan"
-          [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
-          [class.lib-table-column-fixed-right]="column.fixed === 'right'"
           [class.lib-table-column-scroll]="column.fixed !== 'left' && column.fixed !== true && column.fixed !== 'right'"
-          [class.lib-table-column-last-left-fixed]="column.isLastLeftFixed"
-          [class.lib-table-column-first-right-fixed]="column.isFirstRightFixed"
+          [class.lib-table-column-last-left-fixed]="column.isLastLeftFixed && hasLeftShadow"
+          [class.lib-table-column-first-right-fixed]="column.isFirstRightFixed && hasRightShadow"
           [style.textAlign]="column.align || 'left'"
           [style.width]="column.width || null"
           [style.position]="column.fixed || scroll?.y ? 'sticky' : null" 
@@ -278,7 +291,46 @@
   </thead>
 </ng-template>
 
-<!-- 行 -->
+<!-- 复杂表格单元格 -->
+<ng-template #complexTd let-data let-rowIndex="rowIndex">
+  <td 
+    *ngIf="checkable && complexTableObj.data?.get(leafColumns[0]?.field)?.get(rowIndex)"
+    [attr.rowspan]="complexTableObj.data?.get(leafColumns[0]?.field)?.get(rowIndex).length"
+    class="lib-table-checkable-cell"
+    >
+    <lib-checkbox  [ngModel]="getCheckedStatus(data)" checkboxSingle (ngModelChange)="checkedChange($event, data)"></lib-checkbox>
+  </td>
+  <ng-container *ngFor="let column of leafColumns; let colIndex = index">
+    <td 
+      *ngIf="complexTableObj.data?.get(column.field)?.get(rowIndex)"
+      [attr.rowspan]="complexTableObj.data?.get(column.field)?.get(rowIndex).length"
+      class="lib-table-td"
+      [class.lib-table-column-scroll]="column.fixed !== 'left' && column.fixed !== true && column.fixed !== 'right'"
+      [class.lib-table-column-last-left-fixed]="column.isLastLeftFixed && hasLeftShadow"
+      [class.lib-table-column-first-right-fixed]="column.isFirstRightFixed && hasRightShadow"
+      [style.textAlign]="column.align || 'left'"
+      [style.position]="column.fixed ? 'sticky' : null"
+      [style.width]="column.width || null"
+      [style.left]="(column.fixed === 'left' || column.fixed === true) ? getBodyLeftPosition(column) : null"
+      [style.right]="column.fixed === 'right' ? getBodyRightPosition(column) : null" 
+      [style.z-index]="getZIndex(column)"
+      >
+      <div class="lib-table-td-wrapper">
+        <!-- 自定义渲染 -->
+        <ng-container
+          *ngIf="!column.buttons"
+          [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
+          [ngTemplateOutletContext]="{ $implicit: data , column: column, index: rowIndex }"
+          >
+        </ng-container>
+        <!-- 按钮 -->
+        <ng-container *ngTemplateOutlet="buttonTpl; context: { $implicit: column, data: data, rowIndex: rowIndex, isTree: false  }"></ng-container>
+      </div>
+    </td>
+  </ng-container>
+</ng-template>
+
+<!-- td单元格 -->
 <ng-template #td let-data let-rowIndex="rowIndex">
   <td *ngIf="checkable" class="lib-table-checkable-cell">
     <lib-checkbox  [ngModel]="getCheckedStatus(data)" checkboxSingle (ngModelChange)="checkedChange($event, data)"></lib-checkbox>
@@ -286,11 +338,9 @@
   <td 
     *ngFor="let column of leafColumns; let colIndex = index"
     class="lib-table-td"
-    [class.lib-table-column-fixed-left]="column.fixed === 'left' || column.fixed === true"
-    [class.lib-table-column-fixed-right]="column.fixed === 'right'"
     [class.lib-table-column-scroll]="column.fixed !== 'left' && column.fixed !== true && column.fixed !== 'right'"
-    [class.lib-table-column-last-left-fixed]="column.isLastLeftFixed"
-    [class.lib-table-column-first-right-fixed]="column.isFirstRightFixed"
+    [class.lib-table-column-last-left-fixed]="column.isLastLeftFixed && hasLeftShadow"
+    [class.lib-table-column-first-right-fixed]="column.isFirstRightFixed && hasRightShadow"
     [style.textAlign]="column.align || 'left'"
     [style.position]="column.fixed ? 'sticky' : null"
     [style.width]="column.width || null"
@@ -311,38 +361,14 @@
         <span *ngIf="isTree && (!data.node?.children || !data.node?.children?.length)" class="lib-table-tree-switcher-noop"></span>
       </div>
       <!-- 自定义渲染 -->
-      <ng-container *ngIf="!column.buttons">
-        <ng-container   
-          [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
-          [ngTemplateOutletContext]="{ $implicit: isTree ? data.node : data, column: column, index: rowIndex }"
-          >
-        </ng-container>
+      <ng-container
+        *ngIf="!column.buttons"
+        [ngTemplateOutlet]="column.template && widgetSource.get(column.template) || defaultCell"
+        [ngTemplateOutletContext]="{ $implicit: isTree ? data.node : data, column: column, index: rowIndex }"
+        >
       </ng-container>
       <!-- 按钮 -->
-      <div class="lib-table-operation-cell">
-        <ng-container *ngFor="let button of getVisibleButtons(column, isTree ? data.node : data, rowIndex)">
-          <span
-            class="lib-table-operation-cell-button"
-            (click)="button.click(isTree ? data.node : data, rowIndex)">
-            <i *ngIf="button.icon" [ngClass]="button.icon"></i>
-            {{ button.text }}
-          </span>
-        </ng-container>
-        <!-- 更多按钮下拉菜单 -->
-        <ng-container *ngIf="getMoreButtons(column, isTree ? data.node : data, rowIndex).length > 0">
-          <span 
-            class="lib-table-operation-cell-button lib-table-operation-cell-more-button"
-            libDropMenu
-            [dropMenuTrigger]="'hover'"
-            [dropMenuPlacement]="'bottom-left'"
-            [dropMenuItems]="convertButtonsToMenuItems(getMoreButtons(column, isTree ? data.node : data, rowIndex), isTree ? data.node : data, rowIndex)"
-            (dropMenuItemClick)="onMenuItemClick($event)"
-            >
-            <i class="bi bi-three-dots"></i>
-            更多
-          </span>
-        </ng-container>
-      </div>
+      <ng-container *ngTemplateOutlet="buttonTpl; context: { $implicit: column, data: data, rowIndex: rowIndex, isTree: isTree  }"></ng-container>
     </div>
   </td>
 </ng-template>
@@ -363,6 +389,7 @@
     </td>
   </tr>
 </ng-template>
+
 <!-- 正中心加载动画 -->
 <ng-template #centerLoadingTpl>
   <div class="lib-table-center-loading">
@@ -447,3 +474,30 @@
   </div>
 </ng-template>
 
+<!-- 按钮模板区域 -->
+<ng-template #buttonTpl let-column let-data="data" let-rowIndex="rowIndex" let-isTree="isTree">
+  <div class="lib-table-operation-cell">
+    <ng-container *ngFor="let button of getVisibleButtons(column, isTree ? data.node : data, rowIndex)">
+      <span
+        class="lib-table-operation-cell-button"
+        (click)="button.click(isTree ? data.node : data, rowIndex)">
+        <i *ngIf="button.icon" [ngClass]="button.icon"></i>
+        {{ button.text }}
+      </span>
+    </ng-container>
+    <!-- 更多按钮下拉菜单 -->
+    <ng-container *ngIf="getMoreButtons(column, isTree ? data.node : data, rowIndex).length > 0">
+      <span 
+        class="lib-table-operation-cell-button lib-table-operation-cell-more-button"
+        libDropMenu
+        [dropMenuTrigger]="'hover'"
+        [dropMenuPlacement]="'bottom-left'"
+        [dropMenuItems]="convertButtonsToMenuItems(getMoreButtons(column, isTree ? data.node : data, rowIndex), isTree ? data.node : data, rowIndex)"
+        (dropMenuItemClick)="onMenuItemClick($event)"
+        >
+        <i class="bi bi-three-dots"></i>
+        更多
+      </span>
+    </ng-container>
+  </div>
+</ng-template>

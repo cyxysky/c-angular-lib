@@ -281,4 +281,14 @@ export class UtilsService {
       }
     });
   }
+
+  /**
+   * 获取范围随机数
+   * @param min 最小值
+   * @param max 最大值
+   * @returns 随机数
+   */
+  public getRange(min: number, max: number): Array<number> {
+    return Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  }
 }

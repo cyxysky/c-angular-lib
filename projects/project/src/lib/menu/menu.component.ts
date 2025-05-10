@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { cloneDeep, isEqual } from 'lodash';
 import { DropMenuDirective } from '../drop-menu/drop-menu.directive';
 import { DropMenu } from '../drop-menu/drop-menu.interface';
-import { expandCollapse } from '../core';
+import { CustomerExpandCollapse } from '../core';
 
 // 定义菜单项接口
 export interface MenuItem {
@@ -23,7 +23,7 @@ export interface MenuItem {
   imports: [CommonModule, DropMenuDirective],
   templateUrl: './menu.component.html',
   animations: [
-    expandCollapse
+    CustomerExpandCollapse(300)
   ],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush

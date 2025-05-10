@@ -725,6 +725,7 @@
 .table-scroll-container {
   overflow-y: hidden !important; // 确保竖向不会出现滚动条
 }
+
 // 为最后一个左侧固定列和第一个右侧固定列添加特殊样式
 // 默认状态下显示阴影（滚动位于中间时）
 .lib-table-column-last-left-fixed::after {
@@ -749,18 +750,4 @@
   pointer-events: none;
   transition: box-shadow 0.3s;
   box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
-}
-
-// 在最左侧时，左侧固定列无阴影
-.lib-table-scroll-start {
-  .lib-table-column-last-left-fixed::after {
-    box-shadow: none !important;
-  }
-}
-
-// 在最右侧时，右侧固定列无阴影
-.lib-table-scroll-end {
-  .lib-table-column-first-right-fixed::after {
-    box-shadow: none !important;
-  }
 }

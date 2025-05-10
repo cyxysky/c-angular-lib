@@ -23,14 +23,13 @@
   <app-doc-box title="自定义单元格" [sourceCode]="customCellTableSource">
     <div demo>
       <div class="custom-cell-demo">
-        <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要在组件中设置模板引用</p>
+        <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要使用template属性指定模板名称</p>
         <lib-table [tableData]="customData" [tableColumns]="customColumns">
-
         </lib-table>
       </div>
     </div>
     <div description>
-      可以自定义单元格内容，通过在组件中设置模板引用并赋值给列配置。需要在ngAfterViewInit生命周期中将模板引用赋值给列配置的customCell属性。
+      可以自定义单元格内容，通过在组件中定义模板并使用template属性指定模板名称。模板会通过WidgetSource服务注册并在表格中使用。
     </div>
   </app-doc-box>
 
@@ -71,7 +70,7 @@
       </lib-table>
     </div>
     <div description>
-      支持筛选功能的表格，点击筛选图标可以对数据进行筛选。通过在列配置中设置 filters 数组和 filterMultiple 属性来启用筛选功能。
+      支持筛选功能的表格，点击筛选图标可以对数据进行筛选。通过在列配置中设置filterable为true和配置filters对象来启用筛选功能。filters对象支持多种类型，如text、number、select、date等。
     </div>
   </app-doc-box>
 
@@ -79,13 +78,10 @@
   <app-doc-box title="固定列" [sourceCode]="fixedColumnsTableSource">
     <div demo>
       <lib-table [tableData]="fixedColumnsData" [tableColumns]="fixedColumnsColumns" [tableScroll]="fixedColumnsScroll">
-        <ng-template #actionTemplate let-row>
-          <button class="action-button" (click)="onAction(row)">查看</button>
-        </ng-template>
       </lib-table>
     </div>
     <div description>
-      对于列数很多的数据，可以使用固定列，固定在左侧或右侧。通过设置列配置的 fixed: 'left' 或 fixed: 'right' 来启用。需要同时设置 scroll.x 属性。
+      对于列数很多的数据，可以使用固定列，固定在左侧或右侧。通过设置列配置的fixed: 'left'或fixed: 'right'来启用固定列。需要同时设置tableScroll.x属性定义表格的总宽度。固定列在滚动时始终可见，适合放置ID、操作按钮等重要信息。
     </div>
   </app-doc-box>
 
@@ -210,7 +206,7 @@
       </lib-table>
     </div>
     <div description>
-      对于大量数据的表格，可以启用虚拟滚动来提高性能。通过设置 tableVirtualScroll 为 true 启用，并配置 tableScroll.y、tableVirtualItemSize、tableVirtualMinBufferPx 和 tableVirtualMaxBufferPx 等属性。
+      对于大量数据的表格，可以启用虚拟滚动来提高性能。虚拟滚动只渲染可视区域内的数据，滚动时动态加载数据。通过设置tableVirtualScroll为true启用，并配置tableScroll.y、tableVirtualItemSize、tableVirtualMinBufferPx和tableVirtualMaxBufferPx等属性。
     </div>
   </app-doc-box>
 
@@ -222,6 +218,28 @@
     </div>
     <div description>
       表格支持多层级表头，可以通过在列配置中设置children属性来实现。表头可以有多层，数据展示会自动对应最后一层叶子节点的字段。
+    </div>
+  </app-doc-box>
+
+  <!-- 操作列按钮 -->
+  <app-doc-box title="操作列按钮" [sourceCode]="actionButtonsTableSource">
+    <div demo>
+      <lib-table [tableData]="actionButtonsData" [tableColumns]="actionButtonsColumns">
+      </lib-table>
+    </div>
+    <div description>
+      操作列可以配置多个按钮，通过buttons属性定义，每个按钮可以设置文本、图标和点击事件处理函数。还可以通过maxButtons属性限制直接显示的按钮数量，超出部分会显示在"更多"下拉菜单中。
+    </div>
+  </app-doc-box>
+
+  <!-- 复杂表格 -->
+  <app-doc-box title="复杂表格" [sourceCode]="complexTableSource">
+    <div demo>
+      <lib-table [tableData]="complexData" [tableColumns]="complexColumns" [tableComplex]="true" tableBordered tableCheckable>
+      </lib-table>
+    </div>
+    <div description>
+      复杂表格支持单元格合并，通过设置tableComplex为true启用复杂表格模式。数据结构需要有特定的层级组织，表格会自动处理合并单元格的逻辑。
     </div>
   </app-doc-box>
 </div>
