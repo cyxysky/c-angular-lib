@@ -1,8 +1,9 @@
+@import './color.less';
 .c-lib-message {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    color: rgba(0, 0, 0, 0.85);
+    color: @text-color;
     font-size: 14px;
     line-height: 1.5715;
     display: block;
@@ -13,8 +14,8 @@
 .c-lib-message-item {
     padding: 8px 16px;
     border-radius: 4px;
-    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
-    background: #fff;
+    box-shadow: @shadow-3;
+    background: @text-color-inverse;
     pointer-events: auto;
     display: inline-block;
     max-width: calc(100vw - 48px);

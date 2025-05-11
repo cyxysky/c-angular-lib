@@ -1,13 +1,14 @@
+@import './color.less';
+
 .c-lib-tag {
     display: inline-block;
-    margin-right: 8px;
     padding: 2px 7px;
     font-size: 12px;
     white-space: nowrap;
     border-radius: 2px;
     border: 1px solid transparent;
     cursor: default;
-    transition: all 0.3s;
+    transition: all @visible-animation-duration;
 
     &.c-lib-tag-checkable {
         cursor: pointer;

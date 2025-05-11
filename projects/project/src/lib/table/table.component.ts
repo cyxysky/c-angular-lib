@@ -51,7 +51,6 @@ export class PageSizeOptionsFormatPipe implements PipeTransform {
   selector: 'lib-table',
   standalone: true,
   templateUrl: './table.component.html',
-  styleUrl: './table.component.less',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

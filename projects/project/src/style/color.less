@@ -1,0 +1,119 @@
+// 基础色板
+@blue-base: #1890ff;
+@blue-hover: #40a9ff;
+@blue-active: #096dd9;
+@blue-light: #e6f7ff;
+
+@green-base: #2dd55b;
+@red-base: #ff4d4f;
+@yellow-base: #ffc409;
+@yellow-alt: #faad14;
+@danger-base: #c5000f;
+@dark-base: #222428;
+@medium-base: #636469;
+@secondary-base: #0163aa;
+@tertiary-base: #6030ff;
+@light-base: #f4f5f8;
+
+@white: #fff;
+@black: #000;
+@gray-1: #fafafa;
+@gray-2: #f5f5f5;
+@gray-3: #f0f0f0;
+@gray-4: #d9d9d9;
+@gray-5: #bfbfbf;
+
+// 主色系
+@primary-color: @blue-base;
+@primary-color-hover: @blue-hover;
+@primary-color-active: @blue-active;
+@primary-color-outline: fade(@primary-color, 20%);
+@primary-color-bg: @blue-light;
+@primary-color-bg-hover: fade(@primary-color, 10%);
+
+// 功能色系
+@success-color: @green-base;
+@warning-color: @yellow-base;
+@warning-color-alt: @yellow-alt;
+@error-color: @red-base;
+@danger-color: @danger-base;
+@dark-color: @dark-base;
+@medium-color: @medium-base;
+@info-color: @primary-color;
+
+// 特殊颜色
+@secondary-color: @secondary-base;
+@tertiary-color: @tertiary-base;
+@light-color: @light-base;
+
+// 文本颜色
+@text-color: fade(@black, 85%);
+@text-color-secondary: fade(@black, 65%);
+@text-color-tertiary: fade(@black, 45%);
+@text-color-disabled: fade(@black, 25%);
+@text-color-inverse: @white;
+@text-color-dark-mode: fade(@white, 65%);
+@text-color-dark-mode-active: @white;
+@text-color-dark-mode-disabled: fade(@white, 35%);
+
+// 背景颜色
+@background-color-base: @gray-2;
+@background-color-light: @gray-3;
+@background-color-lighter: @gray-1;
+@background-color-dark: #001529;
+@background-color-dark-deep: #000c17;
+@background-color-disabled: @gray-2;
+@background-color-hover: @gray-2;
+@background-color-selected: @primary-color-bg;
+@background-color-mask: fade(@black, 45%);
+@background-color-mask-light: fade(@black, 4%);
+@background-color-mask-lighter: fade(@black, 2%);
+@background-color-dark-mask: fade(@white, 10%);
+
+// 边框颜色
+@border-color-base: @gray-4;
+@border-color-split: @gray-3;
+@border-color-primary: @primary-color;
+@border-color-dashed: @gray-4;
+
+// 阴影颜色和效果
+@shadow-color: fade(@black, 15%);
+@shadow-color-light: fade(@black, 12%);
+@shadow-color-lighter: fade(@black, 8%);
+@shadow-color-lightest: fade(@black, 5%);
+
+@shadow-1-up: 0 -2px 8px fade(@black, 9%);
+@shadow-1-down: 0 2px 8px @shadow-color;
+@shadow-1-left: -2px 0 8px fade(@black, 9%);
+@shadow-1-right: 2px 0 8px fade(@black, 9%);
+@shadow-2: 0 3px 6px -4px fade(@black, 12%), 0 6px 16px 0 fade(@black, 8%);
+@shadow-3: 0 3px 6px -4px fade(@black, 12%), 0 6px 16px 0 fade(@black, 8%), 0 9px 28px 8px fade(@black, 5%);
+
+// 特定组件颜色
+@tooltip-bg: fade(@black, 75%);
+@popover-bg: @white;
+@select-dropdown-bg: @white;
+@menu-dark-bg: @background-color-dark;
+@menu-dark-submenu-bg: @background-color-dark-deep;
+@table-header-bg: @gray-1;
+@table-row-hover-bg: @gray-2;
+@modal-mask-bg: @background-color-mask;
+@drawer-shadow: 0 0 10px fade(@black, 20%);
+@disabled-bg: @gray-2;
+@disabled-color: @text-color-disabled;
+@checkbox-checked-color: @primary-color;
+@checkbox-checked-bg: @primary-color;
+@checkbox-inner-color: @white;
+@radio-dot-color: @primary-color;
+@radio-bg: @white;
+@slider-track-bg: @primary-color-hover;
+@slider-rail-bg: @gray-2;
+@switch-bg: fade(@black, 25%);
+@switch-checked-bg: @primary-color;
+@tabs-active-color: @primary-color;
+@tabs-hover-color: @primary-color-hover;
+@tree-node-selected-bg: fade(@blue-base, 6%);
+@ripple-color: fade(@white, 60%);
+
+// 动画时间
+@visible-animation-duration: 0.3s;

@@ -1,12 +1,13 @@
+@import './color.less';
 // 菜单主体样式
 .c-lib-menu {
     font-size: 14px;
     font-variant: tabular-nums;
     line-height: 1.5;
     font-feature-settings: 'tnum';
-    color: rgba(0, 0, 0, 0.85);
+    color: @text-color;
     width: 240px;
-    background-color: #f0f2f5;
+    background-color: @background-color-light;
     transition: background-color 0.3s, width 0.3s;
 
     ul,
@@ -35,8 +36,8 @@
         transition: color 0.3s, background-color 0.3s, border-color 0.3s;
 
         &:hover {
-            color: #1890ff;
-            background-color: rgba(24, 144, 255, 0.1);
+            color: @primary-color;
+            background-color: @primary-color-bg-hover;
         }
 
         .c-lib-menu-icon {
@@ -131,9 +132,9 @@
             padding-left: 48px;
 
             &-selected {
-                background-color: rgba(24, 144, 255, 0.1);
-                color: #1890ff;
-                border-right: 3px solid #1890ff;
+                background-color: @primary-color-bg-hover;
+                color: @primary-color;
+                border-right: 3px solid @primary-color;
                 border-left: none;
             }
         }
@@ -142,7 +143,7 @@
     // 垂直模式
     &-vertical {
         width: 240px;
-        border-right: 1px solid #f0f0f0;
+        border-right: 1px solid @border-color-split;
 
         .c-lib-menu-submenu {
             .c-lib-menu-sub {
@@ -153,8 +154,8 @@
                 min-width: 160px;
                 z-index: 1050;
                 border-radius: 4px;
-                box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
-                background-color: #fff;
+                box-shadow: @shadow-2;
+                background-color: @text-color-inverse;
                 padding: 8px 0;
             }
 
@@ -193,7 +194,7 @@
     // 水平模式
     &-horizontal {
         display: flex;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid @border-color-split;
         line-height: 46px;
         width: 100%; // 水平模式应该允许占满容器宽度
 
@@ -214,8 +215,8 @@
             position: relative;
 
             &:hover {
-                color: #1890ff;
-                border-bottom-color: #1890ff;
+                color: @primary-color;
+                border-bottom-color: @primary-color;
             }
         }
 
@@ -226,8 +227,8 @@
 
             // 水平模式选中项
             &-selected {
-                color: #1890ff;
-                border-bottom: 2px solid #1890ff;
+                color: @primary-color;
+                border-bottom: 2px solid @primary-color;
             }
         }
 
@@ -240,7 +241,7 @@
 
             // 水平模式下选中的子菜单
             &-selected>.c-lib-menu-submenu-title {
-                color: #1890ff;
+                color: @primary-color;
             }
 
             .c-lib-menu-sub {
@@ -251,8 +252,8 @@
                 margin-top: 4px;
                 z-index: 1050;
                 border-radius: 4px;
-                box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
-                background-color: #fff;
+                box-shadow: @shadow-2;
+                background-color: @text-color-inverse;
                 padding: 8px 0;
 
                 .c-lib-menu-item {
@@ -266,13 +267,13 @@
 
                     &:hover {
                         border-bottom: none;
-                        background-color: rgba(24, 144, 255, 0.1);
+                        background-color: @primary-color-bg-hover;
                     }
 
                     // 下拉菜单中的选中项
                     &-selected {
-                        color: #1890ff;
-                        background-color: rgba(24, 144, 255, 0.1);
+                        color: @primary-color;
+                        background-color: @primary-color-bg-hover;
                         border-bottom: none;
                     }
                 }
@@ -297,8 +298,8 @@
 
                     // 嵌套子菜单中的选中项
                     &-selected>.c-lib-menu-submenu-title {
-                        color: #1890ff;
-                        background-color: rgba(24, 144, 255, 0.1);
+                        color: @primary-color;
+                        background-color: @primary-color-bg-hover;
                         border-bottom: none;
                     }
                 }
@@ -308,25 +309,25 @@
 
     // 亮色主题
     &-light {
-        background: #f0f2f5;
+        background: @background-color-light;
 
         .c-lib-menu-item-selected {
-            color: #1890ff;
-            background-color: rgba(24, 144, 255, 0.1);
+            color: @primary-color;
+            background-color: @primary-color-bg-hover;
             font-weight: 500;
         }
 
         // 选中父级菜单项样式
         .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
-            color: #1890ff;
+            color: @primary-color;
             font-weight: 500;
         }
 
         &.c-lib-menu-horizontal {
             .c-lib-menu-item-selected {
-                color: #1890ff;
+                color: @primary-color;
                 background-color: transparent;
-                border-bottom-color: #1890ff;
+                border-bottom-color: @primary-color;
 
                 &:after {
                     display: none;
@@ -334,85 +335,85 @@
             }
 
             .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
-                color: #1890ff;
-                border-bottom-color: #1890ff;
+                color: @primary-color;
+                border-bottom-color: @primary-color;
             }
         }
     }
 
     // 暗色主题
     &-dark {
-        background: #001529;
-        color: rgba(255, 255, 255, 0.65);
+        background: @background-color-dark;
+        color: @text-color-dark-mode;
 
         .c-lib-menu-item,
         .c-lib-menu-submenu-title {
-            color: rgba(255, 255, 255, 0.65);
+            color: @text-color-dark-mode;
 
             &:hover {
-                color: #fff;
-                background-color: rgba(255, 255, 255, 0.1);
+                color: @text-color-dark-mode-active;
+                background-color: @background-color-dark-mask;
             }
         }
 
         // 提高选中项的选择器权重，确保优先级高于hover
         .c-lib-menu-item.c-lib-menu-item-selected {
-            color: #fff !important;
-            background-color: #1890ff !important;
+            color: @text-color-dark-mode-active !important;
+            background-color: @primary-color !important;
             font-weight: 500;
-            border-right: 3px solid #fff;
+            border-right: 3px solid @text-color-inverse;
             border-left: none;
 
             &:hover {
-                color: #fff !important;
-                background-color: #1890ff !important;
+                color: @text-color-dark-mode-active !important;
+                background-color: @primary-color !important;
             }
         }
 
         // 选中父级菜单项样式也提高优先级
         .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
-            color: #fff !important;
+            color: @text-color-dark-mode-active !important;
 
             &:hover {
-                color: #fff !important;
+                color: @text-color-dark-mode-active !important;
             }
         }
 
         .c-lib-menu-sub {
-            background: #000c17;
+            background: @background-color-dark-deep;
         }
 
         &.c-lib-menu-horizontal {
             .c-lib-menu-item-selected {
-                color: #fff !important;
+                color: @text-color-dark-mode-active !important;
                 background-color: transparent !important;
-                border-bottom-color: #fff;
+                border-bottom-color: @text-color-inverse;
 
                 &:hover {
-                    color: #fff !important;
+                    color: @text-color-dark-mode-active !important;
                 }
             }
 
             .c-lib-menu-submenu-selected>.c-lib-menu-submenu-title {
-                color: #fff !important;
-                border-bottom-color: #fff;
+                color: @text-color-dark-mode-active !important;
+                border-bottom-color: @text-color-inverse;
 
                 &:hover {
-                    color: #fff !important;
+                    color: @text-color-dark-mode-active !important;
                 }
             }
 
             .c-lib-menu-sub {
-                background: #000c17;
+                background: @background-color-dark-deep;
 
                 .c-lib-menu-item:hover {
-                    background-color: rgba(255, 255, 255, 0.1);
-                    color: #fff;
+                    background-color: @background-color-dark-mask;
+                    color: @text-color-dark-mode-active;
                 }
 
                 .c-lib-menu-item-selected {
-                    background-color: #1890ff !important;
-                    color: #fff !important;
+                    background-color: @primary-color !important;
+                    color: @text-color-dark-mode-active !important;
                 }
             }
         }

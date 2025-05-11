@@ -1,3 +1,4 @@
+@import './color.less';
 .c-lib-switch {
   position: relative;
   display: inline-block;
@@ -6,7 +7,7 @@
   height: 22px;
   line-height: 22px;
   vertical-align: middle;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: @switch-bg;
   border: 0;
   border-radius: 100px;
   cursor: pointer;
@@ -20,11 +21,11 @@
   }
 
   &-focused {
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: 0 0 0 2px @primary-color-outline;
   }
 
   &-checked {
-    background-color: #1890ff;
+    background-color: @switch-checked-bg;
   }
 
   &-disabled {
@@ -40,7 +41,7 @@
     height: 18px;
     transition: all 0.2s;
     border-radius: 100%;
-    background-color: #fff;
+    background-color: @text-color-inverse;
     box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
   }
 
@@ -56,12 +57,12 @@
     animation: loadingCircle 2s infinite linear;
     align-items: center;
     justify-content: center;
-    color: #1890ff;
+    color: @primary-color;
   }
 
   &-inner {
     margin: 0 7px 0 24px;
-    color: #fff;
+    color: @text-color-inverse;
     font-size: 12px;
     transition: margin 0.2s;
   }

@@ -1,6 +1,7 @@
+@import './color.less';
 .c-lib-select-hover-options,
 .c-lib-select-option-active {
-    background-color: #f5f5f5;
+    background-color: @background-color-hover;
 }
 
 .c-lib-select-option-base() {
@@ -10,17 +11,17 @@
     height: 36px;
     cursor: pointer;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.85);
+    color: @text-color;
     border-radius: 2px;
     transition: all 0.2s ease;
 
     &:hover,
     &.c-lib-select-option-active {
-        background-color: #f5f5f5;
+        background-color: @background-color-hover;
     }
 
     &-disabled {
-        color: rgba(0, 0, 0, 0.25);
+        color: @text-color-disabled;
         cursor: not-allowed;
         pointer-events: all;
         background-color: transparent;
@@ -37,9 +38,9 @@
 }
 
 .c-lib-select-option-selected-base() {
-    background-color: rgb(30 137 200 / 6%) !important;
+    background-color: fade(@blue-base, 6%) !important;
     font-weight: 500;
-    color: rgb(25 128 163 / 67%);
+    color: fade(@blue-base, 67%);
 }
 
 .c-lib-select-empty-container-base() {
@@ -56,14 +57,14 @@
     }
 
     .c-lib-select-empty-text {
-        color: rgba(0, 0, 0, 0.45);
+        color: @text-color-tertiary;
         font-size: 14px;
     }
 }
 
 .c-lib-select-dropdown {
-    background: #fff;
-    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
+    background: @text-color-inverse;
+    box-shadow: @shadow-2;
     width: 100%;
     margin: 5px 0px;
     border-radius: 4px;
@@ -83,7 +84,7 @@
         justify-content: center;
         align-items: center;
         height: 100%;
-        color: rgba(0, 0, 0, 0.25);
+        color: @text-color-disabled;
         font-size: 14px;
     }
 
@@ -121,8 +122,8 @@
 .c-lib-select-group-title {
     padding: 8px 12px;
     font-size: 13px;
-    color: rgba(0, 0, 0, 0.45);
-    background-color: rgba(0, 0, 0, 0.02);
+    color: @text-color-tertiary;
+    background-color: @background-color-mask-lighter;
     font-weight: 500;
 }
 
@@ -152,7 +153,7 @@
         height: 36px;
         cursor: pointer;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.85);
+        color: @text-color;
         border-radius: 2px;
         transition: all 0.2s ease;
 
@@ -164,11 +165,11 @@
         }
 
         &:hover {
-            background-color: #f5f5f5;
+            background-color: @background-color-hover;
         }
 
         &-disabled {
-            color: rgba(0, 0, 0, 0.25);
+            color: @text-color-disabled;
             cursor: not-allowed;
 
             &:hover {
@@ -198,7 +199,7 @@
     height: 100px;
 
     .c-lib-select-loading-text {
-        color: rgba(0, 0, 0, 0.45);
+        color: @text-color-tertiary;
     }
 }
 

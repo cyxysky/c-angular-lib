@@ -1,3 +1,4 @@
+@import './color.less';
 lib-select-box {
     display: inline-block;
     width: 100%;
@@ -34,13 +35,13 @@ lib-select {
     display: inline-flex;
     align-items: center;
     max-width: 100%;
-    background-color: rgb(30 137 200 / 6%);
-    color: rgb(25 128 163 / 67%);
+    background-color: fade(@blue-base, 6%);
+    color: fade(@blue-base, 67%);
     border-radius: 2px;
     cursor: default;
     box-sizing: border-box;
     transition: all 0.2s ease;
-    border: 1px solid rgba(23, 184, 199, 0.12);
+    border: 1px solid fade(@blue-base, 12%);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     white-space: nowrap;
     overflow: hidden;
@@ -72,12 +73,12 @@ lib-select {
         flex: 0 0 auto;
 
         &:hover {
-            background-color: rgba(0, 0, 0, 0.08);
+            background-color: @background-color-mask-light;
         }
     }
 
     &:hover {
-        background-color: rgba(0, 207, 226, 0.08);
+        background-color: fade(@blue-base, 8%);
     }
 }
 
@@ -113,7 +114,7 @@ lib-select {
 }
 
 .c-lib-select-basic-box {
-    background-color: #fff;
+    background-color: @text-color-inverse;
     border: 1px solid #e7eaed;
     border-radius: 2px;
     transition: all 0.2s ease;
@@ -128,12 +129,12 @@ lib-select {
     box-sizing: border-box;
 
     &:hover {
-        border: 1px solid rgba(0, 207, 226, 0.4);
+        border: 1px solid fade(@blue-base, 40%);
     }
 
     &.c-lib-select-basic-box-active {
-        border: 1px solid rgba(0, 207, 226, 0.6);
-        box-shadow: 0 0 0 2px rgba(0, 207, 226, 0.12);
+        border: 1px solid fade(@blue-base, 60%);
+        box-shadow: 0 0 0 2px fade(@blue-base, 12%);
         outline: none;
     }
 
@@ -195,19 +196,19 @@ lib-select {
     }
 
     &.c-lib-select-basic-box-error {
-        border: 1px solid #ff4d4f;
+        border: 1px solid @error-color;
 
         &.c-lib-select-basic-box-active {
-            border: 1px solid #ff4d4f;
+            border: 1px solid @error-color;
             box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
         }
     }
 
     &.c-lib-select-basic-box-warning {
-        border: 1px solid #faad14;
+        border: 1px solid @warning-color-alt;
 
         &.c-lib-select-basic-box-active {
-            border: 1px solid #faad14;
+            border: 1px solid @warning-color-alt;
             box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
         }
     }
@@ -238,17 +239,17 @@ lib-select {
 
         .c-lib-select-basic-box-clear-icon {
             display: none;
-            color: rgba(0, 0, 0, 0.45);
+            color: @text-color-tertiary;
             transition: all 0.2s ease;
 
             &:hover {
-                color: rgba(0, 0, 0, 0.65);
+                color: @text-color-secondary;
             }
         }
 
         .c-lib-select-basic-box-icon {
             transition: all 0.3s ease-in-out;
-            color: rgba(0, 0, 0, 0.6);
+            color: @text-color-secondary;
         }
 
         .c-lib-select-basic-box-icon-clear {
@@ -262,7 +263,7 @@ lib-select {
 
             .c-lib-select-basic-box-loading-svg {
                 animation: rotate 1.2s linear infinite;
-                color: rgba(23, 184, 199, 0.6);
+                color: fade(@blue-base, 60%);
             }
         }
     }
@@ -284,7 +285,7 @@ lib-select {
     display: flex;
     align-items: center;
     padding-left: 4px;
-    color: rgba(0, 0, 0, 0.45);
+    color: @text-color-tertiary;
     position: absolute;
     height: 100%;
     line-height: normal;
@@ -302,7 +303,7 @@ lib-select {
 
 .c-lib-select-basic-box-singal-data {
     padding-left: 4px;
-    color: rgba(0, 0, 0, 0.85);
+    color: @text-color;
     position: absolute;
     max-width: 100%;
     overflow: hidden;
@@ -312,7 +313,7 @@ lib-select {
 }
 
 .c-lib-select-basic-box-singal-data-gray {
-    color: rgba(0, 0, 0, 0.45);
+    color: @text-color-tertiary;
 }
 
 @keyframes rotate {
@@ -327,9 +328,9 @@ lib-select {
 
 .c-lib-select-basic-box-disabled {
     cursor: not-allowed;
-    background-color: #f5f5f5;
-    color: rgba(0, 0, 0, 0.25);
-    border-color: #d9d9d9 !important;
+    background-color: @background-color-disabled;
+    color: @text-color-disabled;
+    border-color: @border-color-base !important;
 
     .c-lib-select-basic-box-content,
     .c-lib-select-basic-box-suffix {

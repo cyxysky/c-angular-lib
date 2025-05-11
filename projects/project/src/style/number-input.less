@@ -1,30 +1,31 @@
+@import './color.less';
 lib-number-input {
     width: 100%;
     display: inline-block;
 }
 
 .c-lib-number-input-container.c-lib-number-input-error {
-    border-color: #c5000f;
+    border-color: @error-color;
 
     &:hover {
-        border-color: #c5000f;
+        border-color: @error-color;
     }
 
     &.c-lib-number-input-focused {
-        border-color: #c5000f;
+        border-color: @error-color;
         box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
     }
 }
 
 .c-lib-number-input-container.c-lib-number-input-warning {
-    border-color: #ffc409;
+    border-color: @warning-color;
 
     &:hover {
-        border-color: #ffc409;
+        border-color: @warning-color;
     }
 
     &.c-lib-number-input-focused {
-        border-color: #ffc409;
+        border-color: @warning-color;
         box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
     }
 }
@@ -34,7 +35,7 @@ lib-number-input {
     display: flex;
     align-items: stretch;
     padding: 0 9px;
-    border: 1px solid #d9d9d9;
+    border: 1px solid @border-color-base;
     border-radius: 2px;
     transition: all 0.3s;
     box-sizing: border-box;
@@ -42,23 +43,23 @@ lib-number-input {
     font-size: 14px;
 
     &:hover {
-        border-color: #1890ff;
+        border-color: @primary-color;
     }
 
     &.c-lib-number-input-focused {
-        border-color: #1890ff;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        border-color: @primary-color;
+        box-shadow: 0 0 0 2px @primary-color-outline;
     }
 
     &.c-lib-number-input-disabled {
-        background-color: #f5f5f5 !important;
-        border-color: #d9d9d9 !important;
-        color: rgba(0, 0, 0, 0.25) !important;
+        background-color: @background-color-disabled !important;
+        border-color: @border-color-base !important;
+        color: @text-color-disabled !important;
         cursor: not-allowed;
 
         input {
-            background-color: #f5f5f5 !important;
-            color: rgba(0, 0, 0, 0.25) !important;
+            background-color: @background-color-disabled !important;
+            color: @text-color-disabled !important;
             cursor: not-allowed;
         }
     }
@@ -92,7 +93,7 @@ lib-number-input {
     flex: none;
     align-items: center;
     padding-right: 2px;
-    color: rgba(0, 0, 0, 0.65);
+    color: @text-color-secondary;
 }
 
 
@@ -115,7 +116,7 @@ lib-number-input {
     right: 0;
     width: 22px;
     height: 100%;
-    border-left: 1px solid #d9d9d9;
+    border-left: 1px solid @border-color-base;
     display: flex;
     flex-direction: column;
 }
@@ -134,14 +135,14 @@ lib-number-input {
     outline: none;
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.03);
+        background-color: @background-color-mask-light;
 
         .c-lib-number-input-handler-up-inner {
-            border-bottom-color: #1890ff;
+            border-bottom-color: @primary-color;
         }
 
         .c-lib-number-input-handler-down-inner {
-            border-top-color: #1890ff;
+            border-top-color: @primary-color;
         }
     }
 
@@ -149,17 +150,17 @@ lib-number-input {
         cursor: not-allowed;
 
         .c-lib-number-input-handler-up-inner {
-            border-bottom-color: rgba(0, 0, 0, 0.25);
+            border-bottom-color: @text-color-disabled;
         }
 
         .c-lib-number-input-handler-down-inner {
-            border-top-color: rgba(0, 0, 0, 0.25);
+            border-top-color: @text-color-disabled;
         }
     }
 }
 
 .c-lib-number-input-handler-up {
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: 1px solid @border-color-base;
 }
 
 /* 正确的三角形方向 */
@@ -169,7 +170,7 @@ lib-number-input {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     border-top: 0;
-    border-bottom: 4px solid rgba(0, 0, 0, 0.45);
+    border-bottom: 4px solid @text-color-tertiary;
     display: inline-block;
 }
 
@@ -179,6 +180,6 @@ lib-number-input {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     border-bottom: 0;
-    border-top: 4px solid rgba(0, 0, 0, 0.45);
+    border-top: 4px solid @text-color-tertiary;
     display: inline-block;
 }

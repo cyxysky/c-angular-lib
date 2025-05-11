@@ -1,3 +1,4 @@
+@import './color.less';
 lib-input {
     display: inline-block;
     width: 100%;
@@ -16,13 +17,13 @@ lib-input {
     line-height: 32px;
     box-sizing: border-box;
     font-size: 14px;
-    background-color: #fff;
+    background-color: @text-color-inverse;
     transition: all 0.3s;
     width: 100%;
     outline: none;
 
     &::placeholder {
-        color: rgba(0, 0, 0, 0.25);
+        color: @text-color-disabled;
     }
 }
 
@@ -31,7 +32,7 @@ lib-input {
     padding: 0 11px;
     box-sizing: border-box;
     width: 100%;
-    border: 1px solid #d9d9d9;
+    border: 1px solid @border-color-base;
     border-radius: 2px;
     transition: all 0.3s;
 
@@ -41,12 +42,12 @@ lib-input {
     }
 
     &:hover {
-        border-color: #1890ff;
+        border-color: @primary-color;
     }
 
     &.c-lib-input-focused {
-        border-color: #1890ff;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        border-color: @primary-color;
+        box-shadow: 0 0 0 2px @primary-color-outline;
     }
 }
 
@@ -54,7 +55,7 @@ lib-input {
     margin-right: 4px;
     display: flex;
     align-items: center;
-    color: rgba(0, 0, 0, 0.65);
+    color: @text-color-secondary;
 
     .c-lib-input-prefix-icon {
         margin-right: 4px;
@@ -65,7 +66,7 @@ lib-input {
     margin-left: 4px;
     display: flex;
     align-items: center;
-    color: rgba(0, 0, 0, 0.65);
+    color: @text-color-secondary;
 
     .c-lib-input-suffix-icon {
         margin-left: 4px;
@@ -74,17 +75,17 @@ lib-input {
 
 .c-lib-input-clear-icon {
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.25);
+    color: @text-color-disabled;
     transition: color 0.3s;
     margin-left: 4px;
 
     &:hover {
-        color: rgba(0, 0, 0, 0.45);
+        color: @text-color-tertiary;
     }
 }
 
 .c-lib-input-char-count {
-    color: rgba(0, 0, 0, 0.45);
+    color: @text-color-tertiary;
     margin-left: 8px;
 }
 
@@ -107,73 +108,73 @@ lib-input {
 }
 
 .c-lib-input-status-error {
-    border-color: #ff4d4f;
+    border-color: @error-color;
 
     .c-lib-input-control {
         &:hover {
-            border-color: #ff4d4f;
+            border-color: @error-color;
         }
 
         &:focus {
-            border-color: #ff4d4f;
+            border-color: @error-color;
         }
     }
 
     &:hover {
-        border-color: #ff4d4f;
+        border-color: @error-color;
     }
 
     &.c-lib-input-focused {
-        border-color: #ff4d4f;
+        border-color: @error-color;
         box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
     }
 }
 
 .c-lib-input-status-warning {
-    border-color: #faad14;
+    border-color: @warning-color-alt;
 
     .c-lib-input-control {
         &:hover {
-            border-color: #faad14;
+            border-color: @warning-color-alt;
         }
 
         &:focus {
-            border-color: #faad14;
+            border-color: @warning-color-alt;
         }
     }
 
     &:hover {
-        border-color: #faad14;
+        border-color: @warning-color-alt;
     }
 
     &.c-lib-input-focused {
-        border-color: #faad14;
+        border-color: @warning-color-alt;
         box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
     }
 }
 
 .c-lib-input-disabled {
-    background-color: #f5f5f5 !important;
-    border-color: #d9d9d9 !important;
-    color: rgba(0, 0, 0, 0.25) !important;
+    background-color: @background-color-disabled !important;
+    border-color: @border-color-base !important;
+    color: @text-color-disabled !important;
     cursor: not-allowed;
 
     .c-lib-input-control {
-        background-color: #f5f5f5 !important;
-        color: rgba(0, 0, 0, 0.25) !important;
+        background-color: @background-color-disabled !important;
+        color: @text-color-disabled !important;
         cursor: not-allowed;
     }
 
     .c-lib-input-prefix,
     .c-lib-input-suffix {
-        color: rgba(0, 0, 0, 0.25) !important;
+        color: @text-color-disabled !important;
     }
 }
 
 .c-lib-input-borderless {
     border: none;
     box-shadow: none;
-    background-color: #fff;
+    background-color: @text-color-inverse;
 
     .c-lib-input-control {
         border: none;
@@ -188,7 +189,7 @@ lib-input {
 }
 
 .c-lib-input-error {
-    color: #ff4d4f;
+    color: @error-color;
     font-size: 12px;
     line-height: 1.5;
     margin-top: 3px;
