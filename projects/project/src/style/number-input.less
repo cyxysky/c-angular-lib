@@ -1,4 +1,3 @@
-@import './color.less';
 lib-number-input {
     width: 100%;
     display: inline-block;
@@ -13,7 +12,7 @@ lib-number-input {
 
     &.c-lib-number-input-focused {
         border-color: @error-color;
-        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+        box-shadow: 0 0 0 2px fade(@error-color, 20%);
     }
 }
 
@@ -26,7 +25,7 @@ lib-number-input {
 
     &.c-lib-number-input-focused {
         border-color: @warning-color;
-        box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.2);
+        box-shadow: 0 0 0 2px fade(@warning-color, 20%);
     }
 }
 
