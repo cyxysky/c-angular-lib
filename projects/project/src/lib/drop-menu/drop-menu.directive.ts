@@ -16,7 +16,7 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class DropMenuDirective implements OverlayBasicDirective {
   /** 菜单项 */
-  @Input({ alias: 'dropMenuItems', required: true }) menuItems: DropMenu[] = [];
+  @Input({ alias: 'dropMenuItems' }) menuItems: DropMenu[] = [];
   /** 菜单位置 */
   @Input({ alias: 'dropMenuPlacement' }) placement: OverlayBasicPosition = 'bottom-left';
   /** 菜单触发方式 */

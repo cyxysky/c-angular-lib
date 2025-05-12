@@ -20,6 +20,28 @@
     </div>
   </app-doc-box>
 
+  <!-- 多柱状图 -->
+  <app-doc-box title="多系列柱状图" [sourceCode]="multiSeriesChartCode">
+    <div demo>
+      <lib-bar [data]="multiSeriesData"></lib-bar>
+    </div>
+    <div description>
+      <p>多系列柱状图可展示多组数据的对比，每个类别包含多个数据系列。</p>
+      <p>点击图例可以切换显示/隐藏对应的数据系列。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 多柱状图自定义 -->
+  <app-doc-box title="自定义多系列柱状图" [sourceCode]="customMultiSeriesChartCode">
+    <div demo>
+      <lib-bar [data]="customMultiSeriesData" [options]="customMultiSeriesOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>可以为每个系列设置单独的名称和颜色，并自定义图例位置。</p>
+      <p>即使所有系列都被隐藏，图表框架仍会保留，方便再次显示数据。</p>
+    </div>
+  </app-doc-box>
+
   <!-- 自定义颜色 -->
   <app-doc-box title="自定义颜色" [sourceCode]="colorChartCode">
     <div demo>
@@ -125,20 +147,20 @@
       <ng-template #customTooltip let-item>
         <!-- 自定义悬浮框内容，右侧边框由组件设置 -->
         <div style="display: flex; width: 100%; flex-direction: column;">
-          <div style="padding: 16px 18px;">
-            <div style="font-weight: 600; font-size: 16px; margin-bottom: 12px; color: #222; letter-spacing: -0.3px;">
+          <div style="padding: 12px;">
+            <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
               {{item.name}}
             </div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">销售额</span>
-                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatSalesValue(item.value)}}</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatSalesValue(item.item.value)}}</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.item.value / 840) * 100).toFixed(1)}}%</span>
               </div>
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
-                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.value / 840) * 100).toFixed(1)}}%</span>
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">详情</span>
                 <span style="font-weight: 500; color: #3498db; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center; cursor: pointer;">查看</span>
               </div>
@@ -150,6 +172,37 @@
     <div description>
       <p>通过 <code>tooltipTemplate</code> 属性可以使用 Angular 模板自定义悬浮框的内容和样式。</p>
       <p>右侧彩色边框会自动使用对应柱形的颜色，保持视觉一致性。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 多系列悬浮框 -->
+  <app-doc-box title="多系列悬浮框" [sourceCode]="multiSeriesTooltipCode">
+    <div demo>
+      <lib-bar [data]="multiSeriesData" [options]="multiSeriesTooltipOptions" [tooltipTemplate]="multiSeriesTooltip"></lib-bar>
+      
+      <ng-template #multiSeriesTooltip let-data>
+        <div style="display: flex; width: 100%; flex-direction: column;">
+          <div style="padding: 12px;">
+            <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
+              {{data.series.name}} - {{data.item.name}}
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">数值</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatValue(data.item.value)}}</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">系列索引</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{data.seriesIndex}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+    <div description>
+      <p>多系列图表的悬浮框可以显示更丰富的信息，包括系列名称、数据点名称和值。</p>
+      <p>通过模板可以自定义显示内容和样式，增强用户体验。</p>
     </div>
   </app-doc-box>
 </div>

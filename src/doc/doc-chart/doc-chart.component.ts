@@ -3,7 +3,7 @@ import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { CommonModule } from '@angular/common';
-import { ChartData, BarChartOptions, BarComponent, ButtonComponent } from '@project';
+import { ChartData, BarChartOptions, BarComponent, ButtonComponent, ChartSeries } from '@project';
 
 @Component({
   selector: 'app-doc-chart',
@@ -28,6 +28,91 @@ export class DocChartComponent {
     { name: '十一月', value: 120 },
     { name: '十二月', value: 130 }
   ];
+  
+  // 多系列数据
+  multiSeriesData: ChartSeries[] = [
+    {
+      name: '2022年',
+      data: [
+        { name: '一季度', value: 120 },
+        { name: '二季度', value: 150 },
+        { name: '三季度', value: 180 },
+        { name: '四季度', value: 210 }
+      ]
+    },
+    {
+      name: '2023年',
+      data: [
+        { name: '一季度', value: 140 },
+        { name: '二季度', value: 170 },
+        { name: '三季度', value: 200 },
+        { name: '四季度', value: 250 }
+      ]
+    }
+  ];
+  
+  // 自定义多系列数据
+  customMultiSeriesData: ChartSeries[] = [
+    {
+      name: '北京',
+      color: '#FF6384',
+      data: [
+        { name: '一季度', value: 180 },
+        { name: '二季度', value: 200 },
+        { name: '三季度', value: 220 },
+        { name: '四季度', value: 270 }
+      ]
+    },
+    {
+      name: '上海',
+      color: '#36A2EB',
+      data: [
+        { name: '一季度', value: 160 },
+        { name: '二季度', value: 190 },
+        { name: '三季度', value: 210 },
+        { name: '四季度', value: 240 }
+      ]
+    },
+    {
+      name: '广州',
+      color: '#FFCE56',
+      data: [
+        { name: '一季度', value: 140 },
+        { name: '二季度', value: 170 },
+        { name: '三季度', value: 200 },
+        { name: '四季度', value: 230 }
+      ]
+    }
+  ];
+  
+  // 自定义多系列选项
+  customMultiSeriesOptions: BarChartOptions = {
+    title: '2023年主要城市季度销售额',
+    legend: {
+      show: true,
+      position: 'top',
+      align: 'center'
+    },
+    borderRadius: 6,
+    margin: { top: 60, right: 20, bottom: 50, left: 50 }
+  };
+  
+  // 多系列悬浮框选项
+  multiSeriesTooltipOptions: BarChartOptions = {
+    title: '年度季度对比',
+    legend: {
+      show: true,
+      position: 'top',
+      align: 'center'
+    },
+    borderRadius: 6,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      showGuideLine: true,
+      tooltipHoverable: true
+    }
+  };
 
   // 包含零值的测试数据
   zeroValueData: ChartData[] = [
@@ -130,7 +215,12 @@ export class DocChartComponent {
 
   // 格式化销售额
   formatSalesValue(value: number): string {
-    return value.toLocaleString('zh-CN') + ' 元';
+    return value + ' 元';
+  }
+  
+  // 格式化数值（通用）
+  formatValue(value: number): string {
+    return value.toString();
   }
 
   refreshData() {
@@ -155,6 +245,35 @@ export class DocChartComponent {
           name: 'value',
           description: '数据项值',
           type: 'number',
+          default: '-'
+        },
+        {
+          name: 'color',
+          description: '数据项颜色（可选）',
+          type: 'string',
+          default: '-'
+        }
+      ]
+    },
+    {
+      title: 'ChartSeries 系列接口',
+      items: [
+        {
+          name: 'name',
+          description: '系列名称，用于图例显示',
+          type: 'string',
+          default: '-'
+        },
+        {
+          name: 'data',
+          description: '系列中的数据点',
+          type: 'ChartData[]',
+          default: '-'
+        },
+        {
+          name: 'color',
+          description: '系列颜色（可选），如果设置则覆盖默认颜色',
+          type: 'string',
           default: '-'
         }
       ]
@@ -223,10 +342,39 @@ export class DocChartComponent {
           default: "{ top: 40, right: 20, bottom: 50, left: 50 }"
         },
         {
+          name: 'legend',
+          description: '图例配置选项',
+          type: 'object { show?: boolean; position?: string; align?: string; }',
+          default: "{ show: true, position: 'top', align: 'center' }"
+        },
+        {
           name: 'onClick',
           description: '柱形点击回调函数，接收包含点击详情的对象',
           type: 'function',
           default: '-'
+        }
+      ]
+    },
+    {
+      title: 'BarChartOptions.legend 图例配置',
+      items: [
+        {
+          name: 'show',
+          description: '是否显示图例',
+          type: 'boolean',
+          default: 'true'
+        },
+        {
+          name: 'position',
+          description: '图例位置',
+          type: "string ('top' | 'bottom' | 'left' | 'right')",
+          default: "'top'"
+        },
+        {
+          name: 'align',
+          description: '图例对齐方式',
+          type: "string ('start' | 'center' | 'end')",
+          default: "'center'"
         }
       ]
     },
@@ -293,9 +441,15 @@ export class DocChartComponent {
           default: '-'
         },
         {
+          name: 'seriesIndex',
+          description: '点击的系列索引',
+          type: 'number',
+          default: '-'
+        },
+        {
           name: 'data',
           description: '完整的数据集合',
-          type: 'ChartData[]',
+          type: 'ChartSeries[]',
           default: '-'
         },
         {
@@ -323,8 +477,8 @@ export class DocChartComponent {
       items: [
         {
           name: 'data',
-          description: '图表数据数组',
-          type: 'ChartData[]',
+          description: '图表数据数组，可以是单系列数据ChartData[]或多系列数据ChartSeries[]',
+          type: 'ChartData[] | ChartSeries[]',
           default: '[]'
         },
         {
@@ -335,8 +489,8 @@ export class DocChartComponent {
         },
         {
           name: 'tooltipTemplate',
-          description: '自定义悬浮框模板，可使用 ng-template，数据项作为 $implicit 参数传入',
-          type: 'TemplateRef<{ $implicit: ChartData }>',
+          description: '自定义悬浮框模板，可使用ng-template，数据会作为$implicit参数传入',
+          type: 'TemplateRef<{ $implicit: any }>',
           default: '-'
         }
       ]
@@ -361,6 +515,171 @@ export class ChartDemoComponent {
     { name: '五月', value: 70 },
     { name: '六月', value: 50 }
   ];
+}`;
+
+  // 多系列图表示例代码
+  multiSeriesChartCode = `
+import { Component } from '@angular/core';
+import { ChartSeries } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-bar [data]="multiSeriesData"></lib-bar>\`
+})
+export class ChartDemoComponent {
+  multiSeriesData: ChartSeries[] = [
+    {
+      name: '2022年',
+      data: [
+        { name: '一季度', value: 120 },
+        { name: '二季度', value: 150 },
+        { name: '三季度', value: 180 },
+        { name: '四季度', value: 210 }
+      ]
+    },
+    {
+      name: '2023年',
+      data: [
+        { name: '一季度', value: 140 },
+        { name: '二季度', value: 170 },
+        { name: '三季度', value: 200 },
+        { name: '四季度', value: 250 }
+      ]
+    }
+  ];
+}`;
+
+  // 自定义多系列图表示例代码
+  customMultiSeriesChartCode = `
+import { Component } from '@angular/core';
+import { ChartSeries, BarChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-bar [data]="customMultiSeriesData" [options]="customMultiSeriesOptions"></lib-bar>\`
+})
+export class ChartDemoComponent {
+  customMultiSeriesData: ChartSeries[] = [
+    {
+      name: '北京',
+      color: '#FF6384', // 自定义系列颜色
+      data: [
+        { name: '一季度', value: 180 },
+        { name: '二季度', value: 200 },
+        { name: '三季度', value: 220 },
+        { name: '四季度', value: 270 }
+      ]
+    },
+    {
+      name: '上海',
+      color: '#36A2EB',
+      data: [
+        { name: '一季度', value: 160 },
+        { name: '二季度', value: 190 },
+        { name: '三季度', value: 210 },
+        { name: '四季度', value: 240 }
+      ]
+    },
+    {
+      name: '广州',
+      color: '#FFCE56',
+      data: [
+        { name: '一季度', value: 140 },
+        { name: '二季度', value: 170 },
+        { name: '三季度', value: 200 },
+        { name: '四季度', value: 230 }
+      ]
+    }
+  ];
+  
+  customMultiSeriesOptions: BarChartOptions = {
+    title: '2023年主要城市季度销售额',
+    legend: {
+      show: true,
+      position: 'top',
+      align: 'center'
+    },
+    borderRadius: 6,
+    margin: { top: 60, right: 20, bottom: 50, left: 50 }
+  };
+}`;
+
+  // 多系列悬浮框示例代码
+  multiSeriesTooltipCode = `
+import { Component } from '@angular/core';
+import { ChartSeries, BarChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`
+    <lib-bar 
+      [data]="multiSeriesData" 
+      [options]="multiSeriesTooltipOptions" 
+      [tooltipTemplate]="multiSeriesTooltip">
+    </lib-bar>
+    
+    <ng-template #multiSeriesTooltip let-data>
+      <div style="display: flex; width: 100%; flex-direction: column;">
+        <div style="padding: 12px;">
+          <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
+            {{data.series.name}} - {{data.item.name}}
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #555; font-size: 13px; font-weight: 500;">数值</span>
+              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatValue(data.item.value)}}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="color: #555; font-size: 13px; font-weight: 500;">系列索引</span>
+              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{data.seriesIndex}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  \`
+})
+export class ChartDemoComponent {
+  multiSeriesData: ChartSeries[] = [
+    {
+      name: '2022年',
+      data: [
+        { name: '一季度', value: 120 },
+        { name: '二季度', value: 150 },
+        { name: '三季度', value: 180 },
+        { name: '四季度', value: 210 }
+      ]
+    },
+    {
+      name: '2023年',
+      data: [
+        { name: '一季度', value: 140 },
+        { name: '二季度', value: 170 },
+        { name: '三季度', value: 200 },
+        { name: '四季度', value: 250 }
+      ]
+    }
+  ];
+  
+  multiSeriesTooltipOptions: BarChartOptions = {
+    title: '年度季度对比',
+    legend: {
+      show: true,
+      position: 'top',
+      align: 'center'
+    },
+    borderRadius: 6,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      showGuideLine: true,
+      tooltipHoverable: true
+    }
+  };
+  
+  formatValue(value: number): string {
+    return value.toLocaleString('zh-CN');
+  }
 }`;
 
   colorChartCode = `
@@ -579,22 +898,22 @@ import { ChartData, BarChartOptions } from '@project';
     <ng-template #customTooltip let-item>
       <!-- 自定义悬浮框内容，右侧彩色边框由组件自动设置 -->
       <div style="display: flex; width: 100%; flex-direction: column;">
-        <div style="padding: 16px 18px;">
-          <div style="font-weight: 600; font-size: 16px; margin-bottom: 12px; color: #222; letter-spacing: -0.3px;">
+        <div style="padding: 12px;">
+          <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
             {{item.name}}
           </div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
               <span style="color: #555; font-size: 13px; font-weight: 500;">销售额</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; background-color: rgba(0, 0, 0, 0.04); padding: 4px 10px; border-radius: 16px; min-width: 60px; text-align: center;">{{formatSalesValue(item.value)}}</span>
+              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{formatSalesValue(item.value)}}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
+              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.value / totalSales) * 100).toFixed(1)}}%</span>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; background-color: rgba(0, 0, 0, 0.04); padding: 4px 10px; border-radius: 16px; min-width: 60px; text-align: center;">{{((item.value / totalSales) * 100).toFixed(1)}}%</span>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
               <span style="color: #555; font-size: 13px; font-weight: 500;">详情</span>
-              <span style="font-weight: 500; color: #3498db; font-size: 13px; background-color: rgba(52, 152, 219, 0.1); padding: 4px 10px; border-radius: 16px; min-width: 60px; text-align: center; cursor: pointer;">查看</span>
+              <span style="font-weight: 500; color: #3498db; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center; cursor: pointer;">查看</span>
             </div>
           </div>
         </div>

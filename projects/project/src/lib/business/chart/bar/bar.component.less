@@ -12,6 +12,8 @@
   overflow: hidden;
   transition: all 0.3s ease;
   position: relative;
+  display: flex;
+  flex-direction: column;
   
   &:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
@@ -19,11 +21,78 @@
   }
 }
 
+.canvas-container {
+  width: 100%;
+  position: relative;
+}
+
 canvas {
   display: block;
-  max-width: 100%;
+  width: 100%;
   height: auto;
   cursor: pointer;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  margin: 8px 0;
+  justify-content: center;
+  
+  &.legend-position-top {
+    order: -1;
+  }
+  
+  &.legend-position-bottom {
+    order: 1;
+  }
+  
+  &.legend-position-left {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+  }
+  
+  &.legend-position-right {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+  }
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+.legend-name {
+  font-size: 12px;
+  color: #333;
+  white-space: nowrap;
+  
+  &.legend-disabled {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
 }
 
 .bar-tooltip {
@@ -35,9 +104,10 @@ canvas {
   border-radius: 6px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   max-width: 240px;
-  overflow: hidden;
-  border-right-width: 5px;
-  border-right-style: solid;
+  overflow: visible;
+  border-top-width: 5px;
+  border-top-style: solid;
+  white-space: nowrap;
 }
 
 .tooltip-content {

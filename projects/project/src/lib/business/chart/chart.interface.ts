@@ -1,6 +1,13 @@
 export interface ChartData {
   name: string;
   value: number;
+  color?: string; // 可选颜色，用于单独设置数据点颜色
+}
+
+export interface ChartSeries {
+  name: string; // 系列名称，用于图例显示
+  data: ChartData[]; // 系列中的数据点
+  color?: string; // 系列颜色，如果设置则覆盖默认颜色
 }
 
 export interface BarChartOptions {
@@ -19,6 +26,12 @@ export interface BarChartOptions {
     bottom: number;
     left: number;
   };
+  // 图例配置
+  legend?: {
+    show?: boolean; // 是否显示图例
+    position?: 'top' | 'bottom' | 'left' | 'right'; // 图例位置
+    align?: 'start' | 'center' | 'end'; // 图例对齐方式
+  };
   // 悬停效果配置
   hoverEffect?: {
     enabled?: boolean;          // 是否启用悬停效果
@@ -33,7 +46,8 @@ export interface BarChartOptions {
   onClick?: (info: {
     item: ChartData;            // 点击的数据项
     index: number;              // 数据项索引
-    data: ChartData[];          // 完整数据集
+    seriesIndex: number;        // 系列索引
+    data: ChartSeries[];        // 完整数据集
     options: BarChartOptions;   // 图表配置
     event: MouseEvent;          // 原始点击事件
     position: {                 // 被点击柱形的位置信息
