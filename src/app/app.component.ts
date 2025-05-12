@@ -165,5 +165,6 @@ export class AppComponent {
     { name: '结构树', path: 'structure-tree' },
     { name: '动态表格', path: 'dynamic-table' },
     { name: '用户选择', path: 'user-select' },
+    { name: '图表', path: 'chart' },
   ]
 }

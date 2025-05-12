@@ -16,7 +16,7 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class DropMenuDirective implements OverlayBasicDirective {
   /** 菜单项 */
-  @Input({ alias: 'dropMenuItems' }) menuItems: DropMenu[] = [];
+  @Input({ alias: 'dropMenuItems', required: true }) menuItems: DropMenu[] = [];
   /** 菜单位置 */
   @Input({ alias: 'dropMenuPlacement' }) placement: OverlayBasicPosition = 'bottom-left';
   /** 菜单触发方式 */
@@ -66,7 +66,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
   /** 触发元素是否被悬停 */
   private triggerHover = false;
   /** 菜单是否可见 */
-  public isDropDownVisible = false;
+  public isVisible = false;
   /** 进入计时器 */
   private enterTimer: any = null;
   /** 离开计时器 */
@@ -209,7 +209,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
    * 显示下拉菜单
    */
   public show(): void {
-    if (!this.strictVisible && this.isDropDownVisible) return;
+    if (this.isVisible) return;
     // 关闭已存在的菜单
     this.closeDropMenu();
     // 获取位置配置
@@ -307,7 +307,7 @@ export class DropMenuDirective implements OverlayBasicDirective {
    */
   private changeVisible(visible: boolean): void {
     this.visible = visible;
-    this.isDropDownVisible = visible;
+    this.isVisible = visible;
     this.visibleChange.emit(visible);
     this.dropMenuComponentRef?.setInput('isVisible', visible);
   }
@@ -323,11 +323,9 @@ export class DropMenuDirective implements OverlayBasicDirective {
    * 关闭并销毁下拉菜单
    */
   private closeDropMenu(): void {
-    if (this.overlayRef) {
-      this.overlayRef.detach();
-      this.overlayRef.dispose();
-      this.overlayRef = null;
-      this.dropMenuComponentRef = null;
-    }
+    this.overlayRef?.detach();
+    this.overlayRef?.dispose();
+    this.overlayRef = null;
+    this.dropMenuComponentRef = null;
   }
 } 

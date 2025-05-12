@@ -7,11 +7,16 @@
   自定义内容-{{ data?.[column.field] }}
 </ng-template>
 
+<!-- 添加HTML导出工具 -->
+<div class="html-export-tools">
+  <button class="export-button" (click)="downloadHtmlAsPng()">导出为PNG</button>
+</div>
+
 <div class="table-docs-grid">
   <!-- 基础用法 -->
   <app-doc-box title="基础用法" [sourceCode]="basicTableSource">
     <div demo>
-      <lib-table [tableData]="basicData" [tableColumns]="basicColumns">
+      <lib-table [tableData]="basicData" [tableColumns]="basicColumns" >
       </lib-table>
     </div>
     <div description>
@@ -24,7 +29,7 @@
     <div demo>
       <div class="custom-cell-demo">
         <p style="margin-bottom: 10px;">注意：此示例使用代码展示实现方式，因为自定义单元格需要使用template属性指定模板名称</p>
-        <lib-table [tableData]="customData" [tableColumns]="customColumns">
+        <lib-table [tableData]="customData" [tableColumns]="customColumns" >
         </lib-table>
       </div>
     </div>
@@ -235,7 +240,7 @@
   <!-- 复杂表格 -->
   <app-doc-box title="复杂表格" [sourceCode]="complexTableSource">
     <div demo>
-      <lib-table [tableData]="complexData" [tableColumns]="complexColumns" [tableComplex]="true" tableBordered tableCheckable>
+      <lib-table [tableData]="complexData" [tableColumns]="complexColumns" [tableComplex]="true" tableBordered tableCheckable id="baasicTable">
       </lib-table>
     </div>
     <div description>

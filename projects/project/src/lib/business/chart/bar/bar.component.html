@@ -1,0 +1,35 @@
+<div class="bar-chart-container">
+  <canvas #barCanvas (mouseleave)="handleCanvasMouseLeave($event)"></canvas>
+  
+  <!-- 悬浮框容器 -->
+  <div #barTooltip class="bar-tooltip" 
+       [style.display]="hoveredBarIndex >= 0 ? 'flex' : 'none'"
+       [style.pointer-events]="isTooltipHoverable() ? 'auto' : 'none'"
+       [style.border-right-color]="hoveredBarIndex >= 0 ? getBarColor(hoveredBarIndex) : ''">
+  </div>
+  
+  <!-- 默认悬浮框模板 -->
+  <ng-template #defaultTooltip let-item>
+    <div class="tooltip-content">
+      <div class="tooltip-content__wrapper">
+        <div class="tooltip-content__title">
+          {{item.name}}
+        </div>
+        <div class="tooltip-content__data">
+          <div class="tooltip-content__row">
+            <span class="tooltip-content__label">数值</span>
+            <span class="tooltip-content__value">
+              {{formatValue(item.value)}}
+            </span>
+          </div>
+          <div class="tooltip-content__row">
+            <span class="tooltip-content__label">比例</span>
+            <span class="tooltip-content__value">
+              {{calculatePercentage(item.value)}}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

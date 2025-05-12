@@ -24,11 +24,12 @@
         >
         <div #tabsNavList class="c-lib-tabs-nav-list">
           <div 
+            #tabItem
             *ngFor="let tab of allTabs; let i = index; trackBy: trackByTab" 
             class="c-lib-tabs-tab"
             (click)="selectTab(i)" 
             [class.c-lib-tabs-tab-active]="isActive(i)"
-            [class.c-lib-tabs-tab-disabled]="tab.disabled" #tabItem
+            [class.c-lib-tabs-tab-disabled]="tab.disabled" 
             >
             <div class="c-lib-tabs-tab-btn">
               <ng-container *ngIf="tab.customTitle; else defaultTitle">

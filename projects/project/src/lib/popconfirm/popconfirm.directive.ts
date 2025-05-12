@@ -1,4 +1,4 @@
-import { ComponentRef, Directive, ElementRef, EventEmitter, HostListener, Input, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { booleanAttribute, ComponentRef, Directive, ElementRef, EventEmitter, HostListener, Input, Output, SimpleChanges, TemplateRef } from '@angular/core';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -13,31 +13,31 @@ import { UtilsService } from '../core/utils/utils.service';
 })
 export class PopconfirmDirective implements OverlayBasicDirective {
   /** 提示内容 */
-  @Input('popconfirmContent') popconfirmContent: string | TemplateRef<any> = '';
+  @Input({ alias: 'popconfirmContent', required: true }) popconfirmContent: string | TemplateRef<any> = '';
   /** 提示标题 */
-  @Input('popconfirmTitle') popconfirmTitle: string | TemplateRef<any> = '';
+  @Input({ alias: 'popconfirmTitle', required: true }) popconfirmTitle: string | TemplateRef<any> = '';
   /** 提示位置 */
-  @Input('popconfirmPlacement') placement: OverlayBasicPosition = 'top';
+  @Input({ alias: 'popconfirmPlacement' }) placement: OverlayBasicPosition = 'top';
   /** 提示是否显示 */
-  @Input('popconfirmVisible') visible: boolean = false;
+  @Input({ alias: 'popconfirmVisible', transform: booleanAttribute }) visible: boolean = false;
   /** 是否严格由编程控制显示 */
-  @Input('popconfirmStrictVisiable') strictVisiable: boolean = false;
+  @Input({ alias: 'popconfirmStrictVisiable', transform: booleanAttribute }) strictVisiable: boolean = false;
   /** 提示类 */
-  @Input('popconfirmClass') popconfirmClass: string = '';
+  @Input({ alias: 'popconfirmClass' }) popconfirmClass: string = '';
   /** 确认按钮类型 */
-  @Input('popconfirmConfirmButtonType') confirmButtonType: ButtonType = 'default';
+  @Input({ alias: 'popconfirmConfirmButtonType' }) confirmButtonType: ButtonType = 'default';
   /** 确认按钮颜色 */
-  @Input('popconfirmConfirmButtonColor') confirmButtonColor: ButtonColor = 'primary';
+  @Input({ alias: 'popconfirmConfirmButtonColor' }) confirmButtonColor: ButtonColor = 'primary';
   /** 确认按钮内容 */
-  @Input('popconfirmConfirmButtonContent') confirmButtonContent: string | TemplateRef<void> = '确认';
+  @Input({ alias: 'popconfirmConfirmButtonContent' }) confirmButtonContent: string | TemplateRef<void> = '确认';
   /** 取消按钮类型 */
-  @Input('popconfirmCancelButtonType') cancelButtonType: ButtonType = 'default';
+  @Input({ alias: 'popconfirmCancelButtonType' }) cancelButtonType: ButtonType = 'default';
   /** 取消按钮颜色 */
-  @Input('popconfirmCancelButtonColor') cancelButtonColor: ButtonColor = 'ghost';
+  @Input({ alias: 'popconfirmCancelButtonColor' }) cancelButtonColor: ButtonColor = 'ghost';
   /** 取消按钮内容 */
-  @Input('popconfirmCancelButtonContent') cancelButtonContent: string | TemplateRef<void> = '取消';
+  @Input({ alias: 'popconfirmCancelButtonContent' }) cancelButtonContent: string | TemplateRef<void> = '取消';
   /** 底部模板 */
-  @Input('popconfirmBottomTemplate') bottomTemplate: null | TemplateRef<void> = null;
+  @Input({ alias: 'popconfirmBottomTemplate' }) bottomTemplate: null | TemplateRef<void> = null;
   /** 提示显示状态改变事件 */
   @Output('popconfirmVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** 确认函数 */
@@ -50,7 +50,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
   private leaveTimer: any;
   private portal: ComponentPortal<PopoverComponent> | null = null;
   private popconfirmComponentRef: ComponentRef<PopoverComponent> | null = null;
-  public isDropDownVisible: boolean = false;
+  public isVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -94,7 +94,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
-    if (this.isDropDownVisible && !this.popconfirmContent && !this.popconfirmTitle && !this.placement && !this.strictVisiable) return;
+    if (this.isVisible) return;
     this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
@@ -170,7 +170,7 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    */
   changeVisible(visible: boolean): void {
     this.visible = visible;
-    this.isDropDownVisible = visible;
+    this.isVisible = visible;
     this.visibleChange.emit(this.visible);
     this.popconfirmComponentRef?.setInput('isVisible', visible);
   }
@@ -197,10 +197,8 @@ export class PopconfirmDirective implements OverlayBasicDirective {
    * 关闭
    */
   private closePopover(): void {
-    if (this.overlayRef) {
-      this.overlayRef.detach();
-      this.overlayRef.dispose();
-    }
+    this.overlayRef?.detach();
+    this.overlayRef?.dispose();
     this.overlayRef = null;
     this.popconfirmComponentRef = null;
   }

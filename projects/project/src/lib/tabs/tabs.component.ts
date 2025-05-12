@@ -24,7 +24,7 @@ import { TabComponent } from './tab.component';
 import { Subject, timer } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 import { TabItem, tabsDirection, tabsSize, tabsType, tabsAlign } from './tabs.interface';
-
+import { UtilsService } from '@project';
 @Component({
   selector: 'lib-tabs',
   standalone: true,
@@ -90,6 +90,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   constructor(
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private utilsService: UtilsService
   ) {
     // 设置滚动防抖
     this.scrollDebounce$.pipe(
@@ -103,17 +104,14 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedIndex'] && !changes['selectedIndex'].firstChange) {
       this.updateSelectedIndex();
-      
       // 如果启用了懒加载，则将当前选中的标签页添加到已加载集合中
       if (this.lazyLoad) {
         this.loadedTabs.add(this.selectedIndex);
       }
     }
-
     if (changes['tabPosition']) {
       this.updateInkBarStyles();
     }
-    
     // 如果懒加载设置发生变化，且关闭了懒加载，则加载所有标签页
     if (changes['lazyLoad'] && !changes['lazyLoad'].firstChange && !this.lazyLoad) {
       this.loadAllTabs();
@@ -125,7 +123,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     if (this.tabComponents) {
       this.tabComponents.changes.pipe(takeUntil(this.destroy$)).subscribe(() => this.buildAllTabs());
     }
-    
     // 初始化已加载标签页集合
     if (this.lazyLoad) {
       this.loadedTabs.add(this.selectedIndex);
@@ -159,26 +156,20 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
     }
-
     // 移除滚动监听器
     this.removeScrollListener();
-
     this.destroy$.next();
     this.destroy$.complete();
     this.scrollDebounce$.complete();
   }
 
   selectTab(index: number): void {
-    if (this.allTabs[index]?.disabled || this.selectedIndex === index) {
-      return;
-    }
+    if (this.allTabs[index]?.disabled || this.selectedIndex === index) return;
     this.selectedIndex = index;
-    
     // 如果启用了懒加载，将当前选中的标签页添加到已加载集合中
     if (this.lazyLoad) {
       this.loadedTabs.add(index);
     }
-    
     // 设置动画方向
     this.selectedIndexChange.emit(index);
     this.tabClick.emit({ index, tab: this.allTabs[index] });
@@ -191,7 +182,7 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   isActive(index: number): boolean {
     return index === this.selectedIndex;
   }
-  
+
   /**
    * 判断标签页是否应该被渲染
    * 1. 如果不启用懒加载，则所有标签页都会被渲染
@@ -199,17 +190,11 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
    * 3. 如果启用了destroyInactive，则只渲染当前选中的标签页
    */
   shouldRenderTab(index: number): boolean {
-    if (this.destroyInactive) {
-      return this.isActive(index);
-    }
-    
-    if (this.lazyLoad) {
-      return this.loadedTabs.has(index);
-    }
-    
+    if (this.destroyInactive) return this.isActive(index);
+    if (this.lazyLoad) return this.loadedTabs.has(index);
     return true;
   }
-  
+
   /**
    * 加载所有标签页
    */
@@ -219,16 +204,25 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     }
   }
 
+  /**
+   * 添加标签
+   */
   onAddTab(): void {
     this.add.emit();
     this.recalculateAll();
   }
 
+  /**
+   * 关闭标签
+   */
   onCloseTab(index: number, event: MouseEvent): void {
     event.stopPropagation();
     this.close.emit({ index, tab: this.allTabs[index] });
   }
 
+  /**
+   * 跟踪标签
+   */
   trackByTab(index: number, tab: TabItem): string {
     return tab.key || index.toString();
   }
@@ -241,10 +235,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     const navContainer = this.tabsNav.nativeElement;
     const navWidth = navContainer.offsetWidth;
     const currentScroll = navContainer.scrollLeft;
-
     // 计算滚动步长，通常为容器宽度的一半
     const scrollStep = navWidth / 2;
-
     navContainer.scrollTo({
       left: Math.max(0, currentScroll - scrollStep),
       behavior: 'smooth'
@@ -260,10 +252,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     const navWidth = navContainer.offsetWidth;
     const navScrollWidth = navContainer.scrollWidth;
     const currentScroll = navContainer.scrollLeft;
-
     // 计算滚动步长，通常为容器宽度的一半
     const scrollStep = navWidth / 2;
-
     navContainer.scrollTo({
       left: Math.min(navScrollWidth - navWidth, currentScroll + scrollStep),
       behavior: 'smooth'
@@ -276,22 +266,17 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
   scrollToActiveTab(): void {
     if (!this.tabElements || !this.tabsNav || !this.isHorizontal) return;
     if (this.selectedIndex < 0 || this.selectedIndex >= this.tabElements.length) return;
-
     const navContainer = this.tabsNav.nativeElement;
     const activeTab = this.tabElements.toArray()[this.selectedIndex].nativeElement;
-
     // 获取视图容器的宽度和滚动位置
     const navWidth = navContainer.offsetWidth;
     const scrollLeft = navContainer.scrollLeft;
-
     // 获取标签的位置和宽度
     const tabLeft = activeTab.offsetLeft;
     const tabWidth = activeTab.offsetWidth;
     const tabRight = tabLeft + tabWidth;
-
     // 计算可见区域的右边界
     const scrollRight = scrollLeft + navWidth;
-
     // 如果标签不在可见区域内，则滚动到正确位置
     if (tabLeft < scrollLeft) {
       // 如果标签在左侧不可见，滚动使其左边缘可见
@@ -306,9 +291,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         behavior: 'smooth'
       });
     }
-
     // 在滚动完成后更新状态
-    setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       this.checkScrollButtons();
       this.updateInkBarStyles();
     }, 300); // 滚动动画通常在300ms内完成
@@ -319,14 +303,11 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
    */
   checkScrollButtons(): void {
     if (!this.tabsNav || !this.tabsNavList || !this.isHorizontal) return;
-
     const container = this.tabsNav.nativeElement;
     const group = this.tabsNavList.nativeElement;
-
     // 获取导航包装器和滚动按钮的宽度
     let wrapperWidth = 0;
     const buttonWidth = 40; // 按钮宽度 + 间距
-
     // 优先使用导航包装器宽度
     if (this.navWrapper) {
       wrapperWidth = this.navWrapper.nativeElement.offsetWidth;
@@ -337,25 +318,19 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         wrapperWidth = navParent.parentElement.offsetWidth;
       }
     }
-
     // 计算实际可用容器宽度（减去按钮的空间）
     const availableWidth = Math.max(0, wrapperWidth - (buttonWidth * 2));
-
     // 内容宽度
     const contentWidth = group.scrollWidth;
-
     // 判断是否需要显示滚动按钮（内容宽度大于可用宽度）
     const hasOverflow = contentWidth > availableWidth;
-
     // 更新按钮显示状态
     const oldShowScrollNav = this.showScrollNav;
     this.showScrollNav = hasOverflow;
-
     if (hasOverflow) {
       // 更新按钮可用状态
       this.canScrollLeft = container.scrollLeft > 0;
       this.canScrollRight = container.scrollLeft + container.clientWidth < contentWidth;
-
       // 如果出现滚动按钮但滚动位置为0，可能需要将内容移动到左侧
       // 特别是在居中或靠右模式下切换到滚动模式时
       if (oldShowScrollNav !== this.showScrollNav && container.scrollLeft === 0) {
@@ -365,18 +340,15 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     } else {
       this.canScrollLeft = false;
       this.canScrollRight = false;
-
       // 如果不需要滚动但有滚动位置，则重置
       if (container.scrollLeft > 0) {
         container.scrollLeft = 0;
       }
     }
-
     // 状态变化时更新视图
     if (oldShowScrollNav !== this.showScrollNav) {
       // 强制更新一次ink-bar位置
       this.updateInkBarStyles();
-
       // 触发变更检测
       this.cdr.detectChanges();
     } else if (this.showScrollNav) {
@@ -390,13 +362,10 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
    */
   recalculateAll(): void {
     if (!this.tabsNav || !this.tabsNavList) return;
-
     // 强制检查滚动按钮
     this.checkScrollButtons();
-
     // 更新选中标签的指示器样式
     this.updateInkBarStyles();
-
     // 确保选中的标签可见
     if (this.tabElements && this.tabElements.length > 0) {
       this.scrollToActiveTab();
@@ -410,7 +379,10 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     return this.tabPosition === 'top' || this.tabPosition === 'bottom';
   }
 
-  private setupResizeObserver(): void {
+  /**
+   * 设置窗口大小改变监听
+   */
+  setupResizeObserver(): void {
     if (typeof ResizeObserver !== 'undefined') {
       this.ngZone.runOutsideAngular(() => {
         this.resizeObserver = new ResizeObserver(() => {
@@ -434,10 +406,12 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
     }
   }
 
+  /**
+   * 构建所有标签
+   */
   private buildAllTabs(): void {
     // 保存旧的标签数量
     const oldTabsCount = this.allTabs.length;
-
     this.allTabs = [
       ...this.tabComponents?.map(tab => ({
         key: tab.key,
@@ -447,13 +421,11 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         customTitle: tab.customTemplate
       })) || []
     ];
-
     // 如果是新增标签，自动选中新标签
     if (this.allTabs.length > oldTabsCount && oldTabsCount > 0) {
       this.selectedIndex = this.allTabs.length - 1;
       this.selectedIndexChange.emit(this.selectedIndex);
       this.selectChange.emit(this.allTabs[this.selectedIndex]);
-      
       // 如果启用了懒加载，将新标签添加到已加载集合中
       if (this.lazyLoad) {
         this.loadedTabs.add(this.selectedIndex);
@@ -464,41 +436,41 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       this.selectedIndexChange.emit(this.selectedIndex);
       if (this.allTabs.length > 0) {
         this.selectChange.emit(this.allTabs[this.selectedIndex]);
-        
+
         // 如果启用了懒加载，将新选中的标签添加到已加载集合中
         if (this.lazyLoad) {
           this.loadedTabs.add(this.selectedIndex);
         }
       }
     }
-
     // 强制触发变更检测以更新DOM
     this.cdr.detectChanges();
-
     // 在DOM更新后执行滚动
-    setTimeout(() => {
+    this.utilsService.delayExecution(() => {
       this.checkScrollButtons();
-
       // 如果是新增标签，确保滚动到新标签位置
       if (this.allTabs.length > oldTabsCount) {
         this.scrollToActiveTab();
       }
-
       // 最后更新ink-bar位置
       this.updateInkBarStyles();
     }, 0);
   }
 
+  /**
+   * 更新选中的标签索引
+   */
   private updateSelectedIndex(): void {
     this.cdr.markForCheck();
     this.updateInkBarStyles();
     this.scrollToActiveTab();
   }
 
+  /**
+   * 更新墨条样式
+   */
   private updateInkBarStyles(): void {
-    if (this.type !== 'line' || this.allTabs.length === 0) {
-      return;
-    }
+    if (this.type !== 'line' || this.allTabs.length === 0) return;
     if (this.tabElements && this.tabElements.length > this.selectedIndex) {
       const activeElement = this.tabElements.toArray()[this.selectedIndex].nativeElement;
       if (activeElement) {
@@ -506,23 +478,17 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         return;
       }
     }
-    const tabElements = document.querySelectorAll('.lib-tabs-tab');
-    if (tabElements && tabElements.length > this.selectedIndex) {
-      const activeElement = tabElements[this.selectedIndex] as HTMLElement;
-      if (activeElement) {
-        this.setInkBarStyles(activeElement);
-      }
-    }
   }
 
+  /**
+   * 设置墨条样式
+   */
   private setInkBarStyles(element: HTMLElement): void {
     if (!this.tabsNavList) return;
-
     // 使用简单的方式设置ink-bar样式
     // 由于ink-bar现在在nav-list内部，无需考虑滚动位置
     const tabWidth = element.offsetWidth;
     const tabLeft = element.offsetLeft;
-
     this.inkBarStyle = {
       width: `${tabWidth}px`,
       left: `${tabLeft}px`,
@@ -530,7 +496,6 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
       top: this.tabPosition === 'top' ? 'auto' : '0',
       bottom: this.tabPosition === 'top' ? '0' : 'auto'
     };
-
     this.cdr.markForCheck();
   }
 
@@ -539,10 +504,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
    */
   private setupScrollListener(): void {
     if (!this.tabsNav || !this.tabsNavList) return;
-
     const navContainer = this.tabsNav.nativeElement;
     const navList = this.tabsNavList.nativeElement;
-
     // 处理常规滚动事件
     const scrollHandler = () => {
       this.ngZone.run(() => {
@@ -551,10 +514,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         this.updateInkBarStyles();
       });
     };
-
     // 添加滚动事件监听
     navContainer.addEventListener('scroll', scrollHandler, { passive: true });
-
     // 处理鼠标滚轮事件实现水平滚动
     const wheelHandler = (event: WheelEvent) => {
       if (!this.showScrollNav) return; // 不需要滚动时不处理
@@ -581,10 +542,8 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
         behavior: 'smooth'
       });
     };
-
     // 添加滚轮事件监听（在navList上，因为navContainer可能已经有其他滚轮事件）
     navList.addEventListener('wheel', wheelHandler, { passive: false });
-
     // 保存引用以便在销毁时移除
     (this as any)._scrollHandler = scrollHandler;
     (this as any)._wheelHandler = wheelHandler;
@@ -595,16 +554,13 @@ export class TabsComponent implements OnChanges, AfterContentInit, AfterViewInit
    */
   private removeScrollListener(): void {
     if (!this.tabsNav || !this.tabsNavList) return;
-
     const navContainer = this.tabsNav.nativeElement;
     const navList = this.tabsNavList.nativeElement;
-
     // 移除常规滚动事件监听
     if ((this as any)._scrollHandler) {
       navContainer.removeEventListener('scroll', (this as any)._scrollHandler);
       (this as any)._scrollHandler = null;
     }
-
     // 移除滚轮事件监听
     if ((this as any)._wheelHandler) {
       navList.removeEventListener('wheel', (this as any)._wheelHandler);

@@ -185,8 +185,6 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   complexTableObj: { data: any, totalRows: number } = { data: [], totalRows: 0 };
 
   constructor(
-    private elementRef: ElementRef,
-    private renderer: Renderer2,
     public cdr: ChangeDetectorRef,
     private utilsService: UtilsService,
     @Optional() public widgetSource: WidgetSource

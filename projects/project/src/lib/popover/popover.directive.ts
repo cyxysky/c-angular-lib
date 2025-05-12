@@ -1,4 +1,4 @@
-import { Directive, TemplateRef, Input, ElementRef, HostListener, SimpleChanges, ComponentRef, EventEmitter, Output } from '@angular/core';
+import { Directive, TemplateRef, Input, ElementRef, HostListener, SimpleChanges, ComponentRef, EventEmitter, Output, booleanAttribute } from '@angular/core';
 import { OverlayBasicDirective, OverlayBasicPosition, OverlayBasicPositionConfigs, OverlayBasicTrigger } from '../core/overlay/overlay-basic.directive';
 import { OverlayRef, Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -11,32 +11,38 @@ import { UtilsService } from '../core/utils/utils.service';
 })
 export class PopoverDirective implements OverlayBasicDirective {
   /** 提示内容 */
-  @Input('popoverContent') popoverContent: string | TemplateRef<any> = '';
+  @Input({ alias: 'popoverContent', required: true }) popoverContent: string | TemplateRef<any> = '';
   /** 提示标题 */
-  @Input('popoverTitle') popoverTitle: string | TemplateRef<any> = '';
+  @Input({ alias: 'popoverTitle', required: true }) popoverTitle: string | TemplateRef<any> = '';
   /** 提示位置 */
-  @Input('popoverPlacement') placement: OverlayBasicPosition = 'top';
+  @Input({ alias: 'popoverPlacement' }) placement: OverlayBasicPosition = 'top';
   /** 提示触发方式 */
-  @Input('popoverTrigger') trigger: OverlayBasicTrigger = 'hover';
+  @Input({ alias: 'popoverTrigger' }) trigger: OverlayBasicTrigger = 'hover';
   /** 气泡类 */
-  @Input('popoverClass') popoverClass: string = '';
+  @Input({ alias: 'popoverClass' }) popoverClass: string = '';
   /** 提示是否显示 */
-  @Input('popoverVisible') visible: boolean = false;
+  @Input({ alias: 'popoverVisible', transform: booleanAttribute }) visible: boolean = false;
   /** 是否严格由编程控制显示 */
-  @Input('popoverStrictVisiable') strictVisiable: boolean = false;
+  @Input({ alias: 'popoverStrictVisiable', transform: booleanAttribute }) strictVisiable: boolean = false;
   /** 提示鼠标进入延迟 */
-  @Input('popoverMouseEnterDelay') mouseEnterDelay: number = 50;
+  @Input({ alias: 'popoverMouseEnterDelay' }) mouseEnterDelay: number = 50;
   /** 提示鼠标离开延迟 */
-  @Input('popoverMouseLeaveDelay') mouseLeaveDelay: number = 200;
+  @Input({ alias: 'popoverMouseLeaveDelay' }) mouseLeaveDelay: number = 200;
   /** 提示显示状态改变事件 */
   @Output('popoverVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  /** 气泡 */ 
   private overlayRef: OverlayRef | null = null;
+  /** 进入计时器 */
   private enterTimer: any;
+  /** 离开计时器 */
   private leaveTimer: any;
+  /** 气泡组件 */
   private popoverComponentRef: ComponentRef<PopoverComponent> | null = null;
+  /** 组件悬停 */
   private componentHover: boolean = false;
-  public isDropDownVisible: boolean = false;
+  /** 是否显示 */
+  private isVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -115,7 +121,7 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 显示
    */
   public show(): void {
-    if (!this.strictVisiable && this.isDropDownVisible) return;
+    if (this.isVisible) return;
     this.closePopover();
     const positions = this.overlayService.getPositions(this.placement);
     this.overlayRef = this.overlayService.createOverlay(
@@ -168,7 +174,7 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 隐藏
    */
   public hide(): void {
-    if (!this.visible || this.componentHover) return;
+    if (!this.isVisible || this.componentHover) return;
     this.changeVisible(false);
     this.utilsService.delayExecution(() => {
       this.closePopover();
@@ -181,7 +187,7 @@ export class PopoverDirective implements OverlayBasicDirective {
    */
   changeVisible(visible: boolean): void {
     this.visible = visible;
-    this.isDropDownVisible = visible;
+    this.isVisible = visible;
     this.visibleChange.emit(this.visible);
     this.popoverComponentRef?.setInput('isVisible', visible);
   }
@@ -206,10 +212,8 @@ export class PopoverDirective implements OverlayBasicDirective {
    * 关闭
    */
   public closePopover(): void {
-    if (this.overlayRef) {
-      this.overlayRef.detach();
-      this.overlayRef.dispose();
-    }
+    this.overlayRef?.detach();
+    this.overlayRef?.dispose();
     this.overlayRef = null;
     this.popoverComponentRef = null;
   }

@@ -32,6 +32,7 @@ import { DynamicTableComponent } from '@project';
 import { UserSelectComponent } from '@project';
 import { DocMenuComponent } from '../doc/doc-menu/doc-menu.component';
 import { DocTableComponent } from '../doc/doc-table/doc-table.component';
+import { DocChartComponent } from '../doc/doc-chart/doc-chart.component';
 export const routes: Routes = [
     {
         path: 'popconfirm',
@@ -164,5 +165,9 @@ export const routes: Routes = [
     {
         path: 'table',
         component: DocTableComponent
+    },
+    {
+        path: 'chart',
+        component: DocChartComponent
     }
 ];

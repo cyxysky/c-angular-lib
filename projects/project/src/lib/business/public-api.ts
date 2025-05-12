@@ -8,3 +8,4 @@ export * from './process-tree/process-tree.component';
 export * from './process-tree/process-tree.component';
 export * from './structure-tree/structure-tree.component';
 export * from './user-select/user-select.component';
+export * from './chart';

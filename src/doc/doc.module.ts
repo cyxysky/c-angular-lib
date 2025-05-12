@@ -27,7 +27,7 @@ import { DocDrawerComponent } from './doc-drawer/doc-drawer.component';
 import { DocDropMenuComponent } from './doc-drop-menu/doc-drop-menu.component';
 import { DocMenuComponent } from './doc-menu/doc-menu.component';
 import { DocTableComponent } from './doc-table/doc-table.component';
-
+import { DocChartComponent } from './doc-chart/doc-chart.component';
 
 @NgModule({
   declarations: [],
@@ -59,7 +59,8 @@ import { DocTableComponent } from './doc-table/doc-table.component';
     DocDrawerComponent,
     DocDropMenuComponent,
     DocMenuComponent,
-    DocTableComponent
+    DocTableComponent,
+    DocChartComponent
   ],
   exports: [
     DocButtonComponent,
@@ -88,7 +89,8 @@ import { DocTableComponent } from './doc-table/doc-table.component';
     DocDrawerComponent,
     DocDropMenuComponent,
     DocMenuComponent,
-    DocTableComponent
+    DocTableComponent,
+    DocChartComponent
   ]
 })
 export class DocModule { }

@@ -214,7 +214,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    * 打开下拉菜单
    */
   public openDropdown(): void {
-    this.focusSearch();
     if (this.disabled || this.isDropdownOpen) return;
     document.addEventListener('keydown', this.enhancedKeyboardHandler);
     // 重置临时选中路径为当前实际选中路径
@@ -224,7 +223,9 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.keyboardNavIndex = -1;
     this.isOverlayOpen = true;
     this.cdr.detectChanges();
-    this.changeDropdownVisiable(true);
+    this.utilsService.delayExecution(() => {
+      this.changeDropdownVisiable(true);
+    });
   }
 
   /**
@@ -232,7 +233,6 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
    */
   public closeDropdown(): void {
     if (!this.isDropdownOpen) return;
-    this.blurSearch();
     this.changeDropdownVisiable(false);
     this.utilsService.delayExecution(() => {
       document.removeEventListener('keydown', this.enhancedKeyboardHandler);
@@ -250,6 +250,7 @@ export class CascaderComponent implements OnInit, OnDestroy, ControlValueAccesso
   public changeDropdownVisiable(visiable: boolean): void {
     this.isDropdownOpen = visiable;
     this.visibleChange.emit(visiable);
+    visiable ? this.focusSearch() : this.blurSearch();
     this.cdr.detectChanges();
   }
 

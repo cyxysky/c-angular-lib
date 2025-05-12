@@ -13,23 +13,23 @@ import { UtilsService } from '../core/utils/utils.service';
 })
 export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirective {
   /** 提示内容 */
-  @Input('tooltip') tooltipContent: string | TemplateRef<any> = '';
+  @Input({ alias: 'tooltip', required: true }) tooltipContent: string | TemplateRef<any> = '';
   /** 提示位置 */
-  @Input('tooltipPlacement') placement: OverlayBasicPosition = 'top';
+  @Input({ alias: 'tooltipPlacement' }) placement: OverlayBasicPosition = 'top';
   /** 提示触发方式 */
-  @Input('tooltipTrigger') trigger: OverlayBasicTrigger = 'hover';
+  @Input({ alias: 'tooltipTrigger' }) trigger: OverlayBasicTrigger = 'hover';
   /** 提示是否显示 */
-  @Input('tooltipVisible') visible: boolean = false;
+  @Input({ alias: 'tooltipVisible' }) visible: boolean = false;
   /** 是否严格由编程控制显示 */
-  @Input('tooltipStrictVisiable') strictVisiable: boolean = false;
+  @Input({ alias: 'tooltipStrictVisiable' }) strictVisiable: boolean = false;
   /** 提示鼠标进入延迟 */
-  @Input('tooltipMouseEnterDelay') mouseEnterDelay: number = 50;
+  @Input({ alias: 'tooltipMouseEnterDelay' }) mouseEnterDelay: number = 50;
   /** 提示鼠标离开延迟 */
-  @Input('tooltipMouseLeaveDelay') mouseLeaveDelay: number = 200;
+  @Input({ alias: 'tooltipMouseLeaveDelay' }) mouseLeaveDelay: number = 200;
   /** 提示CSS类 */
-  @Input('tooltipClass') tooltipClass: string = '';
+  @Input({ alias: 'tooltipClass' }) tooltipClass: string = '';
   /** 提示颜色 */
-  @Input('tooltipColor') tooltipColor: string = '#000';
+  @Input({ alias: 'tooltipColor' }) tooltipColor: string = '#000';
   /** 提示显示状态改变事件 */
   @Output('tooltipVisibleChange') visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -43,7 +43,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
   private tooltipComponentRef: ComponentRef<TooltipComponent> | null = null;
   /** 组件悬停 */
   private componentHover: boolean = false;
-  public isDropDownVisible: boolean = false;
+  public isVisible: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -119,7 +119,7 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 显示tooltip
    */
   public show(): void {
-    if (!this.strictVisiable && (this.isDropDownVisible || !this.tooltipContent)) return;
+    if (this.isVisible || !this.tooltipContent) return;
     this.closeTooltip();
     const positions = this.overlayService.getPositions(this.placement);
     // 创建overlay
@@ -159,11 +159,22 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 隐藏tooltip
    */
   public hide(): void {
-    if (!this.visible || this.componentHover) return;
+    if (!this.isVisible || this.componentHover) return;
     this.changeVisible(false);
     this.utilsService.delayExecution(() => {
       this.closeTooltip();
     }, OverlayService.overlayVisiableDuration);
+  }
+
+  /**
+   * 改变tooltip显示状态
+   * @param visible 显示状态
+   */
+  public changeVisible(visible: boolean): void {
+    this.visible = visible;
+    this.isVisible = visible;
+    this.visibleChange.emit(this.visible);
+    this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', visible);
   }
 
   /**
@@ -185,24 +196,10 @@ export class TooltipDirective implements OnInit, OnDestroy, OverlayBasicDirectiv
    * 关闭tooltip
    */
   public closeTooltip(): void {
-    if (this.overlayRef) {
-      this.overlayRef.detach();
-      this.overlayRef.dispose();
-    }
+    this.overlayRef?.detach();
+    this.overlayRef?.dispose();
     this.overlayRef = null;
     this.tooltipComponentRef = null;
   }
-
-  /**
-   * 改变tooltip显示状态
-   * @param visible 显示状态
-   */
-  public changeVisible(visible: boolean): void {
-    this.visible = visible;
-    this.isDropDownVisible = visible;
-    this.visibleChange.emit(this.visible);
-    this.tooltipComponentRef && this.tooltipComponentRef.setInput('isVisible', visible);
-  }
-
 
 }

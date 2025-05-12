@@ -1,14 +1,12 @@
-import { Component, ElementRef, forwardRef, HostListener, Input, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, Input, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TooltipDirective, UtilsService } from '@project';
 import * as _ from 'lodash';
-
-interface Mark {
+export interface Mark {
   value: number;
   label: string;
 }
-
 @Component({
   selector: 'lib-slider',
   standalone: true,
@@ -24,20 +22,13 @@ interface Mark {
   encapsulation: ViewEncapsulation.None,
 })
 export class SliderComponent implements OnInit, ControlValueAccessor {
-  //#region 输入属性 (Inputs)
+  @ViewChild('sliderContainer') sliderContainer!: ElementRef<HTMLElement>;
   /** 最小值 */
   @Input({ alias: 'sliderMin' }) min = 0;
   /** 最大值 */
   @Input({ alias: 'sliderMax' }) max = 100;
   /** 步长 */
-  @Input({ alias: 'sliderStep' }) 
-  set step(value: number) {
-    // 确保步长为正整数
-    this._step = Math.max(1, Math.round(value));
-  }
-  get step(): number {
-    return this._step;
-  }
+  @Input({ alias: 'sliderStep', transform: (value: number) => Math.max(1, Math.round(value)) }) step = 1;
   /** 轨道颜色 */
   @Input({ alias: 'sliderTrackColor' }) trackColor = '#1890ff';
   /** 手柄颜色 */
@@ -52,44 +43,42 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   @Input({ alias: 'sliderTipFormatter' }) tipFormatter: ((value: number) => string) | null = null;
   /** 标签模板 */
   @Input({ alias: 'sliderLabelTemplate' }) labelTemplate: TemplateRef<any> | null = null;
-  //#endregion
 
-  //#region 内部状态变量
   /** 当前值（百分比） */
-  value = 0;
+  public value = 0;
   /** 范围值（百分比，[左值, 右值]） */
-  rangeValues = [0, 0];
+  public rangeValues = [0, 0];
   /** 轨道宽度 */
-  trackWidth = '0%';
+  public trackWidth = '0%';
   /** 刻度列表 */
-  markList: Mark[] = [];
+  public markList: Mark[] = [];
+  /** 单滑块手柄是否严格可见 */
+  public singalSliderHandleStrictVisible = false;
   /** 单滑块手柄是否可见 */
-  singalSliderHandleVisible = false;
+  public singalSliderHandleVisible = false;
+  /** 左滑块手柄是否严格可见 */
+  public rangeLeftSliderHandleStrictVisible = false;
   /** 左滑块手柄是否可见 */
-  rangeLeftSliderHandleVisible = false;
+  public rangeLeftSliderHandleVisible = false;
+  /** 右滑块手柄是否严格可见 */
+  public rangeRightSliderHandleStrictVisible = false;
   /** 右滑块手柄是否可见 */
-  rangeRightSliderHandleVisible = false;
+  public rangeRightSliderHandleVisible = false;
   /** 工具提示实例 */
-  private tooltip: TooltipDirective | null = null;
+  public tooltip: TooltipDirective | null = null;
   /** 是否正在拖动 */
-  private isDragging = false;
+  public isDragging = false;
   /** 当前操作的手柄索引 */
-  private currentHandle = 0;
-  /** 内部步长值 */
-  private _step = 1;
-  //#endregion
+  public currentHandle = 0;
 
-  //#region 构造函数
-  constructor(private elementRef: ElementRef, private utilsService: UtilsService) { }
-  //#endregion
+  constructor(
+    private utilsService: UtilsService
+  ) { }
 
-  //#region 生命周期钩子
   ngOnInit(): void {
     this.parseMarks();
   }
-  //#endregion
 
-  //#region 数据初始化与处理
   /**
    * 解析刻度标记
    */
@@ -101,38 +90,34 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
       }));
     }
   }
-  //#endregion
 
-  //#region 事件处理
   /**
    * 滑块手柄鼠标按下事件
    */
   onHandleMouseDown(event: MouseEvent, handleIndex: number, direction: 'left' | 'right' | 'single', tooltip: TooltipDirective): void {
     this.tooltip = tooltip;
-    
     // 设置相应手柄的可见状态
     switch (direction) {
       case 'left':
         this.rangeLeftSliderHandleVisible = true;
+        this.rangeLeftSliderHandleStrictVisible = true;
         break;
       case 'right':
         this.rangeRightSliderHandleVisible = true;
+        this.rangeRightSliderHandleStrictVisible = true;
         break;
       case 'single':
         this.singalSliderHandleVisible = true;
+        this.singalSliderHandleStrictVisible = true;
         break;
     }
-    
     event.preventDefault();
     event.stopPropagation();
-
     this.isDragging = true;
     this.currentHandle = handleIndex;
-
     // 注册全局事件
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
-
     this.onTouched();
   }
 
@@ -142,17 +127,10 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   @HostListener('click', ['$event'])
   onClick(event: MouseEvent): void {
     if (this.isDragging) return;
-
-    const sliderRect = this.elementRef.nativeElement.querySelector('.lib-slider-container').getBoundingClientRect();
-    const offsetX = event.clientX - sliderRect.left;
-    const percent = Math.min(Math.max(offsetX / sliderRect.width * 100, 0), 100);
+    const sliderRect = this.sliderContainer.nativeElement.getBoundingClientRect();
+    const percent = Math.min(Math.max((event.clientX - sliderRect.left) / sliderRect.width * 100, 0), 100);
     const newValue = this.valueFromPercent(percent);
-
-    if (this.isRange) {
-      this.handleRangeValueChange(newValue);
-    } else {
-      this.handleSingleValueChange(newValue);
-    }
+    this.isRange ? this.handleRangeValueChange(newValue) : this.handleSingleValueChange(newValue);
   }
 
   /**
@@ -160,17 +138,10 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
    */
   private onMouseMove = (event: MouseEvent): void => {
     if (!this.isDragging) return;
-
-    const sliderRect = this.elementRef.nativeElement.querySelector('.lib-slider-container').getBoundingClientRect();
-    const offsetX = event.clientX - sliderRect.left;
-    const percent = Math.min(Math.max(offsetX / sliderRect.width * 100, 0), 100);
+    const sliderRect = this.sliderContainer.nativeElement.getBoundingClientRect();
+    const percent = Math.min(Math.max((event.clientX - sliderRect.left) / sliderRect.width * 100, 0), 100);
     const newValue = this.valueFromPercent(percent);
-
-    if (this.isRange) {
-      this.handleRangeDrag(newValue);
-    } else {
-      this.handleSingleValueChange(newValue);
-    }
+    this.isRange ? this.handleRangeDrag(newValue) : this.handleSingleValueChange(newValue);
   };
 
   /**
@@ -178,17 +149,16 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
    */
   private onMouseUp = (): void => {
     this.isDragging = false;
-    console.log('onMouseUp');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
     this.singalSliderHandleVisible = false;
     this.rangeLeftSliderHandleVisible = false;
     this.rangeRightSliderHandleVisible = false;
-
+    this.singalSliderHandleStrictVisible = false;
+    this.rangeLeftSliderHandleStrictVisible = false;
+    this.rangeRightSliderHandleStrictVisible = false;
   };
-  //#endregion
 
-  //#region 值处理方法
   /**
    * 处理范围值变化
    */
@@ -200,7 +170,6 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     } else {
       this.rangeValues[1] = percentValue;
     }
-    
     this.updateRangeValues();
   }
 
@@ -210,14 +179,12 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   private handleRangeDrag(newValue: number): void {
     const percentValue = this.percentOf(newValue);
     this.rangeValues[this.currentHandle] = percentValue;
-
     // 确保左侧手柄不会超过右侧手柄，反之亦然
     if (this.currentHandle === 0 && this.rangeValues[0] > this.rangeValues[1]) {
       this.rangeValues[0] = this.rangeValues[1];
     } else if (this.currentHandle === 1 && this.rangeValues[1] < this.rangeValues[0]) {
       this.rangeValues[1] = this.rangeValues[0];
     }
-    
     this.updateRangeValues();
   }
 
@@ -227,7 +194,6 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   private updateRangeValues(): void {
     this.rangeValues = this.rangeValues.map(value => _.round(value));
     this.updateTrackWidth();
-    
     // 计算实际值并通知变更
     const actualValues = [
       this.valueFromPercent(this.rangeValues[0] / 100 * (this.max - this.min) + this.min),
@@ -251,7 +217,6 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
    */
   updateTrackWidth(): void {
     let value: string | TemplateRef<any> = '';
-    
     if (this.isRange) {
       // 范围模式下设置轨道宽度为两个值之间的差
       if (this.rangeLeftSliderHandleVisible) {
@@ -266,14 +231,11 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
       this.trackWidth = this.value + '%';
       value = this.toString(this.tipFormatter ? this.tipFormatter(this.value) : this.value);
     }
-    
     // 更新提示位置和内容
     this.tooltip?.updatePosition();
     this.tooltip?.updateContent(value);
   }
-  //#endregion
 
-  //#region 工具方法
   /**
    * 将实际值转换为百分比
    */
@@ -286,7 +248,6 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
    */
   valueFromPercent(percent: number): number {
     let rawValue = (percent / 100) * (this.max - this.min) + this.min;
-
     if (this.snapToMarks && this.marks) {
       // 找到最近的刻度值
       const markValues = Object.keys(this.marks).map(Number);
@@ -297,7 +258,6 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
       // 按步长对齐
       rawValue = Math.round(rawValue / this.step) * this.step;
     }
-
     // 确保最终值为整数
     return Math.round(rawValue);
   }
@@ -309,9 +269,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     if (value === undefined || value === null) return '';
     return value.toString().split('.')[0];
   }
-  //#endregion
 
-  //#region ControlValueAccessor 实现
   private onChange: (value: any) => void = () => { };
   private onTouched: () => void = () => { };
 
@@ -353,5 +311,4 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
   setDisabledState?(isDisabled: boolean): void {
     // 实现禁用状态逻辑
   }
-  //#endregion
 }

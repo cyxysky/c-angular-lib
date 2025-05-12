@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.bar-chart-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  margin: 8px 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.bar-tooltip {
+  position: absolute;
+  z-index: 10;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #ffffff;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  max-width: 240px;
+  overflow: hidden;
+  border-right-width: 5px;
+  border-right-style: solid;
+}
+
+.tooltip-content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  
+  &__wrapper {
+    padding: 12px;
+  }
+  
+  &__title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #222;
+    letter-spacing: -0.3px;
+  }
+  
+  &__data {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  &__label {
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  &__value {
+    font-weight: 500;
+    color: #000;
+    font-size: 13px;
+    padding: 4px 10px;
+    min-width: 60px;
+    text-align: center;
+  }
+}

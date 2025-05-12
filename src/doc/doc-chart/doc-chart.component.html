@@ -1,0 +1,158 @@
+<h1>Chart 图表</h1>
+
+<p>图表是数据可视化的重要组件，帮助用户直观地理解和分析数据。</p>
+
+<h2>何时使用</h2>
+<p>当需要展示数据趋势、比较数据大小或表示数据分布时，图表是理想的选择。柱状图特别适合比较不同类别的数据值。</p>
+
+<h2>代码演示</h2>
+
+<div class="chart-docs-grid">
+  <!-- 基本用法 -->
+  <app-doc-box title="基本柱状图" [sourceCode]="basicChartCode">
+    <div demo>
+      <lib-button (click)="refreshData()">刷新数据</lib-button>
+      <lib-bar [data]="basicData"></lib-bar>
+    </div>
+    <div description>
+      <p>最基本的柱状图用法，展示一组数据的比较。</p>
+      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>value</code>。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 自定义颜色 -->
+  <app-doc-box title="自定义颜色" [sourceCode]="colorChartCode">
+    <div demo>
+      <lib-bar [data]="basicData" [options]="colorOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过 <code>options</code> 属性中的 <code>barColors</code> 设置柱形颜色。</p>
+      <p>自定义颜色可以增强数据的视觉区分度或符合品牌标识。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 带标题的柱状图 -->
+  <app-doc-box title="带标题的柱状图" [sourceCode]="titleChartCode">
+    <div demo>
+      <lib-bar [data]="salesData" [options]="titleOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过 <code>options</code> 属性中的 <code>title</code> 添加图表标题。</p>
+      <p>标题可以帮助用户理解图表内容和上下文。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 无网格线 -->
+  <app-doc-box title="无网格线柱状图" [sourceCode]="noGridChartCode">
+    <div demo>
+      <lib-bar [data]="basicData" [options]="noGridOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过设置 <code>showGrid: false</code> 可以隐藏网格线，使图表更加简洁。</p>
+      <p>在数据精确度不是关键时，无网格线的样式更加美观。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 自定义圆角 -->
+  <app-doc-box title="自定义圆角" [sourceCode]="radiusChartCode">
+    <div demo>
+      <lib-bar [data]="basicData" [options]="radiusOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过设置 <code>borderRadius</code> 可以调整柱形的圆角大小。</p>
+      <p>更大的圆角可以创造现代、友好的视觉效果。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 无动画效果 -->
+  <app-doc-box title="无动画效果" [sourceCode]="noAnimateChartCode">
+    <div demo>
+      <lib-bar [data]="basicData" [options]="noAnimateOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过设置 <code>animate: false</code> 可以禁用图表的动画效果。</p>
+      <p>在某些场景下，如数据频繁更新时，禁用动画可能更合适。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 悬停效果 -->
+  <app-doc-box title="悬停效果" [sourceCode]="hoverChartCode">
+    <div demo>
+      <lib-bar [data]="basicData" [options]="hoverOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>通过设置 <code>hoverEffect</code> 可以启用悬停效果，包括贯穿柱形的辅助线和悬浮框。</p>
+      <p>将鼠标悬停在柱形上，可以看到垂直贯穿的虚线和显示数据的悬浮框。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 零值测试 -->
+  <app-doc-box title="零值处理测试" [sourceCode]="hoverChartCode">
+    <div demo>
+      <lib-bar [data]="zeroValueData" [options]="zeroValueOptions"></lib-bar>
+    </div>
+    <div description>
+      <p>当数据值为0时，不会显示柱形，同时将数值标签显示在基线上方。</p>
+      <p>这避免了因圆角设置导致在底部出现突出的半圆形问题。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 点击事件 -->
+  <app-doc-box title="点击事件" [sourceCode]="clickChartCode">
+    <div demo>
+      <lib-bar [data]="salesData" [options]="clickOptions"></lib-bar>
+      <div *ngIf="clickedItem" class="click-result">
+        <div class="click-result-title">点击结果：</div>
+        <div class="click-result-content">
+          <div>名称：{{ clickedItem.item.name }}</div>
+          <div>数值：{{ clickedItem.item.value }}</div>
+          <div>索引：{{ clickedItem.index }}</div>
+          <div>图表标题：{{ clickedItem.options.title || '无标题' }}</div>
+        </div>
+      </div>
+    </div>
+    <div description>
+      <p>通过设置 <code>onClick</code> 回调函数可以响应柱形的点击事件。</p>
+      <p>回调函数会接收一个包含完整上下文信息的对象，包括点击的数据项、索引、完整数据集、图表配置和点击事件等。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 自定义悬浮框 -->
+  <app-doc-box title="自定义悬浮框" [sourceCode]="customTooltipCode">
+    <div demo>
+      <lib-bar [data]="salesData" [options]="customTooltipOptions" [tooltipTemplate]="customTooltip"></lib-bar>
+      
+      <ng-template #customTooltip let-item>
+        <!-- 自定义悬浮框内容，右侧边框由组件设置 -->
+        <div style="display: flex; width: 100%; flex-direction: column;">
+          <div style="padding: 16px 18px;">
+            <div style="font-weight: 600; font-size: 16px; margin-bottom: 12px; color: #222; letter-spacing: -0.3px;">
+              {{item.name}}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">销售额</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatSalesValue(item.value)}}</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.value / 840) * 100).toFixed(1)}}%</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                <span style="color: #555; font-size: 13px; font-weight: 500;">详情</span>
+                <span style="font-weight: 500; color: #3498db; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center; cursor: pointer;">查看</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+    <div description>
+      <p>通过 <code>tooltipTemplate</code> 属性可以使用 Angular 模板自定义悬浮框的内容和样式。</p>
+      <p>右侧彩色边框会自动使用对应柱形的颜色，保持视觉一致性。</p>
+    </div>
+  </app-doc-box>
+</div>
+
+<h2>API</h2>
+<app-doc-api-table [apiData]="apiSections"></app-doc-api-table>

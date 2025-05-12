@@ -1,4 +1,8 @@
-<div class="c-lib-slider-container" [class.c-lib-slider-with-marks]="marks">
+<div 
+  #sliderContainer
+  class="c-lib-slider-container" 
+  [class.c-lib-slider-with-marks]="marks"
+  >
   <div class="c-lib-slider-rail"></div>
   <div 
     class="c-lib-slider-track" 
@@ -12,11 +16,12 @@
     [ngStyle]="{'left': value + '%', 'border-color': handleColor}"
     libTooltip
     #singalSliderTooltip="libTooltip"
-    [tooltipStrictVisiable]="singalSliderHandleVisible"
+    [tooltipStrictVisiable]="singalSliderHandleStrictVisible"
     [tooltip]="toString(tipFormatter ? tipFormatter(value) : value)"
     [tooltipVisible]="singalSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 0, 'single', singalSliderTooltip)"
-  ></div>
+    >
+  </div>
   
   <!-- 范围滑块 -->
   <div 
@@ -24,23 +29,25 @@
     class="c-lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[0] + '%', 'border-color': handleColor}"
     libTooltip
-    [tooltipStrictVisiable]="rangeLeftSliderHandleVisible"
+    [tooltipStrictVisiable]="rangeLeftSliderHandleStrictVisible"
     #rangeLeftSliderTooltip="libTooltip"
     [tooltip]="toString(tipFormatter ? tipFormatter(rangeValues[0]) : rangeValues[0])"
     [tooltipVisible]="rangeLeftSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 0, 'left', rangeLeftSliderTooltip)"
-  ></div>
+    >
+  </div>
   <div 
     *ngIf="isRange"
     class="c-lib-slider-handle" 
     [ngStyle]="{'left': rangeValues[1] + '%', 'border-color': handleColor}"
     libTooltip
-    [tooltipStrictVisiable]="rangeRightSliderHandleVisible"
+    [tooltipStrictVisiable]="rangeRightSliderHandleStrictVisible"
     #rangeRightSliderTooltip="libTooltip"
     [tooltip]="toString(tipFormatter ? tipFormatter(rangeValues[1]) : rangeValues[1])"
     [tooltipVisible]="rangeRightSliderHandleVisible"
     (mousedown)="onHandleMouseDown($event, 1, 'right', rangeRightSliderTooltip)"
-  ></div>
+    >
+  </div>
   
   <!-- 刻度 -->
   <div *ngIf="marks" class="c-lib-slider-marks">

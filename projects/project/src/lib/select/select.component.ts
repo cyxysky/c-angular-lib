@@ -210,7 +210,6 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
    * 打开弹窗
    */
   public openDropdown(): void {
-    this.focusSearchInput();
     if (this.disabled || this.isDropdownOpen) return;
     this.resetOptionList();
     this.initOptionsGroups();
@@ -218,7 +217,9 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     document.addEventListener('keydown', this.onKeyboardNavigate);
     this.isOverlayOpen = true;
     this.cdr.detectChanges();
-    this.changeDropdownVisiable(true);
+    this.utilsService.delayExecution(() => {
+      this.changeDropdownVisiable(true);
+    });
   }
 
   /**
@@ -242,6 +243,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   public changeDropdownVisiable(visiable: boolean): void {
     this.isDropdownOpen = visiable;
     this.visibleChange.emit(visiable);
+    visiable ? this.focusSearch() : this.blurSearch();
     this.cdr.detectChanges();
   }
 
@@ -323,7 +325,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
       return;
     }
     // 多选
-    this.focusSearchInput();
+    this.focusSearch();
     // 对于多选，检查值是否已经在数组中
     this.handleSelectionChange(value, this._data?.includes(value) ? 'remove' : 'add');
   }
@@ -426,8 +428,15 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
   /**
    * 聚焦搜索框
    */
-  public focusSearchInput(): void {
+  public focusSearch(): void {
     this.showSearch && this.searchInput && this.searchInput.focusSearchInput();
+  }
+
+  /**
+   * 失焦搜索框
+   */
+  public blurSearch(): void {
+    this.showSearch && this.searchInput && this.searchInput.blurSearchInput();
   }
 
   /**
@@ -607,7 +616,7 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
     this.cdr.detectChanges();
     // 滚动到可视区域
     this.utilsService.delayExecution(() => {
-      const activeElements = document.querySelectorAll('.option-active');
+      const activeElements = document.querySelectorAll('.c-lib-select-option-active');
       if (activeElements.length > 0) {
         (activeElements[0] as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
