@@ -3,9 +3,9 @@
 <p>图表是数据可视化的重要组件，帮助用户直观地理解和分析数据。</p>
 
 <h2>何时使用</h2>
-<p>当需要展示数据趋势、比较数据大小或表示数据分布时，图表是理想的选择。柱状图特别适合比较不同类别的数据值。</p>
+<p>当需要展示数据趋势、比较数据大小或表示数据分布时，图表是理想的选择。柱状图特别适合比较不同类别的数据值，饼图适合展示占比关系。</p>
 
-<h2>代码演示</h2>
+<h2>柱状图示例</h2>
 
 <div class="chart-docs-grid">
   <!-- 基本用法 -->
@@ -127,7 +127,7 @@
         <div class="click-result-title">点击结果：</div>
         <div class="click-result-content">
           <div>名称：{{ clickedItem.item.name }}</div>
-          <div>数值：{{ clickedItem.item.value }}</div>
+          <div>数值：{{ clickedItem.item.data }}</div>
           <div>索引：{{ clickedItem.index }}</div>
           <div>图表标题：{{ clickedItem.options.title || '无标题' }}</div>
         </div>
@@ -154,11 +154,11 @@
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">销售额</span>
-                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatSalesValue(item.item.value)}}</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatSalesValue(item.item.data)}}</span>
               </div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
-                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.item.value / 840) * 100).toFixed(1)}}%</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.item.data / 840) * 100).toFixed(1)}}%</span>
               </div>
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">详情</span>
@@ -184,12 +184,12 @@
         <div style="display: flex; width: 100%; flex-direction: column;">
           <div style="padding: 12px;">
             <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
-              {{data.series.name}} - {{data.item.name}}
+              {{data.series}} - {{data.item.name}}
             </div>
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">数值</span>
-                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatValue(data.item.value)}}</span>
+                <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatValue(data.item.data)}}</span>
               </div>
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="color: #555; font-size: 13px; font-weight: 500;">系列索引</span>
@@ -203,6 +203,90 @@
     <div description>
       <p>多系列图表的悬浮框可以显示更丰富的信息，包括系列名称、数据点名称和值。</p>
       <p>通过模板可以自定义显示内容和样式，增强用户体验。</p>
+    </div>
+  </app-doc-box>
+</div>
+
+<!-- 饼图示例部分 -->
+<h2>饼图示例</h2>
+
+<div class="chart-docs-grid">
+  <!-- 基本饼图 -->
+  <app-doc-box title="基本饼图" [sourceCode]="basicPieChartCode">
+    <div demo>
+      <lib-pie [data]="pieData" [options]="basicPieOptions"></lib-pie>
+    </div>
+    <div description>
+      <p>基本饼图用于展示不同类别数据的占比关系。</p>
+      <p>通过配置 <code>showLabels</code> 和 <code>showPercentage</code> 可以在扇区上显示名称和百分比。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 环形图 -->
+  <app-doc-box title="环形图" [sourceCode]="donutPieChartCode">
+    <div demo>
+      <lib-pie [data]="donutPieData" [options]="donutPieOptions"></lib-pie>
+    </div>
+    <div description>
+      <p>通过设置 <code>innerRadius</code> 可以创建环形图，适合在中心显示总计数据。</p>
+      <p>环形图比传统饼图更现代化，同时可以在中心区域显示附加信息。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 悬停效果饼图 -->
+  <app-doc-box title="悬停效果" [sourceCode]="hoverPieChartCode">
+    <div demo>
+      <lib-pie [data]="pieData" [options]="hoverPieOptions"></lib-pie>
+    </div>
+    <div description>
+      <p>通过设置 <code>hoverEffect</code> 可以启用悬停效果，包括悬浮框和扇区突出显示。</p>
+      <p>当鼠标悬停在扇区上时，扇区会向外突出并显示详细信息。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 饼图点击事件 -->
+  <app-doc-box title="点击事件" [sourceCode]="pieClickChartCode">
+    <div demo>
+      <lib-pie [data]="pieData" [options]="pieClickOptions"></lib-pie>
+      <div *ngIf="clickedPieItem" class="click-result">
+        <div class="click-result-title">点击结果：</div>
+        <div class="click-result-content">
+          <div>名称：{{ clickedPieItem.item.name }}</div>
+          <div>数值：{{ clickedPieItem.item.value }}</div>
+          <div>百分比：{{ clickedPieItem.item.percentage.toFixed(1) }}%</div>
+          <div>索引：{{ clickedPieItem.index }}</div>
+        </div>
+      </div>
+    </div>
+    <div description>
+      <p>通过设置 <code>onClick</code> 回调函数可以响应扇区的点击事件。</p>
+      <p>回调函数会接收包含完整上下文信息的对象，包括点击的扇区数据、索引和百分比等。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 图表类型切换 -->
+  <app-doc-box title="图表类型切换" [sourceCode]="toggleChartTypeCode">
+    <div demo>
+      <div style="margin-bottom: 16px;">
+        <lib-button (click)="toggleChartType()">
+          切换到{{ isBarChart ? '饼图' : '柱状图' }}
+        </lib-button>
+      </div>
+      
+      <ng-container *ngIf="isBarChart; else pieChartTemplate">
+        <lib-bar [data]="toggleChartData" [options]="toggleBarPieOptions"></lib-bar>
+      </ng-container>
+      
+      <ng-template #pieChartTemplate>
+        <lib-pie 
+          [data]="getPieDataFromBarData(toggleChartData)" 
+          [options]="toggleBarPieOptions">
+        </lib-pie>
+      </ng-template>
+    </div>
+    <div description>
+      <p>可以根据需要在柱状图和饼图之间切换，以不同方式可视化相同的数据。</p>
+      <p>柱状图适合比较类别之间的差异，而饼图更适合展示部分与整体的关系。</p>
     </div>
   </app-doc-box>
 </div>

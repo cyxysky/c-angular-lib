@@ -1,1 +1,45 @@
-<p>pie works!</p>
+<div class="pie-chart-container" #pieContainer>
+  <div class="canvas-container">
+    <canvas #pieCanvas (mouseleave)="handleCanvasMouseLeave($event)"></canvas>
+    
+    <!-- 悬浮框容器 -->
+    <div #pieTooltip class="pie-tooltip" 
+         [style.display]="hoveredIndex >= 0 ? 'flex' : 'none'"
+         [style.pointer-events]="isTooltipHoverable() ? 'auto' : 'none'"
+         [style.border-top-color]="hoveredIndex >= 0 ? getHoveredSliceColor() : ''">
+    </div>
+  </div>
+  
+  <!-- 图例容器 -->
+  <div class="chart-legend" *ngIf="showLegend()" [class]="'legend-position-' + getLegendPosition()">
+    <div class="legend-item" *ngFor="let item of processedData; let i = index" (click)="toggleSliceSelection(i)">
+      <div class="legend-color" [style.background-color]="item.color"></div>
+      <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">{{item.name}}</div>
+    </div>
+  </div>
+  
+  <!-- 默认悬浮框模板 -->
+  <ng-template #defaultTooltip let-data>
+    <div class="tooltip-content">
+      <div class="tooltip-content__wrapper">
+        <div class="tooltip-content__title">
+          {{data.item.name}}
+        </div>
+        <div class="tooltip-content__data">
+          <div class="tooltip-content__row">
+            <span class="tooltip-content__label">数值</span>
+            <span class="tooltip-content__value">
+              {{formatValue(data.item.value)}}
+            </span>
+          </div>
+          <div class="tooltip-content__row">
+            <span class="tooltip-content__label">比例</span>
+            <span class="tooltip-content__value">
+              {{formatPercentage(data.item.percentage)}}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

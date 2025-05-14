@@ -12,9 +12,9 @@
   
   <!-- 图例容器 -->
   <div class="chart-legend" *ngIf="showLegend()" [class]="'legend-position-' + getLegendPosition()">
-    <div class="legend-item" *ngFor="let series of chartSeries; let i = index" (click)="toggleSeriesVisibility(i)">
+    <div class="legend-item" *ngFor="let series of getSeriesNames(); let i = index" (click)="toggleSeriesVisibility(i)">
       <div class="legend-color" [style.background-color]="getSeriesColor(i)"></div>
-      <div class="legend-name" [class.legend-disabled]="!isSeriesVisible(i)">{{series.name}}</div>
+      <div class="legend-name" [class.legend-disabled]="!isSeriesVisible(i)">{{series}}</div>
     </div>
   </div>
   
@@ -23,19 +23,19 @@
     <div class="tooltip-content">
       <div class="tooltip-content__wrapper">
         <div class="tooltip-content__title">
-          {{data.series.name}} - {{data.item.name}}
+          {{data.series}} - {{data.item.name}}
         </div>
         <div class="tooltip-content__data">
           <div class="tooltip-content__row">
             <span class="tooltip-content__label">数值</span>
             <span class="tooltip-content__value">
-              {{formatValue(data.item.value)}}
+              {{formatValue(data.item.data)}}
             </span>
           </div>
           <div class="tooltip-content__row">
             <span class="tooltip-content__label">比例</span>
             <span class="tooltip-content__value">
-              {{calculatePercentage(data.item.value, data.seriesIndex)}}%
+              {{calculatePercentage(data.item.data, data.seriesIndex)}}%
             </span>
           </div>
         </div>

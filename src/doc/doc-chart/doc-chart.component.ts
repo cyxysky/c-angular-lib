@@ -3,84 +3,192 @@ import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { CommonModule } from '@angular/common';
-import { ChartData, BarChartOptions, BarComponent, ButtonComponent, ChartSeries } from '@project';
+import { BarChartData, BarChartOptions, BarComponent, ButtonComponent, PieChartData, PieChartOptions, PieComponent } from '@project';
 
 @Component({
   selector: 'app-doc-chart',
   standalone: true,
-  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, BarComponent, ButtonComponent],
+  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, BarComponent, ButtonComponent, PieComponent],
   templateUrl: './doc-chart.component.html',
   styleUrl: './doc-chart.component.less'
 })
 export class DocChartComponent {
   // 基础数据
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 },
-    { name: '七月', value: 80 },
-    { name: '八月', value: 90 },
-    { name: '九月', value: 100 },
-    { name: '十月', value: 110 },
-    { name: '十一月', value: 120 },
-    { name: '十二月', value: 130 }
+  basicData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 },
+    { name: '四月', data: 45 },
+    { name: '五月', data: 70 },
+    { name: '六月', data: 50 },
+    { name: '七月', data: 80 },
+    { name: '八月', data: 90 },
+    { name: '九月', data: 100 },
+    { name: '十月', data: 110 },
+    { name: '十一月', data: 120 },
+    { name: '十二月', data: 130 }
   ];
   
+  // 销售数据，需要在toggleChartData前定义
+  salesData: BarChartData[] = [
+    { name: '一季度', data: 120 },
+    { name: '二季度', data: 180 },
+    { name: '三季度', data: 240 },
+    { name: '四季度', data: 300 }
+  ];
+  
+  // 饼图数据
+  pieData: PieChartData[] = [
+    { name: '产品A', value: 335 },
+    { name: '产品B', value: 210 },
+    { name: '产品C', value: 180 },
+    { name: '产品D', value: 120 },
+    { name: '产品E', value: 75 }
+  ];
+  
+  // 饼图基础配置选项
+  basicPieOptions: PieChartOptions = {
+    title: '产品销售占比',
+    showLabels: true,
+    showPercentage: true,
+    showLegend: true,
+    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+    animate: true
+  };
+  
+  // 环形图选项
+  donutPieOptions: PieChartOptions = {
+    title: '预算分配',
+    innerRadius: 80,
+    donutText: '总计: 920',
+    showLegend: true,
+    legend: {
+      position: 'right'
+    },
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6']
+  };
+  
+  // 环形图数据
+  donutPieData: PieChartData[] = [
+    { name: '研发', value: 350 },
+    { name: '营销', value: 250 },
+    { name: '运营', value: 180 },
+    { name: '客服', value: 140 }
+  ];
+  
+  // 悬停效果饼图选项
+  hoverPieOptions: PieChartOptions = {
+    title: '区域销售分布',
+    showLabels: true,
+    showPercentage: true,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      expandSlice: true,
+      expandRadius: 10
+    }
+  };
+  
+  // 图表切换数据和选项
+  toggleChartData = [...this.salesData];
+  
+  isBarChart: boolean = true;
+  
+  barChartOptions: BarChartOptions = {
+    title: '季度销售数据',
+    barColors: ['#3498db'],
+    borderRadius: 6
+  };
+  
+  pieChartOptions: PieChartOptions = {
+    title: '季度销售分布',
+    showPercentage: true,
+    showLegend: true,
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
+  };
+  
+  get toggleBarPieOptions(): any {
+    return this.isBarChart ? this.barChartOptions : this.pieChartOptions;
+  }
+  
+  // 饼图点击事件
+  clickedPieItem: any = null;
+  
+  // 饼图点击事件选项
+  pieTotalValue: number = 0;
+  
+  pieClickOptions: PieChartOptions = {
+    title: '产品分类比例',
+    showPercentage: true,
+    showLegend: true,
+    onClick: (info) => {
+      this.clickedPieItem = info;
+      console.log('点击了扇区:', info);
+    }
+  };
+  
   // 多系列数据
-  multiSeriesData: ChartSeries[] = [
+  multiSeriesData: BarChartData[] = [
     {
       name: '2022年',
-      data: [
-        { name: '一季度', value: 120 },
-        { name: '二季度', value: 150 },
-        { name: '三季度', value: 180 },
-        { name: '四季度', value: 210 }
+      series: '2022年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 120 },
+        { name: '二季度', data: 150 },
+        { name: '三季度', data: 180 },
+        { name: '四季度', data: 210 }
       ]
     },
     {
       name: '2023年',
-      data: [
-        { name: '一季度', value: 140 },
-        { name: '二季度', value: 170 },
-        { name: '三季度', value: 200 },
-        { name: '四季度', value: 250 }
+      series: '2023年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 140 },
+        { name: '二季度', data: 170 },
+        { name: '三季度', data: 200 },
+        { name: '四季度', data: 250 }
       ]
     }
   ];
   
   // 自定义多系列数据
-  customMultiSeriesData: ChartSeries[] = [
+  customMultiSeriesData: BarChartData[] = [
     {
       name: '北京',
+      series: '北京',
       color: '#FF6384',
-      data: [
-        { name: '一季度', value: 180 },
-        { name: '二季度', value: 200 },
-        { name: '三季度', value: 220 },
-        { name: '四季度', value: 270 }
+      data: 0,
+      children: [
+        { name: '一季度', data: 180 },
+        { name: '二季度', data: 200 },
+        { name: '三季度', data: 220 },
+        { name: '四季度', data: 270 }
       ]
     },
     {
       name: '上海',
+      series: '上海',
       color: '#36A2EB',
-      data: [
-        { name: '一季度', value: 160 },
-        { name: '二季度', value: 190 },
-        { name: '三季度', value: 210 },
-        { name: '四季度', value: 240 }
+      data: 0,
+      children: [
+        { name: '一季度', data: 160 },
+        { name: '二季度', data: 190 },
+        { name: '三季度', data: 210 },
+        { name: '四季度', data: 240 }
       ]
     },
     {
       name: '广州',
+      series: '广州',
       color: '#FFCE56',
-      data: [
-        { name: '一季度', value: 140 },
-        { name: '二季度', value: 170 },
-        { name: '三季度', value: 200 },
-        { name: '四季度', value: 230 }
+      data: 0,
+      children: [
+        { name: '一季度', data: 140 },
+        { name: '二季度', data: 170 },
+        { name: '三季度', data: 200 },
+        { name: '四季度', data: 230 }
       ]
     }
   ];
@@ -115,13 +223,13 @@ export class DocChartComponent {
   };
 
   // 包含零值的测试数据
-  zeroValueData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 0 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 0 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 0 }
+  zeroValueData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 0 },
+    { name: '三月', data: 61 },
+    { name: '四月', data: 0 },
+    { name: '五月', data: 70 },
+    { name: '六月', data: 0 }
   ];
 
   // 零值测试选项
@@ -130,14 +238,6 @@ export class DocChartComponent {
     barColors: ['#3498db'],
     borderRadius: 8
   };
-
-  // 销售数据
-  salesData: ChartData[] = [
-    { name: '一季度', value: 120 },
-    { name: '二季度', value: 180 },
-    { name: '三季度', value: 240 },
-    { name: '四季度', value: 300 }
-  ];
 
   // 自定义颜色选项
   colorOptions: BarChartOptions = {
@@ -214,26 +314,93 @@ export class DocChartComponent {
   };
 
   // 格式化销售额
-  formatSalesValue(value: number): string {
-    return value + ' 元';
+  formatSalesValue(value: number | undefined): string {
+    if (typeof value === 'number') {
+      return value + ' 元';
+    }
+    return '0 元';
   }
   
   // 格式化数值（通用）
-  formatValue(value: number): string {
-    return value.toString();
+  formatValue(value: number | undefined): string {
+    if (typeof value === 'number') {
+      return value.toString();
+    }
+    return '0';
   }
 
   refreshData() {
     this.basicData = this.basicData.map(item => ({
       ...item,
-      value: Math.floor(Math.random() * 100)
+      data: Math.floor(Math.random() * 100)
+    }));
+  }
+
+  // 切换图表类型
+  toggleChartType() {
+    this.isBarChart = !this.isBarChart;
+  }
+  
+  // 计算饼图的总值
+  calculatePieTotal(data: PieChartData[]): number {
+    return data.reduce((sum, item) => sum + item.value, 0);
+  }
+  
+  // 获取点击扇区的百分比
+  getPiePercentage(value: number): string {
+    if (!this.pieTotalValue) {
+      this.pieTotalValue = this.calculatePieTotal(this.pieData);
+    }
+    return ((value / this.pieTotalValue) * 100).toFixed(1);
+  }
+
+  // 将柱状图数据转换为饼图数据
+  getPieDataFromBarData(barData: BarChartData[]): PieChartData[] {
+    return barData.map(item => ({
+      name: item.name,
+      value: typeof item.data === 'number' ? item.data : 0
     }));
   }
 
   // API 数据定义
   apiSections: ApiData[] = [
     {
-      title: 'ChartData 数据接口',
+      title: 'BarChartData 数据接口',
+      items: [
+        {
+          name: 'name',
+          description: '数据项名称',
+          type: 'string',
+          default: '-'
+        },
+        {
+          name: 'data',
+          description: '数据项值，可以是单个数字或数字数组',
+          type: 'number | number[]',
+          default: '-'
+        },
+        {
+          name: 'color',
+          description: '数据项颜色（可选）',
+          type: 'string',
+          default: '-'
+        },
+        {
+          name: 'children',
+          description: '子数据数组，用于多系列数据（可选）',
+          type: 'BarChartData[]',
+          default: '-'
+        },
+        {
+          name: 'series',
+          description: '系列名称，用于图例显示（可选）',
+          type: 'string',
+          default: '-'
+        }
+      ]
+    },
+    {
+      title: 'PieChartData 数据接口',
       items: [
         {
           name: 'name',
@@ -249,31 +416,184 @@ export class DocChartComponent {
         },
         {
           name: 'color',
-          description: '数据项颜色（可选）',
+          description: '扇区颜色（可选）',
           type: 'string',
+          default: '-'
+        },
+        {
+          name: 'percentage',
+          description: '百分比（可选，组件内部计算）',
+          type: 'number',
+          default: '-'
+        },
+        {
+          name: 'selected',
+          description: '是否选中（可选）',
+          type: 'boolean',
+          default: 'true'
+        }
+      ]
+    },
+    {
+      title: 'PieChartOptions 配置选项',
+      items: [
+        {
+          name: 'width',
+          description: '图表宽度',
+          type: 'number',
+          default: '基于容器'
+        },
+        {
+          name: 'height',
+          description: '图表高度',
+          type: 'number',
+          default: '基于容器'
+        },
+        {
+          name: 'colors',
+          description: '扇区颜色数组，按顺序循环使用',
+          type: 'string[]',
+          default: "['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']"
+        },
+        {
+          name: 'backgroundColor',
+          description: '图表背景颜色',
+          type: 'string',
+          default: "'#ffffff'"
+        },
+        {
+          name: 'innerRadius',
+          description: '内圆半径（用于创建环形图）',
+          type: 'number',
+          default: '0'
+        },
+        {
+          name: 'outerRadius',
+          description: '外圆半径',
+          type: 'number',
+          default: '自动计算'
+        },
+        {
+          name: 'startAngle',
+          description: '起始角度',
+          type: 'number',
+          default: '0'
+        },
+        {
+          name: 'endAngle',
+          description: '结束角度',
+          type: 'number',
+          default: '2π'
+        },
+        {
+          name: 'showLabels',
+          description: '是否显示标签',
+          type: 'boolean',
+          default: 'false'
+        },
+        {
+          name: 'showPercentage',
+          description: '是否显示百分比',
+          type: 'boolean',
+          default: 'false'
+        },
+        {
+          name: 'showLegend',
+          description: '是否显示图例',
+          type: 'boolean',
+          default: 'false'
+        },
+        {
+          name: 'donutText',
+          description: '环形图中心文本',
+          type: 'string',
+          default: '-'
+        },
+        {
+          name: 'animate',
+          description: '是否启用动画效果',
+          type: 'boolean',
+          default: 'true'
+        },
+        {
+          name: 'title',
+          description: '图表标题',
+          type: 'string',
+          default: '-'
+        },
+        {
+          name: 'onClick',
+          description: '扇区点击回调函数',
+          type: 'function',
           default: '-'
         }
       ]
     },
     {
-      title: 'ChartSeries 系列接口',
+      title: 'PieChartOptions.legend 图例配置',
       items: [
         {
-          name: 'name',
-          description: '系列名称，用于图例显示',
-          type: 'string',
-          default: '-'
+          name: 'position',
+          description: '图例位置',
+          type: "string ('top' | 'bottom' | 'left' | 'right')",
+          default: "'bottom'"
         },
+        {
+          name: 'align',
+          description: '图例对齐方式',
+          type: "string ('start' | 'center' | 'end')",
+          default: "'center'"
+        }
+      ]
+    },
+    {
+      title: 'PieChartOptions.hoverEffect 悬停效果配置',
+      items: [
+        {
+          name: 'enabled',
+          description: '是否启用悬停效果',
+          type: 'boolean',
+          default: 'true'
+        },
+        {
+          name: 'showTooltip',
+          description: '是否显示悬浮框',
+          type: 'boolean',
+          default: 'true'
+        },
+        {
+          name: 'expandSlice',
+          description: '是否放大悬停的扇区',
+          type: 'boolean',
+          default: 'false'
+        },
+        {
+          name: 'expandRadius',
+          description: '放大的距离',
+          type: 'number',
+          default: '10'
+        }
+      ]
+    },
+    {
+      title: 'PieComponent Inputs',
+      items: [
         {
           name: 'data',
-          description: '系列中的数据点',
-          type: 'ChartData[]',
-          default: '-'
+          description: '饼图数据数组',
+          type: 'PieChartData[]',
+          default: '[]'
         },
         {
-          name: 'color',
-          description: '系列颜色（可选），如果设置则覆盖默认颜色',
-          type: 'string',
+          name: 'options',
+          description: '饼图配置选项',
+          type: 'PieChartOptions',
+          default: '{}'
+        },
+        {
+          name: 'tooltipTemplate',
+          description: '自定义悬浮框模板',
+          type: 'TemplateRef<{ $implicit: any }>',
           default: '-'
         }
       ]
@@ -431,7 +751,7 @@ export class DocChartComponent {
         {
           name: 'item',
           description: '点击的数据项',
-          type: 'ChartData',
+          type: 'BarChartData',
           default: '-'
         },
         {
@@ -449,7 +769,7 @@ export class DocChartComponent {
         {
           name: 'data',
           description: '完整的数据集合',
-          type: 'ChartSeries[]',
+          type: 'BarChartData[]',
           default: '-'
         },
         {
@@ -477,8 +797,8 @@ export class DocChartComponent {
       items: [
         {
           name: 'data',
-          description: '图表数据数组，可以是单系列数据ChartData[]或多系列数据ChartSeries[]',
-          type: 'ChartData[] | ChartSeries[]',
+          description: '图表数据数组，单个数据项或包含children的层级数据',
+          type: 'BarChartData[]',
           default: '[]'
         },
         {
@@ -498,209 +818,323 @@ export class DocChartComponent {
   ];
   
   // 代码示例
-  basicChartCode = `
+  basicPieChartCode = `
 import { Component } from '@angular/core';
-import { ChartData } from '@project';
+import { PieChartData, PieChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData"></lib-bar>\`
+  template: \`<lib-pie [data]="pieData" [options]="options"></lib-pie>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  pieData: PieChartData[] = [
+    { name: '产品A', value: 335 },
+    { name: '产品B', value: 210 },
+    { name: '产品C', value: 180 },
+    { name: '产品D', value: 120 },
+    { name: '产品E', value: 75 }
+  ];
+  
+  options: PieChartOptions = {
+    title: '产品销售占比',
+    showLabels: true,
+    showPercentage: true,
+    showLegend: true,
+    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+    animate: true
+  };
+}`;
+
+  // 环形图示例代码
+  donutPieChartCode = `
+import { Component } from '@angular/core';
+import { PieChartData, PieChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-pie [data]="donutData" [options]="donutOptions"></lib-pie>\`
+})
+export class ChartDemoComponent {
+  donutData: PieChartData[] = [
+    { name: '研发', value: 350 },
+    { name: '营销', value: 250 },
+    { name: '运营', value: 180 },
+    { name: '客服', value: 140 }
+  ];
+  
+  donutOptions: PieChartOptions = {
+    title: '预算分配',
+    innerRadius: 80, // 设置内圆半径创建环形图
+    donutText: '总计: 920',
+    showLegend: true,
+    legend: {
+      position: 'right'
+    },
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6']
+  };
+}`;
+
+  // 悬停效果饼图代码
+  hoverPieChartCode = `
+import { Component } from '@angular/core';
+import { PieChartData, PieChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-pie [data]="pieData" [options]="hoverOptions"></lib-pie>\`
+})
+export class ChartDemoComponent {
+  pieData: PieChartData[] = [
+    { name: '华东', value: 420 },
+    { name: '华南', value: 380 },
+    { name: '华北', value: 320 },
+    { name: '西部', value: 280 },
+    { name: '东北', value: 190 }
+  ];
+  
+  hoverOptions: PieChartOptions = {
+    title: '区域销售分布',
+    showLabels: true,
+    showPercentage: true,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      expandSlice: true,
+      expandRadius: 10
+    }
+  };
+}`;
+
+  // 饼图点击事件代码
+  pieClickChartCode = `
+import { Component } from '@angular/core';
+import { PieChartData, PieChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`
+    <lib-pie [data]="pieData" [options]="clickOptions"></lib-pie>
+    
+    <div *ngIf="clickedItem" class="click-result">
+      <div class="click-result-title">点击结果：</div>
+      <div class="click-result-content">
+        <div>名称：{{ clickedItem.item.name }}</div>
+        <div>数值：{{ clickedItem.item.value }}</div>
+        <div>百分比：{{ clickedItem.item.percentage.toFixed(1) }}%</div>
+        <div>索引：{{ clickedItem.index }}</div>
+      </div>
+    </div>
+  \`
+})
+export class ChartDemoComponent {
+  pieData: PieChartData[] = [
+    { name: '电子产品', value: 350 },
+    { name: '服装', value: 230 },
+    { name: '食品', value: 180 },
+    { name: '家居', value: 140 },
+    { name: '其他', value: 100 }
+  ];
+  
+  clickedItem: any = null;
+  
+  clickOptions: PieChartOptions = {
+    title: '产品分类比例',
+    showPercentage: true,
+    showLegend: true,
+    onClick: (info) => {
+      this.clickedItem = info;
+      console.log('点击了扇区:', info);
+    }
+  };
+}`;
+
+  // 图表类型切换代码
+  toggleChartTypeCode = `
+import { Component } from '@angular/core';
+import { BarChartData, BarChartOptions, PieChartData, PieChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`
+    <div style="margin-bottom: 16px;">
+      <lib-button (click)="toggleChartType()">
+        切换到{{ isBarChart ? '饼图' : '柱状图' }}
+      </lib-button>
+    </div>
+    
+    <ng-container *ngIf="isBarChart; else pieChart">
+      <lib-bar [data]="chartData" [options]="chartOptions"></lib-bar>
+    </ng-container>
+    
+    <ng-template #pieChart>
+      <lib-pie [data]="getPieData()" [options]="chartOptions"></lib-pie>
+    </ng-template>
+  \`
+})
+export class ChartDemoComponent {
+  isBarChart: boolean = true;
+  
+  chartData: BarChartData[] = [
+    { name: '一季度', data: 120 },
+    { name: '二季度', data: 180 },
+    { name: '三季度', data: 240 },
+    { name: '四季度', data: 300 }
+  ];
+  
+  chartOptions: BarChartOptions | PieChartOptions = {
+    title: '季度销售数据',
+    barColors: ['#3498db'],
+    borderRadius: 6
+  };
+  
+  toggleChartType() {
+    this.isBarChart = !this.isBarChart;
+    
+    if (this.isBarChart) {
+      this.chartOptions = {
+        title: '季度销售数据',
+        barColors: ['#3498db'],
+        borderRadius: 6
+      };
+    } else {
+      this.chartOptions = {
+        title: '季度销售分布',
+        showPercentage: true,
+        showLegend: true,
+        colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
+      };
+    }
+  }
+  
+  // 将柱状图数据转换为饼图数据
+  getPieData(): PieChartData[] {
+    return this.chartData.map(item => ({
+      name: item.name,
+      value: typeof item.data === 'number' ? item.data : 0
+    }));
+  }
+}`;
+
+  // 代码示例
+  basicChartCode = `
+import { Component } from '@angular/core';
+import { BarChartData } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-bar [data]="barData"></lib-bar>\`
+})
+export class ChartDemoComponent {
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 },
+    { name: '四月', data: 45 },
+    { name: '五月', data: 70 },
+    { name: '六月', data: 50 }
   ];
 }`;
 
-  // 多系列图表示例代码
   multiSeriesChartCode = `
 import { Component } from '@angular/core';
-import { ChartSeries } from '@project';
+import { BarChartData } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
   template: \`<lib-bar [data]="multiSeriesData"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  multiSeriesData: ChartSeries[] = [
+  multiSeriesData: BarChartData[] = [
     {
       name: '2022年',
-      data: [
-        { name: '一季度', value: 120 },
-        { name: '二季度', value: 150 },
-        { name: '三季度', value: 180 },
-        { name: '四季度', value: 210 }
+      series: '2022年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 120 },
+        { name: '二季度', data: 150 },
+        { name: '三季度', data: 180 },
+        { name: '四季度', data: 210 }
       ]
     },
     {
       name: '2023年',
-      data: [
-        { name: '一季度', value: 140 },
-        { name: '二季度', value: 170 },
-        { name: '三季度', value: 200 },
-        { name: '四季度', value: 250 }
+      series: '2023年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 140 },
+        { name: '二季度', data: 170 },
+        { name: '三季度', data: 200 },
+        { name: '四季度', data: 250 }
       ]
     }
   ];
 }`;
 
-  // 自定义多系列图表示例代码
   customMultiSeriesChartCode = `
 import { Component } from '@angular/core';
-import { ChartSeries, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="customMultiSeriesData" [options]="customMultiSeriesOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="customData" [options]="customOptions"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  customMultiSeriesData: ChartSeries[] = [
+  customData: BarChartData[] = [
     {
       name: '北京',
-      color: '#FF6384', // 自定义系列颜色
-      data: [
-        { name: '一季度', value: 180 },
-        { name: '二季度', value: 200 },
-        { name: '三季度', value: 220 },
-        { name: '四季度', value: 270 }
+      series: '北京',
+      color: '#FF6384',
+      data: 0,
+      children: [
+        { name: '一季度', data: 180 },
+        { name: '二季度', data: 200 },
+        { name: '三季度', data: 220 },
+        { name: '四季度', data: 270 }
       ]
     },
     {
       name: '上海',
+      series: '上海',
       color: '#36A2EB',
-      data: [
-        { name: '一季度', value: 160 },
-        { name: '二季度', value: 190 },
-        { name: '三季度', value: 210 },
-        { name: '四季度', value: 240 }
-      ]
-    },
-    {
-      name: '广州',
-      color: '#FFCE56',
-      data: [
-        { name: '一季度', value: 140 },
-        { name: '二季度', value: 170 },
-        { name: '三季度', value: 200 },
-        { name: '四季度', value: 230 }
+      data: 0,
+      children: [
+        { name: '一季度', data: 160 },
+        { name: '二季度', data: 190 },
+        { name: '三季度', data: 210 },
+        { name: '四季度', data: 240 }
       ]
     }
   ];
   
-  customMultiSeriesOptions: BarChartOptions = {
+  customOptions: BarChartOptions = {
     title: '2023年主要城市季度销售额',
     legend: {
       show: true,
       position: 'top',
       align: 'center'
     },
-    borderRadius: 6,
-    margin: { top: 60, right: 20, bottom: 50, left: 50 }
+    borderRadius: 6
   };
-}`;
-
-  // 多系列悬浮框示例代码
-  multiSeriesTooltipCode = `
-import { Component } from '@angular/core';
-import { ChartSeries, BarChartOptions } from '@project';
-
-@Component({
-  selector: 'app-chart-demo',
-  template: \`
-    <lib-bar 
-      [data]="multiSeriesData" 
-      [options]="multiSeriesTooltipOptions" 
-      [tooltipTemplate]="multiSeriesTooltip">
-    </lib-bar>
-    
-    <ng-template #multiSeriesTooltip let-data>
-      <div style="display: flex; width: 100%; flex-direction: column;">
-        <div style="padding: 12px;">
-          <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
-            {{data.series.name}} - {{data.item.name}}
-          </div>
-          <div style="display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">数值</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px;min-width: 60px; text-align: center;">{{formatValue(data.item.value)}}</span>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">系列索引</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{data.seriesIndex}}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  \`
-})
-export class ChartDemoComponent {
-  multiSeriesData: ChartSeries[] = [
-    {
-      name: '2022年',
-      data: [
-        { name: '一季度', value: 120 },
-        { name: '二季度', value: 150 },
-        { name: '三季度', value: 180 },
-        { name: '四季度', value: 210 }
-      ]
-    },
-    {
-      name: '2023年',
-      data: [
-        { name: '一季度', value: 140 },
-        { name: '二季度', value: 170 },
-        { name: '三季度', value: 200 },
-        { name: '四季度', value: 250 }
-      ]
-    }
-  ];
-  
-  multiSeriesTooltipOptions: BarChartOptions = {
-    title: '年度季度对比',
-    legend: {
-      show: true,
-      position: 'top',
-      align: 'center'
-    },
-    borderRadius: 6,
-    hoverEffect: {
-      enabled: true,
-      showTooltip: true,
-      showGuideLine: true,
-      tooltipHoverable: true
-    }
-  };
-  
-  formatValue(value: number): string {
-    return value.toLocaleString('zh-CN');
-  }
 }`;
 
   colorChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData" [options]="colorOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 },
+    { name: '四月', data: 45 },
+    { name: '五月', data: 70 }
   ];
-
-  colorOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     barColors: ['#8e44ad', '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
     borderRadius: 4
   };
@@ -708,21 +1142,21 @@ export class ChartDemoComponent {
 
   titleChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="salesData" [options]="titleOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  salesData: ChartData[] = [
-    { name: '一季度', value: 120 },
-    { name: '二季度', value: 180 },
-    { name: '三季度', value: 240 },
-    { name: '四季度', value: 300 }
+  barData: BarChartData[] = [
+    { name: '一季度', data: 120 },
+    { name: '二季度', data: 180 },
+    { name: '三季度', data: 240 },
+    { name: '四季度', data: 300 }
   ];
-
-  titleOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     title: '季度销售额统计',
     barColors: ['#3498db'],
     borderRadius: 4
@@ -731,23 +1165,21 @@ export class ChartDemoComponent {
 
   noGridChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData" [options]="noGridOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 },
+    { name: '四月', data: 45 }
   ];
-
-  noGridOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     showGrid: false,
     barColors: ['#3498db'],
     borderRadius: 4
@@ -756,23 +1188,20 @@ export class ChartDemoComponent {
 
   radiusChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData" [options]="radiusOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 }
   ];
-
-  radiusOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     borderRadius: 12,
     barColors: ['#2ecc71']
   };
@@ -780,49 +1209,42 @@ export class ChartDemoComponent {
 
   noAnimateChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData" [options]="noAnimateOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 }
   ];
-
-  noAnimateOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     animate: false,
     barColors: ['#e74c3c'],
     borderRadius: 4
   };
 }`;
 
-  // 悬停效果示例代码
   hoverChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="basicData" [options]="hoverOptions"></lib-bar>\`
+  template: \`<lib-bar [data]="barData" [options]="options"></lib-bar>\`
 })
 export class ChartDemoComponent {
-  basicData: ChartData[] = [
-    { name: '一月', value: 35 },
-    { name: '二月', value: 52 },
-    { name: '三月', value: 61 },
-    { name: '四月', value: 45 },
-    { name: '五月', value: 70 },
-    { name: '六月', value: 50 }
+  barData: BarChartData[] = [
+    { name: '一月', data: 35 },
+    { name: '二月', data: 52 },
+    { name: '三月', data: 61 }
   ];
-
-  hoverOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     barColors: ['#3498db'],
     borderRadius: 4,
     hoverEffect: {
@@ -836,85 +1258,60 @@ export class ChartDemoComponent {
   };
 }`;
 
-  // 点击事件示例代码
   clickChartCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
   template: \`
-    <lib-bar [data]="salesData" [options]="clickOptions"></lib-bar>
-    
+    <lib-bar [data]="barData" [options]="options"></lib-bar>
     <div *ngIf="clickedItem" class="click-result">
-      <div class="click-result-title">点击结果：</div>
-      <div class="click-result-content">
-        <div>名称：{{ clickedItem.item.name }}</div>
-        <div>数值：{{ clickedItem.item.value }}</div>
-        <div>索引：{{ clickedItem.index }}</div>
-        <div>图表标题：{{ clickedItem.options.title || '无标题' }}</div>
-      </div>
+      <div>名称：{{ clickedItem.item.name }}</div>
+      <div>数值：{{ clickedItem.item.data }}</div>
+      <div>索引：{{ clickedItem.index }}</div>
     </div>
   \`
 })
 export class ChartDemoComponent {
-  salesData: ChartData[] = [
-    { name: '一季度', value: 120 },
-    { name: '二季度', value: 180 },
-    { name: '三季度', value: 240 },
-    { name: '四季度', value: 300 }
+  barData: BarChartData[] = [
+    { name: '一季度', data: 120 },
+    { name: '二季度', data: 180 },
+    { name: '三季度', data: 240 },
+    { name: '四季度', data: 300 }
   ];
   
   clickedItem: any = null;
-
-  clickOptions: BarChartOptions = {
+  
+  options: BarChartOptions = {
     title: '季度销售额统计',
     barColors: ['#2980b9'],
     borderRadius: 6,
     onClick: (info) => {
       this.clickedItem = info;
       console.log('点击了柱形:', info);
-      
-      // 可以在这里执行其他操作，如导航到详情页
-      // this.router.navigate(['/detail', info.item.name]);
     }
   };
 }`;
 
-  // 自定义悬浮框代码
   customTooltipCode = `
 import { Component } from '@angular/core';
-import { ChartData, BarChartOptions } from '@project';
+import { BarChartData, BarChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
   template: \`
-    <lib-bar 
-      [data]="salesData" 
-      [options]="customTooltipOptions"
-      [tooltipTemplate]="customTooltip">
-    </lib-bar>
+    <lib-bar [data]="barData" [options]="options" [tooltipTemplate]="customTooltip"></lib-bar>
     
     <ng-template #customTooltip let-item>
-      <!-- 自定义悬浮框内容，右侧彩色边框由组件自动设置 -->
-      <div style="display: flex; width: 100%; flex-direction: column;">
-        <div style="padding: 12px;">
-          <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: #222; letter-spacing: -0.3px;">
-            {{item.name}}
-          </div>
-          <div style="display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">销售额</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{formatSalesValue(item.value)}}</span>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">占比</span>
-              <span style="font-weight: 500; color: #000; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center;">{{((item.value / totalSales) * 100).toFixed(1)}}%</span>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="color: #555; font-size: 13px; font-weight: 500;">详情</span>
-              <span style="font-weight: 500; color: #3498db; font-size: 13px; padding: 4px 10px; min-width: 60px; text-align: center; cursor: pointer;">查看</span>
-            </div>
+      <div style="padding: 12px;">
+        <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">
+          {{item.name}}
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span>销售额</span>
+            <span>{{item.item.data}} 元</span>
           </div>
         </div>
       </div>
@@ -922,19 +1319,14 @@ import { ChartData, BarChartOptions } from '@project';
   \`
 })
 export class ChartDemoComponent {
-  salesData: ChartData[] = [
-    { name: '一季度', value: 120 },
-    { name: '二季度', value: 180 },
-    { name: '三季度', value: 240 },
-    { name: '四季度', value: 300 }
+  barData: BarChartData[] = [
+    { name: '一季度', data: 120 },
+    { name: '二季度', data: 180 },
+    { name: '三季度', data: 240 },
+    { name: '四季度', data: 300 }
   ];
   
-  // 计算总销售额
-  get totalSales(): number {
-    return this.salesData.reduce((sum, item) => sum + item.value, 0);
-  }
-
-  customTooltipOptions: BarChartOptions = {
+  options: BarChartOptions = {
     barColors: ['#9b59b6'],
     borderRadius: 8,
     hoverEffect: {
@@ -944,9 +1336,71 @@ export class ChartDemoComponent {
       tooltipHoverable: true
     }
   };
+}`;
+
+  multiSeriesTooltipCode = `
+import { Component } from '@angular/core';
+import { BarChartData, BarChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`
+    <lib-bar [data]="multiSeriesData" [options]="options" [tooltipTemplate]="multiSeriesTooltip"></lib-bar>
+    
+    <ng-template #multiSeriesTooltip let-data>
+      <div style="padding: 12px;">
+        <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">
+          {{data.series}} - {{data.item.name}}
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span>数值</span>
+            <span>{{data.item.data}}</span>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  \`
+})
+export class ChartDemoComponent {
+  multiSeriesData: BarChartData[] = [
+    {
+      name: '2022年',
+      series: '2022年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 120 },
+        { name: '二季度', data: 150 },
+        { name: '三季度', data: 180 },
+        { name: '四季度', data: 210 }
+      ]
+    },
+    {
+      name: '2023年',
+      series: '2023年',
+      data: 0,
+      children: [
+        { name: '一季度', data: 140 },
+        { name: '二季度', data: 170 },
+        { name: '三季度', data: 200 },
+        { name: '四季度', data: 250 }
+      ]
+    }
+  ];
   
-  formatSalesValue(value: number): string {
-    return value.toLocaleString('zh-CN') + ' 元';
-  }
+  options: BarChartOptions = {
+    legend: {
+      show: true,
+      position: 'top',
+      align: 'center'
+    },
+    borderRadius: 6,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      showGuideLine: true,
+      tooltipHoverable: true
+    }
+  };
 }`;
 }

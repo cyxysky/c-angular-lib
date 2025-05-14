@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, Renderer2, TemplateRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BarChartOptions, ChartData, ChartSeries } from '../chart.interface';
+import { BarChartOptions, BarChartData } from '../chart.interface';
 import { ChartService } from '../chart.serivice';
 
 @Component({
@@ -15,12 +15,12 @@ export class BarComponent implements OnInit, OnChanges {
   @ViewChild('barCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('barTooltip', { static: true }) tooltipRef!: ElementRef<HTMLDivElement>;
   @ViewChild('defaultTooltip', { static: true }) defaultTooltipRef!: TemplateRef<{ $implicit: any }>;
-  @Input() data: ChartData[] | ChartSeries[] = [];
+  @Input() data: BarChartData[] = [];
   @Input() options: BarChartOptions = {};
   @Input() tooltipTemplate?: TemplateRef<{ $implicit: any }>;
 
   // 渲染相关属性
-  chartSeries: ChartSeries[] = []; // 处理后的图表系列数据
+  processedData: BarChartData[] = []; // 处理后的图表数据
   private seriesVisibility: boolean[] = []; // 系列可见性状态
   private ctx!: CanvasRenderingContext2D;
   private defaultOptions: BarChartOptions = {
@@ -55,7 +55,7 @@ export class BarComponent implements OnInit, OnChanges {
   private currentAnimationValue = 0;
   hoveredBarIndex: number = -1;
   hoveredSeriesIndex: number = -1;
-  barPositions: Array<{ x: number, y: number, width: number, height: number, data: ChartData, seriesIndex: number }> = [];
+  barPositions: Array<{ x: number, y: number, width: number, height: number, data: BarChartData, seriesIndex: number }> = [];
   private mousePosition: { x: number, y: number } = { x: 0, y: 0 };
   private isTooltipHovered: boolean = false;
   private canvasScale: number = 1; // 用于高DPI显示
@@ -80,28 +80,72 @@ export class BarComponent implements OnInit, OnChanges {
     }
   }
 
-  // 处理输入数据，转换为统一的ChartSeries格式
+  // 处理输入数据，转换为统一的ChartData格式
   private processData(): void {
-    this.chartSeries = [];
+    this.processedData = [];
 
     if (!this.data || this.data.length === 0) {
       return;
     }
 
-    // 判断输入的是单系列数据还是多系列数据
-    if (this.data.length > 0 && 'data' in this.data[0]) {
-      // 已经是ChartSeries格式
-      this.chartSeries = this.data as ChartSeries[];
-    } else {
-      // 是单个ChartData数组，转换为单系列
-      this.chartSeries = [{
-        name: this.mergedOptions.title || '数据',
-        data: this.data as ChartData[]
-      }];
-    }
+    try {
+      // 检查是否是扁平数据还是已经包含子数据
+      const hasChildren = this.data.some(item => item.children && item.children.length > 0);
+      const hasSeries = this.data.some(item => item.series);
+      
+      if (hasChildren || hasSeries) {
+        // 已经是适当的格式，直接使用
+        this.processedData = [...this.data];
+      } else {
+        // 扁平数据，假设它是单系列，将其包装为单个系列
+        this.processedData = [{
+          name: this.mergedOptions.title || '数据',
+          series: this.mergedOptions.title || '数据',
+          children: [...this.data]
+        }];
+      }
 
-    // 初始化系列可见性数组
-    this.seriesVisibility = this.chartSeries.map(() => true);
+      // 过滤无效数据
+      this.processedData = this.processedData.map(item => {
+        if (item.children) {
+          return {
+            ...item,
+            children: item.children.filter(child => child && child.name !== undefined)
+          };
+        }
+        return item;
+      });
+
+      // 初始化系列可见性数组
+      const seriesNames = this.getSeriesNames();
+      this.seriesVisibility = seriesNames.map(() => true);
+    } catch (e) {
+      console.error('处理数据时出错:', e);
+      this.processedData = [];
+      this.seriesVisibility = [];
+    }
+  }
+
+  /**
+   * 获取所有系列名称
+   */
+  public getSeriesNames(): string[] {
+    const seriesNames: string[] = [];
+    
+    this.processedData.forEach(item => {
+      if (item.series && !seriesNames.includes(item.series)) {
+        seriesNames.push(item.series);
+      }
+      if (item.children) {
+        item.children.forEach(child => {
+          if (child.series && !seriesNames.includes(child.series)) {
+            seriesNames.push(child.series);
+          }
+        });
+      }
+    });
+    
+    return seriesNames;
   }
 
   // ============================================================
@@ -109,65 +153,167 @@ export class BarComponent implements OnInit, OnChanges {
   // ============================================================
 
   /**
-   * 获取当前可见的系列
+   * 获取当前可见的数据
    */
-  private getVisibleSeries(): ChartSeries[] {
-    return this.chartSeries.filter((_, index) => this.seriesVisibility[index]);
+  private getVisibleData(): BarChartData[] {
+    const visibleSeriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
+    
+    if (!visibleSeriesNames.length) {
+      return [];
+    }
+    
+    return this.processedData.filter(item => {
+      if (item.series && visibleSeriesNames.includes(item.series)) {
+        return true;
+      }
+      if (item.children) {
+        const visibleChildren = item.children.filter(child => 
+          !child.series || visibleSeriesNames.includes(child.series)
+        );
+        return visibleChildren.length > 0;
+      }
+      return false;
+    }).map(item => {
+      if (item.children) {
+        return {
+          ...item,
+          children: item.children.filter(child => 
+            !child.series || visibleSeriesNames.includes(child.series)
+          )
+        };
+      }
+      return item;
+    });
+  }
+
+  /**
+   * 安全地获取数组的最大值
+   * 处理空数组和无效值的情况
+   */
+  private safeArrayMax(arr: number[], defaultValue: number = 0): number {
+    if (!arr || arr.length === 0) {
+      return defaultValue;
+    }
+    
+    // 过滤掉NaN和非数字值
+    const validValues = arr.filter(val => !isNaN(val) && typeof val === 'number' && isFinite(val));
+    
+    if (validValues.length === 0) {
+      return defaultValue;
+    }
+    
+    return Math.max(...validValues);
   }
 
   /**
    * 计算所有可见系列中特定类别的最大值
    */
   private getMaxCategoryValue(): number {
-    const visibleSeries = this.getVisibleSeries();
-    if (visibleSeries.length === 0) return 0;
+    const visibleData = this.getVisibleData();
+    if (visibleData.length === 0) return 0;
 
-    // 获取所有系列中数据点最多的系列的数据点数量
-    const maxDataPoints = Math.max(...visibleSeries.map(series => series.data.length));
+    // 获取所有类别名称
+    const allCategories = new Set<string>();
+    visibleData.forEach(item => {
+      if (item.children) {
+        item.children.forEach(child => {
+          allCategories.add(child.name);
+        });
+      } else if (item.name) {
+        allCategories.add(item.name);
+      }
+    });
 
-    // 初始化类别总和数组
-    const categoryTotals = Array(maxDataPoints).fill(0);
+    if (allCategories.size === 0) return 0;
 
     // 计算每个类别的总和
-    visibleSeries.forEach(series => {
-      series.data.forEach((item, index) => {
-        if (index < categoryTotals.length) {
-          categoryTotals[index] += item.value;
-        }
-      });
+    const categoryTotals: Record<string, number> = {};
+    Array.from(allCategories).forEach(category => {
+      categoryTotals[category] = 0;
+    });
+
+    visibleData.forEach(item => {
+      if (item.children) {
+        item.children.forEach(child => {
+          if (categoryTotals[child.name] !== undefined && child.data !== undefined) {
+            categoryTotals[child.name] += child.data;
+          }
+        });
+      } else if (categoryTotals[item.name] !== undefined && item.data !== undefined) {
+        categoryTotals[item.name] += item.data;
+      }
     });
 
     // 返回最大类别总和
-    return Math.max(...categoryTotals, 0);
+    return Object.values(categoryTotals).length > 0 ? 
+      this.safeArrayMax(Object.values(categoryTotals)) : 0;
   }
 
   /**
    * 计算数据总和，用于百分比计算
    */
   private calculateTotalValue(seriesIndex?: number): number {
-    if (seriesIndex !== undefined && seriesIndex >= 0 && seriesIndex < this.chartSeries.length) {
+    const seriesNames = this.getSeriesNames();
+    
+    if (seriesIndex !== undefined && seriesIndex >= 0 && seriesIndex < seriesNames.length) {
       // 计算特定系列的总和
-      return this.chartSeries[seriesIndex].data.reduce((sum, item) => sum + item.value, 0);
+      const seriesName = seriesNames[seriesIndex];
+      let total = 0;
+      
+      this.processedData.forEach(item => {
+        if (item.series === seriesName && item.data !== undefined) {
+          total += item.data;
+        }
+        if (item.children) {
+          item.children.forEach(child => {
+            if (child.series === seriesName && child.data !== undefined) {
+              total += child.data;
+            }
+          });
+        }
+      });
+      
+      return total;
     } else {
       // 计算所有系列的总和
-      return this.chartSeries.reduce((sum, series) =>
-        sum + series.data.reduce((seriesSum, item) => seriesSum + item.value, 0), 0);
+      let total = 0;
+      
+      this.processedData.forEach(item => {
+        if (item.data !== undefined) {
+          total += item.data;
+        }
+        
+        if (item.children) {
+          item.children.forEach(child => {
+            if (child.data !== undefined) {
+              total += child.data;
+            }
+          });
+        }
+      });
+      
+      return total;
     }
   }
 
   /**
    * 格式化数值显示，供模板使用
    */
-  public formatValue(value: number): string {
-    return this.chartService.formatNumber(value);
+  public formatValue(value: number | undefined): string {
+    if (typeof value === 'number') {
+      return this.chartService.formatNumber(value);
+    }
+    return '0';
   }
 
   /**
    * 计算百分比，供模板使用
    */
-  public calculatePercentage(value: number, seriesIndex?: number): string {
+  public calculatePercentage(value: number | undefined, seriesIndex?: number): string {
     const totalValue = this.calculateTotalValue(seriesIndex);
-    return totalValue > 0 ? (value / totalValue * 100).toFixed(1) : '0';
+    const numValue = typeof value === 'number' ? value : 0;
+    
+    return totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0';
   }
 
   /**
@@ -178,10 +324,25 @@ export class BarComponent implements OnInit, OnChanges {
       return '';
     }
 
+    const seriesNames = this.getSeriesNames();
+    if (seriesIndex >= seriesNames.length) {
+      return '';
+    }
+    
+    const seriesName = seriesNames[seriesIndex];
+    
     // 首先检查系列是否有自定义颜色
-    const series = this.chartSeries[seriesIndex];
-    if (series && series.color) {
-      return series.color;
+    for (const item of this.processedData) {
+      if (item.series === seriesName && item.color) {
+        return item.color;
+      }
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.series === seriesName && child.color) {
+            return child.color;
+          }
+        }
+      }
     }
 
     // 否则使用默认颜色
@@ -197,10 +358,46 @@ export class BarComponent implements OnInit, OnChanges {
       return '';
     }
 
-    // 检查数据点是否有自定义颜色
-    const series = this.chartSeries[seriesIndex];
-    if (series && series.data[dataIndex] && series.data[dataIndex].color) {
-      return series.data[dataIndex].color!;
+    const seriesNames = this.getSeriesNames();
+    if (seriesIndex >= seriesNames.length) {
+      return '';
+    }
+    
+    const seriesName = seriesNames[seriesIndex];
+    
+    // 查找对应的数据项
+    let targetItem: BarChartData | undefined;
+    let itemFound = false;
+    
+    for (const item of this.processedData) {
+      if (item.series === seriesName) {
+        if (!item.children) {
+          if (dataIndex === 0) {
+            targetItem = item;
+            itemFound = true;
+            break;
+          }
+        } else {
+          const matchingChildren = item.children.filter(child => !child.series || child.series === seriesName);
+          if (dataIndex < matchingChildren.length) {
+            targetItem = matchingChildren[dataIndex];
+            itemFound = true;
+            break;
+          }
+        }
+      } else if (item.children) {
+        const matchingChildren = item.children.filter(child => child.series === seriesName);
+        if (dataIndex < matchingChildren.length) {
+          targetItem = matchingChildren[dataIndex];
+          itemFound = true;
+          break;
+        }
+      }
+    }
+    
+    // 如果找到了数据项并且有自定义颜色，使用自定义颜色
+    if (itemFound && targetItem && targetItem.color) {
+      return targetItem.color;
     }
 
     // 否则使用系列颜色
@@ -222,7 +419,7 @@ export class BarComponent implements OnInit, OnChanges {
    * 图例相关方法
    */
   public showLegend(): boolean {
-    return this.mergedOptions?.legend?.show !== false && this.chartSeries.length > 0;
+    return this.mergedOptions?.legend?.show !== false && this.getSeriesNames().length > 0;
   }
 
   public getLegendPosition(): string {
@@ -301,7 +498,7 @@ export class BarComponent implements OnInit, OnChanges {
    * 绘制图表主方法
    */
   private drawChart(): void {
-    if (!this.chartSeries || this.chartSeries.length === 0) return;
+    if (!this.processedData || this.processedData.length === 0) return;
 
     this.mergedOptions = { ...this.defaultOptions, ...this.options };
 
@@ -363,18 +560,14 @@ export class BarComponent implements OnInit, OnChanges {
     const chartHeight = displayHeight - margin.top - margin.bottom;
 
     // 获取可见系列
-    const visibleSeries = this.getVisibleSeries();
+    const visibleData = this.getVisibleData();
 
     // 计算柱形尺寸
     const maxValue = this.getMaxCategoryValue();
 
-    // 获取所有系列中最大的数据点数量，如果没有可见系列，使用所有系列
-    let categoryCount = 0;
-    if (visibleSeries.length > 0) {
-      categoryCount = Math.max(...visibleSeries.map(series => series.data.length));
-    } else if (this.chartSeries.length > 0) {
-      categoryCount = Math.max(...this.chartSeries.map(series => series.data.length));
-    }
+    // 获取所有类别数量
+    const categories = this.getCategories(visibleData);
+    let categoryCount = categories.length;
 
     // 绘制标题
     if (this.mergedOptions.title) {
@@ -392,17 +585,19 @@ export class BarComponent implements OnInit, OnChanges {
     }
 
     // 只有在有可见系列时才绘制柱形
-    if (visibleSeries.length > 0 && maxValue > 0 && categoryCount > 0) {
+    if (visibleData.length > 0 && maxValue > 0 && categoryCount > 0) {
       // 计算每个类别组的总宽度
       const groupWidth = chartWidth / categoryCount;
+      // 获取可见系列数量
+      const visibleSeriesCount = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]).length;
       // 单个柱子宽度 = 组宽度 * 0.7 / 可见系列数量
-      const barWidth = groupWidth * 0.7 / visibleSeries.length;
+      const barWidth = groupWidth * 0.7 / visibleSeriesCount;
       // 组内间距 = 组宽度 * 0.3 / (可见系列数量 + 1)
-      const barSpacing = groupWidth * 0.3 / (visibleSeries.length + 1);
+      const barSpacing = groupWidth * 0.3 / (visibleSeriesCount + 1);
 
       // 绘制柱形
       this.barPositions = [];
-      this.drawBars(visibleSeries, margin, chartHeight, barWidth, barSpacing, groupWidth, maxValue, animationProgress);
+      this.drawBars(visibleData, margin, chartHeight, barWidth, barSpacing, groupWidth, maxValue, animationProgress);
     } else {
       this.barPositions = [];
     }
@@ -442,10 +637,17 @@ export class BarComponent implements OnInit, OnChanges {
   }
 
   /**
+   * 获取数据项的值
+   */
+  private getItemValue(item: BarChartData): number {
+    return item.data !== undefined ? item.data : 0;
+  }
+
+  /**
    * 绘制柱形
    */
   private drawBars(
-    visibleSeries: ChartSeries[],
+    visibleData: BarChartData[],
     margin: any,
     chartHeight: number,
     barWidth: number,
@@ -458,26 +660,36 @@ export class BarComponent implements OnInit, OnChanges {
 
     // 对每个类别绘制所有系列的柱形
     const categoryLabels = new Set<string>();
-
-    // 处理每个系列
-    visibleSeries.forEach((series, seriesIndex) => {
-      const actualSeriesIndex = this.chartSeries.findIndex(s => s === series);
-
-      // 处理每个系列的每个数据点
-      series.data.forEach((item, dataIndex) => {
+    const seriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
+    const categories = this.getCategories(visibleData);
+    
+    // 对每个可见系列，绘制其所有数据点
+    seriesNames.forEach((seriesName, seriesIndex) => {
+      // 获取该系列的所有数据项
+      const dataItems = this.getDataItemsBySeriesName(seriesName);
+      
+      // 处理每个数据项
+      categories.forEach((category, categoryIndex) => {
+        // 查找匹配当前类别的数据项
+        const item = dataItems.find(d => d.name === category);
+        if (!item) return;
+        
         // 保存类别标签，用于后续绘制X轴
-        categoryLabels.add(item.name);
-
+        categoryLabels.add(category);
+        
+        // 获取项目的值
+        const itemValue = this.getItemValue(item);
+                        
         // 计算柱形的位置
         // 组的左侧位置 = 左侧边距 + 组索引 * 组宽度
-        const groupLeft = margin.left + dataIndex * groupWidth;
+        const groupLeft = margin.left + categoryIndex * groupWidth;
         // 柱形的x位置 = 组左侧 + 组内间距 + 系列索引 * (柱宽 + 组内间距)
         const x = groupLeft + barSpacing + seriesIndex * (barWidth + barSpacing);
-
+        
         // 计算柱形高度和y位置
-        const barHeight = (item.value / maxValue) * chartHeight * animationProgress;
+        const barHeight = (itemValue / maxValue) * chartHeight * animationProgress;
         const y = margin.top + chartHeight - barHeight;
-
+        
         // 记录柱形位置，用于交互检测
         this.barPositions.push({
           x,
@@ -485,21 +697,21 @@ export class BarComponent implements OnInit, OnChanges {
           width: barWidth,
           height: barHeight,
           data: item,
-          seriesIndex: actualSeriesIndex
+          seriesIndex: seriesIndex
         });
-
+        
         // 设置柱形填充颜色
-        const barColor = this.getDataColor(actualSeriesIndex, dataIndex);
-
+        const barColor = this.getDataColor(seriesIndex, categoryIndex);
+        
         // 检查是否是悬停的柱形
-        if (dataIndex === this.hoveredBarIndex && actualSeriesIndex === this.hoveredSeriesIndex) {
+        if (categoryIndex === this.hoveredBarIndex && seriesIndex === this.hoveredSeriesIndex) {
           ctx.fillStyle = this.lightenColor(barColor, 20);
         } else {
           ctx.fillStyle = barColor;
         }
-
+        
         // 只有当值大于0时才绘制柱形
-        if (item.value > 0) {
+        if (itemValue > 0) {
           // 绘制柱形
           if (this.mergedOptions.borderRadius && this.mergedOptions.borderRadius > 0) {
             // 确保圆角不超过柱形高度的一半，避免在低高度时出现问题
@@ -509,25 +721,25 @@ export class BarComponent implements OnInit, OnChanges {
             ctx.fillRect(x, y, barWidth, barHeight);
           }
         }
-
+        
         // 绘制数值
         if (this.mergedOptions.showValues && animationProgress > 0.9) {
           ctx.fillStyle = '#333333';
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';
-          const formattedValue = this.chartService.formatNumber(item.value);
-
+          const formattedValue = this.formatValue(item.data);
+          
           // 对于值为0的情况，将数值显示在基线上方
-          const valueY = item.value > 0 ? y - 5 : margin.top + chartHeight - 5;
+          const valueY = itemValue > 0 ? y - 5 : margin.top + chartHeight - 5;
           ctx.fillText(formattedValue, x + barWidth / 2, valueY);
         }
-
+        
         // 只有在第一个系列时绘制X轴标签，避免重复
         if (seriesIndex === 0) {
           ctx.fillStyle = '#666666';
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText(item.name, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
+          ctx.fillText(category, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
         }
       });
     });
@@ -555,18 +767,16 @@ export class BarComponent implements OnInit, OnChanges {
     ctx.stroke();
 
     // 绘制X轴类别标签（即使没有可见系列也显示）
-    if (this.chartSeries.length > 0) {
-      const categoryCount = Math.max(...this.chartSeries.map(series => series.data.length));
-      if (categoryCount > 0) {
-        const groupWidth = chartWidth / categoryCount;
-        this.chartSeries[0].data.forEach((item, dataIndex) => {
-          ctx.fillStyle = '#666666';
-          ctx.font = '12px Arial';
-          ctx.textAlign = 'center';
-          const groupLeft = margin.left + dataIndex * groupWidth;
-          ctx.fillText(item.name, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
-        });
-      }
+    const categories = this.getCategories(this.processedData);
+    if (categories.length > 0) {
+      const groupWidth = chartWidth / categories.length;
+      categories.forEach((category, index) => {
+        ctx.fillStyle = '#666666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        const groupLeft = margin.left + index * groupWidth;
+        ctx.fillText(category, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
+      });
     }
   }
 
@@ -577,10 +787,12 @@ export class BarComponent implements OnInit, OnChanges {
     if (this.hoveredBarIndex === -1 || this.hoveredSeriesIndex === -1 || !this.mergedOptions.hoverEffect?.showGuideLine) return;
 
     const ctx = this.ctx;
+    
     // 查找对应的柱形位置
     const hoveredBar = this.barPositions.find(
-      bar => bar.seriesIndex === this.hoveredSeriesIndex &&
-        bar.data.name === this.chartSeries[this.hoveredSeriesIndex].data[this.hoveredBarIndex].name
+      bar => bar.seriesIndex === this.hoveredSeriesIndex && 
+             bar.data && this.hoveredBarIndex >= 0 && 
+             bar.data.name === this.getCategories(this.getVisibleData())[this.hoveredBarIndex]
     );
 
     if (!hoveredBar) return;
@@ -718,10 +930,15 @@ export class BarComponent implements OnInit, OnChanges {
         y >= bar.y &&
         y <= bar.y + bar.height
       ) {
-        // 找到对应的数据点索引
-        const series = this.chartSeries[bar.seriesIndex];
-        const dataIndex = series.data.findIndex(data => data.name === bar.data.name);
-
+        if (!bar.data || !bar.data.name) {
+          return { dataIndex: -1, seriesIndex: -1 };
+        }
+        
+        // 找到对应的类别索引
+        const category = bar.data.name;
+        const categories = this.getCategories(this.getVisibleData());
+        const dataIndex = categories.indexOf(category);
+        
         return { dataIndex, seriesIndex: bar.seriesIndex };
       }
     }
@@ -776,10 +993,23 @@ export class BarComponent implements OnInit, OnChanges {
 
     // 如果点击到了柱形，执行回调
     if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.seriesIndex !== -1) {
-      const series = this.chartSeries[clickedBarInfo.seriesIndex];
-      const item = series.data[clickedBarInfo.dataIndex];
+      const seriesNames = this.getSeriesNames();
+      if (clickedBarInfo.seriesIndex >= seriesNames.length) return;
+      
+      const seriesName = seriesNames[clickedBarInfo.seriesIndex];
+      const categories = this.getCategories(this.getVisibleData());
+      if (clickedBarInfo.dataIndex >= categories.length) return;
+      
+      const category = categories[clickedBarInfo.dataIndex];
+      
+      // 查找对应的数据项
+      const dataItems = this.getDataItemsBySeriesName(seriesName);
+      const item = dataItems.find(item => item.name === category);
+      
+      if (!item) return;
+      
       const barPosition = this.barPositions.find(
-        bar => bar.seriesIndex === clickedBarInfo.seriesIndex && bar.data.name === item.name
+        bar => bar.seriesIndex === clickedBarInfo.seriesIndex && bar.data && bar.data.name === item.name
       );
 
       if (barPosition) {
@@ -789,7 +1019,7 @@ export class BarComponent implements OnInit, OnChanges {
             item: item,
             index: clickedBarInfo.dataIndex,
             seriesIndex: clickedBarInfo.seriesIndex,
-            data: this.chartSeries,
+            data: this.processedData,
             options: this.mergedOptions,
             event: event,
             position: {
@@ -815,11 +1045,24 @@ export class BarComponent implements OnInit, OnChanges {
     if (!this.mergedOptions.hoverEffect?.showTooltip) return;
 
     const tooltip = this.tooltipRef.nativeElement;
-    const series = this.chartSeries[barInfo.seriesIndex];
-    const item = series.data[barInfo.dataIndex];
+    
+    const seriesNames = this.getSeriesNames();
+    if (barInfo.seriesIndex < 0 || barInfo.seriesIndex >= seriesNames.length) return;
+    
+    const seriesName = seriesNames[barInfo.seriesIndex];
+    const categories = this.getCategories(this.getVisibleData());
+    if (barInfo.dataIndex < 0 || barInfo.dataIndex >= categories.length) return;
+    
+    const category = categories[barInfo.dataIndex];
+    
+    // 查找对应的数据项
+    const dataItems = this.getDataItemsBySeriesName(seriesName);
+    const item = dataItems.find(item => item.name === category);
+    
+    if (!item) return;
 
     const barPosition = this.barPositions.find(
-      bar => bar.seriesIndex === barInfo.seriesIndex && bar.data.name === item.name
+      bar => bar.seriesIndex === barInfo.seriesIndex && bar.data && bar.data.name === item.name
     );
 
     if (!barPosition) return;
@@ -828,7 +1071,7 @@ export class BarComponent implements OnInit, OnChanges {
 
     const tooltipData = {
       item: item,
-      series: series,
+      series: seriesName,
       seriesIndex: barInfo.seriesIndex,
       dataIndex: barInfo.dataIndex
     };
@@ -903,7 +1146,11 @@ export class BarComponent implements OnInit, OnChanges {
       this.hoveredBarIndex = -1;
       this.hoveredSeriesIndex = -1;
     });
-    this.drawChartFrame(1.0);
+    try {
+      this.drawChartFrame(1.0);
+    } catch (e) {
+      console.error('隐藏提示时重绘图表失败:', e);
+    }
   }
 
   // ============================================================
@@ -946,5 +1193,46 @@ export class BarComponent implements OnInit, OnChanges {
     const gg = ((g.toString(16).length === 1) ? '0' + g.toString(16) : g.toString(16));
     const bb = ((b.toString(16).length === 1) ? '0' + b.toString(16) : b.toString(16));
     return `#${rr}${gg}${bb}`;
+  }
+
+  /**
+   * 获取可见数据的所有类别
+   */
+  private getCategories(data: BarChartData[]): string[] {
+    const categories = new Set<string>();
+    
+    data.forEach(item => {
+      if (item.children) {
+        item.children.forEach(child => {
+          categories.add(child.name);
+        });
+      } else {
+        categories.add(item.name);
+      }
+    });
+    
+    return Array.from(categories);
+  }
+
+  /**
+   * 根据系列名获取数据项
+   */
+  private getDataItemsBySeriesName(seriesName: string): BarChartData[] {
+    const items: BarChartData[] = [];
+    
+    this.processedData.forEach(item => {
+      if (item.series === seriesName) {
+        if (item.children) {
+          items.push(...item.children);
+        } else {
+          items.push(item);
+        }
+      } else if (item.children) {
+        const seriesItems = item.children.filter(child => child.series === seriesName);
+        items.push(...seriesItems);
+      }
+    });
+    
+    return items;
   }
 }
