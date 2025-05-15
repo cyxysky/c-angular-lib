@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, Renderer2, TemplateRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BarChartOptions, BarChartData } from '../chart.interface';
-import { ChartService } from '../chart.serivice';
+import { ChartService } from '../chart.service';
 
 @Component({
   selector: 'lib-bar',
@@ -67,9 +67,12 @@ export class BarComponent implements OnInit, OnChanges, OnDestroy {
 
   // 生命周期钩子
   ngOnInit(): void {
+    console.log('ngOnInit');
     this.initCanvas();
     this.setupEventListeners();
-    
+    this.mergedOptions = { ...this.defaultOptions, ...this.options };
+    this.processData();
+    this.drawChart();
     // 添加窗口大小变化监听，以便重新计算图表尺寸
     window.addEventListener('resize', this.handleResize.bind(this));
   }
@@ -83,8 +86,23 @@ export class BarComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   ngOnDestroy(): void {
+    console.log('ngOnDestroy');
     // 移除事件监听器
     window.removeEventListener('resize', this.handleResize.bind(this));
+    
+    // 尝试移除canvas和tooltip上的事件监听器
+    try {
+      const canvas = this.canvasRef?.nativeElement;
+      const tooltip = this.tooltipRef?.nativeElement;
+      
+      if (canvas) {
+        // 直接使用bind创建新的处理函数时无法精确移除之前绑定的匿名函数
+        // 因此这里不尝试移除canvas上的匿名事件监听器
+        // 这由Angular的组件销毁机制处理
+      }
+    } catch (error) {
+      console.error('移除事件监听器失败:', error);
+    }
     
     // 取消任何正在进行的动画
     if (this.animationFrameId) {
@@ -465,17 +483,13 @@ export class BarComponent implements OnInit, OnChanges, OnDestroy {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.mergedOptions = { ...this.defaultOptions, ...this.options };
-
     // 获取容器尺寸
     const container = canvas.parentElement;
     if (!container) return;
-    
     const containerRect = container.getBoundingClientRect();
-    
     // 使用设置的宽高或使用容器尺寸
     const width = this.mergedOptions.width || containerRect.width;
     const height = this.mergedOptions.height || containerRect.height;
-
     // 根据图例位置适当调整尺寸
     const legendPosition = this.getLegendPosition();
     if (this.showLegend()) {
@@ -487,10 +501,8 @@ export class BarComponent implements OnInit, OnChanges, OnDestroy {
         container.style.display = 'block';
       }
     }
-    
     // 设置Canvas并处理高DPI显示
     this.setupHiDPI(canvas, width, height);
-
     this.processData();
     this.drawChart();
   }
@@ -856,6 +868,7 @@ export class BarComponent implements OnInit, OnChanges, OnDestroy {
     const tooltip = this.tooltipRef.nativeElement;
 
     this.ngZone.runOutsideAngular(() => {
+      // 使用匿名函数绑定事件处理器
       canvas.addEventListener('mousemove', (event) => this.handleMouseMove(event));
       canvas.addEventListener('mouseout', (event) => this.handleMouseOut(event));
       canvas.addEventListener('click', (event) => this.handleCanvasClick(event));

@@ -12,18 +12,18 @@
   <app-doc-box title="基本柱状图" [sourceCode]="basicChartCode">
     <div demo>
       <lib-button (click)="refreshData()">刷新数据</lib-button>
-      <lib-bar [data]="basicData"></lib-bar>
+      <lib-chart [data]="basicData" [options]="basicBarOptions"></lib-chart>
     </div>
     <div description>
       <p>最基本的柱状图用法，展示一组数据的比较。</p>
-      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>value</code>。</p>
+      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>value</code>，并将 <code>chartType</code> 设置为 <code>'bar'</code>。</p>
     </div>
   </app-doc-box>
 
   <!-- 多柱状图 -->
   <app-doc-box title="多系列柱状图" [sourceCode]="multiSeriesChartCode">
     <div demo>
-      <lib-bar [data]="multiSeriesData"></lib-bar>
+      <lib-chart [data]="multiSeriesData" [options]="multiSeriesBarOptions"></lib-chart>
     </div>
     <div description>
       <p>多系列柱状图可展示多组数据的对比，每个类别包含多个数据系列。</p>
@@ -34,7 +34,7 @@
   <!-- 多柱状图自定义 -->
   <app-doc-box title="自定义多系列柱状图" [sourceCode]="customMultiSeriesChartCode">
     <div demo>
-      <lib-bar [data]="customMultiSeriesData" [options]="customMultiSeriesOptions"></lib-bar>
+      <lib-chart [data]="customMultiSeriesData" [options]="customMultiSeriesOptions"></lib-chart>
     </div>
     <div description>
       <p>可以为每个系列设置单独的名称和颜色，并自定义图例位置。</p>
@@ -45,10 +45,10 @@
   <!-- 自定义颜色 -->
   <app-doc-box title="自定义颜色" [sourceCode]="colorChartCode">
     <div demo>
-      <lib-bar [data]="basicData" [options]="colorOptions"></lib-bar>
+      <lib-chart [data]="basicData" [options]="colorOptions"></lib-chart>
     </div>
     <div description>
-      <p>通过 <code>options</code> 属性中的 <code>barColors</code> 设置柱形颜色。</p>
+      <p>通过 <code>options</code> 属性中的 <code>colors</code> 设置柱形颜色。</p>
       <p>自定义颜色可以增强数据的视觉区分度或符合品牌标识。</p>
     </div>
   </app-doc-box>
@@ -56,7 +56,7 @@
   <!-- 带标题的柱状图 -->
   <app-doc-box title="带标题的柱状图" [sourceCode]="titleChartCode">
     <div demo>
-      <lib-bar [data]="salesData" [options]="titleOptions"></lib-bar>
+      <lib-chart [data]="salesData" [options]="titleOptions"></lib-chart>
     </div>
     <div description>
       <p>通过 <code>options</code> 属性中的 <code>title</code> 添加图表标题。</p>
@@ -67,7 +67,7 @@
   <!-- 无网格线 -->
   <app-doc-box title="无网格线柱状图" [sourceCode]="noGridChartCode">
     <div demo>
-      <lib-bar [data]="basicData" [options]="noGridOptions"></lib-bar>
+      <lib-chart [data]="basicData" [options]="noGridOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>showGrid: false</code> 可以隐藏网格线，使图表更加简洁。</p>
@@ -78,7 +78,7 @@
   <!-- 自定义圆角 -->
   <app-doc-box title="自定义圆角" [sourceCode]="radiusChartCode">
     <div demo>
-      <lib-bar [data]="basicData" [options]="radiusOptions"></lib-bar>
+      <lib-chart [data]="basicData" [options]="radiusOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>borderRadius</code> 可以调整柱形的圆角大小。</p>
@@ -89,7 +89,7 @@
   <!-- 无动画效果 -->
   <app-doc-box title="无动画效果" [sourceCode]="noAnimateChartCode">
     <div demo>
-      <lib-bar [data]="basicData" [options]="noAnimateOptions"></lib-bar>
+      <lib-chart [data]="basicData" [options]="noAnimateOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>animate: false</code> 可以禁用图表的动画效果。</p>
@@ -100,7 +100,7 @@
   <!-- 悬停效果 -->
   <app-doc-box title="悬停效果" [sourceCode]="hoverChartCode">
     <div demo>
-      <lib-bar [data]="basicData" [options]="hoverOptions"></lib-bar>
+      <lib-chart [data]="basicData" [options]="hoverOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>hoverEffect</code> 可以启用悬停效果，包括贯穿柱形的辅助线和悬浮框。</p>
@@ -111,7 +111,7 @@
   <!-- 零值测试 -->
   <app-doc-box title="零值处理测试" [sourceCode]="hoverChartCode">
     <div demo>
-      <lib-bar [data]="zeroValueData" [options]="zeroValueOptions"></lib-bar>
+      <lib-chart [data]="zeroValueData" [options]="zeroValueOptions"></lib-chart>
     </div>
     <div description>
       <p>当数据值为0时，不会显示柱形，同时将数值标签显示在基线上方。</p>
@@ -122,7 +122,7 @@
   <!-- 点击事件 -->
   <app-doc-box title="点击事件" [sourceCode]="clickChartCode">
     <div demo>
-      <lib-bar [data]="salesData" [options]="clickOptions"></lib-bar>
+      <lib-chart [data]="salesData" [options]="clickOptions"></lib-chart>
       <div *ngIf="clickedItem" class="click-result">
         <div class="click-result-title">点击结果：</div>
         <div class="click-result-content">
@@ -142,7 +142,7 @@
   <!-- 自定义悬浮框 -->
   <app-doc-box title="自定义悬浮框" [sourceCode]="customTooltipCode">
     <div demo>
-      <lib-bar [data]="salesData" [options]="customTooltipOptions" [tooltipTemplate]="customTooltip"></lib-bar>
+      <lib-chart [data]="salesData" [options]="customTooltipOptions" [tooltipTemplate]="customTooltip"></lib-chart>
       
       <ng-template #customTooltip let-item>
         <!-- 自定义悬浮框内容，右侧边框由组件设置 -->
@@ -178,7 +178,7 @@
   <!-- 多系列悬浮框 -->
   <app-doc-box title="多系列悬浮框" [sourceCode]="multiSeriesTooltipCode">
     <div demo>
-      <lib-bar [data]="multiSeriesData" [options]="multiSeriesTooltipOptions" [tooltipTemplate]="multiSeriesTooltip"></lib-bar>
+      <lib-chart [data]="multiSeriesData" [options]="multiSeriesTooltipOptions" [tooltipTemplate]="multiSeriesTooltip"></lib-chart>
       
       <ng-template #multiSeriesTooltip let-data>
         <div style="display: flex; width: 100%; flex-direction: column;">
@@ -214,7 +214,7 @@
   <!-- 基本饼图 -->
   <app-doc-box title="基本饼图" [sourceCode]="basicPieChartCode">
     <div demo>
-      <lib-pie [data]="pieData" [options]="basicPieOptions"></lib-pie>
+      <lib-chart [data]="pieData" [options]="basicPieOptions"></lib-chart>
     </div>
     <div description>
       <p>基本饼图用于展示不同类别数据的占比关系。</p>
@@ -225,7 +225,7 @@
   <!-- 环形图 -->
   <app-doc-box title="环形图" [sourceCode]="donutPieChartCode">
     <div demo>
-      <lib-pie [data]="donutPieData" [options]="donutPieOptions"></lib-pie>
+      <lib-chart [data]="donutPieData" [options]="donutPieOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>innerRadius</code> 可以创建环形图，适合在中心显示总计数据。</p>
@@ -236,7 +236,7 @@
   <!-- 悬停效果饼图 -->
   <app-doc-box title="悬停效果" [sourceCode]="hoverPieChartCode">
     <div demo>
-      <lib-pie [data]="pieData" [options]="hoverPieOptions"></lib-pie>
+      <lib-chart [data]="pieData" [options]="hoverPieOptions"></lib-chart>
     </div>
     <div description>
       <p>通过设置 <code>hoverEffect</code> 可以启用悬停效果，包括悬浮框和扇区突出显示。</p>
@@ -247,7 +247,7 @@
   <!-- 饼图点击事件 -->
   <app-doc-box title="点击事件" [sourceCode]="pieClickChartCode">
     <div demo>
-      <lib-pie [data]="pieData" [options]="pieClickOptions"></lib-pie>
+      <lib-chart [data]="pieData" [options]="pieClickOptions"></lib-chart>
       <div *ngIf="clickedPieItem" class="click-result">
         <div class="click-result-title">点击结果：</div>
         <div class="click-result-content">
@@ -273,16 +273,10 @@
         </lib-button>
       </div>
       
-      <ng-container *ngIf="isBarChart; else pieChartTemplate">
-        <lib-bar [data]="toggleChartData" [options]="barChartOptions"></lib-bar>
-      </ng-container>
-      
-      <ng-template #pieChartTemplate>
-        <lib-pie 
-          [data]="togglePieData" 
-          [options]="pieChartOptions">
-        </lib-pie>
-      </ng-template>
+      <lib-chart 
+        [data]="isBarChart ? toggleChartData : togglePieData" 
+        [options]="isBarChart ? barChartOptions : pieChartOptions">
+      </lib-chart>
     </div>
     <div description>
       <p>可以根据需要在柱状图和饼图之间切换，以不同方式可视化相同的数据。</p>

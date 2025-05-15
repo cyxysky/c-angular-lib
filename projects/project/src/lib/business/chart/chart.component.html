@@ -1,0 +1,45 @@
+<div class="chart-container" #chartContainer>
+  <div class="canvas-wrapper">
+    <canvas #chartCanvas (mouseleave)="handleCanvasMouseLeave($event)"></canvas>
+  </div>
+  <div #chartTooltip class="chart-tooltip" 
+       [style.display]="isTooltipDisplayed ? 'flex' : 'none'"
+       [style.left]="tooltipStylePosition.left"
+       [style.top]="tooltipStylePosition.top"
+       [style.pointer-events]="isTooltipPointerEvents()"
+       [style.border-top-color]="tooltipBorderColor">
+    <ng-container *ngIf="isTooltipDisplayed && tooltipData">
+      <ng-container *ngTemplateOutlet="tooltipTemplate || defaultTooltipRef; context: {$implicit: tooltipData}">
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <!-- Default Tooltip Template -->
+  <ng-template #defaultTooltipTemplate let-tooltipData>
+    <div class="tooltip-content">
+      <div class="tooltip-content__wrapper">
+        <div class="tooltip-content__title">
+          {{ tooltipData.title }}
+        </div>
+        <div class="tooltip-content__data">
+          <div class.tooltip-content__row="" *ngFor="let row of tooltipData.rows">
+            <span class="tooltip-content__label">{{ row.label }}</span>
+            <span class="tooltip-content__value">{{ row.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Legend Container -->
+  <div class="chart-legend-wrapper" *ngIf="showLegend()" [class]="'legend-position-' + getLegendPosition()">
+    <div class="legend-item" *ngFor="let legendItem of legendItems; let i = index" (click)="toggleLegendItem(i)"
+         [class.active]="legendItem.active">
+      <div class="legend-color" [style.background-color]="legendItem.color"></div>
+      <div class="legend-name" [class.legend-disabled]="!legendItem.visible">
+        {{ legendItem.name }}
+        <small *ngIf="legendItem.percentageText">({{ legendItem.percentageText }})</small>
+      </div>
+    </div>
+  </div>
+</div>

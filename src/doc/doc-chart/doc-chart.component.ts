@@ -3,19 +3,19 @@ import { DocBoxComponent } from '../doc-box/doc-box.component';
 import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { CommonModule } from '@angular/common';
-import { BarChartData, BarChartOptions, BarComponent, ButtonComponent, PieChartData, PieChartOptions, PieComponent } from '@project';
+import { BarChartData, BarChartOptions, BarComponent, ButtonComponent, PieChartData, PieChartOptions, PieComponent, ChartComponent, ChartOptions, ChartData } from '@project';
 import { ChartService } from '@project';
 
 @Component({
   selector: 'app-doc-chart',
   standalone: true,
-  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, BarComponent, ButtonComponent, PieComponent],
+  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, BarComponent, ButtonComponent, PieComponent, ChartComponent],
   templateUrl: './doc-chart.component.html',
   styleUrl: './doc-chart.component.less'
 })
 export class DocChartComponent {
   // 基础数据
-  basicData: BarChartData[] = [
+  basicData: ChartData[] = [
     { name: '一月', data: 35 },
     { name: '二月', data: 52 },
     { name: '三月', data: 61 },
@@ -31,7 +31,7 @@ export class DocChartComponent {
   ];
   
   // 销售数据，需要在toggleChartData前定义
-  salesData: BarChartData[] = [
+  salesData: ChartData[] = [
     { name: '一季度', data: 120 },
     { name: '二季度', data: 180 },
     { name: '三季度', data: 240 },
@@ -39,7 +39,7 @@ export class DocChartComponent {
   ];
   
   // 饼图数据
-  pieData: PieChartData[] = [
+  pieData: ChartData[] = [
     { name: '产品A', value: 335 },
     { name: '产品B', value: 210 },
     { name: '产品C', value: 180 },
@@ -48,7 +48,8 @@ export class DocChartComponent {
   ];
   
   // 饼图基础配置选项
-  basicPieOptions: PieChartOptions = {
+  basicPieOptions: ChartOptions = {
+    chartType: 'pie',
     title: '产品销售占比',
     showLabels: true,
     showPercentage: true,
@@ -59,7 +60,8 @@ export class DocChartComponent {
   };
   
   // 环形图选项
-  donutPieOptions: PieChartOptions = {
+  donutPieOptions: ChartOptions = {
+    chartType: 'pie',
     title: '预算分配',
     innerRadius: 80,
     donutText: '总计: 920',
@@ -71,7 +73,7 @@ export class DocChartComponent {
   };
   
   // 环形图数据
-  donutPieData: PieChartData[] = [
+  donutPieData: ChartData[] = [
     { name: '研发', value: 350 },
     { name: '营销', value: 250 },
     { name: '运营', value: 180 },
@@ -79,7 +81,8 @@ export class DocChartComponent {
   ];
   
   // 悬停效果饼图选项
-  hoverPieOptions: PieChartOptions = {
+  hoverPieOptions: ChartOptions = {
+    chartType: 'pie',
     title: '区域销售分布',
     showLabels: true,
     showPercentage: true,
@@ -94,17 +97,19 @@ export class DocChartComponent {
   constructor(public chartService: ChartService) {}
   
   // 图表切换数据和选项
-  toggleChartData = [...this.salesData];
+  toggleChartData: ChartData[] = [...this.salesData];
   
   isBarChart: boolean = true;
   
-  barChartOptions: BarChartOptions = {
+  barChartOptions: ChartOptions = {
+    chartType: 'bar',
     title: '季度销售数据',
-    barColors: ['#3498db'],
+    colors: ['#3498db'],
     borderRadius: 6
   };
   
-  pieChartOptions: PieChartOptions = {
+  pieChartOptions: ChartOptions = {
+    chartType: 'pie',
     title: '季度销售分布',
     showPercentage: true,
     showLegend: true,
@@ -117,18 +122,19 @@ export class DocChartComponent {
   // 饼图点击事件选项
   pieTotalValue: number = 0;
   
-  pieClickOptions: PieChartOptions = {
+  pieClickOptions: ChartOptions = {
+    chartType: 'pie',
     title: '产品分类比例',
     showPercentage: true,
     showLegend: true,
-    onClick: (info) => {
+    onClick: (info: any) => {
       this.clickedPieItem = info;
       console.log('点击了扇区:', info);
     }
   };
   
   // 多系列数据
-  multiSeriesData: BarChartData[] = [
+  multiSeriesData: ChartData[] = [
     {
       name: '2022年',
       series: '2022年',
@@ -154,7 +160,7 @@ export class DocChartComponent {
   ];
   
   // 自定义多系列数据
-  customMultiSeriesData: BarChartData[] = [
+  customMultiSeriesData: ChartData[] = [
     {
       name: '北京',
       series: '北京',
@@ -194,7 +200,8 @@ export class DocChartComponent {
   ];
   
   // 自定义多系列选项
-  customMultiSeriesOptions: BarChartOptions = {
+  customMultiSeriesOptions: ChartOptions = {
+    chartType: 'bar',
     title: '2023年主要城市季度销售额',
     legend: {
       position: 'top',
@@ -205,7 +212,8 @@ export class DocChartComponent {
   };
   
   // 多系列悬浮框选项
-  multiSeriesTooltipOptions: BarChartOptions = {
+  multiSeriesTooltipOptions: ChartOptions = {
+    chartType: 'bar',
     title: '年度季度对比',
     legend: {
       position: 'top',
@@ -221,7 +229,7 @@ export class DocChartComponent {
   };
 
   // 包含零值的测试数据
-  zeroValueData: BarChartData[] = [
+  zeroValueData: ChartData[] = [
     { name: '一月', data: 35 },
     { name: '二月', data: 0 },
     { name: '三月', data: 61 },
@@ -231,48 +239,55 @@ export class DocChartComponent {
   ];
 
   // 零值测试选项
-  zeroValueOptions: BarChartOptions = {
+  zeroValueOptions: ChartOptions = {
+    chartType: 'bar',
     title: '零值测试图表',
-    barColors: ['#3498db'],
+    colors: ['#3498db'],
     borderRadius: 8
   };
 
   // 自定义颜色选项
-  colorOptions: BarChartOptions = {
-    barColors: ['#8e44ad', '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
+  colorOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#8e44ad', '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
     borderRadius: 4
   };
 
   // 标题选项
-  titleOptions: BarChartOptions = {
+  titleOptions: ChartOptions = {
+    chartType: 'bar',
     title: '季度销售额统计',
-    barColors: ['#3498db'],
+    colors: ['#3498db'],
     borderRadius: 6
   };
 
   // 无网格选项
-  noGridOptions: BarChartOptions = {
-    barColors: ['#2ecc71'],
+  noGridOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#2ecc71'],
     showGrid: false,
     borderRadius: 6
   };
 
   // 圆角选项
-  radiusOptions: BarChartOptions = {
-    barColors: ['#e74c3c'],
+  radiusOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#e74c3c'],
     borderRadius: 15
   };
 
   // 无动画选项
-  noAnimateOptions: BarChartOptions = {
-    barColors: ['#9b59b6'],
+  noAnimateOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#9b59b6'],
     animate: false,
     borderRadius: 6
   };
 
   // 带悬停效果的选项
-  hoverOptions: BarChartOptions = {
-    barColors: ['#3498db'],
+  hoverOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#3498db'],
     borderRadius: 4,
     hoverEffect: {
       enabled: true,
@@ -289,19 +304,21 @@ export class DocChartComponent {
   clickedItem: any = null;
   
   // 点击事件选项
-  clickOptions: BarChartOptions = {
+  clickOptions: ChartOptions = {
+    chartType: 'bar',
     title: '季度销售额统计',
-    barColors: ['#2980b9'],
+    colors: ['#2980b9'],
     borderRadius: 6,
-    onClick: (info) => {
+    onClick: (info: any) => {
       this.clickedItem = info;
       console.log('点击了柱形:', info);
     }
   };
 
   // 自定义悬浮框模板选项
-  customTooltipOptions: BarChartOptions = {
-    barColors: ['#9b59b6'],
+  customTooltipOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#9b59b6'],
     borderRadius: 8,
     hoverEffect: {
       enabled: true,
@@ -344,27 +361,32 @@ export class DocChartComponent {
     // 由ChartService处理数据和选项转换，保持颜色一致性
     if (this.isBarChart) {
       // 从饼图转换回柱状图
-      const result = this.chartService.convertPieChartToBarChart(
-        this.chartService.convertBarChartToPieChart(this.toggleChartData, this.barChartOptions).data, 
-        this.pieChartOptions
+      // 此处使用类型断言正确处理转换关系
+      const convertToPieResult = this.chartService.convertBarChartToPieChart(
+        this.toggleChartData as any, 
+        this.barChartOptions as any
       );
-      this.toggleChartData = result.data;
-      this.barChartOptions = result.options;
+      const result = this.chartService.convertPieChartToBarChart(
+        convertToPieResult.data as any, 
+        this.pieChartOptions as any
+      );
+      this.toggleChartData = result.data as ChartData[];
+      this.barChartOptions = result.options as ChartOptions;
     } else {
       // 从柱状图转换为饼图
       const result = this.chartService.convertBarChartToPieChart(
-        this.toggleChartData, 
-        this.barChartOptions
+        this.toggleChartData as any, 
+        this.barChartOptions as any
       );
       // 不需要单独存储饼图数据，直接在模板中使用转换函数
-      this.pieChartOptions = result.options;
-      this.togglePieData = result.data;
+      this.pieChartOptions = result.options as ChartOptions;
+      this.togglePieData = result.data as ChartData[];
     }
   }
   
   // 计算饼图的总值
-  calculatePieTotal(data: PieChartData[]): number {
-    return data.reduce((sum, item) => sum + item.value, 0);
+  calculatePieTotal(data: ChartData[]): number {
+    return data.reduce((sum, item) => sum + (item.value || 0), 0);
   }
   
   // 获取点击扇区的百分比
@@ -833,14 +855,14 @@ export class DocChartComponent {
   // 代码示例
   basicPieChartCode = `
 import { Component } from '@angular/core';
-import { PieChartData, PieChartOptions } from '@project';
+import { ChartData, ChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-pie [data]="pieData" [options]="options"></lib-pie>\`
+  template: \`<lib-chart [data]="pieData" [options]="options" [chartType]="'pie'"></lib-chart>\`
 })
 export class ChartDemoComponent {
-  pieData: PieChartData[] = [
+  pieData: ChartData[] = [
     { name: '产品A', value: 335 },
     { name: '产品B', value: 210 },
     { name: '产品C', value: 180 },
@@ -848,7 +870,7 @@ export class ChartDemoComponent {
     { name: '产品E', value: 75 }
   ];
   
-  options: PieChartOptions = {
+  options: ChartOptions = {
     title: '产品销售占比',
     showLabels: true,
     showPercentage: true,
@@ -861,21 +883,21 @@ export class ChartDemoComponent {
   // 环形图示例代码
   donutPieChartCode = `
 import { Component } from '@angular/core';
-import { PieChartData, PieChartOptions } from '@project';
+import { ChartData, ChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-pie [data]="donutData" [options]="donutOptions"></lib-pie>\`
+  template: \`<lib-chart [data]="donutData" [options]="donutOptions" [chartType]="'pie'"></lib-chart>\`
 })
 export class ChartDemoComponent {
-  donutData: PieChartData[] = [
+  donutData: ChartData[] = [
     { name: '研发', value: 350 },
     { name: '营销', value: 250 },
     { name: '运营', value: 180 },
     { name: '客服', value: 140 }
   ];
   
-  donutOptions: PieChartOptions = {
+  donutOptions: ChartOptions = {
     title: '预算分配',
     innerRadius: 80, // 设置内圆半径创建环形图
     donutText: '总计: 920',
@@ -887,46 +909,15 @@ export class ChartDemoComponent {
   };
 }`;
 
-  // 悬停效果饼图代码
-  hoverPieChartCode = `
-import { Component } from '@angular/core';
-import { PieChartData, PieChartOptions } from '@project';
-
-@Component({
-  selector: 'app-chart-demo',
-  template: \`<lib-pie [data]="pieData" [options]="hoverOptions"></lib-pie>\`
-})
-export class ChartDemoComponent {
-  pieData: PieChartData[] = [
-    { name: '华东', value: 420 },
-    { name: '华南', value: 380 },
-    { name: '华北', value: 320 },
-    { name: '西部', value: 280 },
-    { name: '东北', value: 190 }
-  ];
-  
-  hoverOptions: PieChartOptions = {
-    title: '区域销售分布',
-    showLabels: true,
-    showPercentage: true,
-    hoverEffect: {
-      enabled: true,
-      showTooltip: true,
-      expandSlice: true,
-      expandRadius: 10
-    }
-  };
-}`;
-
   // 饼图点击事件代码
   pieClickChartCode = `
 import { Component } from '@angular/core';
-import { PieChartData, PieChartOptions } from '@project';
+import { ChartData, ChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
   template: \`
-    <lib-pie [data]="pieData" [options]="clickOptions"></lib-pie>
+    <lib-chart [data]="pieData" [options]="clickOptions" [chartType]="'pie'"></lib-chart>
     
     <div *ngIf="clickedItem" class="click-result">
       <div class="click-result-title">点击结果：</div>
@@ -940,7 +931,7 @@ import { PieChartData, PieChartOptions } from '@project';
   \`
 })
 export class ChartDemoComponent {
-  pieData: PieChartData[] = [
+  pieData: ChartData[] = [
     { name: '电子产品', value: 350 },
     { name: '服装', value: 230 },
     { name: '食品', value: 180 },
@@ -950,7 +941,7 @@ export class ChartDemoComponent {
   
   clickedItem: any = null;
   
-  clickOptions: PieChartOptions = {
+  clickOptions: ChartOptions = {
     title: '产品分类比例',
     showPercentage: true,
     showLegend: true,
@@ -961,10 +952,42 @@ export class ChartDemoComponent {
   };
 }`;
 
+  // 悬停效果饼图代码
+  hoverPieChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-chart-demo',
+  template: \`<lib-chart [data]="pieData" [options]="hoverOptions" [chartType]="'pie'"></lib-chart>\`
+})
+export class ChartDemoComponent {
+  pieData: ChartData[] = [
+    { name: '华东', value: 420 },
+    { name: '华南', value: 380 },
+    { name: '华北', value: 320 },
+    { name: '西部', value: 280 },
+    { name: '东北', value: 190 }
+  ];
+  
+  hoverOptions: ChartOptions = {
+    title: '区域销售分布',
+    showLabels: true,
+    showPercentage: true,
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      expandSlice: true,
+      expandRadius: 10
+    }
+  };
+}`;
+
   // 图表类型切换代码
   toggleChartTypeCode = `
 import { Component } from '@angular/core';
-import { BarChartData, BarChartOptions, PieChartData, PieChartOptions } from '@project';
+import { ChartData, ChartOptions } from '@project';
+import { ChartService } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
@@ -975,70 +998,66 @@ import { BarChartData, BarChartOptions, PieChartData, PieChartOptions } from '@p
       </lib-button>
     </div>
     
-    <ng-container *ngIf="isBarChart; else pieChart">
-      <lib-bar [data]="chartData" [options]="chartOptions"></lib-bar>
-    </ng-container>
-    
-    <ng-template #pieChart>
-      <lib-pie [data]="getPieData()" [options]="chartOptions"></lib-pie>
-    </ng-template>
+    <lib-chart 
+      [data]="isBarChart ? chartData : pieData" 
+      [options]="isBarChart ? barOptions : pieOptions"
+      [chartType]="isBarChart ? 'bar' : 'pie'">
+    </lib-chart>
   \`
 })
 export class ChartDemoComponent {
+  constructor(private chartService: ChartService) {}
+  
   isBarChart: boolean = true;
   
-  chartData: BarChartData[] = [
+  chartData: ChartData[] = [
     { name: '一季度', data: 120 },
     { name: '二季度', data: 180 },
     { name: '三季度', data: 240 },
     { name: '四季度', data: 300 }
   ];
   
-  chartOptions: BarChartOptions | PieChartOptions = {
+  pieData: ChartData[] = [];
+  
+  barOptions: ChartOptions = {
     title: '季度销售数据',
-    barColors: ['#3498db'],
+    colors: ['#3498db'],
     borderRadius: 6
+  };
+  
+  pieOptions: ChartOptions = {
+    title: '季度销售分布',
+    showPercentage: true,
+    showLegend: true,
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
   };
   
   toggleChartType() {
     this.isBarChart = !this.isBarChart;
     
-    if (this.isBarChart) {
-      this.chartOptions = {
-        title: '季度销售数据',
-        barColors: ['#3498db'],
-        borderRadius: 6
-      };
-    } else {
-      this.chartOptions = {
-        title: '季度销售分布',
-        showPercentage: true,
-        showLegend: true,
-        colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
-      };
+    if (!this.isBarChart && this.pieData.length === 0) {
+      // 如果是第一次切换到饼图，则将柱状图数据转换为饼图数据
+      const result = this.chartService.convertBarChartToPieChart(
+        this.chartData, 
+        this.barOptions
+      );
+      this.pieData = result.data;
+      this.pieOptions = result.options;
     }
-  }
-  
-  // 将柱状图数据转换为饼图数据
-  getPieData(): PieChartData[] {
-    return this.chartData.map(item => ({
-      name: item.name,
-      value: typeof item.data === 'number' ? item.data : 0
-    }));
   }
 }`;
 
   // 代码示例
   basicChartCode = `
 import { Component } from '@angular/core';
-import { BarChartData } from '@project';
+import { ChartData } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="barData"></lib-bar>\`
+  template: \`<lib-chart [data]="chartData" [chartType]="'bar'"></lib-chart>\`
 })
 export class ChartDemoComponent {
-  barData: BarChartData[] = [
+  chartData: ChartData[] = [
     { name: '一月', data: 35 },
     { name: '二月', data: 52 },
     { name: '三月', data: 61 },
@@ -1050,14 +1069,14 @@ export class ChartDemoComponent {
 
   multiSeriesChartCode = `
 import { Component } from '@angular/core';
-import { BarChartData } from '@project';
+import { ChartData } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="multiSeriesData"></lib-bar>\`
+  template: \`<lib-chart [data]="multiSeriesData" [chartType]="'bar'"></lib-chart>\`
 })
 export class ChartDemoComponent {
-  multiSeriesData: BarChartData[] = [
+  multiSeriesData: ChartData[] = [
     {
       name: '2022年',
       series: '2022年',
@@ -1085,14 +1104,14 @@ export class ChartDemoComponent {
 
   customMultiSeriesChartCode = `
 import { Component } from '@angular/core';
-import { BarChartData, BarChartOptions } from '@project';
+import { ChartData, ChartOptions } from '@project';
 
 @Component({
   selector: 'app-chart-demo',
-  template: \`<lib-bar [data]="customData" [options]="customOptions"></lib-bar>\`
+  template: \`<lib-chart [data]="customData" [options]="customOptions" [chartType]="'bar'"></lib-chart>\`
 })
 export class ChartDemoComponent {
-  customData: BarChartData[] = [
+  customData: ChartData[] = [
     {
       name: '北京',
       series: '北京',
@@ -1119,10 +1138,9 @@ export class ChartDemoComponent {
     }
   ];
   
-  customOptions: BarChartOptions = {
+  customOptions: ChartOptions = {
     title: '2023年主要城市季度销售额',
     legend: {
-      show: true,
       position: 'top',
       align: 'center'
     },
@@ -1416,6 +1434,16 @@ export class ChartDemoComponent {
     }
   };
 }`;
+
+  basicBarOptions: ChartOptions = {
+    chartType: 'bar',
+    title: '基本柱状图'
+  };
+
+  multiSeriesBarOptions: ChartOptions = {
+    chartType: 'bar',
+    title: '多系列柱状图'
+  };
 }
 
 

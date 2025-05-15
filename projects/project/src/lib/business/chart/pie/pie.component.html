@@ -7,7 +7,7 @@
       <div class="legend-color" [style.background-color]="item.color"></div>
       <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">
         {{item.name}}
-        <small *ngIf="options.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
+        <small *ngIf="mergedOptions.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
       <div class="legend-color" [style.background-color]="item.color"></div>
       <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">
         {{item.name}}
-        <small *ngIf="options.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
+        <small *ngIf="mergedOptions.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
       </div>
     </div>
   </div>

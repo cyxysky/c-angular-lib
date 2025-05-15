@@ -17,6 +17,7 @@ import { CustomerFormModalComponent } from './business/customer-form/customer-fo
 import { ProcessTreeComponent } from './business/process-tree/process-tree.component';
 import { ProcessTreeNodeComponent } from './business/process-tree/process-tree-node/process-tree-node.component';
 import { StructureTreeComponent } from './business/structure-tree/structure-tree.component';
+
 // 组件
 import { InputComponent } from './input/input.component';
 import { SelectComponent } from './select/select.component';
@@ -43,6 +44,10 @@ import { DrawerComponent } from './drawer/drawer.component';
 import { DropMenuComponent } from './drop-menu/drop-menu.component';
 import { MenuComponent } from './menu/menu.component';
 import { TableComponent } from './table/table.component';
+
+// 图表
+import { ChartComponent } from './business/chart/chart.component';
+
 // 服务
 
 export * from './core';
@@ -120,7 +125,8 @@ export * from './table';
     DrawerComponent,
     DropMenuComponent,
     MenuComponent,
-    TableComponent
+    TableComponent,
+    ChartComponent
   ],
   exports: [
     CustomerFormComponent,
@@ -163,7 +169,8 @@ export * from './table';
     DrawerComponent,
     DropMenuComponent,
     MenuComponent,
-    TableComponent
+    TableComponent,
+    ChartComponent
   ],
   providers: [
     WidgetSource

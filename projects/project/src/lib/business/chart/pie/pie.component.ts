@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, AfterViewInit, NgZone, Renderer2, TemplateRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartService } from '../chart.serivice';
+import { ChartService } from '../chart.service';
 import { PieChartData, PieChartOptions } from '../chart.interface';
 
 @Component({
@@ -36,6 +36,31 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
   private isTooltipHovered: boolean = false;
   private canvasScale: number = 1;
   
+  // 默认选项
+  private defaultOptions: PieChartOptions = {
+    colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
+    backgroundColor: '#ffffff',
+    showLabels: true,
+    showPercentage: true,
+    showLegend: true,
+    animate: true,
+    dynamicSlices: true,
+    legend: {
+      position: 'top',
+      align: 'center'
+    },
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      expandSlice: true,
+      expandRadius: 10,
+      tooltipHoverable: false
+    }
+  };
+  
+  // 合并后的选项
+  public mergedOptions!: PieChartOptions;
+  
   // MutationObserver实例
   private legendObserver: MutationObserver | null = null;
   
@@ -46,10 +71,18 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     private chartService: ChartService,
     private ngZone: NgZone,
     private renderer: Renderer2
-  ) { }
+  ) {
+    // 初始化合并的选项
+    this.mergedOptions = { ...this.defaultOptions };
+  }
   
   ngOnInit(): void {
+    console.log('ngOnInit');
+
+    // 合并用户提供的选项与默认选项
+    this.mergedOptions = { ...this.defaultOptions, ...this.options };
     this.processData();
+    this.draw();
   }
   
   ngAfterViewInit(): void {
@@ -57,7 +90,31 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     setTimeout(() => {
       this.initializeCanvas();
       this.draw();
-      this.setupEventListeners();
+      
+      // 设置事件监听器
+      const canvas = this.canvasRef.nativeElement;
+      const tooltip = this.tooltipRef.nativeElement;
+      
+      this.ngZone.runOutsideAngular(() => {
+        // 添加Canvas事件监听器
+        canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
+        canvas.addEventListener('click', this.handleCanvasClick.bind(this));
+        
+        // 添加Tooltip事件监听器
+        tooltip.addEventListener('mouseenter', () => {
+          if (this.isTooltipHoverable()) {
+            this.isTooltipHovered = true;
+          }
+        });
+        
+        tooltip.addEventListener('mouseleave', () => {
+          if (this.isTooltipHoverable()) {
+            this.isTooltipHovered = false;
+            if (this.hoveredIndex === -1) this.hideTooltip();
+          }
+        });
+      });
       
       // 添加窗口大小变化监听，以便重新计算图表尺寸
       window.addEventListener('resize', this.handleResize.bind(this));
@@ -65,28 +122,44 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       // 确保图例可点击
       this.ensureLegendClickable();
       
+      // 重新创建MutationObserver，避免重复观察
+      this.destroyLegendObserver();
+      
       // 使用MutationObserver监听DOM变化，确保图例始终可点击
       this.legendObserver = new MutationObserver(() => {
         this.ensureLegendClickable();
       });
       
-      this.legendObserver.observe(this.containerRef.nativeElement, {
-        childList: true,
-        subtree: true
-      });
+      if (this.containerRef && this.containerRef.nativeElement) {
+        this.legendObserver.observe(this.containerRef.nativeElement, {
+          childList: true,
+          subtree: true
+        });
+      }
     }, 0);
   }
   
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['data'] || changes['options']) && this.ctx) {
+      // 更新合并的选项
+      this.mergedOptions = { ...this.defaultOptions, ...this.options };
       this.processData();
       this.draw();
     }
   }
   
   ngOnDestroy(): void {
+    console.log('ngOnDestroy');
     // 移除事件监听器
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    try {
+      window.removeEventListener('resize', this.handleResize.bind(this));
+      
+      // 直接使用bind创建新的处理函数时无法精确移除之前绑定的匿名函数
+      // 因此这里不尝试移除canvas和tooltip上的事件监听器
+      // 这由Angular的组件销毁机制处理
+    } catch (error) {
+      console.error('移除事件监听器失败:', error);
+    }
     
     // 取消任何正在进行的动画
     if (this.animationFrameId) {
@@ -105,10 +178,10 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     if (!this.data || this.data.length === 0) return;
     
     // 确保所有数据项都有颜色
-    const coloredData = this.chartService.assignPieColors(this.data, this.options.colors);
+    const coloredData = this.chartService.assignPieColors(this.data, this.mergedOptions.colors);
     
     // 计算每个扇区的角度
-    this.processedData = this.chartService.calculatePieAngles(coloredData);
+    this.processedData = this.chartService.calculatePieAngles(coloredData) as Array<PieChartData & { startAngle: number; endAngle: number }>;
     
     // 初始化扇区可见性数组
     this.sliceVisibility = this.processedData.map(() => true);
@@ -138,18 +211,18 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     if (availableHeight < 100) availableHeight = 300;
     
     // 应用设置的宽高或使用容器的尺寸
-    this.width = this.options.width || availableWidth;
-    this.height = this.options.height || availableHeight;
+    this.width = this.mergedOptions.width || availableWidth;
+    this.height = this.mergedOptions.height || availableHeight;
     
     // 检查是否为环形图
-    const isDonut = this.options.innerRadius && this.options.innerRadius > 0;
+    const isDonut = this.mergedOptions.innerRadius && this.mergedOptions.innerRadius > 0;
     
     // 如果是环形图，强制图例位置在上方
-    if (isDonut && this.options.showLegend) {
-      if (!this.options.legend) {
-        this.options.legend = {};
+    if (isDonut && this.mergedOptions.showLegend) {
+      if (!this.mergedOptions.legend) {
+        this.mergedOptions.legend = {};
       }
-      this.options.legend.position = 'top';
+      this.mergedOptions.legend.position = 'top';
     }
     
     // 根据图例位置适当调整尺寸
@@ -174,7 +247,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     // 计算中心点和半径
     this.centerX = this.width / 2;
     this.centerY = this.height / 2;
-    this.outerRadius = this.options.outerRadius || Math.min(this.width, this.height) * 0.4;
+    this.outerRadius = this.mergedOptions.outerRadius || Math.min(this.width, this.height) * 0.4;
     
     // 环形图的内半径调整
     if (isDonut) {
@@ -182,15 +255,15 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       this.innerRadius = this.outerRadius * 0.6; // 将内径设置为外径的60%
       
       // 如果用户设置了更大的内径，则使用用户设置
-      if (this.options.innerRadius && this.options.innerRadius > this.innerRadius) {
-        this.innerRadius = this.options.innerRadius;
+      if (this.mergedOptions.innerRadius && this.mergedOptions.innerRadius > this.innerRadius) {
+        this.innerRadius = this.mergedOptions.innerRadius;
       }
     } else {
       this.innerRadius = 0; // 普通饼图没有内径
     }
     
     // 重置动画
-    if (this.options.animate && !skipAnimation) {
+    if (this.mergedOptions.animate && !skipAnimation) {
       this.animationProgress = 0;
       this.startAnimation();
     } else {
@@ -235,17 +308,17 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     this.ctx.clearRect(0, 0, this.width, this.height);
     
     // 应用背景颜色 - 默认透明背景
-    if (this.options.backgroundColor) {
-      this.ctx.fillStyle = this.options.backgroundColor;
+    if (this.mergedOptions.backgroundColor) {
+      this.ctx.fillStyle = this.mergedOptions.backgroundColor;
       this.ctx.fillRect(0, 0, this.width, this.height);
     }
     
     // 绘制标题
-    if (this.options.title) {
+    if (this.mergedOptions.title) {
       this.ctx.fillStyle = '#333';
       this.ctx.textAlign = 'center';
       this.ctx.font = 'bold 16px Arial';
-      this.ctx.fillText(this.options.title, this.centerX, 25); // 调整标题位置
+      this.ctx.fillText(this.mergedOptions.title, this.centerX, 25); // 调整标题位置
     }
     
     // 判断是否为环形图
@@ -261,8 +334,8 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       this.ctx.save();
       
       // 如果悬停且启用了扩展效果
-      if (isHovered && this.options.hoverEffect?.expandSlice) {
-        const expandRadius = this.options.hoverEffect.expandRadius || 10;
+      if (isHovered && this.mergedOptions.hoverEffect?.expandSlice) {
+        const expandRadius = this.mergedOptions.hoverEffect.expandRadius || 10;
         const midAngle = (item.startAngle + animatedEndAngle) / 2;
         const offsetX = Math.cos(midAngle) * expandRadius;
         const offsetY = Math.sin(midAngle) * expandRadius;
@@ -310,18 +383,18 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     });
     
     // 绘制标签
-    if (this.options.showLabels && this.animationProgress === 1) {
+    if (this.mergedOptions.showLabels && this.animationProgress === 1) {
       this.drawLabels();
     }
     
     // 如果是环形图，绘制中心文本
-    if (this.innerRadius > 0 && this.options.donutText && this.animationProgress === 1) {
+    if (this.innerRadius > 0 && this.mergedOptions.donutText && this.animationProgress === 1) {
       this.drawDonutText();
     }
   }
   
   private drawDonutText(): void {
-    if (!this.options.donutText) return;
+    if (!this.mergedOptions.donutText) return;
     
     this.ctx.save();
     
@@ -335,8 +408,8 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     this.ctx.fillStyle = '#333';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.font = 'bold 14px Arial';
-    this.ctx.fillText(this.options.donutText, this.centerX, this.centerY);
+    this.ctx.font = 'bold 16px Arial'; // 稍微增大字体
+    this.ctx.fillText(this.mergedOptions.donutText, this.centerX, this.centerY);
     
     this.ctx.restore();
   }
@@ -346,8 +419,8 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       if (!this.sliceVisibility[index]) return;
       
       const midAngle = (item.startAngle + item.endAngle) / 2;
-      // 调整标签位置，放在扇形上而不是在中心
-      const labelRadius = this.outerRadius * 0.65;
+      // 调整标签位置，放在扇形外侧而不是在中间
+      const labelRadius = this.outerRadius * 0.75;
       
       // 计算标签位置
       const x = this.centerX + Math.cos(midAngle) * labelRadius;
@@ -411,11 +484,11 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
    * 图例相关方法
    */
   public showLegend(): boolean {
-    return this.options.showLegend !== false && this.processedData.length > 0;
+    return this.mergedOptions.showLegend !== false && this.processedData.length > 0;
   }
   
   public getLegendPosition(): string {
-    return this.options.legend?.position || 'top';
+    return this.mergedOptions.legend?.position || 'top';
   }
   
   public isSliceVisible(index: number): boolean {
@@ -441,7 +514,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       this.sliceVisibility[index] = !this.sliceVisibility[index];
       
       // 如果启用了动态扇区，则重新计算角度
-      if (this.options.dynamicSlices) {
+      if (this.mergedOptions.dynamicSlices) {
         // 过滤出可见的数据
         const visibleData = this.processedData.filter((_, i) => this.sliceVisibility[i]);
         
@@ -608,36 +681,12 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
    * 是否允许悬浮框可悬停
    */
   public isTooltipHoverable(): boolean {
-    return this.options.hoverEffect?.tooltipHoverable === true;
+    return this.mergedOptions.hoverEffect?.tooltipHoverable === true;
   }
   
   // ============================================================
   // 事件处理方法
   // ============================================================
-  
-  private setupEventListeners(): void {
-    const canvas = this.canvasRef.nativeElement;
-    const tooltip = this.tooltipRef.nativeElement;
-    
-    this.ngZone.runOutsideAngular(() => {
-      canvas.addEventListener('mousemove', (event) => this.handleMouseMove(event));
-      canvas.addEventListener('mouseout', (event) => this.handleMouseOut(event));
-      canvas.addEventListener('click', (event) => this.handleCanvasClick(event));
-      
-      tooltip.addEventListener('mouseenter', () => {
-        if (this.isTooltipHoverable()) {
-          this.isTooltipHovered = true;
-        }
-      });
-      
-      tooltip.addEventListener('mouseleave', () => {
-        if (this.isTooltipHoverable()) {
-          this.isTooltipHovered = false;
-          if (this.hoveredIndex === -1) this.hideTooltip();
-        }
-      });
-    });
-  }
   
   private handleMouseMove(event: MouseEvent): void {
     const canvas = this.canvasRef.nativeElement;
@@ -656,7 +705,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
         this.hoveredIndex = hoveredSliceIndex;
         this.draw();
         
-        if (hoveredSliceIndex !== -1 && this.options.hoverEffect?.showTooltip) {
+        if (hoveredSliceIndex !== -1 && this.mergedOptions.hoverEffect?.showTooltip) {
           this.showTooltip(hoveredSliceIndex, event);
         } else {
           this.hideTooltip();
@@ -740,7 +789,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
   
   private handleCanvasClick(event: MouseEvent): void {
     // 检查是否有点击回调函数
-    if (!this.options.onClick) return;
+    if (!this.mergedOptions.onClick) return;
     
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
@@ -755,11 +804,11 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     // 如果点击到了扇区，执行回调
     if (clickedSliceIndex !== -1) {
       this.ngZone.run(() => {
-        this.options.onClick!({
+        this.mergedOptions.onClick!({
           item: this.processedData[clickedSliceIndex],
           index: clickedSliceIndex,
           data: this.processedData,
-          options: this.options,
+          options: this.mergedOptions,
           event: event
         });
       });
@@ -768,7 +817,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
   
   // 工具提示相关方法
   private showTooltip(sliceIndex: number, event?: MouseEvent): void {
-    if (!this.options.hoverEffect?.showTooltip || sliceIndex < 0 || sliceIndex >= this.processedData.length) return;
+    if (!this.mergedOptions.hoverEffect?.showTooltip || sliceIndex < 0 || sliceIndex >= this.processedData.length) return;
     
     const tooltip = this.tooltipRef.nativeElement;
     const sliceData = this.processedData[sliceIndex];
