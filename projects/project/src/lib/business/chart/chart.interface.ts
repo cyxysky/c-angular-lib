@@ -11,7 +11,7 @@ export interface PieChartData {
   value: number;
   color?: string;
   percentage?: number;
-  selected?: boolean;
+  _id?: string; // 用于唯一标识和跟踪数据项
 }
 
 export interface PieChartOptions {
@@ -29,6 +29,7 @@ export interface PieChartOptions {
   donutText?: string; // 环形图中心显示的文本
   animate?: boolean; // 是否启用动画
   title?: string; // 图表标题
+  dynamicSlices?: boolean; // 切换图例时是否根据剩余值重新计算饼图
   // 点击回调函数
   onClick?: (info: {
     item: PieChartData;
@@ -48,6 +49,7 @@ export interface PieChartOptions {
     showTooltip?: boolean;
     expandSlice?: boolean;
     expandRadius?: number;
+    tooltipHoverable?: boolean; // 悬浮框是否可以被悬停（悬停时不消失）
   };
 }
 
@@ -58,6 +60,7 @@ export interface BarChartOptions {
   backgroundColor?: string;
   borderRadius?: number;
   showValues?: boolean;
+  showLegend?: boolean; // 是否显示图例
   showGrid?: boolean;
   title?: string;
   animate?: boolean;
@@ -69,7 +72,6 @@ export interface BarChartOptions {
   };
   // 图例配置
   legend?: {
-    show?: boolean; // 是否显示图例
     position?: 'top' | 'bottom' | 'left' | 'right'; // 图例位置
     align?: 'start' | 'center' | 'end'; // 图例对齐方式
   };

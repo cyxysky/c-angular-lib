@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, Renderer2, TemplateRef, HostListener } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, Renderer2, TemplateRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BarChartOptions, BarChartData } from '../chart.interface';
 import { ChartService } from '../chart.serivice';
@@ -10,7 +10,7 @@ import { ChartService } from '../chart.serivice';
   templateUrl: './bar.component.html',
   styleUrl: './bar.component.less'
 })
-export class BarComponent implements OnInit, OnChanges {
+export class BarComponent implements OnInit, OnChanges, OnDestroy {
   // 组件输入和视图引用
   @ViewChild('barCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('barTooltip', { static: true }) tooltipRef!: ElementRef<HTMLDivElement>;
@@ -24,17 +24,15 @@ export class BarComponent implements OnInit, OnChanges {
   private seriesVisibility: boolean[] = []; // 系列可见性状态
   private ctx!: CanvasRenderingContext2D;
   private defaultOptions: BarChartOptions = {
-    width: 600,
-    height: 400,
     barColors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
     backgroundColor: '#ffffff',
     borderRadius: 4,
     showValues: true,
+    showLegend: true,
     showGrid: true,
     animate: true,
     margin: { top: 40, right: 20, bottom: 50, left: 50 },
     legend: {
-      show: true,
       position: 'top',
       align: 'center'
     },
@@ -59,6 +57,7 @@ export class BarComponent implements OnInit, OnChanges {
   private mousePosition: { x: number, y: number } = { x: 0, y: 0 };
   private isTooltipHovered: boolean = false;
   private canvasScale: number = 1; // 用于高DPI显示
+  private resizeTimeout: number | null = null; // 用于窗口大小变化防抖
 
   constructor(
     private chartService: ChartService,
@@ -70,6 +69,9 @@ export class BarComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initCanvas();
     this.setupEventListeners();
+    
+    // 添加窗口大小变化监听，以便重新计算图表尺寸
+    window.addEventListener('resize', this.handleResize.bind(this));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -77,6 +79,23 @@ export class BarComponent implements OnInit, OnChanges {
       this.mergedOptions = { ...this.defaultOptions, ...this.options };
       this.processData();
       this.drawChart();
+    }
+  }
+  
+  ngOnDestroy(): void {
+    // 移除事件监听器
+    window.removeEventListener('resize', this.handleResize.bind(this));
+    
+    // 取消任何正在进行的动画
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    
+    // 清除防抖计时器
+    if (this.resizeTimeout) {
+      window.cancelAnimationFrame(this.resizeTimeout);
+      this.resizeTimeout = null;
     }
   }
 
@@ -419,7 +438,7 @@ export class BarComponent implements OnInit, OnChanges {
    * 图例相关方法
    */
   public showLegend(): boolean {
-    return this.mergedOptions?.legend?.show !== false && this.getSeriesNames().length > 0;
+    return this.mergedOptions.showLegend !== false && this.getSeriesNames().length > 0;
   }
 
   public getLegendPosition(): string {
@@ -447,15 +466,30 @@ export class BarComponent implements OnInit, OnChanges {
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.mergedOptions = { ...this.defaultOptions, ...this.options };
 
-    // 设置Canvas容器大小
+    // 获取容器尺寸
     const container = canvas.parentElement;
-    if (container) {
-      container.style.width = `${this.mergedOptions.width || this.defaultOptions.width!}px`;
-      container.style.height = `${this.mergedOptions.height || this.defaultOptions.height!}px`;
-    }
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    
+    // 使用设置的宽高或使用容器尺寸
+    const width = this.mergedOptions.width || containerRect.width;
+    const height = this.mergedOptions.height || containerRect.height;
 
+    // 根据图例位置适当调整尺寸
+    const legendPosition = this.getLegendPosition();
+    if (this.showLegend()) {
+      if (legendPosition === 'left' || legendPosition === 'right') {
+        // 给图例留出空间
+        container.style.display = 'flex';
+        container.style.flexDirection = legendPosition === 'left' ? 'row-reverse' : 'row';
+      } else {
+        container.style.display = 'block';
+      }
+    }
+    
     // 设置Canvas并处理高DPI显示
-    this.setupHiDPI(canvas);
+    this.setupHiDPI(canvas, width, height);
 
     this.processData();
     this.drawChart();
@@ -465,17 +499,11 @@ export class BarComponent implements OnInit, OnChanges {
    * 设置高DPI屏幕支持
    * 修复高DPI屏幕下图表大小与边框不对应的问题
    */
-  private setupHiDPI(canvas: HTMLCanvasElement): void {
+  private setupHiDPI(canvas: HTMLCanvasElement, width: number, height: number): void {
     // 获取设备像素比
     const devicePixelRatio = window.devicePixelRatio || 1;
-    // 获取canvas元素的CSS宽高
-    const rect = canvas.parentElement?.getBoundingClientRect() || { width: this.mergedOptions.width || 600, height: this.mergedOptions.height || 400 };
 
-    // 保存当前的CSS宽高
-    const width = rect.width;
-    const height = rect.height;
-
-    // 重置Canvas样式宽高
+    // 设置Canvas样式宽高
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
 
@@ -497,7 +525,7 @@ export class BarComponent implements OnInit, OnChanges {
   /**
    * 绘制图表主方法
    */
-  private drawChart(): void {
+  private drawChart(forceNoAnimation: boolean = false): void {
     if (!this.processedData || this.processedData.length === 0) return;
 
     this.mergedOptions = { ...this.defaultOptions, ...this.options };
@@ -507,7 +535,7 @@ export class BarComponent implements OnInit, OnChanges {
       this.animationFrameId = null;
     }
 
-    if (this.mergedOptions.animate) {
+    if (this.mergedOptions.animate && !forceNoAnimation) {
       this.currentAnimationValue = 0;
       this.animateChart();
     } else {
@@ -1234,5 +1262,20 @@ export class BarComponent implements OnInit, OnChanges {
     });
     
     return items;
+  }
+
+  /**
+   * 处理窗口大小变化
+   */
+  private handleResize(): void {
+    // 使用requestAnimationFrame避免频繁重绘
+    if (!this.resizeTimeout) {
+      this.resizeTimeout = window.requestAnimationFrame(() => {
+        this.initCanvas();
+        // 使用强制跳过动画的参数调用绘制
+        this.drawChart(true);
+        this.resizeTimeout = null;
+      });
+    }
   }
 }

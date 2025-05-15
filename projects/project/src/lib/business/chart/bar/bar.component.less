@@ -1,119 +1,158 @@
 :host {
   display: block;
   width: 100%;
+  height: 100%;
 }
 
 .bar-chart-container {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 16px;
-  margin: 8px 0;
-  overflow: hidden;
-  transition: all 0.3s ease;
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  box-sizing: border-box;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   
   &:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
   }
 }
 
 .canvas-container {
-  width: 100%;
   position: relative;
-}
-
-canvas {
-  display: block;
+  flex: 1;
   width: 100%;
-  height: auto;
-  cursor: pointer;
-}
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 8px;
-  margin: 8px 0;
-  justify-content: center;
+  min-height: 250px;
+  overflow: visible;
   
-  &.legend-position-top {
-    order: -1;
-  }
-  
-  &.legend-position-bottom {
-    order: 1;
-  }
-  
-  &.legend-position-left {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    flex-direction: column;
-  }
-  
-  &.legend-position-right {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    flex-direction: column;
-  }
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-right: 16px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  
-  &:last-child {
-    margin-right: 0;
-  }
-}
-
-.legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  margin-right: 6px;
-}
-
-.legend-name {
-  font-size: 12px;
-  color: #333;
-  white-space: nowrap;
-  
-  &.legend-disabled {
-    text-decoration: line-through;
-    opacity: 0.5;
+  canvas {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
 }
 
 .bar-tooltip {
   position: absolute;
+  pointer-events: none;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0;
   z-index: 10;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #ffffff;
-  color: #333;
-  border-radius: 6px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  max-width: 240px;
-  overflow: visible;
-  border-top-width: 5px;
-  border-top-style: solid;
-  white-space: nowrap;
+  min-width: 150px;
+  border-top: 3px solid #4285F4;
+  overflow: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform-origin: center top;
+  animation: tooltip-appear 0.2s ease-out;
+  
+  @keyframes tooltip-appear {
+    from {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 }
 
-.tooltip-content {
+.chart-legend {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  
+  &.legend-position-top {
+    margin-bottom: 12px;
+    margin-top: 0;
+    order: -1;
+  }
+  
+  &.legend-position-bottom {
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+  
+  &.legend-position-left {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 12px;
+    width: auto;
+    max-width: 120px;
+  }
+  
+  &.legend-position-right {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 12px;
+    width: auto;
+    max-width: 120px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    &:active {
+      transform: scale(0.97);
+    }
+    
+    &.active {
+      background-color: rgba(0, 0, 0, 0.07);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .legend-name {
+      font-size: 13px;
+      color: #333;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      
+      &.legend-disabled {
+        color: #999;
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+    }
+  }
+}
+
+// 悬浮框内容样式
+.tooltip-content {
   width: 100%;
-  flex-direction: column;
   
   &__wrapper {
     padding: 12px;
@@ -121,40 +160,35 @@ canvas {
   
   &__title {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 8px;
-    color: #222;
-    letter-spacing: -0.3px;
+    color: #333;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
   }
   
   &__data {
     display: flex;
     flex-direction: column;
+    gap: 5px;
   }
   
   &__row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 4px;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
+    align-items: center;
+    font-size: 12px;
   }
   
   &__label {
-    color: #555;
-    font-size: 13px;
-    font-weight: 500;
+    color: #666;
   }
   
   &__value {
-    font-weight: 500;
-    color: #000;
-    font-size: 13px;
-    padding: 4px 10px;
-    min-width: 60px;
-    text-align: center;
+    font-weight: 600;
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.04);
+    padding: 2px 6px;
+    border-radius: 4px;
   }
 }

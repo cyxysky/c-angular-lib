@@ -1,23 +1,41 @@
 <div class="pie-chart-container" #pieContainer>
+  <!-- 图例容器 - 针对 top 和 left 位置 -->
+  <div class="chart-legend" *ngIf="showLegend() && (getLegendPosition() === 'top' || getLegendPosition() === 'left')"
+    [class]="'legend-position-' + getLegendPosition()">
+    <div class="legend-item" *ngFor="let item of processedData; let i = index" (click)="toggleSliceSelection(i)"
+      [class.active]="hoveredIndex === i">
+      <div class="legend-color" [style.background-color]="item.color"></div>
+      <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">
+        {{item.name}}
+        <small *ngIf="options.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图例容器 - 针对 bottom 和 right 位置 -->
+  <div class="chart-legend"
+    *ngIf="showLegend() && (getLegendPosition() === 'bottom' || getLegendPosition() === 'right')"
+    [class]="'legend-position-' + getLegendPosition()">
+    <div class="legend-item" *ngFor="let item of processedData; let i = index" (click)="toggleSliceSelection(i)"
+      [class.active]="hoveredIndex === i">
+      <div class="legend-color" [style.background-color]="item.color"></div>
+      <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">
+        {{item.name}}
+        <small *ngIf="options.showPercentage && isSliceVisible(i)">({{formatPercentage(item.percentage)}}%)</small>
+      </div>
+    </div>
+  </div>
+
   <div class="canvas-container">
     <canvas #pieCanvas (mouseleave)="handleCanvasMouseLeave($event)"></canvas>
-    
+
     <!-- 悬浮框容器 -->
-    <div #pieTooltip class="pie-tooltip" 
-         [style.display]="hoveredIndex >= 0 ? 'flex' : 'none'"
-         [style.pointer-events]="isTooltipHoverable() ? 'auto' : 'none'"
-         [style.border-top-color]="hoveredIndex >= 0 ? getHoveredSliceColor() : ''">
+    <div #pieTooltip class="pie-tooltip" [style.display]="hoveredIndex >= 0 ? 'flex' : 'none'"
+      [style.pointer-events]="isTooltipHoverable() ? 'auto' : 'none'"
+      [style.border-top-color]="hoveredIndex >= 0 ? getHoveredSliceColor() : ''">
     </div>
   </div>
-  
-  <!-- 图例容器 -->
-  <div class="chart-legend" *ngIf="showLegend()" [class]="'legend-position-' + getLegendPosition()">
-    <div class="legend-item" *ngFor="let item of processedData; let i = index" (click)="toggleSliceSelection(i)">
-      <div class="legend-color" [style.background-color]="item.color"></div>
-      <div class="legend-name" [class.legend-disabled]="!isSliceVisible(i)">{{item.name}}</div>
-    </div>
-  </div>
-  
+
   <!-- 默认悬浮框模板 -->
   <ng-template #defaultTooltip let-data>
     <div class="tooltip-content">

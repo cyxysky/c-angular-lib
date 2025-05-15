@@ -274,19 +274,20 @@
       </div>
       
       <ng-container *ngIf="isBarChart; else pieChartTemplate">
-        <lib-bar [data]="toggleChartData" [options]="toggleBarPieOptions"></lib-bar>
+        <lib-bar [data]="toggleChartData" [options]="barChartOptions"></lib-bar>
       </ng-container>
       
       <ng-template #pieChartTemplate>
         <lib-pie 
-          [data]="getPieDataFromBarData(toggleChartData)" 
-          [options]="toggleBarPieOptions">
+          [data]="togglePieData" 
+          [options]="pieChartOptions">
         </lib-pie>
       </ng-template>
     </div>
     <div description>
       <p>可以根据需要在柱状图和饼图之间切换，以不同方式可视化相同的数据。</p>
-      <p>柱状图适合比较类别之间的差异，而饼图更适合展示部分与整体的关系。</p>
+      <p>饼图和柱状图在切换时保持颜色一致性，提供更好的用户体验。</p>
+      <p>使用<code>ChartService</code>中的转换方法可以简化图表类型间的转换过程。</p>
     </div>
   </app-doc-box>
 </div>

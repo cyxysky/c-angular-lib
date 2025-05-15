@@ -4,6 +4,7 @@ import { ProjectModule } from '@project';
 import { ApiData, DocApiTableComponent } from '../doc-api-table/doc-api-table.component';
 import { CommonModule } from '@angular/common';
 import { BarChartData, BarChartOptions, BarComponent, ButtonComponent, PieChartData, PieChartOptions, PieComponent } from '@project';
+import { ChartService } from '@project';
 
 @Component({
   selector: 'app-doc-chart',
@@ -51,6 +52,7 @@ export class DocChartComponent {
     title: '产品销售占比',
     showLabels: true,
     showPercentage: true,
+    dynamicSlices: true,
     showLegend: true,
     colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
     animate: true
@@ -89,6 +91,8 @@ export class DocChartComponent {
     }
   };
   
+  constructor(public chartService: ChartService) {}
+  
   // 图表切换数据和选项
   toggleChartData = [...this.salesData];
   
@@ -106,10 +110,6 @@ export class DocChartComponent {
     showLegend: true,
     colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
   };
-  
-  get toggleBarPieOptions(): any {
-    return this.isBarChart ? this.barChartOptions : this.pieChartOptions;
-  }
   
   // 饼图点击事件
   clickedPieItem: any = null;
@@ -197,7 +197,6 @@ export class DocChartComponent {
   customMultiSeriesOptions: BarChartOptions = {
     title: '2023年主要城市季度销售额',
     legend: {
-      show: true,
       position: 'top',
       align: 'center'
     },
@@ -209,7 +208,6 @@ export class DocChartComponent {
   multiSeriesTooltipOptions: BarChartOptions = {
     title: '年度季度对比',
     legend: {
-      show: true,
       position: 'top',
       align: 'center'
     },
@@ -249,27 +247,27 @@ export class DocChartComponent {
   titleOptions: BarChartOptions = {
     title: '季度销售额统计',
     barColors: ['#3498db'],
-    borderRadius: 4
+    borderRadius: 6
   };
 
-  // 无网格线选项
+  // 无网格选项
   noGridOptions: BarChartOptions = {
+    barColors: ['#2ecc71'],
     showGrid: false,
-    barColors: ['#3498db'],
-    borderRadius: 4
+    borderRadius: 6
   };
 
   // 圆角选项
   radiusOptions: BarChartOptions = {
-    borderRadius: 12,
-    barColors: ['#2ecc71']
+    barColors: ['#e74c3c'],
+    borderRadius: 15
   };
 
   // 无动画选项
   noAnimateOptions: BarChartOptions = {
+    barColors: ['#9b59b6'],
     animate: false,
-    barColors: ['#e74c3c'],
-    borderRadius: 4
+    borderRadius: 6
   };
 
   // 带悬停效果的选项
@@ -320,8 +318,8 @@ export class DocChartComponent {
     }
     return '0 元';
   }
-  
-  // 格式化数值（通用）
+
+  // 格式化一般数值
   formatValue(value: number | undefined): string {
     if (typeof value === 'number') {
       return value.toString();
@@ -329,16 +327,39 @@ export class DocChartComponent {
     return '0';
   }
 
+  // 刷新数据
   refreshData() {
     this.basicData = this.basicData.map(item => ({
       ...item,
-      data: Math.floor(Math.random() * 100)
+      data: Math.floor(Math.random() * 100) + 20
     }));
   }
 
-  // 切换图表类型
-  toggleChartType() {
+  togglePieData: any;
+
+  // 修改图表类型切换实现，使用ChartService
+  toggleChartType(): void {
     this.isBarChart = !this.isBarChart;
+    
+    // 由ChartService处理数据和选项转换，保持颜色一致性
+    if (this.isBarChart) {
+      // 从饼图转换回柱状图
+      const result = this.chartService.convertPieChartToBarChart(
+        this.chartService.convertBarChartToPieChart(this.toggleChartData, this.barChartOptions).data, 
+        this.pieChartOptions
+      );
+      this.toggleChartData = result.data;
+      this.barChartOptions = result.options;
+    } else {
+      // 从柱状图转换为饼图
+      const result = this.chartService.convertBarChartToPieChart(
+        this.toggleChartData, 
+        this.barChartOptions
+      );
+      // 不需要单独存储饼图数据，直接在模板中使用转换函数
+      this.pieChartOptions = result.options;
+      this.togglePieData = result.data;
+    }
   }
   
   // 计算饼图的总值
@@ -352,14 +373,6 @@ export class DocChartComponent {
       this.pieTotalValue = this.calculatePieTotal(this.pieData);
     }
     return ((value / this.pieTotalValue) * 100).toFixed(1);
-  }
-
-  // 将柱状图数据转换为饼图数据
-  getPieDataFromBarData(barData: BarChartData[]): PieChartData[] {
-    return barData.map(item => ({
-      name: item.name,
-      value: typeof item.data === 'number' ? item.data : 0
-    }));
   }
 
   // API 数据定义
@@ -1404,3 +1417,6 @@ export class ChartDemoComponent {
   };
 }`;
 }
+
+
+// 5.柱状图的图例不要有背景色。6.饼图的扇形上的数值不要有背景色，加粗，使用艺术字体。7.饼图dynamicSlices为true，切换图例时，没有动画重绘
