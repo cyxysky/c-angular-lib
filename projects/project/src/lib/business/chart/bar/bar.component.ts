@@ -1,7 +1,61 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, Renderer2, TemplateRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BarChartOptions, BarChartData } from '../chart.interface';
 import { ChartService } from '../chart.service';
+
+export interface BarChartOptions {
+  width?: number;
+  height?: number;
+  barColors?: string[];
+  backgroundColor?: string;
+  borderRadius?: number;
+  showValues?: boolean;
+  showLegend?: boolean;
+  showGrid?: boolean;
+  title?: string;
+  animate?: boolean;
+  margin?: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  legend?: {
+    position?: 'top' | 'bottom' | 'left' | 'right';
+    align?: 'start' | 'center' | 'end';
+  };
+  hoverEffect?: {
+    enabled?: boolean;
+    showTooltip?: boolean;
+    showGuideLine?: boolean;
+    guideLineStyle?: 'solid' | 'dashed';
+    guideLineColor?: string;
+    guideLineWidth?: number;
+    tooltipHoverable?: boolean;
+  };
+  onClick?: (info: {
+    item: BarChartData;
+    index: number;
+    seriesIndex: number;
+    data: BarChartData[];
+    options: BarChartOptions;
+    event: MouseEvent;
+    position: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  }) => void;
+}
+
+// 保留原接口为向后兼容
+export interface BarChartData {
+  name: string;
+  data?: number;
+  color?: string;
+  children?: BarChartData[];
+  series?: string;
+}
 
 @Component({
   selector: 'lib-bar',

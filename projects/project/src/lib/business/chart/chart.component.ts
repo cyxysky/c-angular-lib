@@ -276,7 +276,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           if (item) {
             const tooltipPayload = {
               title: `${seriesName} - ${item.name}`,
-              rows: [{ label: '数值', value: this.barService.formatValue(item.data ?? item.value) }],
+              rows: [{ label: '数值', value: this.barService.formatValue(item.data) }],
               item: item
             };
             const borderColor = this.barService.getDataColor(hoveredBarInfo.seriesIndex, hoveredBarInfo.dataIndex);
@@ -314,7 +314,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         const tooltipPayload = {
           title: item.name,
           rows: [
-            { label: '数值', value: this.pieService.formatValue(item.data ?? item.value) },
+            { label: '数值', value: this.pieService.formatValue(item.data) },
             { label: '占比', value: `${this.pieService.formatPercentage(item.percentage)}%` }
           ],
           item: item

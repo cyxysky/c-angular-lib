@@ -65,9 +65,6 @@ export class BarService {
     this.displayWidth = displayWidth;
     this.displayHeight = displayHeight;
     this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
-    if (this.mergedOptions.barColors && (!this.mergedOptions.colors || this.mergedOptions.colors.length === 0)) {
-      this.mergedOptions.colors = this.mergedOptions.barColors;
-    }
     this.data = data;
     this.drawChart(skipInitialAnimation);
   }
@@ -262,7 +259,7 @@ export class BarService {
           ctx.fillStyle = '#333333';
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';
-          const formattedValue = this.formatValue(item.data ?? item.value);
+          const formattedValue = this.formatValue(item.data);
           const valueY = y - 5;
           const approximateTextHeight = 12;
           const titleHeightClearance = this.mergedOptions.title ? (margin.top / 2 + approximateTextHeight / 2 + 5) : (approximateTextHeight);
@@ -372,9 +369,6 @@ export class BarService {
    */
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
     this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
-    if (this.mergedOptions.barColors && (!this.mergedOptions.colors || this.mergedOptions.colors.length === 0)) {
-      this.mergedOptions.colors = this.mergedOptions.barColors;
-    }
     if (newDisplayWidth !== undefined) this.displayWidth = newDisplayWidth;
     if (newDisplayHeight !== undefined) this.displayHeight = newDisplayHeight;
     this.data = data;
@@ -558,10 +552,10 @@ export class BarService {
     visibleData.forEach(item => {
       if (item.children) {
         item.children.forEach(child => {
-          if (categoryTotals[child.name] !== undefined) categoryTotals[child.name] += (child.data ?? child.value ?? 0);
+          if (categoryTotals[child.name] !== undefined) categoryTotals[child.name] += (child.data || 0);
         });
       } else if (item.name && categoryTotals[item.name] !== undefined) {
-        categoryTotals[item.name] += (item.data ?? item.value ?? 0);
+        categoryTotals[item.name] += (item.data || 0);
       }
     });
     return Object.values(categoryTotals).length > 0 ? this.safeArrayMax(Object.values(categoryTotals)) : 0;
@@ -578,15 +572,15 @@ export class BarService {
       const seriesName = seriesNames[seriesIndex];
       let total = 0;
       this.processedData.forEach(item => {
-        if (item.series === seriesName) total += (item.data ?? item.value ?? 0);
-        if (item.children) item.children.forEach(child => { if (child.series === seriesName) total += (child.data ?? child.value ?? 0); });
+        if (item.series === seriesName) total += (item.data || 0);
+        if (item.children) item.children.forEach(child => { if (child.series === seriesName) total += (child.data || 0); });
       });
       return total;
     } else {
       let total = 0;
       this.processedData.forEach(item => {
-        total += (item.data ?? item.value ?? 0);
-        if (item.children) item.children.forEach(child => total += (child.data ?? child.value ?? 0));
+        total += (item.data || 0);
+        if (item.children) item.children.forEach(child => total += (child.data || 0));
       });
       return total;
     }
@@ -598,7 +592,7 @@ export class BarService {
    * @returns 数值，如果无效则为 0
    */
   private getItemValue(item: ChartData): number {
-    return (item.data ?? item.value ?? 0);
+    return (item.data || 0);
   }
 
   /**

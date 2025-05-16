@@ -40,11 +40,11 @@ export class DocChartComponent {
 
   // 饼图数据
   pieData: ChartData[] = [
-    { name: '产品A', value: 335 },
-    { name: '产品B', value: 210 },
-    { name: '产品C', value: 180 },
-    { name: '产品D', value: 120 },
-    { name: '产品E', value: 75 }
+    { name: '产品A', data: 335 },
+    { name: '产品B', data: 210 },
+    { name: '产品C', data: 180 },
+    { name: '产品D', data: 120 },
+    { name: '产品E', data: 75 }
   ];
 
   // 饼图基础配置选项
@@ -74,10 +74,10 @@ export class DocChartComponent {
 
   // 环形图数据
   donutPieData: ChartData[] = [
-    { name: '研发', value: 350 },
-    { name: '营销', value: 250 },
-    { name: '运营', value: 180 },
-    { name: '客服', value: 140 }
+    { name: '研发', data: 350 },
+    { name: '营销', data: 250 },
+    { name: '运营', data: 180 },
+    { name: '客服', data: 140 }
   ];
 
   // 悬停效果饼图选项
@@ -358,35 +358,12 @@ export class DocChartComponent {
   toggleChartType(): void {
     this.isBarChart = !this.isBarChart;
 
-    // 由ChartService处理数据和选项转换，保持颜色一致性
-    if (this.isBarChart) {
-      // 从饼图转换回柱状图
-      // 此处使用类型断言正确处理转换关系
-      const convertToPieResult = this.chartService.convertBarChartToPieChart(
-        this.toggleChartData as any,
-        this.barChartOptions as any
-      );
-      const result = this.chartService.convertPieChartToBarChart(
-        convertToPieResult.data as any,
-        this.pieChartOptions as any
-      );
-      this.toggleChartData = result.data as ChartData[];
-      this.barChartOptions = result.options as ChartOptions;
-    } else {
-      // 从柱状图转换为饼图
-      const result = this.chartService.convertBarChartToPieChart(
-        this.toggleChartData as any,
-        this.barChartOptions as any
-      );
-      // 不需要单独存储饼图数据，直接在模板中使用转换函数
-      this.pieChartOptions = result.options as ChartOptions;
-      this.togglePieData = result.data as ChartData[];
-    }
+    
   }
 
   // 计算饼图的总值
   calculatePieTotal(data: ChartData[]): number {
-    return data.reduce((sum, item) => sum + (item.value || 0), 0);
+    return data.reduce((sum, item) => sum + (item.data || 0), 0);
   }
 
   // 获取点击扇区的百分比

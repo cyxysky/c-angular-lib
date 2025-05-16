@@ -346,8 +346,8 @@ export class PieService {
       if (this.mergedOptions.showPercentage && item.percentage !== undefined) {
         labelText = `${this.formatPercentage(item.percentage)}%`;
       }
-      if (this.mergedOptions.showLabels && item.value !== undefined) {
-        const valueText = this.formatValue(item.value);
+      if (this.mergedOptions.showLabels && item.data !== undefined) {
+        const valueText = this.formatValue(item.data);
         labelText = labelText ? `${valueText} (${labelText})` : valueText;
       }
       if (!labelText && item.name) {
