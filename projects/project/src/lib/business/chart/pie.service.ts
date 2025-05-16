@@ -8,8 +8,10 @@ export class PieService {
   private ctx!: CanvasRenderingContext2D;
   private ngZone!: NgZone;
   private chartService!: ChartService;
-  private width = 300; // Logical width for chart drawing area
-  private height = 300; // Logical height for chart drawing area
+  private width = 300; // 图表绘制区域的逻辑宽度
+  private height = 300; // 图表绘制区域的逻辑高度
+  private initialDisplayWidth = 300; // 存储初始化/更新时传入的画布完整逻辑宽度
+  private initialDisplayHeight = 300; // 存储初始化/更新时传入的画布完整逻辑高度
   private centerX = 150;
   private centerY = 150;
   private outerRadius = 120;
@@ -19,9 +21,7 @@ export class PieService {
   private animationFrameId: number | null = null;
   public processedData: Array<ChartDataWithAngles> = [];
   public sliceVisibility: boolean[] = [];
-  private mousePosition: { x: number, y: number } = { x: 0, y: 0 };
-  private canvasScale: number = 1; // devicePixelRatio, passed from component
-  private mergedOptions!: ChartOptions;
+  public mergedOptions!: ChartOptions;
   private defaultOptions: Partial<ChartOptions> = {
     colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
     backgroundColor: '#ffffff',
@@ -37,8 +37,6 @@ export class PieService {
   private sliceAnimationIds: number[] = [];
   private tooltipUpdateSubject = new Subject<TooltipUpdate>();
   public tooltipUpdate$ = this.tooltipUpdateSubject.asObservable();
-  private lastEmittedTooltipData?: any;
-  private lastEmittedBorderColor?: string;
 
   constructor(chartService: ChartService, ngZone: NgZone) {
     this.chartService = chartService;
@@ -47,18 +45,29 @@ export class PieService {
 
   public init(
     ctx: CanvasRenderingContext2D,
-    displayWidth: number, // Initial canvas logical width
-    displayHeight: number, // Initial canvas logical height
-    canvasScale: number, // devicePixelRatio
+    displayWidth: number, // 初始画布逻辑宽度
+    displayHeight: number, // 初始画布逻辑高度
     data: ChartData[],
     options: ChartOptions,
     skipInitialAnimation: boolean = false
   ): void {
     this.ctx = ctx;
-    this.canvasScale = canvasScale;
+    this.initialDisplayWidth = displayWidth; // 存储初始画布尺寸
+    this.initialDisplayHeight = displayHeight; // 存储初始画布尺寸
     this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'pie' };
+    // 如果显示图例，则强制图例位于顶部
+    if (this.mergedOptions.showLegend !== false) {
+      if (!this.mergedOptions.legend) {
+        this.mergedOptions.legend = { position: 'top', align: this.defaultOptions.legend!.align || 'center' };
+      } else {
+        this.mergedOptions.legend.position = 'top';
+        if (!this.mergedOptions.legend.align) {
+          this.mergedOptions.legend.align = this.defaultOptions.legend!.align || 'center';
+        }
+      }
+    }
     this.data = data;
-    this.calculateDimensions(displayWidth, displayHeight); // Calculate actual chart drawing dimensions
+    this.calculateDimensions(displayWidth, displayHeight); // 计算实际图表绘制尺寸
     if (this.mergedOptions.animate && !skipInitialAnimation) {
       this.animationProgress = 0;
       this.startAnimation();
@@ -68,11 +77,36 @@ export class PieService {
     this.draw();
   }
 
+  public setHoveredIndex(index: number): void {
+    this.hoveredIndex = index;
+  }
+
+  public emitTooltipUpdate(update: TooltipUpdate): void {
+    this.tooltipUpdateSubject.next(update);
+  }
+
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
     this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'pie' };
+    if (newDisplayWidth !== undefined) {
+      this.initialDisplayWidth = newDisplayWidth; // 存储更新后的画布尺寸
+    }
+    if (newDisplayHeight !== undefined) {
+      this.initialDisplayHeight = newDisplayHeight; // 存储更新后的画布尺寸
+    }
+    // 如果显示图例，则强制图例位于顶部
+    if (this.mergedOptions.showLegend !== false) {
+      if (!this.mergedOptions.legend) {
+        this.mergedOptions.legend = { position: 'top', align: this.defaultOptions.legend!.align || 'center' };
+      } else {
+        this.mergedOptions.legend.position = 'top';
+        if (!this.mergedOptions.legend.align) {
+          this.mergedOptions.legend.align = this.defaultOptions.legend!.align || 'center';
+        }
+      }
+    }
     this.data = data;
     if (newDisplayWidth !== undefined && newDisplayHeight !== undefined) {
-        this.calculateDimensions(newDisplayWidth, newDisplayHeight);
+      this.calculateDimensions(newDisplayWidth, newDisplayHeight);
     }
     this.draw();
   }
@@ -83,45 +117,87 @@ export class PieService {
 
   private processDataInput(inputData: ChartData[]): void {
     if (!inputData || inputData.length === 0) {
-        this.processedData = [];
-        this.sliceVisibility = [];
-        return;
+      this.processedData = [];
+      this.sliceVisibility = [];
+      return;
     }
     const coloredData = this.chartService.assignPieColors(inputData as any, this.mergedOptions.colors || this.defaultOptions.colors!);
     this.processedData = this.chartService.calculatePieAngles(coloredData) as Array<ChartDataWithAngles>;
-    if (this.processedData.length !== this.sliceVisibility.length || this.sliceVisibility.some(v => v === undefined)){
-        this.sliceVisibility = this.processedData.map(() => true);
+    if (this.processedData.length !== this.sliceVisibility.length || this.sliceVisibility.some(v => v === undefined)) {
+      this.sliceVisibility = this.processedData.map(() => true);
     }
   }
 
   private calculateDimensions(canvasLogicalWidth: number, canvasLogicalHeight: number): void {
-    // Use the passed canvas logical dimensions as the basis
-    this.width = this.mergedOptions.width || canvasLogicalWidth;
-    this.height = this.mergedOptions.height || canvasLogicalHeight;
-    // Adjust drawing area based on legend (similar to original logic but without direct DOM access for padding)
-    const isDonut = this.mergedOptions.innerRadius !== undefined && this.mergedOptions.innerRadius > 0;
-    if (isDonut && this.mergedOptions.showLegend) {
-      if (!this.mergedOptions.legend) this.mergedOptions.legend = {};
-      this.mergedOptions.legend.position = 'top'; // Force legend to top for donut with legend (as per original)
-    }
-    const legendPosition = this.mergedOptions.legend?.position || 'top';
-    if (this.mergedOptions.showLegend) {
-      if (legendPosition === 'left' || legendPosition === 'right') this.width *= 0.8;
-      else if (legendPosition === 'top' || legendPosition === 'bottom') this.height *= 0.85;
-    }
-    // If user specified fixed width/height in options, those should take precedence for chart drawing area.
-    // The canvas itself will be canvasLogicalWidth/Height.
-    // This ensures chart drawing respects options if provided, else fits in given canvas space.
-    this.width = this.mergedOptions.width || this.width; 
-    this.height = this.mergedOptions.height || this.height;
-    this.centerX = this.width / 2;
-    this.centerY = this.height / 2;
-    this.outerRadius = this.mergedOptions.outerRadius || Math.min(this.width, this.height) * 0.4;
-    if (isDonut) {
-      this.innerRadius = this.outerRadius * 0.6;
-      if (this.mergedOptions.innerRadius && this.mergedOptions.innerRadius > 0 && this.mergedOptions.innerRadius < this.outerRadius) {
-        this.innerRadius = this.mergedOptions.innerRadius;
+    // 从完整的逻辑画布尺寸开始
+    let effectiveWidth = canvasLogicalWidth;
+    let effectiveHeight = canvasLogicalHeight;
+    // 如果在选项中显式提供了图表尺寸，则直接将其用于绘制区域。
+    // 否则，绘制区域即为画布尺寸，可能会因图例而减小。
+    if (this.mergedOptions.width) {
+      this.width = this.mergedOptions.width;
+    } else {
+      // 没有显式宽度，从画布宽度派生，可能会为图例减小
+      if (this.mergedOptions.showLegend) {
+        const legendPos = this.mergedOptions.legend?.position || 'top'; // 由于强制，将为 'top'
+        if (legendPos === 'left' || legendPos === 'right') {
+          effectiveWidth *= 0.8; // 减少图表计算可用空间
+        }
       }
+      this.width = effectiveWidth;
+    }
+    if (this.mergedOptions.height) {
+      this.height = this.mergedOptions.height;
+    } else {
+      // 没有显式高度，从画布高度派生，可能会为图例减小
+      if (this.mergedOptions.showLegend) {
+        const legendPos = this.mergedOptions.legend?.position || 'top'; // 由于强制，将为 'top'
+        if (legendPos === 'top' || legendPos === 'bottom') { // 虽然 'bottom' 不应该出现
+          effectiveHeight *= 0.85; // 减少图表计算可用空间
+        }
+      }
+      this.height = effectiveHeight;
+    }
+    // 此时，this.width 和 this.height 是图表绘制框的尺寸。
+    const titleGutter = this.mergedOptions.title ? 40 : 0;
+    this.centerX = this.width / 2;
+    this.centerY = titleGutter + (this.height - titleGutter) / 2;
+    // 计算 outerRadius
+    const availableRadiusX = this.width / 2;
+    const availableRadiusY = (this.height - titleGutter) / 2;
+    const limitingRadiusBasedOnSpace = Math.max(0, Math.min(availableRadiusX, availableRadiusY));
+    if (this.mergedOptions.outerRadius && typeof this.mergedOptions.outerRadius === 'number' && this.mergedOptions.outerRadius > 0) {
+      this.outerRadius = this.mergedOptions.outerRadius;
+    } else {
+      // 默认使用可用限制半径的90%（实际上是直径的0.45），然后增加30px。
+      const baseDefaultRadius = limitingRadiusBasedOnSpace * 0.9;
+      this.outerRadius = baseDefaultRadius + 30;
+    }
+    // 确保最终的 outerRadius（用户定义或默认+30）不超过可用空间。
+    this.outerRadius = Math.min(this.outerRadius, limitingRadiusBasedOnSpace);
+    // 如果空间允许，确保最小实用半径（例如5px）。
+    if (limitingRadiusBasedOnSpace > 0) {
+      this.outerRadius = Math.max(5, this.outerRadius);
+    } else {
+      this.outerRadius = 0; // 没有空间，半径为0
+    }
+    const isDonut = this.mergedOptions.innerRadius !== undefined && typeof this.mergedOptions.innerRadius === 'number' && this.mergedOptions.innerRadius > 0;
+    if (isDonut) {
+      // 默认 innerRadius 是 outerRadius 的 55% (使环更厚，环占 outerRadius 的 65%)。
+      let calculatedInnerRadius = this.outerRadius * 0.55;
+      // 如果有效，用户定义的 innerRadius（绝对值）优先。
+      if (this.mergedOptions.innerRadius! > 0 && this.mergedOptions.innerRadius! < this.outerRadius) {
+        calculatedInnerRadius = this.mergedOptions.innerRadius!;
+      } else if (this.mergedOptions.innerRadius! >= this.outerRadius && this.outerRadius > 0) {
+        // 用户值无效（过大或相等），使用默认的 55%
+        calculatedInnerRadius = this.outerRadius * 0.55;
+      } else if (this.outerRadius === 0) {
+        calculatedInnerRadius = 0; // 没有外半径，所以没有内半径。
+      }
+      // 如果 this.mergedOptions.innerRadius 为 0 (或 undefined, 被 isDonut 捕获),
+      // 它将使用默认计算的 calculatedInnerRadius (this.outerRadius * 0.55)
+      // 除非 outerRadius 也为 0。
+      this.innerRadius = Math.max(0, calculatedInnerRadius); // 确保非负
     } else {
       this.innerRadius = 0;
     }
@@ -145,11 +221,11 @@ export class PieService {
 
   public draw(): void {
     if (!this.ctx || this.processedData.length === 0) return;
-    // Clear using the logical width/height of the drawing area, context is already scaled
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    // 使用画布的完整初始逻辑宽度/高度进行清除，上下文已被缩放
+    this.ctx.clearRect(0, 0, this.initialDisplayWidth, this.initialDisplayHeight);
     if (this.mergedOptions.backgroundColor) {
       this.ctx.fillStyle = this.mergedOptions.backgroundColor;
-      this.ctx.fillRect(0, 0, this.width, this.height);
+      this.ctx.fillRect(0, 0, this.initialDisplayWidth, this.initialDisplayHeight);
     }
     if (this.mergedOptions.title) {
       this.ctx.fillStyle = '#333';
@@ -237,11 +313,11 @@ export class PieService {
 
   public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string }> {
     return this.processedData.map((item, i) => ({
-        name: item.name,
-        color: item.color || this.mergedOptions.colors![i % this.mergedOptions.colors!.length],
-        visible: this.isSliceVisible(i),
-        active: this.hoveredIndex === i,
-        percentageText: this.mergedOptions.showPercentage ? this.formatPercentage(item.percentage) : undefined
+      name: item.name,
+      color: item.color || this.mergedOptions.colors![i % this.mergedOptions.colors!.length],
+      visible: this.isSliceVisible(i),
+      active: this.hoveredIndex === i,
+      percentageText: this.mergedOptions.showPercentage ? this.formatPercentage(item.percentage) : undefined
     }));
   }
 
@@ -305,56 +381,6 @@ export class PieService {
     return percentage !== undefined ? percentage.toFixed(1) : '0';
   }
 
-  public processMouseMove(canvasX: number, canvasY: number, event: MouseEvent, isTooltipHoverable: boolean): void {
-    this.mousePosition = { x: canvasX, y: canvasY };
-    const hoveredSliceIndex = this.findHoveredSlice(canvasX, canvasY);
-    if (hoveredSliceIndex !== this.hoveredIndex) {
-      this.ngZone.run(() => { 
-        this.hoveredIndex = hoveredSliceIndex;
-      });
-      this.draw();
-      if (hoveredSliceIndex !== -1 && this.mergedOptions.hoverEffect?.showTooltip) {
-        const sliceData = this.processedData[hoveredSliceIndex];
-        this.lastEmittedTooltipData = {
-          title: sliceData.name,
-          rows: [
-              { label: '数值', value: this.formatValue(sliceData.value) },
-              { label: '比例', value: `${this.formatPercentage(sliceData.percentage)}%` }
-          ],
-          item: sliceData
-        };
-        this.lastEmittedBorderColor = sliceData.color || '';
-        this.tooltipUpdateSubject.next({
-          isVisible: true,
-          data: this.lastEmittedTooltipData,
-          position: { x: canvasX + 15, y: canvasY }, // Use canvas-relative coordinates
-          borderColor: this.lastEmittedBorderColor
-        });
-      } else {
-         if (this.hoveredIndex === -1) {
-            this.tooltipUpdateSubject.next({ isVisible: false });
-         }
-      }
-    } else if (hoveredSliceIndex !== -1 && this.mergedOptions.hoverEffect?.showTooltip) {
-      this.tooltipUpdateSubject.next({
-        isVisible: true,
-        data: this.lastEmittedTooltipData,
-        position: { x: canvasX + 15, y: canvasY }, // Use canvas-relative coordinates
-        borderColor: this.lastEmittedBorderColor
-      });
-    }
-  }
-
-  public processMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
-    if (isTrulyLeavingCanvas) {
-      if (this.hoveredIndex !== -1) {
-        this.ngZone.run(() => { this.hoveredIndex = -1; });
-        this.draw();
-        this.tooltipUpdateSubject.next({ isVisible: false });
-      }
-    }
-  }
-
   public processCanvasClick(canvasX: number, canvasY: number, event: MouseEvent): void {
     if (!this.mergedOptions.onClick) return;
     const clickedSliceIndex = this.findHoveredSlice(canvasX, canvasY);
@@ -363,15 +389,15 @@ export class PieService {
         this.mergedOptions.onClick!({
           item: this.processedData[clickedSliceIndex],
           index: clickedSliceIndex,
-          data: this.processedData, 
+          data: this.processedData,
           options: this.mergedOptions,
-          event: event // Original mouse event
+          event: event // 原始鼠标事件
         });
       });
     }
   }
 
-  private findHoveredSlice(x: number, y: number): number {
+  public findHoveredSlice(x: number, y: number): number {
     const dx = x - this.centerX;
     const dy = y - this.centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -387,16 +413,16 @@ export class PieService {
     return -1;
   }
 
-  private _hideTooltipInternal(): void {
+  private hideTooltipInternal(): void {
     if (this.hoveredIndex !== -1) {
-        this.ngZone.run(() => { this.hoveredIndex = -1; });
-        this.tooltipUpdateSubject.next({ isVisible: false });
-        this.draw(); 
+      this.ngZone.run(() => { this.hoveredIndex = -1; });
+      this.tooltipUpdateSubject.next({ isVisible: false });
+      this.draw();
     }
   }
 
   public hideAllTooltipsAndRedraw(): void {
-   this._hideTooltipInternal();
+    this.hideTooltipInternal();
   }
 
   public destroy(): void {

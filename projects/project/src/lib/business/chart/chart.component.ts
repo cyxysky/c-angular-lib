@@ -4,7 +4,7 @@ import { ChartData, ChartOptions, TooltipUpdate } from './chart.interface';
 import { ChartService } from './chart.service';
 import { BarService } from './bar.service';
 import { PieService } from './pie.service';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 interface LegendItem {
   name: string;
@@ -35,11 +35,12 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
 
   private resizeTimeout: number | null = null;
   public legendItems: LegendItem[] = [];
+  public tooltipSubject!: Subject<TooltipUpdate>;
   private serviceTooltipSubscription?: Subscription;
 
   isTooltipDisplayed: boolean = false;
   tooltipData?: any;
-  tooltipStylePosition: { left: string, top: string } = { left: '0px', top: '0px' };
+  tooltipStylePosition: { left: string, top: string } = { left: '', top: '' };
   tooltipBorderColor?: string;
   private componentDevicePixelRatio: number = 1;
   private componentCanvasLogicalWidth!: number;
@@ -48,14 +49,14 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   private boundOnCanvasMouseOut!: (event: MouseEvent) => void;
   private boundOnCanvasClick!: (event: MouseEvent) => void;
   private eventListenersAttached: boolean = false;
+  private lastMouseEventForTooltip?: MouseEvent; // 用于存储最后的鼠标事件，在某些提示框逻辑中可能有用
 
   constructor(
-    private chartServiceInstance: ChartService,
     private barService: BarService,
     private pieService: PieService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.validateOptions();
@@ -79,7 +80,6 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         }
       }
     }
-
     if (reinitialize) {
       this.destroyServiceSubscriptions();
       this.removeCanvasEventListeners();
@@ -109,6 +109,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.serviceTooltipSubscription?.unsubscribe();
   }
 
+  /**
+   * 初始化图表依赖的订阅，在此处设置悬浮框的位置
+   */
   private initializeChartDependentSubscriptions(): void {
     this.destroyServiceSubscriptions();
     if (!this.options) return;
@@ -117,10 +120,19 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.isTooltipDisplayed = update.isVisible;
       if (update.isVisible && update.data && update.position) {
         this.tooltipData = update.data;
-        let x = update.position.x;
-        let y = update.position.y;
-        const tooltipHeight = this.chartTooltipElementRef?.nativeElement?.offsetHeight || 30;
-        this.tooltipStylePosition = { left: `${x}px`, top: `${y - (tooltipHeight / 2)}px` };
+        const mouseX = update.position.x; // 画布相关的逻辑鼠标 X 坐标
+        const mouseY = update.position.y; // 画布相关的逻辑鼠标 Y 坐标
+        const tooltipEl = this.chartTooltipElementRef.nativeElement;
+        const canvasLogicalWidth = this.componentCanvasLogicalWidth;
+        let targetLeft = mouseX + 15;
+        let targetTop = mouseY;
+        if (targetLeft + tooltipEl.getBoundingClientRect().width > canvasLogicalWidth) {
+          targetLeft = mouseX - tooltipEl.getBoundingClientRect().width + 15; // 调整为减15，避免紧贴边缘
+        }
+        if (targetLeft < 0) {
+          targetLeft = 0; // 固定到左边缘
+        }
+        this.tooltipStylePosition = { left: `${targetLeft}px`, top: `${targetTop}px` };
         this.tooltipBorderColor = update.borderColor;
       } else {
         this.tooltipData = undefined;
@@ -131,7 +143,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
 
   private validateOptions(): void {
     if (!this.options || !this.options.chartType) {
-      console.error('ChartOptions and chartType are mandatory.');
+      console.error('ChartOptions 和 chartType 是必填项。');
     }
   }
 
@@ -143,7 +155,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const canvas = this.canvasRef.nativeElement;
     const container = canvas.parentElement;
     if (!container) {
-      console.error('Canvas container not found for HiDPI setup.');
+      console.error('未找到用于 HiDPI 设置的画布容器。');
       return null;
     }
     const containerRect = container.getBoundingClientRect();
@@ -158,7 +170,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     canvas.height = physicalHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      console.error('Failed to get 2D context from canvas.');
+      console.error('从画布获取 2D 上下文失败。');
       return null;
     }
     ctx.scale(devicePixelRatio, devicePixelRatio);
@@ -198,10 +210,102 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const rect = canvas.getBoundingClientRect();
     const canvasX = (event.clientX - rect.left) * (canvas.width / this.componentDevicePixelRatio / rect.width);
     const canvasY = (event.clientY - rect.top) * (canvas.height / this.componentDevicePixelRatio / rect.height);
+    this.lastMouseEventForTooltip = event; // 存储最后的鼠标事件
     if (this.options.chartType === 'bar') {
-      this.barService.processMouseMove(canvasX, canvasY, event, this.options.hoverEffect?.tooltipHoverable ?? false);
+      this.handleBarMouseMove(canvasX, canvasY, event);
     } else if (this.options.chartType === 'pie') {
-      this.pieService.processMouseMove(canvasX, canvasY, event, this.options.hoverEffect?.tooltipHoverable ?? false);
+      this.handlePieMouseMove(canvasX, canvasY, event);
+    }
+  }
+
+  private handleBarMouseMove(canvasX: number, canvasY: number, event: MouseEvent): void {
+    if (!this.barService || !this.barService.mergedOptions) return; // 防御性检查
+    const hoveredBarInfo = this.barService.findHoveredBar(canvasX, canvasY);
+    const previousHoveredBarIndex = this.barService.hoveredBarIndex;
+    const previousHoveredSeriesIndex = this.barService.hoveredSeriesIndex;
+    if (hoveredBarInfo.dataIndex !== previousHoveredBarIndex || hoveredBarInfo.seriesIndex !== previousHoveredSeriesIndex) {
+      this.ngZone.run(() => {
+        this.barService.setHoveredIndices(hoveredBarInfo.dataIndex, hoveredBarInfo.seriesIndex);
+      });
+      this.barService.drawChartFrame(1.0); // 重绘以实现柱子悬停效果
+    }
+    // 提示框逻辑
+    if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.seriesIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
+      const seriesNames = this.barService.getSeriesNames();
+      if (hoveredBarInfo.seriesIndex < seriesNames.length) {
+        const seriesName = seriesNames[hoveredBarInfo.seriesIndex];
+        const categories = this.barService.getCategories(this.barService.getVisibleData());
+        if (hoveredBarInfo.dataIndex < categories.length) {
+          const categoryName = categories[hoveredBarInfo.dataIndex];
+          const dataItems = this.barService.getDataItemsBySeriesName(seriesName);
+          const item = dataItems.find(d => d.name === categoryName);
+          if (item) {
+            const tooltipPayload = {
+              title: `${seriesName} - ${item.name}`,
+              rows: [{ label: '数值', value: this.barService.formatValue(item.data ?? item.value) }],
+              item: item
+            };
+            const borderColor = this.barService.getDataColor(hoveredBarInfo.seriesIndex, hoveredBarInfo.dataIndex);
+            this.barService.emitTooltipUpdate({
+              isVisible: true,
+              data: tooltipPayload,
+              position: { x: canvasX, y: canvasY },
+              borderColor: borderColor,
+              mouseEvent: event
+            });
+          } else {
+            this.barService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+          }
+        } else {
+          this.barService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+        }
+      } else {
+        this.barService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
+    } else {
+      if (this.isTooltipDisplayed || previousHoveredBarIndex !== -1 || previousHoveredSeriesIndex !== -1) {
+        this.barService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
+    }
+  }
+
+  private handlePieMouseMove(canvasX: number, canvasY: number, event: MouseEvent): void {
+    if (!this.pieService || !this.pieService.mergedOptions) return; // 防御性检查
+    const hoveredSliceIndex = this.pieService.findHoveredSlice(canvasX, canvasY);
+    const previousHoveredIndex = this.pieService.hoveredIndex;
+    if (hoveredSliceIndex !== previousHoveredIndex) {
+      this.ngZone.run(() => {
+        this.pieService.setHoveredIndex(hoveredSliceIndex);
+      });
+      this.pieService.draw(); // 重绘以实现扇区悬停效果
+    }
+    // 提示框逻辑
+    if (hoveredSliceIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
+      const sliceData = this.pieService.processedData[hoveredSliceIndex];
+      if (sliceData) { // 确保 sliceData 存在
+        const tooltipPayload = {
+          title: sliceData.name,
+          rows: [
+            { label: '数值', value: this.pieService.formatValue(sliceData.value) },
+            { label: '比例', value: `${this.pieService.formatPercentage(sliceData.percentage)}%` }
+          ],
+          item: sliceData
+        };
+        const borderColor = sliceData.color || '';
+        this.pieService.emitTooltipUpdate({
+          isVisible: true,
+          data: tooltipPayload,
+          position: { x: canvasX, y: canvasY },
+          borderColor: borderColor,
+          mouseEvent: event
+        });
+      } else { // 未找到扇区数据
+        this.pieService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
+    } else { // 未悬停或提示框已禁用
+      if (this.isTooltipDisplayed || previousHoveredIndex !== -1) {
+        this.pieService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
     }
   }
 
@@ -213,18 +317,45 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     let trulyLeftCanvas = true;
     if (relatedTarget) {
       if (canvas.contains(relatedTarget) ||
-          (rect.left <= event.clientX && event.clientX <= rect.right &&
-           rect.top <= event.clientY && event.clientY <= rect.bottom)) {
+        (rect.left <= event.clientX && event.clientX <= rect.right &&
+          rect.top <= event.clientY && event.clientY <= rect.bottom)) {
         trulyLeftCanvas = false;
       }
     }
     if (event.target === canvas && !relatedTarget) {
-        trulyLeftCanvas = true;
+      trulyLeftCanvas = true;
     }
+    this.lastMouseEventForTooltip = event; // 存储最后的鼠标事件
     if (this.options.chartType === 'bar') {
-      this.barService.processMouseOut(trulyLeftCanvas, event);
+      this.handleBarMouseOut(trulyLeftCanvas, event);
     } else if (this.options.chartType === 'pie') {
-      this.pieService.processMouseOut(trulyLeftCanvas, event);
+      this.handlePieMouseOut(trulyLeftCanvas, event);
+    }
+  }
+
+  private handleBarMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
+    if (!this.barService) return;
+    if (isTrulyLeavingCanvas) {
+      if (this.barService.hoveredBarIndex !== -1 || this.barService.hoveredSeriesIndex !== -1) {
+        this.ngZone.run(() => {
+          this.barService.setHoveredIndices(-1, -1);
+        });
+        this.barService.drawChartFrame(1.0);
+        this.barService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
+    }
+  }
+
+  private handlePieMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
+    if (!this.pieService) return;
+    if (isTrulyLeavingCanvas) {
+      if (this.pieService.hoveredIndex !== -1) {
+        this.ngZone.run(() => {
+          this.pieService.setHoveredIndex(-1);
+        });
+        this.pieService.draw();
+        this.pieService.emitTooltipUpdate({ isVisible: false, mouseEvent: event });
+      }
     }
   }
 
@@ -253,7 +384,6 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         ctx,
         logicalWidth,
         logicalHeight,
-        devicePixelRatio,
         this.data,
         this.options,
         skipAnimation
@@ -263,7 +393,6 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         ctx,
         logicalWidth,
         logicalHeight,
-        devicePixelRatio,
         this.data,
         this.options,
         skipAnimation
@@ -323,8 +452,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const activeService = this.options.chartType === 'bar' ? this.barService : this.pieService;
     if (!activeService || typeof activeService.hideAllTooltipsAndRedraw !== 'function') return;
     const tooltipEl = this.chartTooltipElementRef.nativeElement;
+    // 如果鼠标确实离开了画布，并且没有悬停在可交互的工具提示上，则隐藏工具提示
     if (tooltipEl.contains(event.relatedTarget as Node) && this.options.hoverEffect?.tooltipHoverable) {
-      return;
+      return; // 鼠标在可交互的工具提示上，不隐藏
     }
     activeService.hideAllTooltipsAndRedraw();
   }
@@ -334,7 +464,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (!this.options) return;
     const activeService = this.options.chartType === 'bar' ? this.barService : this.pieService;
     if (activeService && typeof activeService.hideAllTooltipsAndRedraw === 'function') {
-        activeService.hideAllTooltipsAndRedraw();
+      activeService.hideAllTooltipsAndRedraw();
     }
   }
 
@@ -343,7 +473,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (!this.options) return;
     const activeService = this.options.chartType === 'bar' ? this.barService : this.pieService;
     if (activeService && typeof activeService.hideAllTooltipsAndRedraw === 'function') {
-        activeService.hideAllTooltipsAndRedraw();
+      activeService.hideAllTooltipsAndRedraw();
     }
   }
 
@@ -352,7 +482,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     this.resizeTimeout = window.requestAnimationFrame(() => {
       this.removeCanvasEventListeners();
       if (this.isCanvasReady()) {
-        this.initializeChart(true);
+        this.initializeChart(true); // 重建图表，跳过动画
       }
       this.resizeTimeout = null;
     });

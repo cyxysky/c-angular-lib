@@ -2,12 +2,15 @@
   <div class="canvas-wrapper">
     <canvas #chartCanvas (mouseleave)="handleCanvasMouseLeave($event)"></canvas>
   </div>
-  <div #chartTooltip class="chart-tooltip" 
-       [style.display]="isTooltipDisplayed ? 'flex' : 'none'"
-       [style.left]="tooltipStylePosition.left"
-       [style.top]="tooltipStylePosition.top"
-       [style.pointer-events]="isTooltipPointerEvents()"
-       [style.border-top-color]="tooltipBorderColor">
+  <div 
+    #chartTooltip 
+    class="chart-tooltip" 
+    [style.display]="isTooltipDisplayed ? 'flex' : 'none'"
+    [style.left]="tooltipStylePosition.left"
+    [style.top]="tooltipStylePosition.top"
+    [style.pointer-events]="isTooltipPointerEvents()"
+    [style.border-top-color]="tooltipBorderColor"
+    >
     <ng-container *ngIf="isTooltipDisplayed && tooltipData">
       <ng-container *ngTemplateOutlet="tooltipTemplate || defaultTooltipRef; context: {$implicit: tooltipData}">
       </ng-container>
@@ -22,7 +25,7 @@
           {{ tooltipData.title }}
         </div>
         <div class="tooltip-content__data">
-          <div class.tooltip-content__row="" *ngFor="let row of tooltipData.rows">
+          <div *ngFor="let row of tooltipData.rows">
             <span class="tooltip-content__label">{{ row.label }}</span>
             <span class="tooltip-content__value">{{ row.value }}</span>
           </div>

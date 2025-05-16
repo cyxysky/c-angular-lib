@@ -198,6 +198,7 @@ export interface TooltipUpdate {
   data?: any; // 传递给模板的上下文数据
   position?: { x: number; y: number }; // 悬浮框左上角的目标位置
   borderColor?: string; // 悬浮框顶部边框颜色
+  mouseEvent?: MouseEvent; // 悬浮框的鼠标事件
 }
 
 

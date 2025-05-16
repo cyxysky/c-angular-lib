@@ -8,9 +8,9 @@ export class BarService {
   private ctx!: CanvasRenderingContext2D;
   private ngZone!: NgZone;
   private chartService!: ChartService;
-  private processedData: ChartData[] = [];
+  public processedData: ChartData[] = [];
   private seriesVisibility: boolean[] = [];
-  private mergedOptions!: ChartOptions;
+  public mergedOptions!: ChartOptions;
   private defaultOptions: Partial<ChartOptions> = {
     colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
     backgroundColor: '#ffffff',
@@ -28,14 +28,10 @@ export class BarService {
   public hoveredBarIndex: number = -1;
   public hoveredSeriesIndex: number = -1;
   public barPositions: Array<{ x: number, y: number, width: number, height: number, data: ChartData, seriesIndex: number }> = [];
-  private mousePosition: { x: number, y: number } = { x: 0, y: 0 };
-  private canvasScale!: number; // devicePixelRatio
-  private displayWidth!: number; // logical width
-  private displayHeight!: number; // logical height
+  private displayWidth!: number; // 逻辑宽度
+  private displayHeight!: number; // 逻辑高度
   private tooltipUpdateSubject = new Subject<TooltipUpdate>();
   public tooltipUpdate$ = this.tooltipUpdateSubject.asObservable();
-  private lastEmittedTooltipData?: any;
-  private lastEmittedBorderColor?: string;
 
   constructor(chartService: ChartService, ngZone: NgZone) {
     this.chartService = chartService;
@@ -46,7 +42,6 @@ export class BarService {
     ctx: CanvasRenderingContext2D,
     displayWidth: number,
     displayHeight: number,
-    canvasScale: number, // This is devicePixelRatio
     data: ChartData[],
     options: ChartOptions,
     skipInitialAnimation: boolean = false
@@ -54,15 +49,21 @@ export class BarService {
     this.ctx = ctx;
     this.displayWidth = displayWidth;
     this.displayHeight = displayHeight;
-    this.canvasScale = canvasScale;
     this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
     if (this.mergedOptions.barColors && (!this.mergedOptions.colors || this.mergedOptions.colors.length === 0)) {
       this.mergedOptions.colors = this.mergedOptions.barColors;
     }
     this.data = data;
-    // HiDPI setup is done by component, ctx is already scaled
     this.drawChart(skipInitialAnimation);
-    // Event listeners are setup by component
+  }
+
+  public setHoveredIndices(dataIndex: number, seriesIndex: number): void {
+    this.hoveredBarIndex = dataIndex;
+    this.hoveredSeriesIndex = seriesIndex;
+  }
+
+  public emitTooltipUpdate(update: TooltipUpdate): void {
+    this.tooltipUpdateSubject.next(update);
   }
 
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
@@ -75,7 +76,7 @@ export class BarService {
     this.data = data;
     this.drawChart();
   }
-  
+
   private set data(newData: ChartData[]) {
     this.processDataInput(newData);
   }
@@ -109,88 +110,24 @@ export class BarService {
     }
   }
 
-  public processMouseMove(canvasX: number, canvasY: number, event: MouseEvent, isTooltipHoverable: boolean): void {
-    this.mousePosition = { x: canvasX, y: canvasY };
-    const hoveredBarInfo = this.findHoveredBar(canvasX, canvasY);
-    if (hoveredBarInfo.dataIndex !== this.hoveredBarIndex || hoveredBarInfo.seriesIndex !== this.hoveredSeriesIndex) {
-      this.ngZone.run(() => {
-        this.hoveredBarIndex = hoveredBarInfo.dataIndex;
-        this.hoveredSeriesIndex = hoveredBarInfo.seriesIndex;
-      });
-      this.drawChartFrame(1.0);
-      if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.seriesIndex !== -1 && this.mergedOptions.hoverEffect?.showTooltip) {
-        const seriesNames = this.getSeriesNames();
-        if (hoveredBarInfo.seriesIndex >= seriesNames.length) return;
-        const seriesName = seriesNames[hoveredBarInfo.seriesIndex];
-        const categories = this.getCategories(this.getVisibleData());
-        if (hoveredBarInfo.dataIndex >= categories.length) return;
-        const categoryName = categories[hoveredBarInfo.dataIndex];
-        const dataItems = this.getDataItemsBySeriesName(seriesName);
-        const item = dataItems.find(d => d.name === categoryName);
-        if (item) {
-          this.lastEmittedTooltipData = {
-            title: `${seriesName} - ${item.name}`,
-            rows: [
-              { label: '数值', value: this.formatValue(item.data ?? item.value) },
-              { label: '比例', value: `${this.calculatePercentage(item.data ?? item.value, hoveredBarInfo.seriesIndex)}%` }
-            ],
-            item: item
-          };
-          this.lastEmittedBorderColor = this.getDataColor(hoveredBarInfo.seriesIndex, hoveredBarInfo.dataIndex);
-          this.tooltipUpdateSubject.next({
-            isVisible: true,
-            data: this.lastEmittedTooltipData,
-            position: { x: canvasX + 15, y: canvasY }, // Use canvasX, canvasY
-            borderColor: this.lastEmittedBorderColor
-          });
-        }
-      } else {
-        if (this.hoveredBarIndex === -1 && this.hoveredSeriesIndex === -1) {
-            this.tooltipUpdateSubject.next({ isVisible: false });
-        }
-      }
-    } else if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.seriesIndex !== -1 && this.mergedOptions.hoverEffect?.showTooltip) {
-      this.tooltipUpdateSubject.next({
-        isVisible: true,
-        data: this.lastEmittedTooltipData,
-        position: { x: canvasX + 15, y: canvasY }, // Use canvasX, canvasY
-        borderColor: this.lastEmittedBorderColor
-      });
-    }
-  }
-
-  public processMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
-    if (isTrulyLeavingCanvas) {
-      if (this.hoveredBarIndex !== -1 || this.hoveredSeriesIndex !== -1) {
-        this.ngZone.run(() => {
-          this.hoveredBarIndex = -1;
-          this.hoveredSeriesIndex = -1;
-        });
-        this.drawChartFrame(1.0);
-        this.tooltipUpdateSubject.next({ isVisible: false });
-      }
-    }
-  }
-
-  private _hideTooltipInternal(): void {
+  private hideTooltipInternal(): void {
     if (this.hoveredBarIndex !== -1 || this.hoveredSeriesIndex !== -1) {
-        this.ngZone.run(() => {
-          this.hoveredBarIndex = -1;
-          this.hoveredSeriesIndex = -1;
-        });
-        this.tooltipUpdateSubject.next({ isVisible: false });
-        this.drawChartFrame(1.0);
+      this.ngZone.run(() => {
+        this.hoveredBarIndex = -1;
+        this.hoveredSeriesIndex = -1;
+      });
+      this.tooltipUpdateSubject.next({ isVisible: false });
+      this.drawChartFrame(1.0);
     }
   }
 
   public hideAllTooltipsAndRedraw(): void {
-    this._hideTooltipInternal();
+    this.hideTooltipInternal();
   }
 
   public destroy(): void {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
-    // Event listeners are managed by the component
   }
 
   public getSeriesNames(): string[] {
@@ -209,10 +146,10 @@ export class BarService {
     });
     return seriesNames;
   }
-  
-  private getVisibleData(): ChartData[] {
+
+  public getVisibleData(): ChartData[] {
     const visibleSeriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
-    if (!visibleSeriesNames.length) return []; 
+    if (!visibleSeriesNames.length) return [];
     return this.processedData.filter(item => {
       if (item.series && visibleSeriesNames.includes(item.series)) return true;
       if (item.children) {
@@ -309,11 +246,10 @@ export class BarService {
     let targetItem: ChartData | undefined;
     const categories = this.getCategories(this.getVisibleData());
     const categoryName = categories[dataIndex];
-
     for (const item of this.processedData) {
       if (item.series === seriesName) {
         if (item.children) targetItem = item.children.find(child => child.name === categoryName && (!child.series || child.series === seriesName));
-        else if(item.name === categoryName) targetItem = item;
+        else if (item.name === categoryName) targetItem = item;
       } else if (item.children) {
         targetItem = item.children.find(child => child.name === categoryName && child.series === seriesName);
       }
@@ -373,12 +309,10 @@ export class BarService {
     });
   }
 
-  private drawChartFrame(animationProgress: number): void {
+  public drawChartFrame(animationProgress: number): void {
     const ctx = this.ctx;
-    // displayWidth and displayHeight are logical dimensions, ctx is already scaled
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     ctx.fillStyle = this.mergedOptions.backgroundColor!;
-    // FillRect uses logical dimensions due to scaled context
     ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
     const margin = this.mergedOptions.margin!;
     const chartWidth = this.displayWidth - margin.left - margin.right;
@@ -404,7 +338,7 @@ export class BarService {
       const barSpacing = groupWidth * 0.3 / (visibleSeriesCount + 1);
       this.drawBars(visibleData, margin, chartHeight, barWidth, barSpacing, groupWidth, maxValue, animationProgress);
     } else {
-      this.barPositions = []; 
+      this.barPositions = [];
     }
     this.drawAxes(margin, chartHeight, chartWidth);
     if (this.hoveredBarIndex !== -1 && this.hoveredSeriesIndex !== -1 && this.mergedOptions.hoverEffect?.showGuideLine) {
@@ -441,7 +375,6 @@ export class BarService {
     const ctx = this.ctx;
     const seriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
     const categories = this.getCategories(visibleData);
-
     categories.forEach((category, categoryIdx) => {
       let cumulativeHeight = 0;
       seriesNames.forEach((seriesName, seriesIdxInGroup) => {
@@ -449,16 +382,13 @@ export class BarService {
         const dataItems = this.getDataItemsBySeriesName(seriesName);
         const item = dataItems.find(d => d.name === category);
         if (!item) return;
-        
         const itemValue = this.getItemValue(item);
         const groupLeft = margin.left + categoryIdx * groupWidth;
         const x = groupLeft + barSpacing + seriesIdxInGroup * (barWidth + barSpacing);
         const barH = (itemValue / maxValue) * chartHeight * animationProgress;
         const y = margin.top + chartHeight - barH - cumulativeHeight;
-
         this.barPositions.push({ x, y, width: barWidth, height: barH, data: item, seriesIndex: originalSeriesIndex });
         const barColor = this.getDataColor(originalSeriesIndex, categoryIdx);
-        
         if (categoryIdx === this.hoveredBarIndex && originalSeriesIndex === this.hoveredSeriesIndex) {
           ctx.fillStyle = this.lightenColor(barColor, 20);
         } else {
@@ -466,7 +396,7 @@ export class BarService {
         }
         if (itemValue > 0) {
           if (this.mergedOptions.borderRadius && this.mergedOptions.borderRadius > 0) {
-            const effectiveRadius = Math.min(this.mergedOptions.borderRadius, barH / 2, barWidth / 2);
+            const effectiveRadius = Math.min(this.mergedOptions.borderRadius, barH, barWidth / 2);
             this.roundRect(ctx, x, y, barWidth, barH, effectiveRadius, true, false);
           } else {
             ctx.fillRect(x, y, barWidth, barH);
@@ -477,19 +407,25 @@ export class BarService {
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';
           const formattedValue = this.formatValue(item.data ?? item.value);
-          const valueY = y - 5; 
-          if (valueY > margin.top) {
-          ctx.fillText(formattedValue, x + barWidth / 2, valueY);
+          const valueY = y - 5;
+          const approximateTextHeight = 12;
+          const titleHeightClearance = this.mergedOptions.title ? (margin.top / 2 + approximateTextHeight / 2 + 5) : (approximateTextHeight);
+
+          if (valueY > titleHeightClearance) {
+            ctx.fillText(formattedValue, x + barWidth / 2, valueY);
+          } else if (barH > approximateTextHeight + 10) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2);
           }
         }
       });
       if (seriesNames.length > 0) {
-          ctx.fillStyle = '#666666';
-          ctx.font = '12px Arial';
-          ctx.textAlign = 'center';
+        ctx.fillStyle = '#666666';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
         const groupLeft = margin.left + categoryIdx * groupWidth;
-          ctx.fillText(category, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
-        }
+        ctx.fillText(category, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
+      }
     });
   }
 
@@ -512,12 +448,10 @@ export class BarService {
     const ctx = this.ctx;
     const categories = this.getCategories(this.getVisibleData());
     if (this.hoveredBarIndex >= categories.length) return;
-
     const categoryName = categories[this.hoveredBarIndex];
     const hoveredBar = this.barPositions.find(
       bar => bar.seriesIndex === this.hoveredSeriesIndex && bar.data?.name === categoryName
     );
-    
     if (!hoveredBar) return;
     const barCenterX = hoveredBar.x + hoveredBar.width / 2;
     ctx.beginPath();
@@ -531,7 +465,7 @@ export class BarService {
     ctx.setLineDash([]);
   }
 
-  private findHoveredBar(x: number, y: number): { dataIndex: number, seriesIndex: number } {
+  public findHoveredBar(x: number, y: number): { dataIndex: number, seriesIndex: number } {
     for (let i = 0; i < this.barPositions.length; i++) {
       const bar = this.barPositions[i];
       if (x >= bar.x && x <= bar.x + bar.width && y >= bar.y && y <= bar.y + bar.height) {
@@ -544,51 +478,47 @@ export class BarService {
   }
 
   private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: boolean, stroke: boolean): void {
+    const effectiveRadius = Math.max(0, radius);
     ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - (height > 0 ? 0 : radius));
-    if (height <= 0) {
-        ctx.lineTo(x,y);
-    } else {
+    ctx.moveTo(x, y + effectiveRadius);
+    ctx.quadraticCurveTo(x, y, x + effectiveRadius, y);
+    ctx.lineTo(x + width - effectiveRadius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + effectiveRadius);
     ctx.lineTo(x + width, y + height);
     ctx.lineTo(x, y + height);
-    }
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.lineTo(x, y + effectiveRadius);
     ctx.closePath();
     if (fill) ctx.fill();
     if (stroke) ctx.stroke();
   }
 
-  private lightenColor(color: string, percent: number): string {
+  public lightenColor(color: string, percent: number): string {
     try {
-    let r = parseInt(color.substring(1, 3), 16);
-    let g = parseInt(color.substring(3, 5), 16);
-    let b = parseInt(color.substring(5, 7), 16);
-    r = Math.min(255, Math.floor(r * (100 + percent) / 100));
-    g = Math.min(255, Math.floor(g * (100 + percent) / 100));
-    b = Math.min(255, Math.floor(b * (100 + percent) / 100));
-    const rr = ((r.toString(16).length === 1) ? '0' + r.toString(16) : r.toString(16));
-    const gg = ((g.toString(16).length === 1) ? '0' + g.toString(16) : g.toString(16));
-    const bb = ((b.toString(16).length === 1) ? '0' + b.toString(16) : b.toString(16));
-    return `#${rr}${gg}${bb}`;
+      let r = parseInt(color.substring(1, 3), 16);
+      let g = parseInt(color.substring(3, 5), 16);
+      let b = parseInt(color.substring(5, 7), 16);
+      r = Math.min(255, Math.floor(r * (100 + percent) / 100));
+      g = Math.min(255, Math.floor(g * (100 + percent) / 100));
+      b = Math.min(255, Math.floor(b * (100 + percent) / 100));
+      const rr = ((r.toString(16).length === 1) ? '0' + r.toString(16) : r.toString(16));
+      const gg = ((g.toString(16).length === 1) ? '0' + g.toString(16) : g.toString(16));
+      const bb = ((b.toString(16).length === 1) ? '0' + b.toString(16) : b.toString(16));
+      return `#${rr}${gg}${bb}`;
     } catch (e) {
-        return color;
+      return color;
     }
   }
 
-  private getCategories(data: ChartData[]): string[] {
+  public getCategories(data: ChartData[]): string[] {
     const categories = new Set<string>();
     data.forEach(item => {
-      if (item.children) item.children.forEach(child => { if(child.name) categories.add(child.name); });
+      if (item.children) item.children.forEach(child => { if (child.name) categories.add(child.name); });
       else if (item.name) categories.add(item.name);
     });
     return Array.from(categories);
   }
 
-  private getDataItemsBySeriesName(seriesName: string): ChartData[] {
+  public getDataItemsBySeriesName(seriesName: string): ChartData[] {
     const items: ChartData[] = [];
     this.processedData.forEach(item => {
       if (item.series === seriesName) {
@@ -604,7 +534,6 @@ export class BarService {
 
   public processCanvasClick(canvasX: number, canvasY: number, event: MouseEvent): void {
     if (!this.mergedOptions.onClick) return;
-    // canvasX, canvasY are already adjusted for HiDPI and CSS scaling
     const clickedBarInfo = this.findHoveredBar(canvasX, canvasY);
     if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.seriesIndex !== -1) {
       const seriesNames = this.getSeriesNames();
@@ -619,7 +548,6 @@ export class BarService {
       const barPosition = this.barPositions.find(
         bar => bar.seriesIndex === clickedBarInfo.seriesIndex && bar.data?.name === item.name
       );
-
       if (barPosition) {
         this.ngZone.run(() => {
           this.mergedOptions.onClick!({
@@ -628,7 +556,7 @@ export class BarService {
             seriesIndex: clickedBarInfo.seriesIndex,
             data: this.processedData,
             options: this.mergedOptions,
-            event: event, // Original mouse event
+            event: event,
             position: { x: barPosition.x, y: barPosition.y, width: barPosition.width, height: barPosition.height }
           });
         });

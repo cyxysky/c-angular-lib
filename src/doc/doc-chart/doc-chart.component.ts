@@ -29,7 +29,7 @@ export class DocChartComponent {
     { name: '十一月', data: 120 },
     { name: '十二月', data: 130 }
   ];
-  
+
   // 销售数据，需要在toggleChartData前定义
   salesData: ChartData[] = [
     { name: '一季度', data: 120 },
@@ -37,7 +37,7 @@ export class DocChartComponent {
     { name: '三季度', data: 240 },
     { name: '四季度', data: 300 }
   ];
-  
+
   // 饼图数据
   pieData: ChartData[] = [
     { name: '产品A', value: 335 },
@@ -46,7 +46,7 @@ export class DocChartComponent {
     { name: '产品D', value: 120 },
     { name: '产品E', value: 75 }
   ];
-  
+
   // 饼图基础配置选项
   basicPieOptions: ChartOptions = {
     chartType: 'pie',
@@ -58,12 +58,12 @@ export class DocChartComponent {
     colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
     animate: true
   };
-  
+
   // 环形图选项
   donutPieOptions: ChartOptions = {
     chartType: 'pie',
     title: '预算分配',
-    innerRadius: 80,
+    innerRadius: 60,
     donutText: '总计: 920',
     showLegend: true,
     legend: {
@@ -71,7 +71,7 @@ export class DocChartComponent {
     },
     colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6']
   };
-  
+
   // 环形图数据
   donutPieData: ChartData[] = [
     { name: '研发', value: 350 },
@@ -79,7 +79,7 @@ export class DocChartComponent {
     { name: '运营', value: 180 },
     { name: '客服', value: 140 }
   ];
-  
+
   // 悬停效果饼图选项
   hoverPieOptions: ChartOptions = {
     chartType: 'pie',
@@ -93,21 +93,21 @@ export class DocChartComponent {
       expandRadius: 10
     }
   };
-  
-  constructor(public chartService: ChartService) {}
-  
+
+  constructor(public chartService: ChartService) { }
+
   // 图表切换数据和选项
   toggleChartData: ChartData[] = [...this.salesData];
-  
+
   isBarChart: boolean = true;
-  
+
   barChartOptions: ChartOptions = {
     chartType: 'bar',
     title: '季度销售数据',
     colors: ['#3498db'],
     borderRadius: 6
   };
-  
+
   pieChartOptions: ChartOptions = {
     chartType: 'pie',
     title: '季度销售分布',
@@ -115,13 +115,13 @@ export class DocChartComponent {
     showLegend: true,
     colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
   };
-  
+
   // 饼图点击事件
   clickedPieItem: any = null;
-  
+
   // 饼图点击事件选项
   pieTotalValue: number = 0;
-  
+
   pieClickOptions: ChartOptions = {
     chartType: 'pie',
     title: '产品分类比例',
@@ -132,7 +132,7 @@ export class DocChartComponent {
       console.log('点击了扇区:', info);
     }
   };
-  
+
   // 多系列数据
   multiSeriesData: ChartData[] = [
     {
@@ -158,7 +158,7 @@ export class DocChartComponent {
       ]
     }
   ];
-  
+
   // 自定义多系列数据
   customMultiSeriesData: ChartData[] = [
     {
@@ -198,7 +198,7 @@ export class DocChartComponent {
       ]
     }
   ];
-  
+
   // 自定义多系列选项
   customMultiSeriesOptions: ChartOptions = {
     chartType: 'bar',
@@ -210,7 +210,7 @@ export class DocChartComponent {
     borderRadius: 6,
     margin: { top: 60, right: 20, bottom: 50, left: 50 }
   };
-  
+
   // 多系列悬浮框选项
   multiSeriesTooltipOptions: ChartOptions = {
     chartType: 'bar',
@@ -302,7 +302,7 @@ export class DocChartComponent {
 
   // 点击事件相关
   clickedItem: any = null;
-  
+
   // 点击事件选项
   clickOptions: ChartOptions = {
     chartType: 'bar',
@@ -357,17 +357,17 @@ export class DocChartComponent {
   // 修改图表类型切换实现，使用ChartService
   toggleChartType(): void {
     this.isBarChart = !this.isBarChart;
-    
+
     // 由ChartService处理数据和选项转换，保持颜色一致性
     if (this.isBarChart) {
       // 从饼图转换回柱状图
       // 此处使用类型断言正确处理转换关系
       const convertToPieResult = this.chartService.convertBarChartToPieChart(
-        this.toggleChartData as any, 
+        this.toggleChartData as any,
         this.barChartOptions as any
       );
       const result = this.chartService.convertPieChartToBarChart(
-        convertToPieResult.data as any, 
+        convertToPieResult.data as any,
         this.pieChartOptions as any
       );
       this.toggleChartData = result.data as ChartData[];
@@ -375,7 +375,7 @@ export class DocChartComponent {
     } else {
       // 从柱状图转换为饼图
       const result = this.chartService.convertBarChartToPieChart(
-        this.toggleChartData as any, 
+        this.toggleChartData as any,
         this.barChartOptions as any
       );
       // 不需要单独存储饼图数据，直接在模板中使用转换函数
@@ -383,12 +383,12 @@ export class DocChartComponent {
       this.togglePieData = result.data as ChartData[];
     }
   }
-  
+
   // 计算饼图的总值
   calculatePieTotal(data: ChartData[]): number {
     return data.reduce((sum, item) => sum + (item.value || 0), 0);
   }
-  
+
   // 获取点击扇区的百分比
   getPiePercentage(value: number): string {
     if (!this.pieTotalValue) {
@@ -851,7 +851,7 @@ export class DocChartComponent {
       ]
     }
   ];
-  
+
   // 代码示例
   basicPieChartCode = `
 import { Component } from '@angular/core';
