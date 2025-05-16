@@ -1,7 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ChartData, ChartOptions, TooltipUpdate } from './chart.interface';
 import { ChartService } from './chart.service';
-import { Subject } from 'rxjs';
 
 @Injectable()
 export class BarService {
@@ -30,8 +29,6 @@ export class BarService {
   public barPositions: Array<{ x: number, y: number, width: number, height: number, data: ChartData, seriesIndex: number }> = [];
   private displayWidth!: number; // 逻辑宽度
   private displayHeight!: number; // 逻辑高度
-  private tooltipUpdateSubject = new Subject<TooltipUpdate>();
-  public tooltipUpdate$ = this.tooltipUpdateSubject.asObservable();
 
   constructor(chartService: ChartService, ngZone: NgZone) {
     this.chartService = chartService;
@@ -60,10 +57,6 @@ export class BarService {
   public setHoveredIndices(dataIndex: number, seriesIndex: number): void {
     this.hoveredBarIndex = dataIndex;
     this.hoveredSeriesIndex = seriesIndex;
-  }
-
-  public emitTooltipUpdate(update: TooltipUpdate): void {
-    this.tooltipUpdateSubject.next(update);
   }
 
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
@@ -116,7 +109,6 @@ export class BarService {
         this.hoveredBarIndex = -1;
         this.hoveredSeriesIndex = -1;
       });
-      this.tooltipUpdateSubject.next({ isVisible: false });
       this.drawChartFrame(1.0);
     }
   }
@@ -389,11 +381,7 @@ export class BarService {
         const y = margin.top + chartHeight - barH - cumulativeHeight;
         this.barPositions.push({ x, y, width: barWidth, height: barH, data: item, seriesIndex: originalSeriesIndex });
         const barColor = this.getDataColor(originalSeriesIndex, categoryIdx);
-        if (categoryIdx === this.hoveredBarIndex && originalSeriesIndex === this.hoveredSeriesIndex) {
-          ctx.fillStyle = this.lightenColor(barColor, 20);
-        } else {
-          ctx.fillStyle = barColor;
-        }
+        ctx.fillStyle = barColor;
         if (itemValue > 0) {
           if (this.mergedOptions.borderRadius && this.mergedOptions.borderRadius > 0) {
             const effectiveRadius = Math.min(this.mergedOptions.borderRadius, barH, barWidth / 2);
@@ -490,23 +478,6 @@ export class BarService {
     ctx.closePath();
     if (fill) ctx.fill();
     if (stroke) ctx.stroke();
-  }
-
-  public lightenColor(color: string, percent: number): string {
-    try {
-      let r = parseInt(color.substring(1, 3), 16);
-      let g = parseInt(color.substring(3, 5), 16);
-      let b = parseInt(color.substring(5, 7), 16);
-      r = Math.min(255, Math.floor(r * (100 + percent) / 100));
-      g = Math.min(255, Math.floor(g * (100 + percent) / 100));
-      b = Math.min(255, Math.floor(b * (100 + percent) / 100));
-      const rr = ((r.toString(16).length === 1) ? '0' + r.toString(16) : r.toString(16));
-      const gg = ((g.toString(16).length === 1) ? '0' + g.toString(16) : g.toString(16));
-      const bb = ((b.toString(16).length === 1) ? '0' + b.toString(16) : b.toString(16));
-      return `#${rr}${gg}${bb}`;
-    } catch (e) {
-      return color;
-    }
   }
 
   public getCategories(data: ChartData[]): string[] {

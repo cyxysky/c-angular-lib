@@ -1,7 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ChartData, ChartOptions, ChartDataWithAngles, TooltipUpdate } from './chart.interface';
 import { ChartService } from './chart.service';
-import { Subject } from 'rxjs';
 
 @Injectable()
 export class PieService {
@@ -35,8 +34,6 @@ export class PieService {
   };
   private _isToggling: boolean = false;
   private sliceAnimationIds: number[] = [];
-  private tooltipUpdateSubject = new Subject<TooltipUpdate>();
-  public tooltipUpdate$ = this.tooltipUpdateSubject.asObservable();
 
   constructor(chartService: ChartService, ngZone: NgZone) {
     this.chartService = chartService;
@@ -79,10 +76,6 @@ export class PieService {
 
   public setHoveredIndex(index: number): void {
     this.hoveredIndex = index;
-  }
-
-  public emitTooltipUpdate(update: TooltipUpdate): void {
-    this.tooltipUpdateSubject.next(update);
   }
 
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
@@ -290,10 +283,22 @@ export class PieService {
   private drawLabels(): void {
     this.processedData.forEach((item, index) => {
       if (!this.sliceVisibility[index]) return;
+
       const midAngle = (item.startAngle + item.endAngle) / 2;
-      const labelRadius = this.outerRadius * 0.75;
-      const x = this.centerX + Math.cos(midAngle) * labelRadius;
-      const y = this.centerY + Math.sin(midAngle) * labelRadius;
+      let labelRadius = this.outerRadius * 0.75;
+      let x = this.centerX + Math.cos(midAngle) * labelRadius;
+      let y = this.centerY + Math.sin(midAngle) * labelRadius;
+
+      // Check if the current slice is hovered and should be expanded
+      const isHovered = index === this.hoveredIndex;
+      if (isHovered && this.mergedOptions.hoverEffect?.expandSlice) {
+        const expandRadius = this.mergedOptions.hoverEffect.expandRadius || 10;
+        const hoverOffsetX = Math.cos(midAngle) * expandRadius;
+        const hoverOffsetY = Math.sin(midAngle) * expandRadius;
+        x += hoverOffsetX;
+        y += hoverOffsetY;
+      }
+
       this.ctx.save();
       this.ctx.textAlign = 'center';
       this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
@@ -416,7 +421,6 @@ export class PieService {
   private hideTooltipInternal(): void {
     if (this.hoveredIndex !== -1) {
       this.ngZone.run(() => { this.hoveredIndex = -1; });
-      this.tooltipUpdateSubject.next({ isVisible: false });
       this.draw();
     }
   }
