@@ -30,11 +30,29 @@ export class BarService {
   private displayWidth!: number; // 逻辑宽度
   private displayHeight!: number; // 逻辑高度
 
+  // =================================================================================
+  // 1. 初始化方法 (Initialization Methods)
+  // =================================================================================
+
+  /**
+   * 构造函数
+   * @param chartService 图表服务实例
+   * @param ngZone Angular Zone 服务实例
+   */
   constructor(chartService: ChartService, ngZone: NgZone) {
     this.chartService = chartService;
     this.ngZone = ngZone;
   }
 
+  /**
+   * 初始化图表服务
+   * @param ctx Canvas 2D 上下文
+   * @param displayWidth 画布逻辑宽度
+   * @param displayHeight 画布逻辑高度
+   * @param data 图表数据
+   * @param options 图表配置项
+   * @param skipInitialAnimation 是否跳过初始动画
+   */
   public init(
     ctx: CanvasRenderingContext2D,
     displayWidth: number,
@@ -54,26 +72,18 @@ export class BarService {
     this.drawChart(skipInitialAnimation);
   }
 
-  public setHoveredIndices(dataIndex: number, seriesIndex: number): void {
-    this.hoveredBarIndex = dataIndex;
-    this.hoveredSeriesIndex = seriesIndex;
-  }
-
-  public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
-    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
-    if (this.mergedOptions.barColors && (!this.mergedOptions.colors || this.mergedOptions.colors.length === 0)) {
-      this.mergedOptions.colors = this.mergedOptions.barColors;
-    }
-    if (newDisplayWidth !== undefined) this.displayWidth = newDisplayWidth;
-    if (newDisplayHeight !== undefined) this.displayHeight = newDisplayHeight;
-    this.data = data;
-    this.drawChart();
-  }
-
+  /**
+   * 设置图表数据 (内部使用 setter)
+   * @param newData 新的图表数据
+   */
   private set data(newData: ChartData[]) {
     this.processDataInput(newData);
   }
 
+  /**
+   * 处理和转换输入的图表数据
+   * @param inputData 原始输入的图表数据
+   */
   private processDataInput(inputData: ChartData[]): void {
     this.processedData = [];
     if (!inputData || inputData.length === 0) return;
@@ -103,177 +113,14 @@ export class BarService {
     }
   }
 
-  private hideTooltipInternal(): void {
-    if (this.hoveredBarIndex !== -1 || this.hoveredSeriesIndex !== -1) {
-      this.ngZone.run(() => {
-        this.hoveredBarIndex = -1;
-        this.hoveredSeriesIndex = -1;
-      });
-      this.drawChartFrame(1.0);
-    }
-  }
+  // =================================================================================
+  // 2. 绘制方法 (Drawing Methods)
+  // =================================================================================
 
-  public hideAllTooltipsAndRedraw(): void {
-    this.hideTooltipInternal();
-  }
-
-  public destroy(): void {
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    this.animationFrameId = null;
-  }
-
-  public getSeriesNames(): string[] {
-    const seriesNames: string[] = [];
-    this.processedData.forEach(item => {
-      if (item.series && !seriesNames.includes(item.series)) {
-        seriesNames.push(item.series);
-      }
-      if (item.children) {
-        item.children.forEach(child => {
-          if (child.series && !seriesNames.includes(child.series)) {
-            seriesNames.push(child.series);
-          }
-        });
-      }
-    });
-    return seriesNames;
-  }
-
-  public getVisibleData(): ChartData[] {
-    const visibleSeriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
-    if (!visibleSeriesNames.length) return [];
-    return this.processedData.filter(item => {
-      if (item.series && visibleSeriesNames.includes(item.series)) return true;
-      if (item.children) {
-        const visibleChildren = item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series));
-        return visibleChildren.length > 0;
-      }
-      return false;
-    }).map(item => {
-      if (item.children) {
-        return { ...item, children: item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series)) };
-      }
-      return item;
-    });
-  }
-
-  private safeArrayMax(arr: number[], defaultValue: number = 0): number {
-    if (!arr || arr.length === 0) return defaultValue;
-    const validValues = arr.filter(val => !isNaN(val) && typeof val === 'number' && isFinite(val));
-    if (validValues.length === 0) return defaultValue;
-    return Math.max(...validValues);
-  }
-
-  private getMaxCategoryValue(): number {
-    const visibleData = this.getVisibleData();
-    if (visibleData.length === 0) return 0;
-    const allCategories = new Set<string>();
-    visibleData.forEach(item => {
-      if (item.children) item.children.forEach(child => allCategories.add(child.name));
-      else if (item.name) allCategories.add(item.name);
-    });
-    if (allCategories.size === 0) return 0;
-    const categoryTotals: Record<string, number> = {};
-    Array.from(allCategories).forEach(category => categoryTotals[category] = 0);
-    visibleData.forEach(item => {
-      if (item.children) {
-        item.children.forEach(child => {
-          if (categoryTotals[child.name] !== undefined) categoryTotals[child.name] += (child.data ?? child.value ?? 0);
-        });
-      } else if (item.name && categoryTotals[item.name] !== undefined) {
-        categoryTotals[item.name] += (item.data ?? item.value ?? 0);
-      }
-    });
-    return Object.values(categoryTotals).length > 0 ? this.safeArrayMax(Object.values(categoryTotals)) : 0;
-  }
-
-  private calculateTotalValue(seriesIndex?: number): number {
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex !== undefined && seriesIndex >= 0 && seriesIndex < seriesNames.length) {
-      const seriesName = seriesNames[seriesIndex];
-      let total = 0;
-      this.processedData.forEach(item => {
-        if (item.series === seriesName) total += (item.data ?? item.value ?? 0);
-        if (item.children) item.children.forEach(child => { if (child.series === seriesName) total += (child.data ?? child.value ?? 0); });
-      });
-      return total;
-    } else {
-      let total = 0;
-      this.processedData.forEach(item => {
-        total += (item.data ?? item.value ?? 0);
-        if (item.children) item.children.forEach(child => total += (child.data ?? child.value ?? 0));
-      });
-      return total;
-    }
-  }
-
-  public formatValue(value: number | undefined): string {
-    if (typeof value === 'number') return this.chartService.formatNumber(value);
-    return '0';
-  }
-
-  public calculatePercentage(value: number | undefined, seriesIndex?: number): string {
-    const totalValue = this.calculateTotalValue(seriesIndex);
-    const numValue = typeof value === 'number' ? value : 0;
-    return totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0';
-  }
-
-  public getSeriesColor(seriesIndex: number): string {
-    if (seriesIndex < 0 || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex >= seriesNames.length) return '';
-    const seriesName = seriesNames[seriesIndex];
-    for (const item of this.processedData) {
-      if (item.series === seriesName && item.color) return item.color;
-      if (item.children) for (const child of item.children) if (child.series === seriesName && child.color) return child.color;
-    }
-    return this.mergedOptions.colors[seriesIndex % this.mergedOptions.colors.length];
-  }
-
-  public getDataColor(seriesIndex: number, dataIndex: number): string {
-    if (seriesIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex >= seriesNames.length) return '';
-    const seriesName = seriesNames[seriesIndex];
-    let targetItem: ChartData | undefined;
-    const categories = this.getCategories(this.getVisibleData());
-    const categoryName = categories[dataIndex];
-    for (const item of this.processedData) {
-      if (item.series === seriesName) {
-        if (item.children) targetItem = item.children.find(child => child.name === categoryName && (!child.series || child.series === seriesName));
-        else if (item.name === categoryName) targetItem = item;
-      } else if (item.children) {
-        targetItem = item.children.find(child => child.name === categoryName && child.series === seriesName);
-      }
-      if (targetItem) break;
-    }
-    if (targetItem && targetItem.color) return targetItem.color;
-    return this.getSeriesColor(seriesIndex);
-  }
-
-  public getHoveredBarColor(): string {
-    if (this.hoveredBarIndex < 0 || this.hoveredSeriesIndex < 0) return '';
-    return this.getDataColor(this.hoveredSeriesIndex, this.hoveredBarIndex);
-  }
-
-  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string }> {
-    return this.getSeriesNames().map((name, i) => ({
-      name,
-      color: this.getSeriesColor(i),
-      visible: this.isSeriesVisible(i),
-      active: this.hoveredSeriesIndex === i
-    }));
-  }
-
-  public isSeriesVisible(index: number): boolean {
-    return this.seriesVisibility[index] === true;
-  }
-
-  public toggleSeriesVisibility(index: number): void {
-    this.seriesVisibility[index] = !this.seriesVisibility[index];
-    this.drawChart();
-  }
-
+  /**
+   * 绘制整个图表，如果需要动画则启动动画流程
+   * @param forceNoAnimation 是否强制不使用动画
+   */
   private drawChart(forceNoAnimation: boolean = false): void {
     if (!this.processedData || this.processedData.length === 0 || !this.ctx) return;
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -285,6 +132,9 @@ export class BarService {
     }
   }
 
+  /**
+   * 执行图表动画的循环
+   */
   private animateChart(): void {
     this.ngZone.runOutsideAngular(() => {
       const animate = () => {
@@ -301,6 +151,10 @@ export class BarService {
     });
   }
 
+  /**
+   * 绘制图表的单帧内容
+   * @param animationProgress 动画进度 (0 到 1)
+   */
   public drawChartFrame(animationProgress: number): void {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
@@ -338,6 +192,13 @@ export class BarService {
     }
   }
 
+  /**
+   * 绘制图表网格线
+   * @param margin 图表边距
+   * @param chartHeight 图表绘制区域高度
+   * @param chartWidth 图表绘制区域宽度
+   * @param maxValue Y轴最大值
+   */
   private drawGrid(margin: any, chartHeight: number, chartWidth: number, maxValue: number): void {
     const ctx = this.ctx;
     const gridCount = 5;
@@ -356,10 +217,17 @@ export class BarService {
     }
   }
 
-  private getItemValue(item: ChartData): number {
-    return (item.data ?? item.value ?? 0);
-  }
-
+  /**
+   * 绘制柱状图的柱子
+   * @param visibleData 过滤后的可见数据
+   * @param margin 图表边距
+   * @param chartHeight 图表绘制区域高度
+   * @param barWidth 单个柱子宽度
+   * @param barSpacing 柱子间距
+   * @param groupWidth 每组柱子的总宽度
+   * @param maxValue Y轴最大值
+   * @param animationProgress 动画进度
+   */
   private drawBars(
     visibleData: ChartData[], margin: any, chartHeight: number, barWidth: number, barSpacing: number,
     groupWidth: number, maxValue: number, animationProgress: number
@@ -417,6 +285,12 @@ export class BarService {
     });
   }
 
+  /**
+   * 绘制坐标轴
+   * @param margin 图表边距
+   * @param chartHeight 图表绘制区域高度
+   * @param chartWidth 图表绘制区域宽度
+   */
   private drawAxes(margin: any, chartHeight: number, chartWidth: number): void {
     const ctx = this.ctx;
     ctx.strokeStyle = '#333333';
@@ -431,6 +305,12 @@ export class BarService {
     ctx.stroke();
   }
 
+  /**
+   * 绘制鼠标悬浮时的辅助引导线
+   * @param margin 图表边距
+   * @param chartHeight 图表绘制区域高度
+   * @param chartWidth 图表绘制区域宽度
+   */
   private drawGuideLine(margin: any, chartHeight: number, chartWidth: number): void {
     if (this.hoveredBarIndex === -1 || this.hoveredSeriesIndex === -1 || !this.mergedOptions.hoverEffect?.showGuideLine) return;
     const ctx = this.ctx;
@@ -453,18 +333,17 @@ export class BarService {
     ctx.setLineDash([]);
   }
 
-  public findHoveredBar(x: number, y: number): { dataIndex: number, seriesIndex: number } {
-    for (let i = 0; i < this.barPositions.length; i++) {
-      const bar = this.barPositions[i];
-      if (x >= bar.x && x <= bar.x + bar.width && y >= bar.y && y <= bar.y + bar.height) {
-        const categories = this.getCategories(this.getVisibleData());
-        const dataIndex = categories.indexOf(bar.data.name!);
-        return { dataIndex, seriesIndex: bar.seriesIndex };
-      }
-    }
-    return { dataIndex: -1, seriesIndex: -1 };
-  }
-
+  /**
+   * 绘制圆角矩形 (用于柱子)
+   * @param ctx Canvas 2D 上下文
+   * @param x 矩形左上角 x 坐标
+   * @param y 矩形左上角 y 坐标
+   * @param width 矩形宽度
+   * @param height 矩形高度
+   * @param radius 圆角半径
+   * @param fill 是否填充
+   * @param stroke 是否描边
+   */
   private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: boolean, stroke: boolean): void {
     const effectiveRadius = Math.max(0, radius);
     ctx.beginPath();
@@ -476,49 +355,78 @@ export class BarService {
     ctx.lineTo(x, y + height);
     ctx.lineTo(x, y + effectiveRadius);
     ctx.closePath();
-    if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
+    fill && ctx.fill();
+    stroke && ctx.stroke();
   }
 
-  public getCategories(data: ChartData[]): string[] {
-    const categories = new Set<string>();
-    data.forEach(item => {
-      if (item.children) item.children.forEach(child => { if (child.name) categories.add(child.name); });
-      else if (item.name) categories.add(item.name);
-    });
-    return Array.from(categories);
+  // =================================================================================
+  // 3. 其他功能方法 (Other Functional Methods)
+  // =================================================================================
+
+  /**
+   * 更新图表数据和配置项
+   * @param data 新的图表数据
+   * @param options 新的图表配置项
+   * @param newDisplayWidth 可选，新的画布逻辑宽度
+   * @param newDisplayHeight 可选，新的画布逻辑高度
+   */
+  public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
+    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
+    if (this.mergedOptions.barColors && (!this.mergedOptions.colors || this.mergedOptions.colors.length === 0)) {
+      this.mergedOptions.colors = this.mergedOptions.barColors;
+    }
+    if (newDisplayWidth !== undefined) this.displayWidth = newDisplayWidth;
+    if (newDisplayHeight !== undefined) this.displayHeight = newDisplayHeight;
+    this.data = data;
+    this.drawChart();
   }
 
-  public getDataItemsBySeriesName(seriesName: string): ChartData[] {
-    const items: ChartData[] = [];
-    this.processedData.forEach(item => {
-      if (item.series === seriesName) {
-        if (item.children) items.push(...item.children);
-        else items.push(item);
-      } else if (item.children) {
-        const seriesItems = item.children.filter(child => child.series === seriesName);
-        items.push(...seriesItems);
-      }
-    });
-    return items;
+  /**
+   * 设置当前悬浮的柱子数据索引和系列索引
+   * @param dataIndex 柱子数据索引 (通常是类别索引)
+   * @param seriesIndex 系列索引
+   */
+  public setHoveredIndices(dataIndex: number, seriesIndex: number): void {
+    this.hoveredBarIndex = dataIndex;
+    this.hoveredSeriesIndex = seriesIndex;
   }
 
+  /**
+   * 切换指定系列（图例项）的可见性
+   * @param index 系列的索引
+   */
+  public toggleSeriesVisibility(index: number): void {
+    this.seriesVisibility[index] = !this.seriesVisibility[index];
+    this.drawChart();
+  }
+
+  /**
+   * 处理画布点击事件
+   * @param canvasX 点击位置相对于画布的 X 坐标 (逻辑单位)
+   * @param canvasY 点击位置相对于画布的 Y 坐标 (逻辑单位)
+   * @param event 原始鼠标事件
+   */
   public processCanvasClick(canvasX: number, canvasY: number, event: MouseEvent): void {
     if (!this.mergedOptions.onClick) return;
+
     const clickedBarInfo = this.findHoveredBar(canvasX, canvasY);
     if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.seriesIndex !== -1) {
       const seriesNames = this.getSeriesNames();
       if (clickedBarInfo.seriesIndex >= seriesNames.length) return;
       const seriesName = seriesNames[clickedBarInfo.seriesIndex];
+
       const categories = this.getCategories(this.getVisibleData());
       if (clickedBarInfo.dataIndex >= categories.length) return;
       const category = categories[clickedBarInfo.dataIndex];
+
       const dataItems = this.getDataItemsBySeriesName(seriesName);
       const item = dataItems.find(d => d.name === category);
       if (!item) return;
+
       const barPosition = this.barPositions.find(
         bar => bar.seriesIndex === clickedBarInfo.seriesIndex && bar.data?.name === item.name
       );
+
       if (barPosition) {
         this.ngZone.run(() => {
           this.mergedOptions.onClick!({
@@ -533,5 +441,309 @@ export class BarService {
         });
       }
     }
+  }
+
+  /**
+   * 隐藏所有工具提示并重绘图表 (通常在鼠标移出画布时调用)
+   */
+  public hideAllTooltipsAndRedraw(): void {
+    this.hideTooltipInternal();
+  }
+
+  /**
+   * 获取所有系列名称
+   * @returns 系列名称数组
+   */
+  public getSeriesNames(): string[] {
+    const seriesNames: string[] = [];
+    this.processedData.forEach(item => {
+      if (item.series && !seriesNames.includes(item.series)) {
+        seriesNames.push(item.series);
+      }
+      if (item.children) {
+        item.children.forEach(child => {
+          if (child.series && !seriesNames.includes(child.series)) {
+            seriesNames.push(child.series);
+          }
+        });
+      }
+    });
+    return seriesNames;
+  }
+
+  /**
+   * 获取所有分类名称
+   * @param data 用于提取分类的数据集 (通常是 getVisibleData() 的结果)
+   * @returns 分类名称数组
+   */
+  public getCategories(data: ChartData[]): string[] {
+    const categories = new Set<string>();
+    data.forEach(item => {
+      if (item.children) item.children.forEach(child => { if (child.name) categories.add(child.name); });
+      else if (item.name) categories.add(item.name);
+    });
+    return Array.from(categories);
+  }
+
+  /**
+   * 根据系列名称获取对应的数据项
+   * @param seriesName 系列名称
+   * @returns 该系列下的数据项数组
+   */
+  public getDataItemsBySeriesName(seriesName: string): ChartData[] {
+    const items: ChartData[] = [];
+    this.processedData.forEach(item => {
+      if (item.series === seriesName) {
+        if (item.children) items.push(...item.children);
+        else items.push(item);
+      } else if (item.children) {
+        const seriesItems = item.children.filter(child => child.series === seriesName);
+        items.push(...seriesItems);
+      }
+    });
+    return items;
+  }
+
+  /**
+   * 获取当前可见的数据 (根据 seriesVisibility 过滤)
+   * @returns 可见数据数组
+   */
+  public getVisibleData(): ChartData[] {
+    const visibleSeriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
+    if (!visibleSeriesNames.length) return [];
+
+    return this.processedData.filter(item => {
+      if (item.series && visibleSeriesNames.includes(item.series)) return true;
+      if (item.children) {
+        const visibleChildren = item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series));
+        return visibleChildren.length > 0;
+      }
+      return false;
+    }).map(item => {
+      if (item.children) {
+        return { ...item, children: item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series)) };
+      }
+      return item;
+    });
+  }
+
+  /**
+   * 检查指定索引的系列是否可见
+   * @param index 系列的索引
+   * @returns 如果可见则返回 true，否则返回 false
+   */
+  public isSeriesVisible(index: number): boolean {
+    return this.seriesVisibility[index] === true;
+  }
+
+  /**
+   * 获取Y轴的最大值 (基于每个类别的总和，用于堆叠或分组柱状图的正确缩放)
+   * @returns Y轴最大值
+   */
+  private getMaxCategoryValue(): number {
+    const visibleData = this.getVisibleData();
+    if (visibleData.length === 0) return 0;
+
+    const allCategories = new Set<string>();
+    visibleData.forEach(item => {
+      if (item.children) item.children.forEach(child => allCategories.add(child.name));
+      else if (item.name) allCategories.add(item.name);
+    });
+
+    if (allCategories.size === 0) return 0;
+
+    const categoryTotals: Record<string, number> = {};
+    Array.from(allCategories).forEach(category => categoryTotals[category] = 0);
+
+    visibleData.forEach(item => {
+      if (item.children) {
+        item.children.forEach(child => {
+          if (categoryTotals[child.name] !== undefined) categoryTotals[child.name] += (child.data ?? child.value ?? 0);
+        });
+      } else if (item.name && categoryTotals[item.name] !== undefined) {
+        categoryTotals[item.name] += (item.data ?? item.value ?? 0);
+      }
+    });
+    return Object.values(categoryTotals).length > 0 ? this.safeArrayMax(Object.values(categoryTotals)) : 0;
+  }
+
+  /**
+   * 计算总值，可选按系列计算
+   * @param seriesIndex 可选，系列索引。如果提供，则计算该系列的总值
+   * @returns 总数值
+   */
+  private calculateTotalValue(seriesIndex?: number): number {
+    const seriesNames = this.getSeriesNames();
+    if (seriesIndex !== undefined && seriesIndex >= 0 && seriesIndex < seriesNames.length) {
+      const seriesName = seriesNames[seriesIndex];
+      let total = 0;
+      this.processedData.forEach(item => {
+        if (item.series === seriesName) total += (item.data ?? item.value ?? 0);
+        if (item.children) item.children.forEach(child => { if (child.series === seriesName) total += (child.data ?? child.value ?? 0); });
+      });
+      return total;
+    } else {
+      let total = 0;
+      this.processedData.forEach(item => {
+        total += (item.data ?? item.value ?? 0);
+        if (item.children) item.children.forEach(child => total += (child.data ?? child.value ?? 0));
+      });
+      return total;
+    }
+  }
+
+  /**
+   * 获取单个数据项的值
+   * @param item 数据项
+   * @returns 数值，如果无效则为 0
+   */
+  private getItemValue(item: ChartData): number {
+    return (item.data ?? item.value ?? 0);
+  }
+
+  /**
+   * 安全地获取数组中的最大值
+   * @param arr 数字数组
+   * @param defaultValue 如果数组无效或为空，返回的默认值
+   * @returns 最大值或默认值
+   */
+  private safeArrayMax(arr: number[], defaultValue: number = 0): number {
+    if (!arr || arr.length === 0) return defaultValue;
+    const validValues = arr.filter(val => !isNaN(val) && typeof val === 'number' && isFinite(val));
+    if (validValues.length === 0) return defaultValue;
+    return Math.max(...validValues);
+  }
+
+  /**
+   * 格式化数值 (例如，添加千位分隔符)
+   * @param value 要格式化的数值
+   * @returns 格式化后的字符串
+   */
+  public formatValue(value: number | undefined): string {
+    if (typeof value === 'number') return this.chartService.formatNumber(value);
+    return '0';
+  }
+
+  /**
+   * 计算并格式化百分比
+   * @param value 当前值
+   * @param seriesIndex 可选，系列索引，用于计算该系列的总值作为基数
+   * @returns 百分比字符串 (例如 "25.0")
+   */
+  public calculatePercentage(value: number | undefined, seriesIndex?: number): string {
+    const totalValue = this.calculateTotalValue(seriesIndex);
+    const numValue = typeof value === 'number' ? value : 0;
+    return totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0';
+  }
+
+  /**
+   * 获取指定系列的颜色
+   * @param seriesIndex 系列索引
+   * @returns 颜色字符串 (HEX, RGB, etc.)
+   */
+  public getSeriesColor(seriesIndex: number): string {
+    if (seriesIndex < 0 || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
+    const seriesNames = this.getSeriesNames();
+    if (seriesIndex >= seriesNames.length) return '';
+
+    const seriesName = seriesNames[seriesIndex];
+    for (const item of this.processedData) {
+      if (item.series === seriesName && item.color) return item.color;
+      if (item.children) for (const child of item.children) if (child.series === seriesName && child.color) return child.color;
+    }
+    return this.mergedOptions.colors[seriesIndex % this.mergedOptions.colors.length];
+  }
+
+  /**
+   * 获取特定数据点（柱子）的颜色
+   * @param seriesIndex 系列索引
+   * @param dataIndex 数据索引 (通常是类别索引)
+   * @returns 颜色字符串
+   */
+  public getDataColor(seriesIndex: number, dataIndex: number): string {
+    if (seriesIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
+    const seriesNames = this.getSeriesNames();
+    if (seriesIndex >= seriesNames.length) return '';
+
+    const seriesName = seriesNames[seriesIndex];
+    let targetItem: ChartData | undefined;
+    const categories = this.getCategories(this.getVisibleData());
+    if (dataIndex >= categories.length) return this.getSeriesColor(seriesIndex);
+
+    const categoryName = categories[dataIndex];
+
+    for (const item of this.processedData) {
+      if (item.series === seriesName) {
+        if (item.children) targetItem = item.children.find(child => child.name === categoryName && (!child.series || child.series === seriesName));
+        else if (item.name === categoryName) targetItem = item;
+      } else if (item.children) {
+        targetItem = item.children.find(child => child.name === categoryName && child.series === seriesName);
+      }
+      if (targetItem) break;
+    }
+
+    if (targetItem && targetItem.color) return targetItem.color;
+    return this.getSeriesColor(seriesIndex);
+  }
+
+  /**
+   * 获取当前悬浮柱子的颜色
+   * @returns 颜色字符串，如果没有悬浮则为空字符串
+   */
+  public getHoveredBarColor(): string {
+    if (this.hoveredBarIndex < 0 || this.hoveredSeriesIndex < 0) return '';
+    return this.getDataColor(this.hoveredSeriesIndex, this.hoveredBarIndex);
+  }
+
+  /**
+   * 获取图例项数组，用于在图表组件中渲染图例
+   * @returns 图例项数组
+   */
+  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string }> {
+    return this.getSeriesNames().map((name, i) => ({
+      name,
+      color: this.getSeriesColor(i),
+      visible: this.isSeriesVisible(i),
+      active: this.hoveredSeriesIndex === i
+    }));
+  }
+
+  /**
+   * 内部方法，用于在鼠标移出或需要主动隐藏时处理工具提示的隐藏逻辑
+   */
+  private hideTooltipInternal(): void {
+    if (this.hoveredBarIndex !== -1 || this.hoveredSeriesIndex !== -1) {
+      this.ngZone.run(() => {
+        this.hoveredBarIndex = -1;
+        this.hoveredSeriesIndex = -1;
+      });
+      this.drawChartFrame(1.0);
+    }
+  }
+
+  /**
+   * 查找鼠标位置对应的柱子
+   * @param x 鼠标相对于画布的 X 坐标 (逻辑单位)
+   * @param y 鼠标相对于画布的 Y 坐标 (逻辑单位)
+   * @returns 返回包含 dataIndex 和 seriesIndex 的对象，未找到则为 -1
+   */
+  public findHoveredBar(x: number, y: number): { dataIndex: number, seriesIndex: number } {
+    for (let i = 0; i < this.barPositions.length; i++) {
+      const bar = this.barPositions[i];
+      if (x >= bar.x && x <= bar.x + bar.width && y >= bar.y && y <= bar.y + bar.height) {
+        const categories = this.getCategories(this.getVisibleData());
+        const dataIndex = categories.indexOf(bar.data.name!);
+        return { dataIndex, seriesIndex: bar.seriesIndex };
+      }
+    }
+    return { dataIndex: -1, seriesIndex: -1 };
+  }
+
+  /**
+   * 销毁服务，清理资源 (例如取消动画帧)
+   */
+  public destroy(): void {
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = null;
   }
 }
