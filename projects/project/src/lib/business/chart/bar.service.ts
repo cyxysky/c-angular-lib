@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ChartData, ChartOptions, TooltipUpdate } from './chart.interface';
+import { ChartData, ChartOptions, TooltipUpdate, BarSpecificOptions } from './chart.interface';
 import { ChartService } from './chart.service';
 
 @Injectable()
@@ -9,19 +9,37 @@ export class BarService {
   private chartService!: ChartService;
   public processedData: ChartData[] = [];
   private seriesVisibility: boolean[] = [];
-  public mergedOptions!: ChartOptions;
-  private defaultOptions: Partial<ChartOptions> = {
-    colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
-    backgroundColor: '#ffffff',
-    borderRadius: 4,
-    showValues: true,
-    showLegend: true,
-    showGrid: true,
-    animate: true,
-    margin: { top: 40, right: 20, bottom: 50, left: 50 },
-    legend: { position: 'top', align: 'center' },
-    hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false }
-  };
+  public mergedOptions!: ChartOptions & { bar: BarSpecificOptions };
+  private defaultOptions: {
+    colors: string[];
+    backgroundColor: string;
+    showLegend: boolean;
+    animate: boolean;
+    legend: { position: 'top' | 'bottom' | 'left' | 'right'; align: 'start' | 'center' | 'end'; };
+    hoverEffect: {
+      enabled: boolean;
+      showTooltip: boolean;
+      showGuideLine: boolean;
+      guideLineStyle: 'solid' | 'dashed';
+      guideLineColor: string;
+      guideLineWidth: number;
+      tooltipHoverable: boolean;
+    };
+    bar: BarSpecificOptions;
+  } = {
+      colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
+      backgroundColor: '#ffffff',
+      showLegend: true,
+      animate: true,
+      legend: { position: 'top', align: 'center' },
+      hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false },
+      bar: {
+        borderRadius: 4,
+        showValues: true,
+        showGrid: true,
+        margin: { top: 40, right: 20, bottom: 50, left: 50 },
+      }
+    };
   private animationFrameId: number | null = null;
   private currentAnimationValue = 0;
   public hoveredBarIndex: number = -1;
@@ -64,7 +82,15 @@ export class BarService {
     this.ctx = ctx;
     this.displayWidth = displayWidth;
     this.displayHeight = displayHeight;
-    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
+    this.mergedOptions = {
+      ...this.defaultOptions,
+      ...options,
+      bar: {
+        ...this.defaultOptions.bar,
+        ...(options.bar || {}),
+      },
+      chartType: 'bar'
+    };
     this.data = data;
     this.drawChart(skipInitialAnimation);
   }
@@ -157,7 +183,7 @@ export class BarService {
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     ctx.fillStyle = this.mergedOptions.backgroundColor!;
     ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
-    const margin = this.mergedOptions.margin!;
+    const margin = this.mergedOptions.bar.margin!;
     const chartWidth = this.displayWidth - margin.left - margin.right;
     const chartHeight = this.displayHeight - margin.top - margin.bottom;
     const visibleData = this.getVisibleData();
@@ -170,7 +196,7 @@ export class BarService {
       ctx.textAlign = 'center';
       ctx.fillText(this.mergedOptions.title, this.displayWidth / 2, margin.top / 2);
     }
-    if (this.mergedOptions.showGrid && maxValue > 0) {
+    if (this.mergedOptions.bar.showGrid && maxValue > 0) {
       this.drawGrid(margin, chartHeight, chartWidth, maxValue);
     }
     this.barPositions = [];
@@ -248,14 +274,14 @@ export class BarService {
         const barColor = this.getDataColor(originalSeriesIndex, categoryIdx);
         ctx.fillStyle = barColor;
         if (itemValue > 0) {
-          if (this.mergedOptions.borderRadius && this.mergedOptions.borderRadius > 0) {
-            const effectiveRadius = Math.min(this.mergedOptions.borderRadius, barH, barWidth / 2);
+          if (this.mergedOptions.bar.borderRadius && this.mergedOptions.bar.borderRadius > 0) {
+            const effectiveRadius = Math.min(this.mergedOptions.bar.borderRadius, barH, barWidth / 2);
             this.roundRect(ctx, x, y, barWidth, barH, effectiveRadius, true, false);
           } else {
             ctx.fillRect(x, y, barWidth, barH);
           }
         }
-        if (this.mergedOptions.showValues && animationProgress > 0.9 && itemValue > 0) {
+        if (this.mergedOptions.bar.showValues && animationProgress > 0.9 && itemValue > 0) {
           ctx.fillStyle = '#333333';
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';
@@ -368,7 +394,15 @@ export class BarService {
    * @param newDisplayHeight 可选，新的画布逻辑高度
    */
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
-    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'bar' };
+    this.mergedOptions = {
+      ...this.defaultOptions,
+      ...options,
+      bar: {
+        ...this.defaultOptions.bar,
+        ...(options.bar || {}),
+      },
+      chartType: 'bar'
+    };
     if (newDisplayWidth !== undefined) this.displayWidth = newDisplayWidth;
     if (newDisplayHeight !== undefined) this.displayHeight = newDisplayHeight;
     this.data = data;
@@ -572,8 +606,10 @@ export class BarService {
       const seriesName = seriesNames[seriesIndex];
       let total = 0;
       this.processedData.forEach(item => {
-        if (item.series === seriesName) total += (item.data || 0);
-        if (item.children) item.children.forEach(child => { if (child.series === seriesName) total += (child.data || 0); });
+        if (item.series === seriesName) {
+          total += (item.data || 0);
+          if (item.children) item.children.forEach(child => total += (child.data || 0));
+        }
       });
       return total;
     } else {
@@ -627,7 +663,7 @@ export class BarService {
   public calculatePercentage(value: number | undefined, seriesIndex?: number): string {
     const totalValue = this.calculateTotalValue(seriesIndex);
     const numValue = typeof value === 'number' ? value : 0;
-    return totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0';
+    return (totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0') + '%';
   }
 
   /**
@@ -693,12 +729,14 @@ export class BarService {
    * 获取图例项数组，用于在图表组件中渲染图例
    * @returns 图例项数组
    */
-  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string }> {
+  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string, numberText?: string }> {
     return this.getSeriesNames().map((name, i) => ({
       name,
       color: this.getSeriesColor(i),
       visible: this.isSeriesVisible(i),
-      active: this.hoveredSeriesIndex === i
+      active: this.hoveredSeriesIndex === i,
+      percentageText: this.calculatePercentage(this.calculateTotalValue(i)),
+      numberText: this.calculateTotalValue(i).toString()
     }));
   }
 

@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ChartData, ChartOptions, ChartDataWithAngles, TooltipUpdate } from './chart.interface';
+import { ChartData, ChartOptions, ChartDataWithAngles, TooltipUpdate, PieSpecificOptions } from './chart.interface';
 import { ChartService } from './chart.service';
 
 @Injectable()
@@ -20,17 +20,36 @@ export class PieService {
   private animationFrameId: number | null = null;
   public processedData: Array<ChartDataWithAngles> = [];
   public sliceVisibility: boolean[] = [];
-  public mergedOptions!: ChartOptions;
-  private defaultOptions: Partial<ChartOptions> = {
+  public mergedOptions!: ChartOptions & { pie: PieSpecificOptions };
+  private defaultOptions: {
+    colors: string[];
+    backgroundColor: string;
+    showLegend: boolean;
+    animate: boolean;
+    legend: { position: 'top' | 'bottom' | 'left' | 'right'; align: 'start' | 'center' | 'end'; };
+    hoverEffect: { 
+      enabled: boolean; 
+      showTooltip: boolean; 
+      expandSlice: boolean; 
+      expandRadius: number; 
+      tooltipHoverable: boolean; 
+    };
+    pie: PieSpecificOptions;
+  } = {
     colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
     backgroundColor: '#ffffff',
-    showLabels: true,
-    showPercentage: true,
     showLegend: true,
     animate: true,
-    dynamicSlices: true,
     legend: { position: 'top', align: 'center' },
-    hoverEffect: { enabled: true, showTooltip: true, expandSlice: true, expandRadius: 10, tooltipHoverable: false }
+    hoverEffect: { enabled: true, showTooltip: true, expandSlice: true, expandRadius: 10, tooltipHoverable: false },
+    pie: {
+      showLabels: true,
+      showPercentage: true,
+      dynamicSlices: true,
+      innerRadius: 0, // Default for pie, can be overridden for donut
+      outerRadius: undefined, // Will be calculated if not set
+      donutText: ''
+    }
   };
   private _isToggling: boolean = false; // 防止快速切换导致状态异常的标志
   private sliceAnimationIds: number[] = []; // 用于独立控制切片动画（如果未来需要）
@@ -69,7 +88,15 @@ export class PieService {
     this.ctx = ctx;
     this.initialDisplayWidth = displayWidth;
     this.initialDisplayHeight = displayHeight;
-    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'pie' };
+    this.mergedOptions = {
+      ...this.defaultOptions,
+      ...options,
+      pie: {
+        ...this.defaultOptions.pie,
+        ...(options.pie || {}),
+      },
+      chartType: 'pie' 
+    };
 
     // 饼图强制图例在顶部 (如果显示图例)
     if (this.mergedOptions.showLegend !== false) {
@@ -163,8 +190,8 @@ export class PieService {
     const availableRadiusY = (this.height - titleGutter) / 2;
     const limitingRadiusBasedOnSpace = Math.max(0, Math.min(availableRadiusX, availableRadiusY));
 
-    if (this.mergedOptions.outerRadius && typeof this.mergedOptions.outerRadius === 'number' && this.mergedOptions.outerRadius > 0) {
-      this.outerRadius = this.mergedOptions.outerRadius;
+    if (this.mergedOptions.pie.outerRadius && typeof this.mergedOptions.pie.outerRadius === 'number' && this.mergedOptions.pie.outerRadius > 0) {
+      this.outerRadius = this.mergedOptions.pie.outerRadius;
     } else {
       // 默认使用可用限制半径的90%，并微调 (例如 +30px，但需确保不超过限制)
       // 这个默认值可以根据视觉效果调整，此处简化为基于可用空间的比例
@@ -177,12 +204,12 @@ export class PieService {
 
 
     // 计算内半径 (用于甜甜圈图)
-    const isDonut = this.mergedOptions.innerRadius !== undefined && typeof this.mergedOptions.innerRadius === 'number' && this.mergedOptions.innerRadius > 0;
+    const isDonut = this.mergedOptions.pie.innerRadius !== undefined && typeof this.mergedOptions.pie.innerRadius === 'number' && this.mergedOptions.pie.innerRadius > 0;
     if (isDonut) {
       let calculatedInnerRadius = this.outerRadius * 0.55; // 默认内半径为外半径的55%
-      if (this.mergedOptions.innerRadius! > 0 && this.mergedOptions.innerRadius! < this.outerRadius) {
-        calculatedInnerRadius = this.mergedOptions.innerRadius!;
-      } else if (this.mergedOptions.innerRadius! >= this.outerRadius && this.outerRadius > 0) {
+      if (this.mergedOptions.pie.innerRadius! > 0 && this.mergedOptions.pie.innerRadius! < this.outerRadius) {
+        calculatedInnerRadius = this.mergedOptions.pie.innerRadius!;
+      } else if (this.mergedOptions.pie.innerRadius! >= this.outerRadius && this.outerRadius > 0) {
         // 用户值无效（过大或等于外半径），回退到默认比例
         calculatedInnerRadius = this.outerRadius * 0.55;
       } else if (this.outerRadius === 0) {
@@ -287,15 +314,15 @@ export class PieService {
     });
 
     // 动画完成后绘制标签和甜甜圈文本
-    if (this.mergedOptions.showLabels && this.animationProgress === 1) this.drawLabels();
-    if (isDonut && this.mergedOptions.donutText && this.animationProgress === 1) this.drawDonutText();
+    if (this.mergedOptions.pie.showLabels && this.animationProgress === 1) this.drawLabels();
+    if (isDonut && this.mergedOptions.pie.donutText && this.animationProgress === 1) this.drawDonutText();
   }
 
   /**
    * 在甜甜圈图中心绘制文本
    */
   private drawDonutText(): void {
-    if (!this.mergedOptions.donutText) return;
+    if (!this.mergedOptions.pie.donutText) return;
     this.ctx.save();
     this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'; // 轻微阴影
     this.ctx.shadowBlur = 4;
@@ -303,7 +330,7 @@ export class PieService {
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.font = 'bold 16px Arial'; // 文本样式
-    this.ctx.fillText(this.mergedOptions.donutText, this.centerX, this.centerY);
+    this.ctx.fillText(this.mergedOptions.pie.donutText, this.centerX, this.centerY);
     this.ctx.restore();
   }
 
@@ -316,7 +343,7 @@ export class PieService {
 
       const midAngle = (item.startAngle + item.endAngle) / 2; // 切片中间角度
       // 标签位置可以根据需求调整，例如更靠近外边缘或内边缘
-      let labelRadius = this.outerRadius * 0.75; // 默认标签半径
+      let labelRadius = this.outerRadius * 0.8; // 默认标签半径
       if (this.innerRadius > 0 && this.outerRadius - this.innerRadius < 40) { // 如果环很窄
         labelRadius = this.innerRadius + (this.outerRadius - this.innerRadius) / 2;
       } else if (this.innerRadius > 0) {
@@ -343,10 +370,10 @@ export class PieService {
       this.ctx.shadowBlur = 3;
       
       let labelText = '';
-      if (this.mergedOptions.showPercentage && item.percentage !== undefined) {
-        labelText = `${this.formatPercentage(item.percentage)}%`;
+      if (this.mergedOptions.pie.showPercentage && item.percentage !== undefined) {
+        labelText = `${this.formatPercentage(item.percentage)}`;
       }
-      if (this.mergedOptions.showLabels && item.data !== undefined) {
+      if (this.mergedOptions.pie.showLabels && item.data !== undefined) {
         const valueText = this.formatValue(item.data);
         labelText = labelText ? `${valueText} (${labelText})` : valueText;
       }
@@ -378,7 +405,15 @@ export class PieService {
    * @param newDisplayHeight 可选，新的画布逻辑高度
    */
   public update(data: ChartData[], options: ChartOptions, newDisplayWidth?: number, newDisplayHeight?: number): void {
-    this.mergedOptions = { ...this.defaultOptions, ...options, chartType: 'pie' };
+    this.mergedOptions = {
+      ...this.defaultOptions,
+      ...options,
+      pie: {
+        ...this.defaultOptions.pie,
+        ...(options.pie || {}),
+      },
+      chartType: 'pie'
+    };
     // 强制图例在顶部
     if (this.mergedOptions.showLegend !== false) {
       if (!this.mergedOptions.legend) {
@@ -420,7 +455,7 @@ export class PieService {
 
       this.sliceVisibility[index] = !this.sliceVisibility[index];
 
-      if (this.mergedOptions.dynamicSlices) {
+      if (this.mergedOptions.pie.dynamicSlices) {
         // 获取所有当前可见的切片数据
         const visibleDataItems = this.processedData.filter((_, i) => this.sliceVisibility[i]);
         if (visibleDataItems.length > 0) {
@@ -459,13 +494,14 @@ export class PieService {
    * 获取图例项数组，用于在图表组件中渲染图例
    * @returns 图例项数组
    */
-  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string }> {
+  public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string, numberText?: string }> {
     return this.processedData.map((item, i) => ({
       name: item.name,
       color: item.color || this.mergedOptions.colors![i % this.mergedOptions.colors!.length], // 回退到默认颜色
       visible: this.isSliceVisible(i),
       active: this.hoveredIndex === i, // 是否为当前悬浮的切片
-      percentageText: (this.mergedOptions.showPercentage && item.percentage !== undefined) ? this.formatPercentage(item.percentage) : undefined
+      percentageText: (this.mergedOptions.pie.showPercentage && item.percentage !== undefined) ? this.formatPercentage(item.percentage) : undefined,
+      numberText: (this.mergedOptions.pie.showLabels && item.data !== undefined) ? this.formatValue(item.data) : undefined
     }));
   }
 
@@ -503,7 +539,7 @@ export class PieService {
    * @returns 格式化后的百分比字符串 (例如 "25.0")，无效则为 '0'
    */
   public formatPercentage(percentage: number | undefined): string {
-    return percentage !== undefined ? percentage.toFixed(1) : '0';
+    return percentage !== undefined ? percentage.toFixed(1) + '%' : '0%';
   }
   
   /**

@@ -1,18 +1,12 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, SimpleChanges, NgZone, TemplateRef, OnDestroy, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartData, ChartOptions, TooltipUpdate } from './chart.interface';
+import { ChartData, ChartOptions, LegendItem, TooltipUpdate } from './chart.interface';
 import { ChartService } from './chart.service';
 import { BarService } from './bar.service';
 import { PieService } from './pie.service';
 import { Subject, Subscription } from 'rxjs';
 
-interface LegendItem {
-  name: string;
-  color: string;
-  visible: boolean;
-  active: boolean;
-  percentageText?: string;
-}
+
 
 @Component({
   selector: 'lib-chart',
@@ -142,9 +136,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         if (targetLeft < 0) {
           targetLeft = 0;
         }
-        
+
         this.tooltipStylePosition = { left: `${targetLeft}px`, top: `${targetTop}px` };
-      } 
+      }
       // Always trigger change detection
       if (this.cdr) {
         this.cdr.detectChanges();
@@ -257,10 +251,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (hoveredBarInfo.dataIndex !== previousHoveredBarIndex || hoveredBarInfo.seriesIndex !== previousHoveredSeriesIndex) {
       this.ngZone.run(() => {
         this.barService.setHoveredIndices(hoveredBarInfo.dataIndex, hoveredBarInfo.seriesIndex);
-        this.updateLegendItems(); 
+        this.updateLegendItems();
       });
       this.barService.drawChartFrame(1.0);
-      this.cdr.detectChanges(); 
+      this.cdr.detectChanges();
     }
 
     if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.seriesIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
@@ -276,7 +270,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           if (item) {
             const tooltipPayload = {
               title: `${seriesName} - ${item.name}`,
-              rows: [{ label: '数值', value: this.barService.formatValue(item.data) }],
+              rows: [
+                { label: '数值', value: this.barService.formatValue(item.data) },
+                { label: '占比', value: `${this.barService.calculatePercentage(item.data)}` }
+              ],
               item: item
             };
             const borderColor = this.barService.getDataColor(hoveredBarInfo.seriesIndex, hoveredBarInfo.dataIndex);
@@ -302,10 +299,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (hoveredSliceIndex !== previousHoveredIndex) {
       this.ngZone.run(() => {
         this.pieService.setHoveredIndex(hoveredSliceIndex);
-        this.updateLegendItems(); 
+        this.updateLegendItems();
       });
       this.pieService.draw();
-      this.cdr.detectChanges(); 
+      this.cdr.detectChanges();
     }
 
     if (hoveredSliceIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
@@ -315,7 +312,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           title: item.name,
           rows: [
             { label: '数值', value: this.pieService.formatValue(item.data) },
-            { label: '占比', value: `${this.pieService.formatPercentage(item.percentage)}%` }
+            { label: '占比', value: `${this.pieService.formatPercentage(item.percentage)}` }
           ],
           item: item
         };
@@ -352,10 +349,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       if (this.barService.hoveredBarIndex !== -1 || this.barService.hoveredSeriesIndex !== -1) {
         this.ngZone.run(() => {
           this.barService.setHoveredIndices(-1, -1);
-          this.updateLegendItems(); 
+          this.updateLegendItems();
         });
         this.barService.drawChartFrame(1.0);
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       }
       this.tooltipUpdateSubject.next({ isVisible: false });
     } else {
@@ -377,10 +374,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       if (this.pieService.hoveredIndex !== -1) {
         this.ngZone.run(() => {
           this.pieService.setHoveredIndex(-1);
-          this.updateLegendItems(); 
+          this.updateLegendItems();
         });
         this.pieService.draw();
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       }
       this.tooltipUpdateSubject.next({ isVisible: false });
     } else {

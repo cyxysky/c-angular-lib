@@ -25,23 +25,24 @@
           {{ tooltipData.title }}
         </div>
         <div class="tooltip-content__data">
-          <div *ngFor="let row of tooltipData.rows">
-            <span class="tooltip-content__label">{{ row.label }}</span>
-            <span class="tooltip-content__value">{{ row.value }}</span>
+          <div *ngFor="let row of tooltipData.rows" style="display: flex; justify-content: space-between; align-items: center;" >
+            <div class="tooltip-content__label">{{ row.label }}</div>
+            <div class="tooltip-content__value">{{ row.value }}</div>
           </div>
         </div>
       </div>
     </div>
   </ng-template>
 
-  <!-- Legend Container -->
+  <!-- 图例 -->
   <div class="chart-legend-wrapper" *ngIf="showLegend()" [class]="'legend-position-' + getLegendPosition()">
     <div class="legend-item" *ngFor="let legendItem of legendItems; let i = index" (click)="toggleLegendItem(i)"
          [class.active]="legendItem.active">
       <div class="legend-color" [style.background-color]="legendItem.color"></div>
       <div class="legend-name" [class.legend-disabled]="!legendItem.visible">
         {{ legendItem.name }}
-        <small *ngIf="legendItem.percentageText">({{ legendItem.percentageText }})</small>
+        <small *ngIf="legendItem.numberText">{{ legendItem.numberText }}</small>
+        <small *ngIf="legendItem.percentageText"> ({{ legendItem.percentageText }})</small>
       </div>
     </div>
   </div>

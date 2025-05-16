@@ -25,6 +25,39 @@ export type ProcessedPieData = ChartData & {
   endAngle: number;
 };
 
+/** 柱状图特有配置 */
+export interface BarSpecificOptions {
+  /** 柱形圆角 */
+  borderRadius?: number;
+  /** 是否显示网格 */
+  showGrid?: boolean;
+  /** 边距 */
+  margin?: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  /** 是否在柱状图顶部显示数值 */
+  showValues?: boolean;
+}
+
+/** 饼图特有配置 */
+export interface PieSpecificOptions {
+  /** 内圆半径（用于环形图） */
+  innerRadius?: number;
+  /** 外圆半径 */
+  outerRadius?: number;
+  /** 是否在饼图扇区显示标签 */
+  showLabels?: boolean;
+  /** 是否在饼图标签或图例中显示百分比 */
+  showPercentage?: boolean;
+  /** 环形图中心文本 */
+  donutText?: string;
+  /** 切换图例时饼图扇区是否动态调整大小 */
+  dynamicSlices?: boolean;
+}
+
 /** 统一的图表选项接口 */
 export interface ChartOptions {
   /** 图表类型 */
@@ -71,6 +104,10 @@ export interface ChartOptions {
     /** 展开半径 */
     expandRadius?: number;
   };
+  /** 柱状图特有配置 */
+  bar?: BarSpecificOptions;
+  /** 饼图特有配置 */
+  pie?: PieSpecificOptions;
   /** 点击回调 */
   onClick?: (info: {
     /** 点击的数据项 */
@@ -93,37 +130,6 @@ export interface ChartOptions {
       height: number;
     };
   }) => void;
-  /** =======================柱状图特有======================= */
-  /** 柱形圆角 */
-  borderRadius?: number;
-  /** 是否显示网格 */
-  showGrid?: boolean;
-  /** 边距 */
-  margin?: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-  /** 是否在柱状图顶部显示数值 */
-  showValues?: boolean;
-  // ======== 饼图特有选项 ========
-  /** 内圆半径（用于环形图） */
-  innerRadius?: number;
-  /** 外圆半径 */
-  outerRadius?: number;
-  /** 饼图起始角度 (通常由服务计算) */
-  startAngle?: number;
-  /** 饼图结束角度 (通常由服务计算) */
-  endAngle?: number;
-  /** 是否在饼图扇区显示标签 */
-  showLabels?: boolean;
-  /** 是否在饼图标签或图例中显示百分比 */
-  showPercentage?: boolean;
-  /** 环形图中心文本 */
-  donutText?: string;
-  /** 切换图例时饼图扇区是否动态调整大小 */
-  dynamicSlices?: boolean;
 }
 
 // 新增：用于服务向组件传递悬浮框更新信息的接口
@@ -135,5 +141,13 @@ export interface TooltipUpdate {
   mouseEvent?: MouseEvent; // 悬浮框的鼠标事件
 }
 
-
+/** 图例项 */
+export interface LegendItem {
+  name: string;
+  color: string;
+  visible: boolean;
+  active: boolean;
+  percentageText?: string;
+  numberText?: string;
+}
 

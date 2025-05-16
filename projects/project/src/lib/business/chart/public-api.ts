@@ -7,3 +7,4 @@ export * from './chart.interface';
 export * from './chart.component';
 export * from './bar.service';
 export * from './pie.service';
+export * from './line.service'

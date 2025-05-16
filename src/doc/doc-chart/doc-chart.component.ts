@@ -40,7 +40,7 @@ export class DocChartComponent {
 
   // 饼图数据
   pieData: ChartData[] = [
-    { name: '产品A', data: 335 },
+    { name: '产品A', data: 33005 },
     { name: '产品B', data: 210 },
     { name: '产品C', data: 180 },
     { name: '产品D', data: 120 },
@@ -51,25 +51,29 @@ export class DocChartComponent {
   basicPieOptions: ChartOptions = {
     chartType: 'pie',
     title: '产品销售占比',
-    showLabels: true,
-    showPercentage: true,
-    dynamicSlices: true,
     showLegend: true,
     colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-    animate: true
+    animate: true,
+    pie: {
+      showLabels: true,
+      showPercentage: true,
+      dynamicSlices: true
+    }
   };
 
   // 环形图选项
   donutPieOptions: ChartOptions = {
     chartType: 'pie',
     title: '预算分配',
-    innerRadius: 60,
-    donutText: '总计: 920',
     showLegend: true,
     legend: {
       position: 'right'
     },
-    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6']
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6'],
+    pie: {
+      innerRadius: 60,
+      donutText: '总计: 920'
+    }
   };
 
   // 环形图数据
@@ -84,13 +88,16 @@ export class DocChartComponent {
   hoverPieOptions: ChartOptions = {
     chartType: 'pie',
     title: '区域销售分布',
-    showLabels: true,
-    showPercentage: true,
+    showLegend: true,
     hoverEffect: {
       enabled: true,
       showTooltip: true,
       expandSlice: true,
       expandRadius: 10
+    },
+    pie: {
+      showLabels: true,
+      showPercentage: true
     }
   };
 
@@ -105,15 +112,19 @@ export class DocChartComponent {
     chartType: 'bar',
     title: '季度销售数据',
     colors: ['#3498db'],
-    borderRadius: 6
+    bar: {
+      borderRadius: 6
+    }
   };
 
   pieChartOptions: ChartOptions = {
     chartType: 'pie',
     title: '季度销售分布',
-    showPercentage: true,
     showLegend: true,
-    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f'],
+    pie: {
+      showPercentage: true
+    }
   };
 
   // 饼图点击事件
@@ -125,11 +136,13 @@ export class DocChartComponent {
   pieClickOptions: ChartOptions = {
     chartType: 'pie',
     title: '产品分类比例',
-    showPercentage: true,
     showLegend: true,
     onClick: (info: any) => {
       this.clickedPieItem = info;
       console.log('点击了扇区:', info);
+    },
+    pie: {
+      showPercentage: true
     }
   };
 
@@ -203,28 +216,34 @@ export class DocChartComponent {
   customMultiSeriesOptions: ChartOptions = {
     chartType: 'bar',
     title: '2023年主要城市季度销售额',
+    showLegend: true,
     legend: {
       position: 'top',
       align: 'center'
     },
-    borderRadius: 6,
-    margin: { top: 60, right: 20, bottom: 50, left: 50 }
+    bar: {
+      borderRadius: 6,
+      margin: { top: 60, right: 20, bottom: 50, left: 50 }
+    }
   };
 
   // 多系列悬浮框选项
   multiSeriesTooltipOptions: ChartOptions = {
     chartType: 'bar',
     title: '年度季度对比',
+    showLegend: true,
     legend: {
       position: 'top',
       align: 'center'
     },
-    borderRadius: 6,
     hoverEffect: {
       enabled: true,
       showTooltip: true,
       showGuideLine: true,
       tooltipHoverable: true
+    },
+    bar: {
+      borderRadius: 6
     }
   };
 
@@ -243,14 +262,18 @@ export class DocChartComponent {
     chartType: 'bar',
     title: '零值测试图表',
     colors: ['#3498db'],
-    borderRadius: 8
+    bar: {
+      borderRadius: 8
+    }
   };
 
   // 自定义颜色选项
   colorOptions: ChartOptions = {
     chartType: 'bar',
     colors: ['#8e44ad', '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
-    borderRadius: 4
+    bar: {
+      borderRadius: 4
+    }
   };
 
   // 标题选项
@@ -258,22 +281,28 @@ export class DocChartComponent {
     chartType: 'bar',
     title: '季度销售额统计',
     colors: ['#3498db'],
-    borderRadius: 6
+    bar: {
+      borderRadius: 6
+    }
   };
 
   // 无网格选项
   noGridOptions: ChartOptions = {
     chartType: 'bar',
     colors: ['#2ecc71'],
-    showGrid: false,
-    borderRadius: 6
+    bar: {
+      showGrid: false,
+      borderRadius: 6
+    }
   };
 
   // 圆角选项
   radiusOptions: ChartOptions = {
     chartType: 'bar',
     colors: ['#e74c3c'],
-    borderRadius: 15
+    bar: {
+      borderRadius: 15
+    }
   };
 
   // 无动画选项
@@ -281,14 +310,15 @@ export class DocChartComponent {
     chartType: 'bar',
     colors: ['#9b59b6'],
     animate: false,
-    borderRadius: 6
+    bar: {
+      borderRadius: 6
+    }
   };
 
   // 带悬停效果的选项
   hoverOptions: ChartOptions = {
     chartType: 'bar',
     colors: ['#3498db'],
-    borderRadius: 4,
     hoverEffect: {
       enabled: true,
       showTooltip: true,
@@ -297,6 +327,9 @@ export class DocChartComponent {
       guideLineColor: '#666',
       guideLineWidth: 1,
       tooltipHoverable: false
+    },
+    bar: {
+      borderRadius: 4
     }
   };
 
@@ -308,10 +341,12 @@ export class DocChartComponent {
     chartType: 'bar',
     title: '季度销售额统计',
     colors: ['#2980b9'],
-    borderRadius: 6,
     onClick: (info: any) => {
       this.clickedItem = info;
       console.log('点击了柱形:', info);
+    },
+    bar: {
+      borderRadius: 6
     }
   };
 
@@ -319,12 +354,14 @@ export class DocChartComponent {
   customTooltipOptions: ChartOptions = {
     chartType: 'bar',
     colors: ['#9b59b6'],
-    borderRadius: 8,
     hoverEffect: {
       enabled: true,
       showTooltip: true,
       showGuideLine: true,
       tooltipHoverable: true
+    },
+    bar: {
+      borderRadius: 8
     }
   };
 
@@ -999,14 +1036,18 @@ export class ChartDemoComponent {
   barOptions: ChartOptions = {
     title: '季度销售数据',
     colors: ['#3498db'],
-    borderRadius: 6
+    bar: {
+      borderRadius: 6
+    }
   };
   
   pieOptions: ChartOptions = {
     title: '季度销售分布',
-    showPercentage: true,
     showLegend: true,
-    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f']
+    colors: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f'],
+    pie: {
+      showPercentage: true
+    }
   };
   
   toggleChartType() {
@@ -1117,11 +1158,14 @@ export class ChartDemoComponent {
   
   customOptions: ChartOptions = {
     title: '2023年主要城市季度销售额',
+    showLegend: true,
     legend: {
       position: 'top',
       align: 'center'
     },
-    borderRadius: 6
+    bar: {
+      borderRadius: 6
+    }
   };
 }`;
 
@@ -1144,7 +1188,9 @@ export class ChartDemoComponent {
   
   options: BarChartOptions = {
     barColors: ['#8e44ad', '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
-    borderRadius: 4
+    bar: {
+      borderRadius: 4
+    }
   };
 }`;
 
@@ -1167,7 +1213,9 @@ export class ChartDemoComponent {
   options: BarChartOptions = {
     title: '季度销售额统计',
     barColors: ['#3498db'],
-    borderRadius: 4
+    bar: {
+      borderRadius: 4
+    }
   };
 }`;
 
@@ -1190,7 +1238,9 @@ export class ChartDemoComponent {
   options: BarChartOptions = {
     showGrid: false,
     barColors: ['#3498db'],
-    borderRadius: 4
+    bar: {
+      borderRadius: 4
+    }
   };
 }`;
 
@@ -1233,7 +1283,9 @@ export class ChartDemoComponent {
   options: BarChartOptions = {
     animate: false,
     barColors: ['#e74c3c'],
-    borderRadius: 4
+    bar: {
+      borderRadius: 4
+    }
   };
 }`;
 
@@ -1254,14 +1306,16 @@ export class ChartDemoComponent {
   
   options: BarChartOptions = {
     barColors: ['#3498db'],
-    borderRadius: 4,
-    hoverEffect: {
-      enabled: true,
-      showTooltip: true,
-      showGuideLine: true,
-      guideLineStyle: 'dashed',
-      guideLineColor: '#666',
-      guideLineWidth: 1
+    bar: {
+      borderRadius: 4,
+      hoverEffect: {
+        enabled: true,
+        showTooltip: true,
+        showGuideLine: true,
+        guideLineStyle: 'dashed',
+        guideLineColor: '#666',
+        guideLineWidth: 1
+      }
     }
   };
 }`;
@@ -1294,7 +1348,9 @@ export class ChartDemoComponent {
   options: BarChartOptions = {
     title: '季度销售额统计',
     barColors: ['#2980b9'],
-    borderRadius: 6,
+    bar: {
+      borderRadius: 6
+    },
     onClick: (info) => {
       this.clickedItem = info;
       console.log('点击了柱形:', info);
@@ -1336,7 +1392,9 @@ export class ChartDemoComponent {
   
   options: BarChartOptions = {
     barColors: ['#9b59b6'],
-    borderRadius: 8,
+    bar: {
+      borderRadius: 8
+    },
     hoverEffect: {
       enabled: true,
       showTooltip: true,
@@ -1402,7 +1460,9 @@ export class ChartDemoComponent {
       position: 'top',
       align: 'center'
     },
-    borderRadius: 6,
+    bar: {
+      borderRadius: 6
+    },
     hoverEffect: {
       enabled: true,
       showTooltip: true,
