@@ -48,7 +48,8 @@ export class PieService {
       dynamicSlices: true,
       innerRadius: 0, // Default for pie, can be overridden for donut
       outerRadius: undefined, // Will be calculated if not set
-      donutText: ''
+      donutText: '',
+      minSliceSize: 4
     }
   };
   private _isToggling: boolean = false; // 防止快速切换导致状态异常的标志
@@ -142,7 +143,7 @@ export class PieService {
     }
     // 为数据分配颜色并计算百分比和角度
     const coloredData = this.chartService.assignPieColors(inputData as any, this.mergedOptions.colors || this.defaultOptions.colors!);
-    this.processedData = this.chartService.calculatePieAngles(coloredData) as Array<ChartDataWithAngles>;
+    this.processedData = this.chartService.calculatePieAngles(coloredData, this.mergedOptions?.pie?.minSliceSize) as Array<ChartDataWithAngles>;
 
     // 初始化或更新切片可见性状态，仅当长度变化或存在未定义状态时
     if (this.processedData.length !== this.sliceVisibility.length || this.sliceVisibility.some(v => v === undefined)) {
@@ -460,8 +461,7 @@ export class PieService {
         const visibleDataItems = this.processedData.filter((_, i) => this.sliceVisibility[i]);
         if (visibleDataItems.length > 0) {
           // 重新计算可见切片的角度和百分比
-          const recalculatedData = this.chartService.calculatePieAngles(visibleDataItems) as ChartDataWithAngles[];
-          
+          const recalculatedData = this.chartService.calculatePieAngles(visibleDataItems, this.mergedOptions?.pie?.minSliceSize) as ChartDataWithAngles[];
           // 更新 processedData 中对应可见切片的角度和百分比信息
           let visibleIndex = 0;
           for (let i = 0; i < this.processedData.length; i++) {

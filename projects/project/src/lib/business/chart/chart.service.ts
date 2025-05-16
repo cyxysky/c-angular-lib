@@ -10,7 +10,7 @@ export class ChartService {
   /**
    * 计算饼图扇区角度
    */
-  calculatePieAngles(data: ChartData[]): ChartDataWithAngles[] {
+  calculatePieAngles(data: ChartData[], minSliceSize?: number): ChartDataWithAngles[] {
     if (!data || data.length === 0) return [];
 
     const totalValue = data.reduce((sum, item) => {
@@ -21,10 +21,11 @@ export class ChartService {
     const result: ChartDataWithAngles[] = [];
 
     let currentAngle = 0;
-    data.forEach((item, index) => {
+    data.sort((a: any, b: any) => b.data - a.data).forEach((item, index) => {
       const value = item.data || 0;
       const portion = totalValue > 0 ? value / totalValue : 0;
-      const angleSize = portion * Math.PI * 2; // 计算弧度大小
+      // minSliceSize ? Math.max(minSliceSize / 100 * Math.PI * 2, portion * Math.PI * 2) :
+      const angleSize =  portion * Math.PI * 2; // 计算弧度大小
 
       // 创建新对象以避免类型问题
       const newItem: ChartDataWithAngles = {

@@ -56,6 +56,8 @@ export interface PieSpecificOptions {
   donutText?: string;
   /** 切换图例时饼图扇区是否动态调整大小 */
   dynamicSlices?: boolean;
+  /** 最小扇形大小 */
+  minSliceSize?: number;
 }
 
 /** 统一的图表选项接口 */
