@@ -9,37 +9,22 @@ export class BarService {
   private chartService!: ChartService;
   public processedData: ChartData[] = [];
   private seriesVisibility: boolean[] = [];
-  public mergedOptions!: ChartOptions & { bar: BarSpecificOptions };
-  private defaultOptions: {
-    colors: string[];
-    backgroundColor: string;
-    showLegend: boolean;
-    animate: boolean;
-    legend: { position: 'top' | 'bottom' | 'left' | 'right'; align: 'start' | 'center' | 'end'; };
-    hoverEffect: {
-      enabled: boolean;
-      showTooltip: boolean;
-      showGuideLine: boolean;
-      guideLineStyle: 'solid' | 'dashed';
-      guideLineColor: string;
-      guideLineWidth: number;
-      tooltipHoverable: boolean;
-    };
-    bar: BarSpecificOptions;
-  } = {
-      colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
-      backgroundColor: '#ffffff',
-      showLegend: true,
-      animate: true,
-      legend: { position: 'top', align: 'center' },
-      hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false },
-      bar: {
-        borderRadius: 4,
-        showValues: true,
-        showGrid: true,
-        margin: { top: 40, right: 20, bottom: 50, left: 50 },
-      }
-    };
+  public mergedOptions!: ChartOptions;
+  private defaultOptions: ChartOptions = {
+    chartType: 'bar',
+    colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#8341f4', '#3acfb4', '#fa7e1e', '#dc3545'],
+    backgroundColor: '#ffffff',
+    showLegend: true,
+    animate: true,
+    legend: { position: 'top', align: 'center' },
+    hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false },
+    bar: {
+      borderRadius: 4,
+      showValues: true,
+      showGrid: true,
+      margin: { top: 40, right: 20, bottom: 50, left: 50 },
+    }
+  };
   private animationFrameId: number | null = null;
   private currentAnimationValue = 0;
   public hoveredBarIndex: number = -1;
@@ -183,7 +168,7 @@ export class BarService {
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     ctx.fillStyle = this.mergedOptions.backgroundColor!;
     ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
-    const margin = this.mergedOptions.bar.margin!;
+    const margin = this.mergedOptions?.bar?.margin!;
     const chartWidth = this.displayWidth - margin.left - margin.right;
     const chartHeight = this.displayHeight - margin.top - margin.bottom;
     const visibleData = this.getVisibleData();
@@ -196,7 +181,7 @@ export class BarService {
       ctx.textAlign = 'center';
       ctx.fillText(this.mergedOptions.title, this.displayWidth / 2, margin.top / 2);
     }
-    if (this.mergedOptions.bar.showGrid && maxValue > 0) {
+    if (this.mergedOptions?.bar?.showGrid && maxValue > 0) {
       this.drawGrid(margin, chartHeight, chartWidth, maxValue);
     }
     this.barPositions = [];
@@ -274,14 +259,14 @@ export class BarService {
         const barColor = this.getDataColor(originalSeriesIndex, categoryIdx);
         ctx.fillStyle = barColor;
         if (itemValue > 0) {
-          if (this.mergedOptions.bar.borderRadius && this.mergedOptions.bar.borderRadius > 0) {
+          if (this.mergedOptions?.bar?.borderRadius && this.mergedOptions.bar.borderRadius > 0) {
             const effectiveRadius = Math.min(this.mergedOptions.bar.borderRadius, barH, barWidth / 2);
             this.roundRect(ctx, x, y, barWidth, barH, effectiveRadius, true, false);
           } else {
             ctx.fillRect(x, y, barWidth, barH);
           }
         }
-        if (this.mergedOptions.bar.showValues && animationProgress > 0.9 && itemValue > 0) {
+        if (this.mergedOptions?.bar?.showValues && animationProgress > 0.9 && itemValue > 0) {
           ctx.fillStyle = '#333333';
           ctx.font = '12px Arial';
           ctx.textAlign = 'center';

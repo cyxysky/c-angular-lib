@@ -6,10 +6,10 @@ export interface ChartData {
   data?: number;
   /** 颜色 */
   color?: string;
-  /** 系列 */
-  series?: string;
   /** 子数据 */
   children?: ChartData[];
+  /** 系列 */
+  series?: string;
 }
 
 /** 处理后的带角度信息的图表数据 (主要用于饼图内部) */
@@ -24,6 +24,23 @@ export type ProcessedPieData = ChartData & {
   startAngle: number;
   endAngle: number;
 };
+
+/** 处理后的折线图数据 */
+export type ProcessedLineData = ChartData & {
+  x: number;
+  y: number;
+};
+
+/** 折线图特有配置 */
+export interface LineSpecificOptions {
+  /** 是否显示辅助线 */
+  showGuideLine?: boolean;
+  /** 辅助线样式 */
+  guideLineStyle?: 'solid' | 'dashed';
+  /** 辅助线颜色 */
+  guideLineColor?: string;
+
+}
 
 /** 柱状图特有配置 */
 export interface BarSpecificOptions {
@@ -63,7 +80,7 @@ export interface PieSpecificOptions {
 /** 统一的图表选项接口 */
 export interface ChartOptions {
   /** 图表类型 */
-  chartType: 'bar' | 'pie';
+  chartType: 'bar' | 'pie' | 'line';
   /** 宽度 */
   width?: number;
   /** 高度 */
@@ -110,6 +127,8 @@ export interface ChartOptions {
   bar?: BarSpecificOptions;
   /** 饼图特有配置 */
   pie?: PieSpecificOptions;
+  /** 折线图特有配置 */
+  line?: LineSpecificOptions;
   /** 点击回调 */
   onClick?: (info: {
     /** 点击的数据项 */
