@@ -1,6 +1,13 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ChartData, ChartOptions, ChartDataWithAngles, TooltipUpdate, PieSpecificOptions } from './chart.interface';
-import { ChartService } from './chart.service';
+import {
+  ChartService,
+  DEFAULT_PIE_LABEL_FONT,
+  DEFAULT_SLICE_LABEL_SHADOW_COLOR,
+  DEFAULT_SLICE_LABEL_SHADOW_BLUR,
+  DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR,
+  DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH
+} from './chart.service';
 
 @Injectable()
 export class PieService {
@@ -267,11 +274,12 @@ export class PieService {
 
       const animatedEndAngle = item.startAngle + (item.endAngle - item.startAngle) * this.animationProgress;
       const isHovered = index === this.hoveredIndex;
+      const numberOfVisibleSlices = this.processedData.filter((_, i) => this.sliceVisibility[i]).length;
 
       this.ctx.save(); // 保存当前上下文状态
 
       // 处理悬浮时的切片扩展效果
-      if (isHovered && this.mergedOptions?.pie?.expandSlice) {
+      if (isHovered && this.mergedOptions?.pie?.expandSlice && numberOfVisibleSlices > 1) {
         const expandRadius = this.mergedOptions?.pie?.expandRadius || 10;
         const midAngle = (item.startAngle + animatedEndAngle) / 2;
         const offsetX = Math.cos(midAngle) * expandRadius;
@@ -284,10 +292,21 @@ export class PieService {
         this.ctx.arc(this.centerX, this.centerY, this.outerRadius, item.startAngle, animatedEndAngle);
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, animatedEndAngle, item.startAngle, true); // 逆时针绘制内圆弧
         this.ctx.closePath();
-      } else {
-        this.ctx.moveTo(this.centerX, this.centerY);
-        this.ctx.arc(this.centerX, this.centerY, this.outerRadius, item.startAngle, animatedEndAngle);
-        this.ctx.lineTo(this.centerX, this.centerY);
+      } else { // 非甜甜圈图
+        const angleDiff = animatedEndAngle - item.startAngle;
+        // 使用一个小的容差值来判断是否接近完整的圆
+        const isFullCircle = Math.abs(angleDiff - (Math.PI * 2)) < 1e-6;
+
+        if (isFullCircle) {
+          // 如果是完整的圆，只绘制圆弧本身，确保从0到2*PI以避免潜在的微小间隙问题
+          this.ctx.arc(this.centerX, this.centerY, this.outerRadius, 0, Math.PI * 2);
+          this.ctx.closePath(); // 虽然arc(0, 2PI)本身是闭合的，但显式调用closePath保持路径定义完整
+        } else {
+          // 标准的饼图扇形路径：从圆心开始，绘制圆弧，然后闭合路径回到圆心
+          this.ctx.moveTo(this.centerX, this.centerY);
+          this.ctx.arc(this.centerX, this.centerY, this.outerRadius, item.startAngle, animatedEndAngle);
+          this.ctx.closePath(); // 连接圆弧的终点到moveTo设置的起点（圆心）
+        }
       }
 
       this.ctx.fillStyle = item.color || '#ccc'; // 设置填充颜色
@@ -332,40 +351,52 @@ export class PieService {
    * 在每个切片上绘制标签 (数值或百分比)
    */
   private drawLabels(): void {
+    const numberOfVisibleSlices = this.processedData.filter((_, i) => this.sliceVisibility[i]).length;
+
     this.processedData.forEach((item, index) => {
       if (!this.sliceVisibility[index]) return; // 不绘制不可见切片的标签
 
-      const midAngle = (item.startAngle + item.endAngle) / 2; // 切片中间角度
-      // 标签位置可以根据需求调整，例如更靠近外边缘或内边缘
-      let labelRadius = this.outerRadius * 0.8; // 默认标签半径
-      if (this.innerRadius > 0 && this.outerRadius - this.innerRadius < 40) { // 如果环很窄
-        labelRadius = this.innerRadius + (this.outerRadius - this.innerRadius) / 2;
-      } else if (this.innerRadius > 0) {
-        labelRadius = this.innerRadius + (this.outerRadius - this.innerRadius) * 0.6;
-      }
+      let x: number;
+      let y: number;
 
-      let x = this.centerX + Math.cos(midAngle) * labelRadius;
-      let y = this.centerY + Math.sin(midAngle) * labelRadius;
+      if (numberOfVisibleSlices === 1) {
+        // 如果只有一个可见切片（100%），标签位于圆心且不移动
+        x = this.centerX;
+        y = this.centerY;
+      } else {
+        // 多个切片时的标准标签定位逻辑
+        const midAngle = (item.startAngle + item.endAngle) / 2; // 切片中间角度
+        let labelRadius = this.outerRadius * 0.8; // 默认标签半径
+        if (this.innerRadius > 0 && this.outerRadius - this.innerRadius < 40) { // 如果环很窄
+          labelRadius = this.innerRadius + (this.outerRadius - this.innerRadius) / 2;
+        } else if (this.innerRadius > 0) {
+          labelRadius = this.innerRadius + (this.outerRadius - this.innerRadius) * 0.6;
+        }
+        x = this.centerX + Math.cos(midAngle) * labelRadius;
+        y = this.centerY + Math.sin(midAngle) * labelRadius;
 
-      // 如果当前切片被悬浮且有扩展效果，调整标签位置
-      const isHovered = index === this.hoveredIndex;
-      if (isHovered && this.mergedOptions?.pie?.expandSlice) {
-        const expandRadius = this.mergedOptions?.pie?.expandRadius || 10;
-        const hoverOffsetX = Math.cos(midAngle) * expandRadius;
-        const hoverOffsetY = Math.sin(midAngle) * expandRadius;
-        x += hoverOffsetX;
-        y += hoverOffsetY;
+        // 如果当前切片被悬浮且选项允许扩展（这只在 numberOfVisibleSlices > 1 时发生）
+        // 标签也需要相应移动以保持在切片上
+        const isHovered = index === this.hoveredIndex;
+        if (isHovered && this.mergedOptions?.pie?.expandSlice) {
+          const expandRadius = this.mergedOptions?.pie?.expandRadius || 10;
+          const hoverOffsetX = Math.cos(midAngle) * expandRadius;
+          const hoverOffsetY = Math.sin(midAngle) * expandRadius;
+          x += hoverOffsetX;
+          y += hoverOffsetY;
+        }
       }
 
       this.ctx.save();
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'; // 文本阴影使其更易读
-      this.ctx.shadowBlur = 3;
+      this.ctx.shadowColor = DEFAULT_SLICE_LABEL_SHADOW_COLOR; // 文本阴影使其更易读
+      this.ctx.shadowBlur = DEFAULT_SLICE_LABEL_SHADOW_BLUR;
 
       let labelText = '';
-      if (this.mergedOptions?.pie?.showPercentage && item.percentage !== undefined) {
-        labelText = `${this.formatPercentage(item.percentage)}`;
+      // 使用 originalPercentage 进行显示
+      if (this.mergedOptions?.pie?.showPercentage && item.originalPercentage !== undefined) {
+        labelText = `${this.formatPercentage(item.originalPercentage)}`;
       }
       if (this.mergedOptions?.pie?.showLabels && item.data !== undefined) {
         const valueText = this.formatValue(item.data);
@@ -375,11 +406,11 @@ export class PieService {
         labelText = item.name; // 如果都没有，显示名称
       }
 
-      this.ctx.font = 'bold 13px Arial, sans-serif'; // 标签字体
+      this.ctx.font = DEFAULT_PIE_LABEL_FONT; // 标签字体
       this.ctx.fillStyle = '#fff'; // 标签文字颜色 (白色，通常在彩色背景上较好)
       // 为白色文字添加黑色描边以增强对比度
-      this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.lineWidth = 3; // 描边宽度
+      this.ctx.strokeStyle = DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR;
+      this.ctx.lineWidth = DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH; // 描边宽度
       this.ctx.lineJoin = 'round'; // 描边连接样式
       this.ctx.strokeText(labelText, x, y);
       this.ctx.fillText(labelText, x, y);
@@ -462,7 +493,9 @@ export class PieService {
               if (visibleIndex < recalculatedData.length) { // 确保 recalculatedData 有对应项
                 this.processedData[i].startAngle = recalculatedData[visibleIndex].startAngle;
                 this.processedData[i].endAngle = recalculatedData[visibleIndex].endAngle;
-                this.processedData[i].percentage = recalculatedData[visibleIndex].percentage;
+                this.processedData[i].percentage = recalculatedData[visibleIndex].percentage; // 更新用于绘制的百分比
+                // 更新用于显示的 originalPercentage，使其反映在当前可见项中的占比
+                this.processedData[i].originalPercentage = recalculatedData[visibleIndex].originalPercentage;
                 visibleIndex++;
               }
             }
@@ -493,7 +526,8 @@ export class PieService {
       color: item.color || this.mergedOptions.colors![i % this.mergedOptions.colors!.length], // 回退到默认颜色
       visible: this.isSliceVisible(i),
       active: this.hoveredIndex === i, // 是否为当前悬浮的切片
-      percentageText: (this.mergedOptions?.pie?.showPercentage && item.percentage !== undefined) ? this.formatPercentage(item.percentage) : undefined,
+      // 使用 originalPercentage 进行显示
+      percentageText: (this.mergedOptions?.pie?.showPercentage && item.originalPercentage !== undefined) ? this.formatPercentage(item.originalPercentage) : undefined,
       numberText: (this.mergedOptions?.pie?.showLabels && item.data !== undefined) ? this.formatValue(item.data) : undefined
     }));
   }

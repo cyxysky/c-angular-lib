@@ -55,37 +55,126 @@ export class ChartService {
   /**
    * 计算饼图扇区角度
    */
-  calculatePieAngles(data: ChartData[], minSliceSize?: number): ChartDataWithAngles[] {
+  calculatePieAngles(data: ChartData[], minSlicePercent?: number): ChartDataWithAngles[] {
     if (!data || data.length === 0) return [];
-
     const totalValue = data.reduce((sum, item) => {
-      const value = item.data || 0;
+      const value = Math.max(0, item.data || 0); // 确保值为非负数
       return sum + value;
     }, 0);
+    if (totalValue <= 0) {
+      // 处理所有数据项都为零或负数的情况：均分角度或所有角度为零
+      const numSlices = data.length;
+      const anglePerSlice = numSlices > 0 ? (Math.PI * 2) / numSlices : 0;
+      let currentAngle = 0;
+      return data.map(item => {
+        const sliceAngle = numSlices > 0 ? anglePerSlice : 0;
+        const result = {
+          ...item,
+          startAngle: currentAngle,
+          endAngle: currentAngle + sliceAngle,
+          percentage: numSlices > 0 ? 100 / numSlices : 0, // 调整后的百分比，用于绘制
+          originalPercentage: numSlices > 0 ? 100 / numSlices : 0, // 原始百分比，用于显示
+          data: item.data || 0 // 保留原始数据值
+        };
+        currentAngle += sliceAngle;
+        return result;
+      });
+    }
+    // 准备包含初始百分比的条目
+    let processedItems = data.map(item => ({
+      originalItem: item,
+      value: Math.max(0, item.data || 0),
+      // originalPercentage 用于显示，直接根据原始数据计算
+      originalPercentage: (Math.max(0, item.data || 0) / totalValue) * 100,
+      // percentage 用于后续可能的调整（基于minSlicePercent），并用于绘制角度
+      percentage: (Math.max(0, item.data || 0) / totalValue) * 100,
+    }));
+    // 按数据值排序有助于确定哪些切片最初较大/较小，但迭代调整会处理最终大小
+    processedItems.sort((a, b) => b.value - a.value);
+    let adjustedPercentages = processedItems.map(p => p.percentage);
+    if (minSlicePercent && minSlicePercent > 0 && data.length > 0) {
+      const numSlices = data.length;
+      if (numSlices * minSlicePercent > 100.0 + 1e-9) { // 为浮点数比较添加容差
+        // 如果所有切片的minSlicePercent总和超过100%，则使所有切片均等
+        const equalPercent = 100.0 / numSlices;
+        adjustedPercentages = adjustedPercentages.map(() => equalPercent);
+      } else {
+        const MAX_ITERATIONS = 10; // 最大迭代次数以防止无限循环
+        const TOLERANCE = 1e-6; // 收敛的容差
+        for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+          let modifiedInIteration = false;
+          // 1. 应用最小百分比（下限）
+          for (let i = 0; i < numSlices; i++) {
+            if (adjustedPercentages[i] < minSlicePercent - TOLERANCE) {
+              if (Math.abs(adjustedPercentages[i] - minSlicePercent) > TOLERANCE) {
+                modifiedInIteration = true;
+              }
+              adjustedPercentages[i] = minSlicePercent;
+            }
+          }
+          // 2. 计算当前总和
+          const currentSum = adjustedPercentages.reduce((sum, p) => sum + p, 0);
+          // 3. 归一化（如果总和不为零且与100有显著差异）
+          if (Math.abs(currentSum) > TOLERANCE && Math.abs(currentSum - 100.0) > TOLERANCE) {
+            for (let i = 0; i < numSlices; i++) {
+              const newPercentage = (adjustedPercentages[i] / currentSum) * 100.0;
+              if (Math.abs(adjustedPercentages[i] - newPercentage) > TOLERANCE) {
+                modifiedInIteration = true;
+              }
+              adjustedPercentages[i] = newPercentage;
+            }
+          } else if (Math.abs(currentSum) < TOLERANCE && numSlices > 0) { // 总和为零，但存在条目
+             const equalPercent = 100.0 / numSlices;
+             for(let i=0; i<numSlices; i++) {
+                 if(Math.abs(adjustedPercentages[i] - equalPercent) > TOLERANCE) modifiedInIteration = true;
+                 adjustedPercentages[i] = equalPercent;
+             }
+          }
+          if (!modifiedInIteration) {
+            break; // 已收敛
+          }
+        }
+      }
+    }
+    // 最后一步确保总和由于潜在的浮点误差正好是100
+    const finalSum = adjustedPercentages.reduce((sum, p) => sum + p, 0);
+    if (Math.abs(finalSum - 100.0) > 1e-9 && Math.abs(finalSum) > 1e-9) {
+        for (let i = 0; i < adjustedPercentages.length; i++) {
+            adjustedPercentages[i] = (adjustedPercentages[i] / finalSum) * 100.0;
+        }
+    }
 
-    const result: ChartDataWithAngles[] = [];
-
+    const resultWithAngles: ChartDataWithAngles[] = [];
     let currentAngle = 0;
-    data.sort((a: any, b: any) => b.data - a.data).forEach((item, index) => {
-      const value = item.data || 0;
-      const portion = totalValue > 0 ? value / totalValue : 0;
-      // minSliceSize ? Math.max(minSliceSize / 100 * Math.PI * 2, portion * Math.PI * 2) :
-      const angleSize = portion * Math.PI * 2; // 计算弧度大小
-
-      // 创建新对象以避免类型问题
-      const newItem: ChartDataWithAngles = {
-        ...item,
+    processedItems.forEach((item, index) => {
+      const visualPercentage = adjustedPercentages[index]; // 用于绘制的百分比
+      const angleSize = (visualPercentage / 100) * (Math.PI * 2);
+      resultWithAngles.push({
+        ...(item.originalItem),
+        data: item.value, // 确保data是用于计算的数值
         startAngle: currentAngle,
         endAngle: currentAngle + angleSize,
-        percentage: portion * 100
-      };
-
-      result.push(newItem);
-
+        percentage: visualPercentage, // 存储调整后的百分比，用于绘制
+        originalPercentage: item.originalPercentage, // 存储原始百分比，用于显示
+      });
       currentAngle += angleSize;
     });
-
-    return result;
+    // 由于浮点运算，最后一个切片的endAngle可能不完全是2*PI。如果需要，进行调整。
+    if (resultWithAngles.length > 0) {
+        const lastSlice = resultWithAngles[resultWithAngles.length - 1];
+        if (Math.abs(lastSlice.endAngle - Math.PI * 2) > 1e-9 && Math.abs(lastSlice.endAngle) > 1e-9) { // 如果不是已经是2PI
+            // 如果currentAngle与2*PI略有偏差，调整最后一个切片
+            if (Math.abs(currentAngle - Math.PI*2) > 1e-9) {
+                 lastSlice.endAngle = Math.PI * 2;
+            }
+        }
+         // 如果只有一个切片且角度略有偏差，确保第一个切片从0开始
+        if (resultWithAngles.length === 1 && Math.abs(resultWithAngles[0].startAngle) > 1e-9) {
+            resultWithAngles[0].endAngle = Math.PI * 2 - resultWithAngles[0].startAngle;
+            resultWithAngles[0].startAngle = 0;
+        }
+    }
+    return resultWithAngles;
   }
 
   /**

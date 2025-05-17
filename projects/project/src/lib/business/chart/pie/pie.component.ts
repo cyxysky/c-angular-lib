@@ -4,7 +4,7 @@ import { ChartService } from '../chart.service';
 
 export interface PieChartData {
   name: string;
-  value: number;
+  data: number;
   color?: string;
   percentage?: number;
   _id?: string;
@@ -26,6 +26,7 @@ export interface PieChartOptions {
   animate?: boolean;
   title?: string;
   dynamicSlices?: boolean;
+  minSlicePercent?: number;
   onClick?: (info: {
     item: PieChartData;
     index: number;
@@ -222,7 +223,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
     // 确保所有数据项都有颜色
     const coloredData = this.chartService.assignPieColors(this.data, this.mergedOptions.colors);
     // 计算每个扇区的角度
-    this.processedData = this.chartService.calculatePieAngles(coloredData) as Array<PieChartData & { startAngle: number; endAngle: number }>;
+    this.processedData = this.chartService.calculatePieAngles(coloredData, this.mergedOptions.minSlicePercent) as Array<PieChartData & { startAngle: number; endAngle: number }>;
     // 初始化扇区可见性数组
     this.sliceVisibility = this.processedData.map(() => true);
   }
@@ -471,7 +472,7 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
       this.ctx.shadowOffsetY = 1;
 
       // 仅绘制数值，不绘制名称
-      const valueText = this.formatValue(item.value);
+      const valueText = this.formatValue(item.data);
       const percentageText = `${item.percentage?.toFixed(1)}%`;
 
       // 使用艺术字体，不绘制背景
@@ -696,9 +697,9 @@ export class PieComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy
   /**
    * 格式化数值显示
    */
-  public formatValue(value: number | undefined): string {
-    if (typeof value === 'number') {
-      return this.chartService.formatNumber(value);
+  public formatValue(data: number | undefined): string {
+    if (typeof data === 'number') {
+      return this.chartService.formatNumber(data);
     }
     return '0';
   }

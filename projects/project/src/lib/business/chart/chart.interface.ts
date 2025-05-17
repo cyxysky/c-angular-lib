@@ -15,7 +15,8 @@ export interface ChartData {
 export type ChartDataWithAngles = ChartData & {
   startAngle: number;
   endAngle: number;
-  percentage: number;
+  percentage: number; // 用于绘制扇区的调整后百分比
+  originalPercentage: number; // 原始数据计算出的真实百分比，用于显示
 };
 
 /** 处理后的饼图数据（向后兼容） */
