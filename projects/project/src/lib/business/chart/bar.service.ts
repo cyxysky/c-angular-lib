@@ -6,9 +6,8 @@ import { ChartService } from './chart.service';
 export class BarService {
   private ctx!: CanvasRenderingContext2D;
   private ngZone!: NgZone;
-  private chartService!: ChartService;
   public processedData: ChartData[] = [];
-  private seriesVisibility: boolean[] = [];
+  private groupVisibility: boolean[] = [];
   public mergedOptions!: ChartOptions;
   private defaultOptions: ChartOptions = {
     chartType: 'bar',
@@ -28,8 +27,8 @@ export class BarService {
   private animationFrameId: number | null = null;
   private currentAnimationValue = 0;
   public hoveredBarIndex: number = -1;
-  public hoveredSeriesIndex: number = -1;
-  public barPositions: Array<{ x: number, y: number, width: number, height: number, data: ChartData, seriesIndex: number }> = [];
+  public hoveredGroupIndex: number = -1;
+  public barPositions: Array<{ x: number, y: number, width: number, height: number, data: ChartData, groupIndex: number }> = [];
   private displayWidth!: number; // 逻辑宽度
   private displayHeight!: number; // 逻辑高度
 
@@ -42,8 +41,7 @@ export class BarService {
    * @param chartService 图表服务实例
    * @param ngZone Angular Zone 服务实例
    */
-  constructor(chartService: ChartService, ngZone: NgZone) {
-    this.chartService = chartService;
+  constructor(private chartService: ChartService, ngZone: NgZone) {
     this.ngZone = ngZone;
   }
 
@@ -97,13 +95,11 @@ export class BarService {
     if (!inputData || inputData.length === 0) return;
     try {
       const hasChildren = inputData.some(item => item.children && item.children.length > 0);
-      const hasSeries = inputData.some(item => item.series);
-      if (hasChildren || hasSeries) {
+      if (hasChildren) {
         this.processedData = [...inputData];
       } else {
         this.processedData = [{
-          name: this.mergedOptions.title || '数据',
-          series: this.mergedOptions.title || '数据',
+          name: this.mergedOptions.title || '数据系列',
           children: [...inputData]
         }];
       }
@@ -113,11 +109,11 @@ export class BarService {
         }
         return item;
       });
-      this.seriesVisibility = this.getSeriesNames().map(() => true);
+      this.groupVisibility = this.getGroupNames().map(() => true);
     } catch (e) {
       console.error('处理数据时出错:', e);
       this.processedData = [];
-      this.seriesVisibility = [];
+      this.groupVisibility = [];
     }
   }
 
@@ -168,34 +164,29 @@ export class BarService {
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     ctx.fillStyle = this.mergedOptions.backgroundColor!;
     ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
-    const margin = this.mergedOptions?.bar?.margin!;
+    const margin = this.getMargin();
     const chartWidth = this.displayWidth - margin.left - margin.right;
     const chartHeight = this.displayHeight - margin.top - margin.bottom;
     const visibleData = this.getVisibleData();
     const maxValue = this.getMaxCategoryValue();
     const categories = this.getCategories(visibleData);
     let categoryCount = categories.length;
-    if (this.mergedOptions.title) {
-      ctx.fillStyle = '#333333';
-      ctx.font = 'bold 16px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(this.mergedOptions.title, this.displayWidth / 2, margin.top / 2);
-    }
+    this.chartService.drawTitle(ctx, this.mergedOptions.title, margin, chartWidth);
     if (this.mergedOptions?.bar?.showGrid && maxValue > 0) {
       this.drawGrid(margin, chartHeight, chartWidth, maxValue);
     }
     this.barPositions = [];
     if (visibleData.length > 0 && maxValue > 0 && categoryCount > 0) {
       const groupWidth = chartWidth / categoryCount;
-      const visibleSeriesCount = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]).length || 1;
-      const barWidth = groupWidth * 0.7 / visibleSeriesCount;
-      const barSpacing = groupWidth * 0.3 / (visibleSeriesCount + 1);
+      const visibleGroupCount = this.getGroupNames().filter((_, i) => this.groupVisibility[i]).length || 1;
+      const barWidth = groupWidth * 0.7 / visibleGroupCount;
+      const barSpacing = groupWidth * 0.3 / (visibleGroupCount + 1);
       this.drawBars(visibleData, margin, chartHeight, barWidth, barSpacing, groupWidth, maxValue, animationProgress);
     } else {
       this.barPositions = [];
     }
     this.drawAxes(margin, chartHeight, chartWidth);
-    if (this.hoveredBarIndex !== -1 && this.hoveredSeriesIndex !== -1 && this.mergedOptions.hoverEffect?.showGuideLine) {
+    if (this.hoveredBarIndex !== -1 && this.hoveredGroupIndex !== -1 && this.mergedOptions.hoverEffect?.showGuideLine) {
       this.drawGuideLine(margin, chartHeight, chartWidth);
     }
   }
@@ -241,22 +232,22 @@ export class BarService {
     groupWidth: number, maxValue: number, animationProgress: number
   ): void {
     const ctx = this.ctx;
-    const seriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
+    const groupNames = this.getGroupNames().filter((_, i) => this.groupVisibility[i]);
     const categories = this.getCategories(visibleData);
     categories.forEach((category, categoryIdx) => {
       let cumulativeHeight = 0;
-      seriesNames.forEach((seriesName, seriesIdxInGroup) => {
-        const originalSeriesIndex = this.getSeriesNames().indexOf(seriesName);
-        const dataItems = this.getDataItemsBySeriesName(seriesName);
+      groupNames.forEach((groupName, groupIdxInGroup) => {
+        const originalGroupIndex = this.getGroupNames().indexOf(groupName);
+        const dataItems = this.getDataItemsByGroupName(groupName);
         const item = dataItems.find(d => d.name === category);
         if (!item) return;
         const itemValue = this.getItemValue(item);
         const groupLeft = margin.left + categoryIdx * groupWidth;
-        const x = groupLeft + barSpacing + seriesIdxInGroup * (barWidth + barSpacing);
+        const x = groupLeft + barSpacing + groupIdxInGroup * (barWidth + barSpacing);
         const barH = (itemValue / maxValue) * chartHeight * animationProgress;
         const y = margin.top + chartHeight - barH - cumulativeHeight;
-        this.barPositions.push({ x, y, width: barWidth, height: barH, data: item, seriesIndex: originalSeriesIndex });
-        const barColor = this.getDataColor(originalSeriesIndex, categoryIdx);
+        this.barPositions.push({ x, y, width: barWidth, height: barH, data: item, groupIndex: originalGroupIndex });
+        const barColor = this.getDataColor(originalGroupIndex, categoryIdx);
         ctx.fillStyle = barColor;
         if (itemValue > 0) {
           if (this.mergedOptions?.bar?.borderRadius && this.mergedOptions.bar.borderRadius > 0) {
@@ -283,7 +274,7 @@ export class BarService {
           }
         }
       });
-      if (seriesNames.length > 0) {
+      if (groupNames.length > 0) {
         ctx.fillStyle = '#666666';
         ctx.font = '12px Arial';
         ctx.textAlign = 'center';
@@ -320,13 +311,13 @@ export class BarService {
    * @param chartWidth 图表绘制区域宽度
    */
   private drawGuideLine(margin: any, chartHeight: number, chartWidth: number): void {
-    if (this.hoveredBarIndex === -1 || this.hoveredSeriesIndex === -1 || !this.mergedOptions.hoverEffect?.showGuideLine) return;
+    if (this.hoveredBarIndex === -1 || this.hoveredGroupIndex === -1 || !this.mergedOptions.hoverEffect?.showGuideLine) return;
     const ctx = this.ctx;
     const categories = this.getCategories(this.getVisibleData());
     if (this.hoveredBarIndex >= categories.length) return;
     const categoryName = categories[this.hoveredBarIndex];
     const hoveredBar = this.barPositions.find(
-      bar => bar.seriesIndex === this.hoveredSeriesIndex && bar.data?.name === categoryName
+      bar => bar.groupIndex === this.hoveredGroupIndex && bar.data?.name === categoryName
     );
     if (!hoveredBar) return;
     const barCenterX = hoveredBar.x + hoveredBar.width / 2;
@@ -395,21 +386,21 @@ export class BarService {
   }
 
   /**
-   * 设置当前悬浮的柱子数据索引和系列索引
+   * 设置当前悬浮的柱子数据索引和分组索引
    * @param dataIndex 柱子数据索引 (通常是类别索引)
-   * @param seriesIndex 系列索引
+   * @param groupIndex 分组索引
    */
-  public setHoveredIndices(dataIndex: number, seriesIndex: number): void {
+  public setHoveredIndices(dataIndex: number, groupIndex: number): void {
     this.hoveredBarIndex = dataIndex;
-    this.hoveredSeriesIndex = seriesIndex;
+    this.hoveredGroupIndex = groupIndex;
   }
 
   /**
-   * 切换指定系列（图例项）的可见性
-   * @param index 系列的索引
+   * 切换指定分组（图例项）的可见性
+   * @param index 分组的索引
    */
-  public toggleSeriesVisibility(index: number): void {
-    this.seriesVisibility[index] = !this.seriesVisibility[index];
+  public toggleGroupVisibility(index: number): void {
+    this.groupVisibility[index] = !this.groupVisibility[index];
     this.drawChart();
   }
 
@@ -423,21 +414,21 @@ export class BarService {
     if (!this.mergedOptions.onClick) return;
 
     const clickedBarInfo = this.findHoveredBar(canvasX, canvasY);
-    if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.seriesIndex !== -1) {
-      const seriesNames = this.getSeriesNames();
-      if (clickedBarInfo.seriesIndex >= seriesNames.length) return;
-      const seriesName = seriesNames[clickedBarInfo.seriesIndex];
+    if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.groupIndex !== -1) {
+      const groupNames = this.getGroupNames();
+      if (clickedBarInfo.groupIndex >= groupNames.length) return;
+      const groupName = groupNames[clickedBarInfo.groupIndex];
 
       const categories = this.getCategories(this.getVisibleData());
       if (clickedBarInfo.dataIndex >= categories.length) return;
       const category = categories[clickedBarInfo.dataIndex];
 
-      const dataItems = this.getDataItemsBySeriesName(seriesName);
+      const dataItems = this.getDataItemsByGroupName(groupName);
       const item = dataItems.find(d => d.name === category);
       if (!item) return;
 
       const barPosition = this.barPositions.find(
-        bar => bar.seriesIndex === clickedBarInfo.seriesIndex && bar.data?.name === item.name
+        bar => bar.groupIndex === clickedBarInfo.groupIndex && bar.data?.name === item.name
       );
 
       if (barPosition) {
@@ -445,7 +436,7 @@ export class BarService {
           this.mergedOptions.onClick!({
             item: item,
             index: clickedBarInfo.dataIndex,
-            seriesIndex: clickedBarInfo.seriesIndex,
+            groupIndex: clickedBarInfo.groupIndex,
             data: this.processedData,
             options: this.mergedOptions,
             event: event,
@@ -464,24 +455,20 @@ export class BarService {
   }
 
   /**
-   * 获取所有系列名称
-   * @returns 系列名称数组
+   * 获取所有分组名称
+   * @returns 分组名称数组
    */
-  public getSeriesNames(): string[] {
-    const seriesNames: string[] = [];
+  public getGroupNames(): string[] {
+    const groupNames: string[] = [];
     this.processedData.forEach(item => {
-      if (item.series && !seriesNames.includes(item.series)) {
-        seriesNames.push(item.series);
-      }
-      if (item.children) {
-        item.children.forEach(child => {
-          if (child.series && !seriesNames.includes(child.series)) {
-            seriesNames.push(child.series);
-          }
-        });
+      if (item.children && item.children.length > 0 && item.name && !groupNames.includes(item.name)) {
+        groupNames.push(item.name);
       }
     });
-    return seriesNames;
+    if (groupNames.length === 0 && this.processedData.length > 0 && !this.processedData.some(item => item.children && item.children.length > 0)) {
+      groupNames.push(this.processedData[0].name || '默认分组');
+    }
+    return groupNames;
   }
 
   /**
@@ -499,54 +486,54 @@ export class BarService {
   }
 
   /**
-   * 根据系列名称获取对应的数据项
-   * @param seriesName 系列名称
-   * @returns 该系列下的数据项数组
+   * 根据分组名称获取对应的数据项
+   * @param groupName 分组名称
+   * @returns 该分组下的数据项数组
    */
-  public getDataItemsBySeriesName(seriesName: string): ChartData[] {
-    const items: ChartData[] = [];
-    this.processedData.forEach(item => {
-      if (item.series === seriesName) {
-        if (item.children) items.push(...item.children);
-        else items.push(item);
-      } else if (item.children) {
-        const seriesItems = item.children.filter(child => child.series === seriesName);
-        items.push(...seriesItems);
-      }
-    });
-    return items;
+  public getDataItemsByGroupName(groupName: string): ChartData[] {
+    const group = this.processedData.find(item => item.name === groupName && item.children && item.children.length > 0);
+    if (group && group.children) {
+      return group.children;
+    }
+    if (!this.processedData.some(item => item.children && item.children.length > 0)) {
+      return this.processedData.filter(item => item.name === groupName);
+    }
+    return [];
   }
 
   /**
-   * 获取当前可见的数据 (根据 seriesVisibility 过滤)
+   * 获取当前可见的数据 (根据 groupVisibility 过滤)
    * @returns 可见数据数组
    */
   public getVisibleData(): ChartData[] {
-    const visibleSeriesNames = this.getSeriesNames().filter((_, i) => this.seriesVisibility[i]);
-    if (!visibleSeriesNames.length) return [];
+    const visibleGroupNames = this.getGroupNames().filter((_, i) => this.groupVisibility[i]);
+    if (!visibleGroupNames.length) return [];
 
     return this.processedData.filter(item => {
-      if (item.series && visibleSeriesNames.includes(item.series)) return true;
-      if (item.children) {
-        const visibleChildren = item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series));
-        return visibleChildren.length > 0;
+      if (item.children && item.children.length > 0) {
+        return visibleGroupNames.includes(item.name);
       }
-      return false;
+      // If no children, it means it's a flat structure considered as a single group.
+      // The visibility of this single group is controlled by the first entry in groupVisibility.
+      return !item.children && visibleGroupNames.length > 0 && this.groupVisibility[0];
     }).map(item => {
       if (item.children) {
-        return { ...item, children: item.children.filter(child => !child.series || visibleSeriesNames.includes(child.series)) };
+        // For items with children (actual groups), return as is if the group name is visible
+        return item;
       }
+      // For flat data (considered as one group), this mapping is mainly to ensure structure.
+      // The filtering is already done.
       return item;
     });
   }
 
   /**
-   * 检查指定索引的系列是否可见
-   * @param index 系列的索引
+   * 检查指定索引的分组是否可见
+   * @param groupIndex 分组的索引
    * @returns 如果可见则返回 true，否则返回 false
    */
-  public isSeriesVisible(index: number): boolean {
-    return this.seriesVisibility[index] === true;
+  public isGroupVisible(groupIndex: number): boolean {
+    return this.groupVisibility[groupIndex] === true;
   }
 
   /**
@@ -581,27 +568,33 @@ export class BarService {
   }
 
   /**
-   * 计算总值，可选按系列计算
-   * @param seriesIndex 可选，系列索引。如果提供，则计算该系列的总值
+   * 计算总值，可选按分组计算
+   * @param groupIndex 可选，分组索引。如果提供，则计算该分组的总值
    * @returns 总数值
    */
-  private calculateTotalValue(seriesIndex?: number): number {
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex !== undefined && seriesIndex >= 0 && seriesIndex < seriesNames.length) {
-      const seriesName = seriesNames[seriesIndex];
+  private calculateTotalValue(groupIndex?: number): number {
+    const groupNames = this.getGroupNames();
+    if (groupIndex !== undefined && groupIndex >= 0 && groupIndex < groupNames.length) {
+      const groupName = groupNames[groupIndex];
       let total = 0;
-      this.processedData.forEach(item => {
-        if (item.series === seriesName) {
-          total += (item.data || 0);
-          if (item.children) item.children.forEach(child => total += (child.data || 0));
+      const groupItem = this.processedData.find(item => item.name === groupName && item.children);
+      if (groupItem && groupItem.children) {
+        groupItem.children.forEach(child => total += (child.data || 0));
+      } else if (!this.processedData.some(it => it.children && it.children.length > 0)) {
+        // Flat data, sum all items if groupIndex is 0 (representing the single group)
+        if (groupIndex === 0) {
+          this.processedData.forEach(child => total += (child.data || 0));
         }
-      });
+      }
       return total;
     } else {
       let total = 0;
       this.processedData.forEach(item => {
-        total += (item.data || 0);
-        if (item.children) item.children.forEach(child => total += (child.data || 0));
+        if (item.children) {
+          item.children.forEach(child => total += (child.data || 0));
+        } else {
+          total += (item.data || 0); // For flat data structure
+        }
       });
       return total;
     }
@@ -642,63 +635,57 @@ export class BarService {
   /**
    * 计算并格式化百分比
    * @param value 当前值
-   * @param seriesIndex 可选，系列索引，用于计算该系列的总值作为基数
+   * @param groupIndex 可选，分组索引，用于计算该分组的总值作为基数
    * @returns 百分比字符串 (例如 "25.0")
    */
-  public calculatePercentage(value: number | undefined, seriesIndex?: number): string {
-    const totalValue = this.calculateTotalValue(seriesIndex);
+  public calculatePercentage(value: number | undefined, groupIndex?: number): string {
+    const totalValue = this.calculateTotalValue(groupIndex);
     const numValue = typeof value === 'number' ? value : 0;
     return (totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0') + '%';
   }
 
   /**
-   * 获取指定系列的颜色
-   * @param seriesIndex 系列索引
+   * 获取指定分组的颜色
+   * @param groupIndex 分组索引
    * @returns 颜色字符串 (HEX, RGB, etc.)
    */
-  public getSeriesColor(seriesIndex: number): string {
-    if (seriesIndex < 0 || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex >= seriesNames.length) return '';
-
-    const seriesName = seriesNames[seriesIndex];
-    for (const item of this.processedData) {
-      if (item.series === seriesName && item.color) return item.color;
-      if (item.children) for (const child of item.children) if (child.series === seriesName && child.color) return child.color;
-    }
-    return this.mergedOptions.colors[seriesIndex % this.mergedOptions.colors.length];
+  public getGroupColor(groupIndex: number): string {
+    if (groupIndex < 0 || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
+    const groupNames = this.getGroupNames();
+    if (groupIndex >= groupNames.length) return '';
+    const groupName = groupNames[groupIndex];
+    const groupItem = this.processedData.find(item => item.name === groupName);
+    if (groupItem && groupItem.color) return groupItem.color;
+    return this.mergedOptions.colors[groupIndex % this.mergedOptions.colors.length];
   }
 
   /**
    * 获取特定数据点（柱子）的颜色
-   * @param seriesIndex 系列索引
+   * @param groupIndex 分组索引
    * @param dataIndex 数据索引 (通常是类别索引)
    * @returns 颜色字符串
    */
-  public getDataColor(seriesIndex: number, dataIndex: number): string {
-    if (seriesIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
-    const seriesNames = this.getSeriesNames();
-    if (seriesIndex >= seriesNames.length) return '';
+  public getDataColor(groupIndex: number, dataIndex: number): string {
+    if (groupIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
+    const groupNames = this.getGroupNames();
+    if (groupIndex >= groupNames.length) return this.getGroupColor(groupIndex);
 
-    const seriesName = seriesNames[seriesIndex];
-    let targetItem: ChartData | undefined;
+    const groupName = groupNames[groupIndex];
     const categories = this.getCategories(this.getVisibleData());
-    if (dataIndex >= categories.length) return this.getSeriesColor(seriesIndex);
-
+    if (dataIndex >= categories.length) return this.getGroupColor(groupIndex);
     const categoryName = categories[dataIndex];
 
-    for (const item of this.processedData) {
-      if (item.series === seriesName) {
-        if (item.children) targetItem = item.children.find(child => child.name === categoryName && (!child.series || child.series === seriesName));
-        else if (item.name === categoryName) targetItem = item;
-      } else if (item.children) {
-        targetItem = item.children.find(child => child.name === categoryName && child.series === seriesName);
-      }
-      if (targetItem) break;
+    const groupItem = this.processedData.find(item => item.name === groupName && item.children);
+    if (groupItem && groupItem.children) {
+      const childItem = groupItem.children.find(child => child.name === categoryName);
+      if (childItem && childItem.color) return childItem.color;
+    } else if (!this.processedData.some(it => it.children && it.children.length > 0)) {
+      // Flat data structure
+      const flatItem = this.processedData.find(it => it.name === categoryName);
+      if (flatItem && flatItem.color) return flatItem.color;
     }
 
-    if (targetItem && targetItem.color) return targetItem.color;
-    return this.getSeriesColor(seriesIndex);
+    return this.getGroupColor(groupIndex);
   }
 
   /**
@@ -706,8 +693,8 @@ export class BarService {
    * @returns 颜色字符串，如果没有悬浮则为空字符串
    */
   public getHoveredBarColor(): string {
-    if (this.hoveredBarIndex < 0 || this.hoveredSeriesIndex < 0) return '';
-    return this.getDataColor(this.hoveredSeriesIndex, this.hoveredBarIndex);
+    if (this.hoveredBarIndex < 0 || this.hoveredGroupIndex < 0) return '';
+    return this.getDataColor(this.hoveredGroupIndex, this.hoveredBarIndex);
   }
 
   /**
@@ -715,11 +702,11 @@ export class BarService {
    * @returns 图例项数组
    */
   public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean; percentageText?: string, numberText?: string }> {
-    return this.getSeriesNames().map((name, i) => ({
+    return this.getGroupNames().map((name, i) => ({
       name,
-      color: this.getSeriesColor(i),
-      visible: this.isSeriesVisible(i),
-      active: this.hoveredSeriesIndex === i,
+      color: this.getGroupColor(i),
+      visible: this.isGroupVisible(i),
+      active: this.hoveredGroupIndex === i,
       percentageText: this.calculatePercentage(this.calculateTotalValue(i)),
       numberText: this.calculateTotalValue(i).toString()
     }));
@@ -729,10 +716,10 @@ export class BarService {
    * 内部方法，用于在鼠标移出或需要主动隐藏时处理工具提示的隐藏逻辑
    */
   private hideTooltipInternal(): void {
-    if (this.hoveredBarIndex !== -1 || this.hoveredSeriesIndex !== -1) {
+    if (this.hoveredBarIndex !== -1 || this.hoveredGroupIndex !== -1) {
       this.ngZone.run(() => {
         this.hoveredBarIndex = -1;
-        this.hoveredSeriesIndex = -1;
+        this.hoveredGroupIndex = -1;
       });
       this.drawChartFrame(1.0);
     }
@@ -742,18 +729,18 @@ export class BarService {
    * 查找鼠标位置对应的柱子
    * @param x 鼠标相对于画布的 X 坐标 (逻辑单位)
    * @param y 鼠标相对于画布的 Y 坐标 (逻辑单位)
-   * @returns 返回包含 dataIndex 和 seriesIndex 的对象，未找到则为 -1
+   * @returns 返回包含 dataIndex 和 groupIndex 的对象，未找到则为 -1
    */
-  public findHoveredBar(x: number, y: number): { dataIndex: number, seriesIndex: number } {
+  public findHoveredBar(x: number, y: number): { dataIndex: number, groupIndex: number } {
     for (let i = 0; i < this.barPositions.length; i++) {
       const bar = this.barPositions[i];
       if (x >= bar.x && x <= bar.x + bar.width && y >= bar.y && y <= bar.y + bar.height) {
         const categories = this.getCategories(this.getVisibleData());
         const dataIndex = categories.indexOf(bar.data.name!);
-        return { dataIndex, seriesIndex: bar.seriesIndex };
+        return { dataIndex, groupIndex: bar.groupIndex };
       }
     }
-    return { dataIndex: -1, seriesIndex: -1 };
+    return { dataIndex: -1, groupIndex: -1 };
   }
 
   /**
@@ -762,5 +749,9 @@ export class BarService {
   public destroy(): void {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
+  }
+
+  public getMargin(): any {
+    return this.mergedOptions?.bar?.margin! || { top: 40, right: 20, bottom: 50, left: 50 };
   }
 }

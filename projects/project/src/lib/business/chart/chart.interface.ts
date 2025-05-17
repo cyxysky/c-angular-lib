@@ -8,9 +8,8 @@ export interface ChartData {
   color?: string;
   /** 子数据 */
   children?: ChartData[];
-  /** 系列 */
-  series?: string;
 }
+
 
 /** 处理后的带角度信息的图表数据 (主要用于饼图内部) */
 export type ChartDataWithAngles = ChartData & {
@@ -39,7 +38,13 @@ export interface LineSpecificOptions {
   guideLineStyle?: 'solid' | 'dashed';
   /** 辅助线颜色 */
   guideLineColor?: string;
-
+  /** 边距 */
+  margin?: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
 }
 
 /** 柱状图特有配置 */
@@ -57,6 +62,7 @@ export interface BarSpecificOptions {
   };
   /** 是否在柱状图顶部显示数值 */
   showValues?: boolean;
+
 }
 
 /** 饼图特有配置 */
@@ -75,6 +81,12 @@ export interface PieSpecificOptions {
   dynamicSlices?: boolean;
   /** 最小扇形大小 */
   minSliceSize?: number;
+  /** 切片悬浮效果 */
+  sliceHoverEffect?: {
+    shadowColor?: string;
+    shadowBlur?: number;
+    // expandRadius 已经在 hoverEffect.expandRadius 中定义
+  };
 }
 
 /** 统一的图表选项接口 */
@@ -136,7 +148,7 @@ export interface ChartOptions {
     /** 数据项在其集合中的索引 */
     index: number;
     /** 系列索引 (多系列图表如图柱状图) */
-    seriesIndex?: number;
+    groupIndex?: number;
     /** 完整数据集 */
     data: ChartData[];
     /** 当前图表选项 */

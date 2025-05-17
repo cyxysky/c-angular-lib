@@ -25,7 +25,7 @@ export class ChartService {
       const value = item.data || 0;
       const portion = totalValue > 0 ? value / totalValue : 0;
       // minSliceSize ? Math.max(minSliceSize / 100 * Math.PI * 2, portion * Math.PI * 2) :
-      const angleSize =  portion * Math.PI * 2; // 计算弧度大小
+      const angleSize = portion * Math.PI * 2; // 计算弧度大小
 
       // 创建新对象以避免类型问题
       const newItem: ChartDataWithAngles = {
@@ -55,39 +55,27 @@ export class ChartService {
    */
   getMaxValue(data: ChartData[]): number {
     if (!data || data.length === 0) return 0;
-
     return Math.max(...data.map(item => {
       if (item.children && item.children.length > 0) {
         return this.getMaxValue(item.children);
       }
       if (item.data === undefined) return 0;
-
       return item.data;
     }));
   }
 
   /**
-   * 获取所有系列名称
+   * 获取所有分组名称
    */
-  getSeriesNames(data: ChartData[]): string[] {
+  getGroupNames(data: ChartData[]): string[] {
     if (!data || data.length === 0) return [];
-
-    const seriesNames: string[] = [];
+    const groupNames: string[] = [];
     data.forEach(item => {
-      if (item.series && !seriesNames.includes(item.series)) {
-        seriesNames.push(item.series);
-      }
-      if (item.children) {
-        const childSeriesNames = this.getSeriesNames(item.children);
-        childSeriesNames.forEach(name => {
-          if (!seriesNames.includes(name)) {
-            seriesNames.push(name);
-          }
-        });
+      if (item.children && item.children.length > 0 && item.name && !groupNames.includes(item.name)) {
+        groupNames.push(item.name);
       }
     });
-
-    return seriesNames;
+    return groupNames;
   }
 
   /**
@@ -122,6 +110,28 @@ export class ChartService {
       ...item,
       color: item.color || assignedColors[index % assignedColors.length]
     }));
+  }
+
+  /**
+   * 计算并格式化百分比
+   * @param value 当前值
+   * @param totalValue 总值
+   * @returns 百分比字符串 (例如 "25.0%")
+   */
+  public calculatePercentage(value: number | undefined, totalValue: number): string {
+    const numValue = typeof value === 'number' ? value : 0;
+    return (totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0') + '%';
+  }
+
+  /**
+   * 绘制标题
+   */
+  public drawTitle(ctx: CanvasRenderingContext2D, title: string | undefined, margin: any, displayWidth: number): void {
+    if (!title) return;
+    ctx.fillStyle = '#333333';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, margin.left + displayWidth / 2, margin.top / 2);
   }
 
 

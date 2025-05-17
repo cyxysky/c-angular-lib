@@ -246,37 +246,37 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (!this.barService || !this.barService.mergedOptions) return;
     const hoveredBarInfo = this.barService.findHoveredBar(logicalCanvasX, logicalCanvasY);
     const previousHoveredBarIndex = this.barService.hoveredBarIndex;
-    const previousHoveredSeriesIndex = this.barService.hoveredSeriesIndex;
+    const previousHoveredGroupIndex = this.barService.hoveredGroupIndex;
 
-    if (hoveredBarInfo.dataIndex !== previousHoveredBarIndex || hoveredBarInfo.seriesIndex !== previousHoveredSeriesIndex) {
+    if (hoveredBarInfo.dataIndex !== previousHoveredBarIndex || hoveredBarInfo.groupIndex !== previousHoveredGroupIndex) {
       this.ngZone.run(() => {
-        this.barService.setHoveredIndices(hoveredBarInfo.dataIndex, hoveredBarInfo.seriesIndex);
+        this.barService.setHoveredIndices(hoveredBarInfo.dataIndex, hoveredBarInfo.groupIndex);
         this.updateLegendItems();
       });
       this.barService.drawChartFrame(1.0);
       this.cdr.detectChanges();
     }
 
-    if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.seriesIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
-      const seriesNames = this.barService.getSeriesNames();
-      if (hoveredBarInfo.seriesIndex < seriesNames.length) {
-        const seriesName = seriesNames[hoveredBarInfo.seriesIndex];
+    if (hoveredBarInfo.dataIndex !== -1 && hoveredBarInfo.groupIndex !== -1 && this.options.hoverEffect?.showTooltip !== false) {
+      const groupNames = this.barService.getGroupNames();
+      if (hoveredBarInfo.groupIndex < groupNames.length) {
+        const groupName = groupNames[hoveredBarInfo.groupIndex];
         const categories = this.barService.getCategories(this.barService.getVisibleData());
         if (hoveredBarInfo.dataIndex < categories.length) {
           const categoryName = categories[hoveredBarInfo.dataIndex];
-          const dataItems = this.barService.getDataItemsBySeriesName(seriesName);
+          const dataItems = this.barService.getDataItemsByGroupName(groupName);
           const item = dataItems.find(d => d.name === categoryName);
 
           if (item) {
             const tooltipPayload = {
-              title: `${seriesName} - ${item.name}`,
+              title: `${groupName} - ${item.name}`,
               rows: [
                 { label: '数值', value: this.barService.formatValue(item.data) },
                 { label: '占比', value: `${this.barService.calculatePercentage(item.data)}` }
               ],
               item: item
             };
-            const borderColor = this.barService.getDataColor(hoveredBarInfo.seriesIndex, hoveredBarInfo.dataIndex);
+            const borderColor = this.barService.getDataColor(hoveredBarInfo.groupIndex, hoveredBarInfo.dataIndex);
             this.tooltipUpdateSubject.next({
               isVisible: true,
               data: tooltipPayload,
@@ -286,7 +286,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           }
         }
       }
-    } else if (this.isTooltipDisplayed && (hoveredBarInfo.dataIndex === -1 || hoveredBarInfo.seriesIndex === -1)) {
+    } else if (this.isTooltipDisplayed && (hoveredBarInfo.dataIndex === -1 || hoveredBarInfo.groupIndex === -1)) {
       this.tooltipUpdateSubject.next({ isVisible: false });
     }
   }
@@ -346,7 +346,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
 
   private handleBarMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
     if (isTrulyLeavingCanvas) {
-      if (this.barService.hoveredBarIndex !== -1 || this.barService.hoveredSeriesIndex !== -1) {
+      if (this.barService.hoveredBarIndex !== -1 || this.barService.hoveredGroupIndex !== -1) {
         this.ngZone.run(() => {
           this.barService.setHoveredIndices(-1, -1);
           this.updateLegendItems();
@@ -362,7 +362,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         const canvasX = (event.clientX - rect.left) * (canvas.width / this.componentDevicePixelRatio / rect.width);
         const canvasY = (event.clientY - rect.top) * (canvas.height / this.componentDevicePixelRatio / rect.height);
         const hoveredBarInfo = this.barService.findHoveredBar(canvasX, canvasY);
-        if (hoveredBarInfo.dataIndex === -1 && hoveredBarInfo.seriesIndex === -1 && this.isTooltipDisplayed) {
+        if (hoveredBarInfo.dataIndex === -1 && hoveredBarInfo.groupIndex === -1 && this.isTooltipDisplayed) {
           this.tooltipUpdateSubject.next({ isVisible: false });
         }
       }
@@ -474,7 +474,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   public toggleLegendItem(index: number): void {
     if (!this.options) return;
     if (this.options.chartType === 'bar') {
-      this.barService.toggleSeriesVisibility(index);
+      this.barService.toggleGroupVisibility(index);
     } else if (this.options.chartType === 'pie') {
       this.pieService.toggleSliceSelection(index);
     }

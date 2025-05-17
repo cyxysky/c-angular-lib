@@ -17,11 +17,11 @@
     [class.c-lib-table-bordered]="bordered" 
     [class.c-lib-table-small]="size === 'small'"
     [class.c-lib-table-middle]="size === 'middle'" 
-    [class.c-lib-table-fixed-header]="scroll?.y"
+    [class.c-lib-table-fixed-header]="scroll.y"
     [class.c-lib-table-fixed-left]="hasFixedLeft" 
     [class.c-lib-table-fixed-right]="hasFixedRight"
     [class.c-lib-table-loading]="loading" 
-    [class.c-lib-table-scrollable]="scroll?.x || scroll?.y"
+    [class.c-lib-table-scrollable]="scroll.x || scroll.y"
     >
     <!-- 正中心加载动画 -->
     <ng-container *ngIf="loading">
@@ -31,7 +31,7 @@
       #tableContainerBox
       class="c-lib-table-container"
       [class.virtual-scroll-mode]="virtualScroll"
-      [style.overflow-y]="scroll?.y ? 'auto' : null"
+      [style.overflow-y]="scroll.y ? 'auto' : null"
       [style.overflow-x]="'hidden'"
       >
       <!-- 虚拟滚动模式 -->
@@ -148,8 +148,8 @@
           [class.c-lib-table-column-first-right-fixed]="column.isFirstRightFixed && hasRightShadow"
           [style.textAlign]="column.align || 'left'"
           [style.width]="column.width || null"
-          [style.position]="column.fixed || scroll?.y ? 'sticky' : null" 
-          [style.top]="scroll?.y ? '0' : null"
+          [style.position]="column.fixed || scroll.y ? 'sticky' : null" 
+          [style.top]="scroll.y ? '0' : null"
           [style.left]="(column.fixed === 'left' || column.fixed === true) ? getHeaderLeftPosition(rowIndex, colIndex) : null"
           [style.right]="column.fixed === 'right' ? getHeaderRightPosition(rowIndex, colIndex) : null"
           [style.z-index]="getZIndex(column)"
@@ -295,7 +295,7 @@
 <ng-template #complexTd let-data let-rowIndex="rowIndex">
   <td 
     *ngIf="checkable && complexTableObj.data?.get(leafColumns[0]?.field)?.get(rowIndex)"
-    [attr.rowspan]="complexTableObj.data?.get(leafColumns[0]?.field)?.get(rowIndex).length"
+    [attr.rowspan]="complexTableObj.data?.get(leafColumns[0].field)?.get(rowIndex).length"
     class="c-lib-table-checkable-cell"
     >
     <lib-checkbox  [ngModel]="getCheckedStatus(data)" checkboxSingle (ngModelChange)="checkedChange($event, data)"></lib-checkbox>

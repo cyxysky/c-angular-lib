@@ -9,7 +9,7 @@ import { ChartService } from '@project';
 @Component({
   selector: 'app-doc-chart',
   standalone: true,
-  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, BarComponent, ButtonComponent, PieComponent, ChartComponent],
+  imports: [DocBoxComponent, ProjectModule, DocApiTableComponent, CommonModule, ButtonComponent, ChartComponent],
   templateUrl: './doc-chart.component.html',
   styleUrl: './doc-chart.component.less'
 })
@@ -150,7 +150,6 @@ export class DocChartComponent {
   multiSeriesData: ChartData[] = [
     {
       name: '2022年',
-      series: '2022年',
       data: 0,
       children: [
         { name: '一季度', data: 120 },
@@ -161,7 +160,6 @@ export class DocChartComponent {
     },
     {
       name: '2023年',
-      series: '2023年',
       data: 0,
       children: [
         { name: '一季度', data: 140 },
@@ -176,7 +174,6 @@ export class DocChartComponent {
   customMultiSeriesData: ChartData[] = [
     {
       name: '北京',
-      series: '北京',
       color: '#FF6384',
       data: 0,
       children: [
@@ -188,7 +185,6 @@ export class DocChartComponent {
     },
     {
       name: '上海',
-      series: '上海',
       color: '#36A2EB',
       data: 0,
       children: [
@@ -200,7 +196,6 @@ export class DocChartComponent {
     },
     {
       name: '广州',
-      series: '广州',
       color: '#FFCE56',
       data: 0,
       children: [
