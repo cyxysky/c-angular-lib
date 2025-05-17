@@ -1,6 +1,10 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ChartData, ChartOptions, TooltipUpdate, BarSpecificOptions } from './chart.interface';
-import { ChartService } from './chart.service';
+import {
+  ChartService, DEFAULT_TEXT_COLOR, DEFAULT_MUTED_TEXT_COLOR, DEFAULT_BACKGROUND_TEXT_COLOR,
+  DEFAULT_LABEL_FONT, DEFAULT_GRID_LINE_COLOR, DEFAULT_GRID_LINE_WIDTH,
+  DEFAULT_AXIS_LINE_COLOR, DEFAULT_AXIS_LINE_WIDTH
+} from './chart.service';
 
 @Injectable()
 export class BarService {
@@ -15,13 +19,22 @@ export class BarService {
     backgroundColor: '#ffffff',
     showLegend: true,
     animate: true,
+
     legend: { position: 'top', align: 'center' },
-    hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false },
+    hoverEffect: { 
+      enabled: true, 
+      showTooltip: true, 
+      tooltipHoverable: false 
+    },
     bar: {
       borderRadius: 4,
       showValues: true,
       showGrid: true,
       margin: { top: 40, right: 20, bottom: 50, left: 50 },
+      showGuideLine: true, 
+      guideLineStyle: 'dashed', 
+      guideLineColor: '#666', 
+      guideLineWidth: 1, 
     }
   };
   private animationFrameId: number | null = null;
@@ -186,7 +199,7 @@ export class BarService {
       this.barPositions = [];
     }
     this.drawAxes(margin, chartHeight, chartWidth);
-    if (this.hoveredBarIndex !== -1 && this.hoveredGroupIndex !== -1 && this.mergedOptions.hoverEffect?.showGuideLine) {
+    if (this.hoveredBarIndex !== -1 && this.hoveredGroupIndex !== -1 && this.mergedOptions?.bar?.showGuideLine) {
       this.drawGuideLine(margin, chartHeight, chartWidth);
     }
   }
@@ -201,17 +214,20 @@ export class BarService {
   private drawGrid(margin: any, chartHeight: number, chartWidth: number, maxValue: number): void {
     const ctx = this.ctx;
     const gridCount = 5;
-    ctx.strokeStyle = '#e0e0e0';
-    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = DEFAULT_GRID_LINE_COLOR;
+    ctx.lineWidth = DEFAULT_GRID_LINE_WIDTH;
+    ctx.setLineDash([]); // Ensure solid lines for grid unless specified otherwise by a new option
+
     for (let i = 0; i <= gridCount; i++) {
       const yPos = margin.top + chartHeight - (i / gridCount) * chartHeight;
       ctx.beginPath();
       ctx.moveTo(margin.left, yPos);
       ctx.lineTo(margin.left + chartWidth, yPos);
       ctx.stroke();
-      ctx.fillStyle = '#666666';
-      ctx.font = '12px Arial';
+      ctx.fillStyle = DEFAULT_MUTED_TEXT_COLOR;
+      ctx.font = DEFAULT_LABEL_FONT;
       ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
       ctx.fillText(this.chartService.formatNumber(maxValue * i / gridCount), margin.left - 10, yPos + 4);
     }
   }
@@ -258,28 +274,37 @@ export class BarService {
           }
         }
         if (this.mergedOptions?.bar?.showValues && animationProgress > 0.9 && itemValue > 0) {
-          ctx.fillStyle = '#333333';
-          ctx.font = '12px Arial';
           ctx.textAlign = 'center';
           const formattedValue = this.formatValue(item.data);
           const valueY = y - 5;
-          const approximateTextHeight = 12;
-          const titleHeightClearance = this.mergedOptions.title ? (margin.top / 2 + approximateTextHeight / 2 + 5) : (approximateTextHeight);
+          // Use DEFAULT_LABEL_FONT to determine approximateTextHeight for consistency
+          const approximateTextHeight = parseInt(DEFAULT_LABEL_FONT.substring(DEFAULT_LABEL_FONT.search(/\d/)), 10) || 12;
 
-          if (valueY > titleHeightClearance) {
+          // Original title clearance logic, ensuring it uses a defined title font if title exists
+          const titleClearance = this.mergedOptions.title ? (margin.top / 2 + approximateTextHeight / 2 + 5) : (approximateTextHeight);
+
+          if (valueY > titleClearance) {
+            ctx.fillStyle = DEFAULT_TEXT_COLOR;
+            ctx.font = DEFAULT_LABEL_FONT;
+            ctx.textBaseline = 'bottom'; // Ensure text is properly aligned above the baseline
             ctx.fillText(formattedValue, x + barWidth / 2, valueY);
-          } else if (barH > approximateTextHeight + 10) {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2);
+          } else if (barH > approximateTextHeight + 10) { // If bar is tall enough for text inside
+            ctx.fillStyle = DEFAULT_BACKGROUND_TEXT_COLOR;
+            ctx.font = DEFAULT_LABEL_FONT;
+            ctx.textBaseline = 'alphabetic'; // Or 'middle' depending on desired alignment inside
+            // Position text inside the bar, near the top, adjusted by approximateTextHeight
+            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2); 
           }
         }
       });
-      if (groupNames.length > 0) {
-        ctx.fillStyle = '#666666';
-        ctx.font = '12px Arial';
+      // Draw category labels after all bars in a category group are drawn
+      if (groupNames.length > 0 && categories.length > 0 && categoryIdx < categories.length) {
+        ctx.fillStyle = DEFAULT_MUTED_TEXT_COLOR;
+        ctx.font = DEFAULT_LABEL_FONT;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
         const groupLeft = margin.left + categoryIdx * groupWidth;
-        ctx.fillText(category, groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
+        ctx.fillText(categories[categoryIdx], groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
       }
     });
   }
@@ -292,8 +317,10 @@ export class BarService {
    */
   private drawAxes(margin: any, chartHeight: number, chartWidth: number): void {
     const ctx = this.ctx;
-    ctx.strokeStyle = '#333333';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = DEFAULT_AXIS_LINE_COLOR;
+    ctx.lineWidth = DEFAULT_AXIS_LINE_WIDTH;
+    ctx.setLineDash([]); // Ensure solid axis lines
+
     ctx.beginPath();
     ctx.moveTo(margin.left, margin.top);
     ctx.lineTo(margin.left, margin.top + chartHeight);
@@ -311,7 +338,7 @@ export class BarService {
    * @param chartWidth 图表绘制区域宽度
    */
   private drawGuideLine(margin: any, chartHeight: number, chartWidth: number): void {
-    if (this.hoveredBarIndex === -1 || this.hoveredGroupIndex === -1 || !this.mergedOptions.hoverEffect?.showGuideLine) return;
+    if (this.hoveredBarIndex === -1 || this.hoveredGroupIndex === -1 || !this.mergedOptions?.bar?.showGuideLine) return;
     const ctx = this.ctx;
     const categories = this.getCategories(this.getVisibleData());
     if (this.hoveredBarIndex >= categories.length) return;
@@ -322,9 +349,9 @@ export class BarService {
     if (!hoveredBar) return;
     const barCenterX = hoveredBar.x + hoveredBar.width / 2;
     ctx.beginPath();
-    ctx.strokeStyle = this.mergedOptions.hoverEffect?.guideLineColor || '#666';
-    ctx.lineWidth = this.mergedOptions.hoverEffect?.guideLineWidth || 1;
-    if (this.mergedOptions.hoverEffect?.guideLineStyle === 'dashed') ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = this.mergedOptions?.bar?.guideLineColor || '#666';
+    ctx.lineWidth = this.mergedOptions?.bar?.guideLineWidth || 1;
+    if (this.mergedOptions?.bar?.guideLineStyle === 'dashed') ctx.setLineDash([4, 4]);
     else ctx.setLineDash([]);
     ctx.moveTo(barCenterX, margin.top);
     ctx.lineTo(barCenterX, margin.top + chartHeight);

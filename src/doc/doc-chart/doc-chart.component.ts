@@ -92,12 +92,12 @@ export class DocChartComponent {
     hoverEffect: {
       enabled: true,
       showTooltip: true,
-      expandSlice: true,
-      expandRadius: 10
     },
     pie: {
       showLabels: true,
-      showPercentage: true
+      showPercentage: true,
+      expandSlice: true,
+      expandRadius: 10
     }
   };
 
@@ -234,11 +234,11 @@ export class DocChartComponent {
     hoverEffect: {
       enabled: true,
       showTooltip: true,
-      showGuideLine: true,
       tooltipHoverable: true
     },
     bar: {
-      borderRadius: 6
+      borderRadius: 6,
+      showGuideLine: true,
     }
   };
 
@@ -317,14 +317,14 @@ export class DocChartComponent {
     hoverEffect: {
       enabled: true,
       showTooltip: true,
+      tooltipHoverable: false
+    },
+    bar: {
+      borderRadius: 4,
       showGuideLine: true,
       guideLineStyle: 'dashed',
       guideLineColor: '#666',
       guideLineWidth: 1,
-      tooltipHoverable: false
-    },
-    bar: {
-      borderRadius: 4
     }
   };
 
@@ -352,11 +352,12 @@ export class DocChartComponent {
     hoverEffect: {
       enabled: true,
       showTooltip: true,
-      showGuideLine: true,
       tooltipHoverable: true
     },
     bar: {
-      borderRadius: 8
+      borderRadius: 8,
+      showGuideLine: true,
+
     }
   };
 
@@ -390,7 +391,7 @@ export class DocChartComponent {
   toggleChartType(): void {
     this.isBarChart = !this.isBarChart;
 
-    
+
   }
 
   // 计算饼图的总值

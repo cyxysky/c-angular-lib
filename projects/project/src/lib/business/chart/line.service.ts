@@ -16,11 +16,16 @@ export class LineService {
 		showLegend: true,
 		animate: true,
 		legend: { position: 'top', align: 'center' },
-		hoverEffect: { enabled: true, showTooltip: true, showGuideLine: true, guideLineStyle: 'dashed', guideLineColor: '#666', guideLineWidth: 1, tooltipHoverable: false },
+		hoverEffect: {
+			enabled: true,
+			showTooltip: true,
+			tooltipHoverable: false
+		},
 		line: {
 			showGuideLine: true,
 			guideLineStyle: 'dashed',
 			guideLineColor: '#666',
+			guideLineWidth: 1,
 			margin: { top: 40, right: 20, bottom: 50, left: 50 },
 		}
 	};

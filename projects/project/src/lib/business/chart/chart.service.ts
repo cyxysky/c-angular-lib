@@ -1,6 +1,51 @@
 import { Injectable, TemplateRef, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { ChartData, ChartOptions, ChartDataWithAngles } from './chart.interface';
 
+/** 文本颜色 */
+export const DEFAULT_TEXT_COLOR = '#333333';
+/** 次要文本颜色 */
+export const DEFAULT_MUTED_TEXT_COLOR = '#666666';
+/** 背景文本颜色 */
+export const DEFAULT_BACKGROUND_TEXT_COLOR = '#ffffff';
+/** 标题字体 */
+export const DEFAULT_TITLE_FONT = 'bold 16px Arial';
+/** 标签字体 */
+export const DEFAULT_LABEL_FONT = '12px Arial';
+/** 饼图标签字体 */
+export const DEFAULT_PIE_LABEL_FONT = 'bold 13px Arial, sans-serif';
+/** 网格线颜色 */
+export const DEFAULT_GRID_LINE_COLOR = '#e0e0e0';
+/** 网格线宽度 */
+export const DEFAULT_GRID_LINE_WIDTH = 0.5;
+/** 轴线颜色 */
+export const DEFAULT_AXIS_LINE_COLOR = '#333333';
+/** 轴线宽度 */
+export const DEFAULT_AXIS_LINE_WIDTH = 1;
+/** 饼图扇区边框颜色 */
+export const DEFAULT_PIE_SLICE_BORDER_COLOR = 'rgba(255, 255, 255, 0.7)';
+/** 饼图扇区边框宽度 */
+export const DEFAULT_PIE_SLICE_BORDER_WIDTH = 1;
+/** 悬停时饼图扇区边框颜色 */
+export const HOVER_PIE_SLICE_BORDER_COLOR = '#fff';
+/** 悬停时饼图扇区边框宽度 */
+export const HOVER_PIE_SLICE_BORDER_WIDTH = 2;
+/** 悬停时饼图扇区阴影颜色 */
+export const HOVER_PIE_SHADOW_COLOR = 'rgba(0, 0, 0, 0.3)';
+/** 悬停时饼图扇区阴影模糊 */
+export const HOVER_PIE_SHADOW_BLUR = 8;
+/** 饼图环形文本阴影颜色 */
+export const DEFAULT_DONUT_TEXT_SHADOW_COLOR = 'rgba(0, 0, 0, 0.1)';
+/** 饼图环形文本阴影模糊 */
+export const DEFAULT_DONUT_TEXT_SHADOW_BLUR = 4;
+/** 饼图扇区标签阴影颜色 */
+export const DEFAULT_SLICE_LABEL_SHADOW_COLOR = 'rgba(0, 0, 0, 0.4)';
+/** 饼图扇区标签阴影模糊 */
+export const DEFAULT_SLICE_LABEL_SHADOW_BLUR = 3;
+/** 饼图扇区标签对比色边框颜色 */
+export const DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR = 'rgba(0, 0, 0, 0.7)';
+/** 饼图扇区标签对比色边框宽度 */
+export const DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH = 3;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -126,12 +171,13 @@ export class ChartService {
   /**
    * 绘制标题
    */
-  public drawTitle(ctx: CanvasRenderingContext2D, title: string | undefined, margin: any, displayWidth: number): void {
+  public drawTitle(ctx: CanvasRenderingContext2D, title: string | undefined, margin: { top: number, left: number, right: number, bottom: number }, chartAreaWidth: number): void {
     if (!title) return;
-    ctx.fillStyle = '#333333';
-    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = DEFAULT_TEXT_COLOR;
+    ctx.font = DEFAULT_TITLE_FONT;
     ctx.textAlign = 'center';
-    ctx.fillText(title, margin.left + displayWidth / 2, margin.top / 2);
+    ctx.textBaseline = 'middle'; // Common for titles
+    ctx.fillText(title, margin.left + chartAreaWidth / 2, margin.top / 2);
   }
 
 

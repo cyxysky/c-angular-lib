@@ -28,7 +28,11 @@ export class PieService {
     showLegend: true,
     animate: true,
     legend: { position: 'top', align: 'center' },
-    hoverEffect: { enabled: true, showTooltip: true, expandSlice: true, expandRadius: 10, tooltipHoverable: false },
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      tooltipHoverable: false
+    },
     pie: {
       showLabels: true,
       showPercentage: true,
@@ -36,7 +40,9 @@ export class PieService {
       innerRadius: 0, // Default for pie, can be overridden for donut
       outerRadius: undefined, // Will be calculated if not set
       donutText: '',
-      minSliceSize: 4
+      minSliceSize: 4,
+      expandSlice: true,
+      expandRadius: 10,
     }
   };
   private _isToggling: boolean = false; // 防止快速切换导致状态异常的标志
@@ -265,8 +271,8 @@ export class PieService {
       this.ctx.save(); // 保存当前上下文状态
 
       // 处理悬浮时的切片扩展效果
-      if (isHovered && this.mergedOptions.hoverEffect?.expandSlice) {
-        const expandRadius = this.mergedOptions.hoverEffect.expandRadius || 10;
+      if (isHovered && this.mergedOptions?.pie?.expandSlice) {
+        const expandRadius = this.mergedOptions?.pie?.expandRadius || 10;
         const midAngle = (item.startAngle + animatedEndAngle) / 2;
         const offsetX = Math.cos(midAngle) * expandRadius;
         const offsetY = Math.sin(midAngle) * expandRadius;
@@ -343,8 +349,8 @@ export class PieService {
 
       // 如果当前切片被悬浮且有扩展效果，调整标签位置
       const isHovered = index === this.hoveredIndex;
-      if (isHovered && this.mergedOptions.hoverEffect?.expandSlice) {
-        const expandRadius = this.mergedOptions.hoverEffect.expandRadius || 10;
+      if (isHovered && this.mergedOptions?.pie?.expandSlice) {
+        const expandRadius = this.mergedOptions?.pie?.expandRadius || 10;
         const hoverOffsetX = Math.cos(midAngle) * expandRadius;
         const hoverOffsetY = Math.sin(midAngle) * expandRadius;
         x += hoverOffsetX;

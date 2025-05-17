@@ -32,12 +32,6 @@ export type ProcessedLineData = ChartData & {
 
 /** 折线图特有配置 */
 export interface LineSpecificOptions {
-  /** 是否显示辅助线 */
-  showGuideLine?: boolean;
-  /** 辅助线样式 */
-  guideLineStyle?: 'solid' | 'dashed';
-  /** 辅助线颜色 */
-  guideLineColor?: string;
   /** 边距 */
   margin?: {
     top: number;
@@ -45,6 +39,16 @@ export interface LineSpecificOptions {
     bottom: number;
     left: number;
   };
+  /** 是否在柱状图顶部显示数值 */
+  showValues?: boolean;
+  /** 是否显示辅助线 */
+  showGuideLine?: boolean;
+  /** 辅助线样式 */
+  guideLineStyle?: 'solid' | 'dashed';
+  /** 辅助线颜色 */
+  guideLineColor?: string;
+  /** 辅助线宽度 */
+  guideLineWidth?: number;
 }
 
 /** 柱状图特有配置 */
@@ -62,6 +66,14 @@ export interface BarSpecificOptions {
   };
   /** 是否在柱状图顶部显示数值 */
   showValues?: boolean;
+  /** 是否显示辅助线 */
+  showGuideLine?: boolean;
+  /** 辅助线样式 */
+  guideLineStyle?: 'solid' | 'dashed';
+  /** 辅助线颜色 */
+  guideLineColor?: string;
+  /** 辅助线宽度 */
+  guideLineWidth?: number;
 
 }
 
@@ -87,6 +99,10 @@ export interface PieSpecificOptions {
     shadowBlur?: number;
     // expandRadius 已经在 hoverEffect.expandRadius 中定义
   };
+  /** 是否展开扇区 */
+  expandSlice?: boolean;
+  /** 展开半径 */
+  expandRadius?: number;
 }
 
 /** 统一的图表选项接口 */
@@ -120,20 +136,6 @@ export interface ChartOptions {
     showTooltip?: boolean;
     /** 悬浮框是否可悬停 */
     tooltipHoverable?: boolean;
-    /** =======================柱状图特有======================= */
-    /** 是否显示辅助线 */
-    showGuideLine?: boolean;
-    /** 辅助线样式 */
-    guideLineStyle?: 'solid' | 'dashed';
-    /** 辅助线颜色 */
-    guideLineColor?: string;
-    /** 辅助线宽度 */
-    guideLineWidth?: number;
-    /** =======================饼图特有======================= */
-    /** 是否展开扇区 */
-    expandSlice?: boolean;
-    /** 展开半径 */
-    expandRadius?: number;
   };
   /** 柱状图特有配置 */
   bar?: BarSpecificOptions;
