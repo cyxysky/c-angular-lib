@@ -32,7 +32,7 @@ export class LineService {
 		},
 		line: {
 			margin: { top: 40, right: 40, bottom: 70, left: 60 },
-			showValues: false,
+			showValues: true,
 			showGuideLine: true,
 			guideLineStyle: 'dashed',
 			guideLineColor: DEFAULT_GRID_LINE_COLOR,
@@ -148,40 +148,40 @@ export class LineService {
 
 	private calculateNiceScale(minVal: number, maxVal: number, maxTicks: number = 5): NiceScale {
 		let range = this.niceNum(maxVal - minVal, false);
-		let tickSpacing = this.niceNum(range / (maxTicks -1), true);
+		let tickSpacing = this.niceNum(range / (maxTicks - 1), true);
 		let niceMin = Math.floor(minVal / tickSpacing) * tickSpacing;
 		let niceMax = Math.ceil(maxVal / tickSpacing) * tickSpacing;
-		
+
 		// Adjust if minVal and maxVal are the same or very close, avoid division by zero or tiny range
 		if (minVal === maxVal) {
 			if (minVal === 0) { // Special case for all data being 0
 				niceMin = 0;
-				niceMax = maxTicks > 1 ? maxTicks -1 : 10; // Or some default like 10 if only 1 tick target
-				tickSpacing = niceMax / (maxTicks > 1 ? maxTicks -1 : 1) || 1;
+				niceMax = maxTicks > 1 ? maxTicks - 1 : 10; // Or some default like 10 if only 1 tick target
+				tickSpacing = niceMax / (maxTicks > 1 ? maxTicks - 1 : 1) || 1;
 				range = niceMax - niceMin;
 			} else { // All data has same non-zero value
 				// Create a small range around the value
 				const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal))));
 				tickSpacing = this.niceNum(magnitude / (maxTicks > 1 ? 2 : 1), true); // A fraction of magnitude for tick spacing
-				niceMin = Math.floor(minVal / tickSpacing) * tickSpacing - tickSpacing; 
+				niceMin = Math.floor(minVal / tickSpacing) * tickSpacing - tickSpacing;
 				niceMax = Math.ceil(maxVal / tickSpacing) * tickSpacing + tickSpacing;
-				if(niceMin >= minVal) niceMin -= tickSpacing;
-				if(niceMax <= maxVal) niceMax += tickSpacing;
-				if(niceMin === niceMax) { // if still equal, force a range
-					 niceMax += tickSpacing > 0 ? tickSpacing : 1;
-					 niceMin -= tickSpacing > 0 ? tickSpacing : 1;
-					 if(niceMin < 0 && minVal >=0) niceMin =0;
+				if (niceMin >= minVal) niceMin -= tickSpacing;
+				if (niceMax <= maxVal) niceMax += tickSpacing;
+				if (niceMin === niceMax) { // if still equal, force a range
+					niceMax += tickSpacing > 0 ? tickSpacing : 1;
+					niceMin -= tickSpacing > 0 ? tickSpacing : 1;
+					if (niceMin < 0 && minVal >= 0) niceMin = 0;
 				}
 				range = niceMax - niceMin;
-				if (range <=0 || tickSpacing <=0 ) { // fallback for safety
+				if (range <= 0 || tickSpacing <= 0) { // fallback for safety
 					tickSpacing = 1;
-					niceMax = niceMin + (maxTicks-1)*tickSpacing;
+					niceMax = niceMin + (maxTicks - 1) * tickSpacing;
 					range = niceMax - niceMin;
 				}
 			}
 		} else if (range === 0 && tickSpacing === 0) { // Fallback if initial calc results in zeros
 			tickSpacing = 1;
-			niceMax = niceMin + (maxTicks -1) * tickSpacing;
+			niceMax = niceMin + (maxTicks - 1) * tickSpacing;
 			range = niceMax - niceMin;
 		}
 
@@ -223,18 +223,10 @@ export class LineService {
 		const chartAreaWidth = this.displayWidth - margin.left - margin.right;
 		const chartAreaHeight = this.displayHeight - margin.top - margin.bottom;
 		this.chartService.drawTitle(ctx, this.mergedOptions.title, margin, chartAreaWidth);
-		const visibleData = this.getVisibleData();
-		if (visibleData.length === 0 || chartAreaWidth <= 0 || chartAreaHeight <= 0) {
-			return;
-		}
-		const categories = this.getCategories(visibleData);
-		if (categories.length === 0 && !visibleData.some(group => group.children && group.children.length > 0 && group.children.some(child => child.name === undefined))) {
-			return; 
-		}
-
+		// Calculate scale based on all processed data, not just visible data
 		let actualMinDataValue = Infinity;
 		let actualMaxDataValue = -Infinity;
-		visibleData.forEach(group => {
+		this.processedData.forEach(group => {
 			group.children?.forEach(item => {
 				if (typeof item.data === 'number') {
 					if (item.data < actualMinDataValue) actualMinDataValue = item.data;
@@ -243,19 +235,32 @@ export class LineService {
 			});
 		});
 		if (actualMinDataValue === Infinity) actualMinDataValue = 0;
-		if (actualMaxDataValue === -Infinity) actualMaxDataValue = 10; // Default if no data, or all non-numeric
-		if (actualMinDataValue > 0) actualMinDataValue = 0; // Always include 0 in Y axis if data is positive
-		
-		// Use a fixed number of ticks for now, e.g., 5 segments = 6 labels including 0
+		if (actualMaxDataValue === -Infinity) actualMaxDataValue = 10;
+		// Always include 0 in Y axis if data is positive and min is greater than 0.
+		if (actualMinDataValue > 0 && actualMaxDataValue >= actualMinDataValue) actualMinDataValue = 0;
 		const yAxisScale = this.calculateNiceScale(actualMinDataValue, actualMaxDataValue, 6);
 		const niceMinValue = yAxisScale.niceMin;
 		const niceMaxValue = yAxisScale.niceMax;
 		const tickSpacing = yAxisScale.tickSpacing;
-
+		// Get all categories for drawing axes
+		const allCategories = this.getCategories(this.processedData);
 		this.drawGrid(margin, chartAreaWidth, chartAreaHeight, niceMinValue, niceMaxValue, tickSpacing);
-		this.drawAxesAndLabels(margin, chartAreaWidth, chartAreaHeight, categories, niceMinValue, niceMaxValue, tickSpacing);
+		this.drawAxesAndLabels(margin, chartAreaWidth, chartAreaHeight, allCategories, niceMinValue, niceMaxValue, tickSpacing);
+		// Now get visible data for drawing lines and points
+		const visibleData = this.getVisibleData();
+		if (visibleData.length === 0 || chartAreaWidth <= 0 || chartAreaHeight <= 0) {
+			this.pointPositions = []; // Clear points if nothing to draw
+			return;
+		}
+		// Get categories based on visible data for line drawing
+		const categoriesForLines = this.getCategories(visibleData);
+		// Original check based on visible data categories before drawing lines
+		if (categoriesForLines.length === 0 && !visibleData.some(group => group.children && group.children.length > 0 && group.children.some(child => child.name === undefined))) {
+			this.pointPositions = [];
+			return;
+		}
 		this.pointPositions = [];
-		this.drawLinesAndPoints(visibleData, categories, margin, chartAreaWidth, chartAreaHeight, niceMinValue, niceMaxValue, animationProgress);
+		this.drawLinesAndPoints(visibleData, categoriesForLines, margin, chartAreaWidth, chartAreaHeight, niceMinValue, niceMaxValue, animationProgress);
 	}
 
 	private drawGrid(margin: Required<LineSpecificOptions>['margin'], chartAreaWidth: number, chartAreaHeight: number, niceMinValue: number, niceMaxValue: number, tickSpacing: number): void {
@@ -265,7 +270,7 @@ export class LineService {
 		ctx.lineWidth = this.mergedOptions.line.guideLineWidth!;
 		ctx.setLineDash(this.mergedOptions.line.guideLineStyle === 'dashed' ? [4, 4] : []);
 		const valueRange = niceMaxValue - niceMinValue;
-		if (valueRange <= 0) return; 
+		if (valueRange <= 0) return;
 
 		for (let val = niceMinValue + tickSpacing; val < niceMaxValue; val += tickSpacing) {
 			const yPos = margin.top + chartAreaHeight - ((val - niceMinValue) / valueRange) * chartAreaHeight;
@@ -301,7 +306,7 @@ export class LineService {
 
 		const valueRange = niceMaxValue - niceMinValue;
 		if (valueRange <= 0 || tickSpacing <= 0) { // Safety check if range or spacing is invalid
-			 // Draw at least min and max if possible
+			// Draw at least min and max if possible
 			let yPosMin = margin.top + chartAreaHeight;
 			let yPosMax = margin.top;
 			if (valueRange === 0) { // min === max
@@ -309,21 +314,21 @@ export class LineService {
 				yPosMax = yPosMin;
 				ctx.fillText(this.chartService.formatNumber(niceMinValue), margin.left - 10, yPosMin);
 			} else { // Should not happen if tickSpacing > 0
-				 ctx.fillText(this.chartService.formatNumber(niceMinValue), margin.left - 10, yPosMin);
-				 ctx.fillText(this.chartService.formatNumber(niceMaxValue), margin.left - 10, yPosMax);
+				ctx.fillText(this.chartService.formatNumber(niceMinValue), margin.left - 10, yPosMin);
+				ctx.fillText(this.chartService.formatNumber(niceMaxValue), margin.left - 10, yPosMax);
 			}
 		} else {
 			for (let val = niceMinValue; val <= niceMaxValue; val += tickSpacing) {
-			  // Ensure val doesn't slightly exceed niceMaxValue due to floating point issues
-			  if (val > niceMaxValue && (val - niceMaxValue < tickSpacing * 0.001)) val = niceMaxValue; 
-			  const yPos = margin.top + chartAreaHeight - ((val - niceMinValue) / valueRange) * chartAreaHeight;
-			  ctx.fillText(this.chartService.formatNumber(val), margin.left - 10, yPos);
-			  if (this.mergedOptions.line.showYAxisTicks) {
-				ctx.beginPath();
-				ctx.moveTo(margin.left - 5, yPos);
-				ctx.lineTo(margin.left, yPos);
-				ctx.stroke();
-			  }
+				// Ensure val doesn't slightly exceed niceMaxValue due to floating point issues
+				if (val > niceMaxValue && (val - niceMaxValue < tickSpacing * 0.001)) val = niceMaxValue;
+				const yPos = margin.top + chartAreaHeight - ((val - niceMinValue) / valueRange) * chartAreaHeight;
+				ctx.fillText(this.chartService.formatNumber(val), margin.left - 10, yPos);
+				if (this.mergedOptions.line.showYAxisTicks) {
+					ctx.beginPath();
+					ctx.moveTo(margin.left - 5, yPos);
+					ctx.lineTo(margin.left, yPos);
+					ctx.stroke();
+				}
 			}
 		}
 
@@ -331,26 +336,26 @@ export class LineService {
 		ctx.textAlign = 'center';
 		const categorySlotWidth = chartAreaWidth / Math.max(1, categories.length);
 		categories.forEach((category, index) => {
-		  const xPos = margin.left + categorySlotWidth * (index + 0.5);
-		  const yPos = margin.top + chartAreaHeight + 20;
-		  if (this.mergedOptions.line.xAxisLabelRotation && this.mergedOptions.line.xAxisLabelRotation !== 0) {
-			ctx.save();
-			ctx.translate(xPos, yPos);
-			ctx.rotate(this.mergedOptions.line.xAxisLabelRotation! * Math.PI / 180);
-			ctx.textAlign = this.mergedOptions.line.xAxisLabelRotation! > 0 ? 'right' : 'left';
-			ctx.textBaseline = 'middle';
-			ctx.fillText(category, 0, 0);
-			ctx.restore();
-		  } else {
-			ctx.textBaseline = 'top';
-			ctx.fillText(category, xPos, yPos);
-		  }
-		  if (this.mergedOptions.line.showXAxisTicks) {
-			ctx.beginPath();
-			ctx.moveTo(xPos, margin.top + chartAreaHeight);
-			ctx.lineTo(xPos, margin.top + chartAreaHeight + 5);
-			ctx.stroke();
-		  }
+			const xPos = margin.left + categorySlotWidth * (index + 0.5);
+			const yPos = margin.top + chartAreaHeight + 20;
+			if (this.mergedOptions.line.xAxisLabelRotation && this.mergedOptions.line.xAxisLabelRotation !== 0) {
+				ctx.save();
+				ctx.translate(xPos, yPos);
+				ctx.rotate(this.mergedOptions.line.xAxisLabelRotation! * Math.PI / 180);
+				ctx.textAlign = this.mergedOptions.line.xAxisLabelRotation! > 0 ? 'right' : 'left';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(category, 0, 0);
+				ctx.restore();
+			} else {
+				ctx.textBaseline = 'top';
+				ctx.fillText(category, xPos, yPos);
+			}
+			if (this.mergedOptions.line.showXAxisTicks) {
+				ctx.beginPath();
+				ctx.moveTo(xPos, margin.top + chartAreaHeight);
+				ctx.lineTo(xPos, margin.top + chartAreaHeight + 5);
+				ctx.stroke();
+			}
 		});
 	}
 
@@ -363,16 +368,13 @@ export class LineService {
 	): void {
 		const ctx = this.ctx;
 		const categoryMap = new Map(categories.map((cat, idx) => [cat, idx]));
-		const categorySlotWidth = chartAreaWidth / Math.max(1, categories.length);
 		const yValueRange = niceMaxValue - niceMinValue; // Use nice range
-
 		this.pointPositions = [];
-
 		visibleData.forEach((group, groupIndex) => {
 			if (!group.children || group.children.length === 0) return;
 			const originalGroupIndex = this.processedData.findIndex(pGroup => pGroup.name === group.name);
 			const lineColor = group.color || this.mergedOptions.colors![originalGroupIndex % this.mergedOptions.colors!.length];
-			
+
 			const allOriginalPoints: Array<{ x: number, y: number, data: ChartData }> = [];
 			group.children.forEach((item, dataIdx) => {
 				const categoryIndex = categoryMap.get(item.name);
@@ -386,7 +388,7 @@ export class LineService {
 				const x = margin.left + slotWidthForCalc * ((currentCatIndex ?? 0) + 0.5);
 				// Ensure data value is clamped within the nice scale for y calculation
 				const yValue = Math.max(niceMinValue, Math.min(niceMaxValue, item.data || 0));
-				const y = margin.top + chartAreaHeight - ((yValue - niceMinValue) / (yValueRange > 0 ? yValueRange : 1) ) * chartAreaHeight;
+				const y = margin.top + chartAreaHeight - ((yValue - niceMinValue) / (yValueRange > 0 ? yValueRange : 1)) * chartAreaHeight;
 				allOriginalPoints.push({ x, y, data: item });
 				this.pointPositions.push({ x, y, data: item, groupIndex: originalGroupIndex, dataIndex: dataIdx });
 			});
@@ -400,13 +402,13 @@ export class LineService {
 			const pointsToDrawThisFrame: Array<{ x: number, y: number, data?: ChartData }> = [];
 			const totalSegments = allOriginalPoints.length - 1;
 
-			if (totalSegments < 0) { 
+			if (totalSegments < 0) {
 				if (animationProgress === 1.0 && this.mergedOptions.line.showPoints) {
-					this.drawDataPoint(ctx, allOriginalPoints[0].x, allOriginalPoints[0].y, lineColor, originalGroupIndex, 0 );
+					this.drawDataPoint(ctx, allOriginalPoints[0].x, allOriginalPoints[0].y, lineColor, originalGroupIndex, 0);
 				}
 				return;
 			}
-			
+
 			const animatedSegmentCount = totalSegments * animationProgress;
 			const numFullSegments = Math.floor(animatedSegmentCount);
 			const partialSegmentFraction = animatedSegmentCount - numFullSegments;
@@ -426,33 +428,29 @@ export class LineService {
 				const interpolatedY = startPt.y + (endPt.y - startPt.y) * partialSegmentFraction;
 				pointsToDrawThisFrame.push({ x: interpolatedX, y: interpolatedY, data: endPt.data });
 			}
-			
-			if (pointsToDrawThisFrame.length < 2 && !(pointsToDrawThisFrame.length === 1 && totalSegments === 0) ) {
-			} else if (pointsToDrawThisFrame.length >=1 ) { 
-		ctx.beginPath();
+
+			if (pointsToDrawThisFrame.length < 2 && !(pointsToDrawThisFrame.length === 1 && totalSegments === 0)) {
+			} else if (pointsToDrawThisFrame.length >= 1) {
+				ctx.beginPath();
 				ctx.moveTo(pointsToDrawThisFrame[0].x, pointsToDrawThisFrame[0].y);
 				if (this.mergedOptions.line.smoothLine && pointsToDrawThisFrame.length > 1) {
 					for (let i = 0; i < pointsToDrawThisFrame.length - 1; i++) {
-						if (pointsToDrawThisFrame[i+1]) {
-							const xc = (pointsToDrawThisFrame[i].x + pointsToDrawThisFrame[i + 1].x) / 2;
-							const yc = (pointsToDrawThisFrame[i].y + pointsToDrawThisFrame[i + 1].y) / 2;
-							if (i === 0 && pointsToDrawThisFrame.length === 2 && partialSegmentFraction > 0 && partialSegmentFraction < 1 && numFullSegments === 0) {
-								ctx.lineTo(pointsToDrawThisFrame[i+1].x, pointsToDrawThisFrame[i+1].y);
-							} else {
-								ctx.quadraticCurveTo(pointsToDrawThisFrame[i].x, pointsToDrawThisFrame[i].y, xc, yc); 
-							}
-						}
-					}
-					if (pointsToDrawThisFrame.length > 1 && !(partialSegmentFraction > 0 && numFullSegments < totalSegments && pointsToDrawThisFrame[pointsToDrawThisFrame.length-1] !== allOriginalPoints[numFullSegments+1])) {
-						ctx.lineTo(pointsToDrawThisFrame[pointsToDrawThisFrame.length-1].x, pointsToDrawThisFrame[pointsToDrawThisFrame.length-1].y);
+						const p0 = (i === 0) ? pointsToDrawThisFrame[i] : pointsToDrawThisFrame[i - 1];
+						const p1 = pointsToDrawThisFrame[i];
+						const p2 = pointsToDrawThisFrame[i + 1];
+						const p3 = (i === pointsToDrawThisFrame.length - 2) ? pointsToDrawThisFrame[i + 1] : pointsToDrawThisFrame[i + 2];
+						const cp1x = p1.x + (p2.x - p0.x) / 6;
+						const cp1y = p1.y + (p2.y - p0.y) / 6;
+						const cp2x = p2.x - (p3.x - p1.x) / 6;
+						const cp2y = p2.y - (p3.y - p1.y) / 6;
+						ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
 					}
 				} else {
 					for (let i = 1; i < pointsToDrawThisFrame.length; i++) {
 						ctx.lineTo(pointsToDrawThisFrame[i].x, pointsToDrawThisFrame[i].y);
 					}
 				}
-		ctx.stroke();
-
+				ctx.stroke();
 				if (this.mergedOptions.line.areaFill && pointsToDrawThisFrame.length > 1) {
 					const fillStyle = this.mergedOptions.line.areaFillColor || lineColor;
 					ctx.fillStyle = this.chartService.colorWithOpacity(fillStyle, this.mergedOptions.line.areaFillOpacity!);
@@ -461,18 +459,15 @@ export class LineService {
 					ctx.lineTo(pointsToDrawThisFrame[0].x, pointsToDrawThisFrame[0].y);
 					if (this.mergedOptions.line.smoothLine) {
 						for (let i = 0; i < pointsToDrawThisFrame.length - 1; i++) {
-							if(pointsToDrawThisFrame[i+1]){
-								const xc = (pointsToDrawThisFrame[i].x + pointsToDrawThisFrame[i + 1].x) / 2;
-								const yc = (pointsToDrawThisFrame[i].y + pointsToDrawThisFrame[i + 1].y) / 2;
-								 if (i === 0 && pointsToDrawThisFrame.length === 2 && partialSegmentFraction > 0 && partialSegmentFraction < 1 && numFullSegments === 0) {
-									ctx.lineTo(pointsToDrawThisFrame[i+1].x, pointsToDrawThisFrame[i+1].y);
-								} else {
-									ctx.quadraticCurveTo(pointsToDrawThisFrame[i].x, pointsToDrawThisFrame[i].y, xc, yc);
-								}
-							}
-						}
-						if (pointsToDrawThisFrame.length > 1 && !(partialSegmentFraction > 0 && numFullSegments < totalSegments && pointsToDrawThisFrame[pointsToDrawThisFrame.length-1] !== allOriginalPoints[numFullSegments+1])) {
-							ctx.lineTo(pointsToDrawThisFrame[pointsToDrawThisFrame.length-1].x, pointsToDrawThisFrame[pointsToDrawThisFrame.length-1].y);
+							const p0 = (i === 0) ? pointsToDrawThisFrame[i] : pointsToDrawThisFrame[i - 1];
+							const p1 = pointsToDrawThisFrame[i];
+							const p2 = pointsToDrawThisFrame[i + 1];
+							const p3 = (i === pointsToDrawThisFrame.length - 2) ? pointsToDrawThisFrame[i + 1] : pointsToDrawThisFrame[i + 2];
+							const cp1x = p1.x + (p2.x - p0.x) / 6;
+							const cp1y = p1.y + (p2.y - p0.y) / 6;
+							const cp2x = p2.x - (p3.x - p1.x) / 6;
+							const cp2y = p2.y - (p3.y - p1.y) / 6;
+							ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
 						}
 					} else {
 						for (let i = 1; i < pointsToDrawThisFrame.length; i++) {
@@ -484,12 +479,12 @@ export class LineService {
 					ctx.fill();
 				}
 			}
-			
+
 			if (this.mergedOptions.line.showPoints) {
 				for (let i = 0; i <= numFullSegments; i++) {
-					if(allOriginalPoints[i]) { 
+					if (allOriginalPoints[i]) {
 						const originalDataIndex = group.children.findIndex(child => child === allOriginalPoints[i].data);
-						this.drawDataPoint(ctx, allOriginalPoints[i].x, allOriginalPoints[i].y, lineColor, originalGroupIndex, originalDataIndex !== -1 ? originalDataIndex : i );
+						this.drawDataPoint(ctx, allOriginalPoints[i].x, allOriginalPoints[i].y, lineColor, originalGroupIndex, originalDataIndex !== -1 ? originalDataIndex : i);
 					}
 				}
 			}
@@ -565,7 +560,7 @@ export class LineService {
 		if (typeof value === 'number') return this.chartService.formatNumber(value);
 		return '0';
 	}
-	
+
 	public getLineColor(groupIndex: number): string {
 		const group = this.processedData[groupIndex];
 		if (group?.color) return group.color;
@@ -586,7 +581,7 @@ export class LineService {
 		if (newDisplayHeight !== undefined) this.displayHeight = newDisplayHeight;
 		this.data = data;
 		// Forcing animation on update as requested
-		this.drawChart(false); 
+		this.drawChart(false);
 	}
 
 	public destroy(): void {
@@ -638,9 +633,9 @@ export class LineService {
 			this.ngZone.run(() => {
 				this.mergedOptions.onClick!({
 					item: clickedItem,
-					index: dataIndex, 
+					index: dataIndex,
 					groupIndex: groupIndex,
-					data: this.processedData, 
+					data: this.processedData,
 					options: this.mergedOptions,
 					event: event,
 					position: { x: point.x, y: point.y, width: 0, height: 0 }
@@ -651,8 +646,8 @@ export class LineService {
 
 	public hideAllTooltipsAndRedraw(): void {
 		const needsRedraw = this.hoveredPointInfo.groupIndex !== -1 || this.hoveredPointInfo.dataIndex !== -1;
-		this.setHoveredPointInfo(-1,-1);
-		if(needsRedraw) {
+		this.setHoveredPointInfo(-1, -1);
+		if (needsRedraw) {
 			this.drawChartFrame(1.0);
 		}
 	}

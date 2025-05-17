@@ -1482,6 +1482,337 @@ export class ChartDemoComponent {
     chartType: 'bar',
     title: '多系列柱状图'
   };
+
+  // 折线图数据
+  // basicData 已经存在，可用于单系列折线图
+  // multiSeriesData 已经存在，可用于多系列折线图
+
+  // 折线图配置选项
+  // basicLineOptions 已经存在
+
+  multiSeriesLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '多系列折线图',
+    showLegend: true,
+    colors: ['#4285F4', '#DB4437', '#F4B400'], // 示例颜色
+    line: {
+      lineWidth: 2,
+      pointSize: 6,
+    }
+  };
+
+  customColorLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '自定义颜色折线图',
+    colors: ['#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#00BCD4'],
+    line: {
+      lineWidth: 3,
+      pointStyle: 'square',
+    }
+  };
+
+  titleLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '带标题的折线图',
+    line: {}
+  };
+
+  noAnimateLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '无动画折线图',
+    animate: false,
+    line: {}
+  };
+
+  hoverLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '悬停效果折线图',
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true
+    },
+    line: {
+      pointSize: 8,
+    }
+  };
+
+  clickedLineItem: any = null;
+  clickLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '点击事件折线图',
+    onClick: (info: any) => {
+      this.clickedLineItem = info;
+      console.log('点击了折线图数据点:', info);
+    },
+    line: {
+      pointSize: 7,
+    }
+  };
+
+  smoothLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '平滑曲线折线图',
+    line: {
+      smoothLine: true,
+      lineWidth: 3,
+    }
+  };
+
+  areaFillLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '区域填充折线图',
+    line: {
+      areaFill: true,
+      areaFillOpacity: 0.3,
+      pointSize: 0, // 通常区域图不突出显示点
+      lineWidth: 2,
+    }
+  };
+  
+  multiSeriesAreaFillLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '多系列区域填充',
+    showLegend: true,
+    colors: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(255, 205, 86, 0.7)'],
+    line: {
+      areaFill: true,
+      areaFillOpacity: 0.3, // 将被颜色中的 alpha 覆盖或结合
+      lineWidth: 1,
+      pointSize: 4,
+      smoothLine: false,
+    }
+  };
+
+  customPointLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '自定义数据点样式',
+    line: {
+      showPoints: true,
+      pointStyle: 'triangle', // 'circle', 'square', 'triangle'
+      pointSize: 10,
+      pointColor: '#FF6384',
+      pointBorderColor: '#36A2EB',
+      pointBorderWidth: 2,
+      lineWidth: 2,
+    }
+  };
+
+  // 折线图代码片段字符串
+  basicLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="basicLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [
+    { name: '一月', data: 35 }, { name: '二月', data: 52 }, // ... 更多数据
+  ];
+  basicLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '基本折线图'
+  };
+}`;
+
+  multiSeriesLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="multiSeriesData" [options]="multiSeriesLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  multiSeriesData: ChartData[] = [
+    { name: '系列A', children: [{ name: 'Q1', data: 10 }, { name: 'Q2', data: 20 }] },
+    { name: '系列B', children: [{ name: 'Q1', data: 15 }, { name: 'Q2', data: 25 }] }
+  ];
+  multiSeriesLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '多系列折线图',
+    showLegend: true,
+    line: { lineWidth: 2, pointSize: 6 }
+  };
+}`;
+
+  customColorLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="customColorLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  customColorLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '自定义颜色折线图',
+    colors: ['#E91E63', '#9C27B0', '#673AB7'],
+    line: { lineWidth: 3, pointStyle: 'square' }
+  };
+}`;
+
+  titleLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="titleLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  titleLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '带标题的折线图'
+  };
+}`;
+
+  noAnimateLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="noAnimateLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  noAnimateLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '无动画折线图',
+    animate: false
+  };
+}`;
+
+  hoverLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="hoverLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  hoverLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '悬停效果折线图',
+    hoverEffect: { enabled: true, showTooltip: true },
+    line: { pointSize: 8 }
+  };
+}`;
+
+  clickLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`
+    <lib-chart [data]="basicData" [options]="clickLineOptions"></lib-chart>
+    <div *ngIf="clickedLineItem">Clicked: {{ clickedLineItem | json }}</div>
+  \`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  clickedLineItem: any = null;
+  clickLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '点击事件折线图',
+    onClick: (info: any) => { this.clickedLineItem = info; console.log(info); },
+    line: { pointSize: 7 }
+  };
+}`;
+
+  smoothLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="smoothLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  smoothLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '平滑曲线折线图',
+    line: { smoothLine: true, lineWidth: 3 }
+  };
+}`;
+
+  areaFillLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="areaFillLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  areaFillLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '区域填充折线图',
+    line: { areaFill: true, areaFillOpacity: 0.3, pointSize: 0, lineWidth: 2 }
+  };
+}`;
+
+  multiSeriesAreaFillLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="multiSeriesData" [options]="multiSeriesAreaFillLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  multiSeriesData: ChartData[] = [
+    { name: '系列A', color: 'rgba(75, 192, 192, 0.7)', children: [{ name: 'Q1', data: 10 }, { name: 'Q2', data: 20 }] },
+    { name: '系列B', color: 'rgba(255, 99, 132, 0.7)', children: [{ name: 'Q1', data: 15 }, { name: 'Q2', data: 25 }] }
+  ];
+  multiSeriesAreaFillLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '多系列区域填充',
+    showLegend: true,
+    // colors can be defined here or in data for each series
+    line: {
+      areaFill: true,
+      areaFillOpacity: 0.3, // May be overridden by color alpha
+      lineWidth: 1,
+      pointSize: 4,
+    }
+  };
+}`;
+
+  customPointLineChartCode = `
+import { Component } from '@angular/core';
+import { ChartData, ChartOptions } from '@project';
+
+@Component({
+  selector: 'app-line-chart-demo',
+  template: \`<lib-chart [data]="basicData" [options]="customPointLineOptions"></lib-chart>\`
+})
+export class LineChartDemoComponent {
+  basicData: ChartData[] = [ /* ... */ ];
+  customPointLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '自定义数据点样式',
+    line: {
+      showPoints: true,
+      pointStyle: 'triangle', // 'circle', 'square', 'triangle'
+      pointSize: 10,
+      pointColor: '#FF6384',
+      pointBorderColor: '#36A2EB',
+      pointBorderWidth: 2,
+      lineWidth: 2
+    }
+  };
+}`;
 }
 
 

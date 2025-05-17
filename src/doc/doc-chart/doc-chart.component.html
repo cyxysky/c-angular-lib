@@ -15,8 +15,8 @@
       <lib-chart [data]="basicData" [options]="basicLineOptions"></lib-chart>
     </div>
     <div description>
-      <p>最基本的折线图用法，展示一组数据的比较。</p>
-      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>value</code>，并将 <code>chartType</code> 设置为 <code>'bar'</code>。</p>
+      <p>最基本的折线图用法，展示一组数据的趋势。</p>
+      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>data</code>，并将 <code>chartType</code> 设置为 <code>'line'</code>。</p>
     </div>
   </app-doc-box>
 
@@ -218,6 +218,117 @@
       <p>通过模板可以自定义显示内容和样式，增强用户体验。</p>
     </div>
   </app-doc-box>
+</div>
+
+<!-- 折线图示例部分 -->
+<h2>折线图示例</h2>
+<div class="chart-docs-grid">
+  <!-- 多系列折线图 -->
+  <app-doc-box title="多系列折线图" [sourceCode]="multiSeriesLineChartCode">
+    <div demo>
+      <lib-chart [data]="multiSeriesData" [options]="multiSeriesLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>多系列折线图可展示多组数据的趋势对比。</p>
+      <p>点击图例可以切换显示/隐藏对应的数据系列。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 自定义颜色折线图 -->
+  <app-doc-box title="自定义颜色折线图" [sourceCode]="customColorLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="customColorLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>options</code> 中的 <code>colors</code> 数组为折线图指定一系列颜色。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 带标题的折线图 -->
+  <app-doc-box title="带标题的折线图" [sourceCode]="titleLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="titleLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>options</code> 中的 <code>title</code> 为折线图添加标题。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 无动画折线图 -->
+  <app-doc-box title="无动画折线图" [sourceCode]="noAnimateLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="noAnimateLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过设置 <code>animate: false</code> 禁用折线图的动画效果。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 悬停效果折线图 -->
+  <app-doc-box title="悬停效果折线图" [sourceCode]="hoverLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="hoverLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>hoverEffect</code> 配置启用悬停效果，如显示工具提示。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 点击事件折线图 -->
+  <app-doc-box title="点击事件折线图" [sourceCode]="clickLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="clickLineOptions"></lib-chart>
+      <div *ngIf="clickedLineItem" class="click-result">
+        <div class="click-result-title">点击结果：</div>
+        <pre>{{ clickedLineItem | json }}</pre>
+      </div>
+    </div>
+    <div description>
+      <p>通过 <code>onClick</code> 回调响应数据点的点击事件。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 平滑曲线折线图 -->
+  <app-doc-box title="平滑曲线折线图" [sourceCode]="smoothLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="smoothLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>line.smoothLine: true</code> 将折线渲染为平滑曲线。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 区域填充折线图 -->
+  <app-doc-box title="区域填充折线图" [sourceCode]="areaFillLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="areaFillLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>line.areaFill: true</code> 启用折线下方的区域填充。</p>
+      <p>可使用 <code>line.areaFillColor</code> 和 <code>line.areaFillOpacity</code> 自定义填充样式。</p>
+    </div>
+  </app-doc-box>
+
+  <!-- 多系列区域填充折线图 -->
+  <app-doc-box title="多系列区域填充" [sourceCode]="multiSeriesAreaFillLineChartCode">
+    <div demo>
+      <lib-chart [data]="multiSeriesData" [options]="multiSeriesAreaFillLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>多系列数据同样支持区域填充，每个系列可以有独立的填充色（通过数据项的 <code>color</code> 属性或全局 <code>colors</code> 数组并结合透明度）。</p>
+    </div>
+  </app-doc-box>
+  
+  <!-- 自定义数据点样式 -->
+  <app-doc-box title="自定义数据点样式" [sourceCode]="customPointLineChartCode">
+    <div demo>
+      <lib-chart [data]="basicData" [options]="customPointLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>通过 <code>line.pointStyle</code>, <code>line.pointSize</code>, <code>line.pointColor</code>, <code>line.pointBorderColor</code>, <code>line.pointBorderWidth</code> 等选项自定义数据点的外观。</p>
+    </div>
+  </app-doc-box>
+
 </div>
 
 <!-- 饼图示例部分 -->
