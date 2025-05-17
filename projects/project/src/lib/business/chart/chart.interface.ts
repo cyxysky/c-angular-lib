@@ -39,9 +39,9 @@ export interface LineSpecificOptions {
     bottom: number;
     left: number;
   };
-  /** 是否在柱状图顶部显示数值 */
+  /** 是否在折线图顶部显示数值 (通常指数据点上的标签) */
   showValues?: boolean;
-  /** 是否显示辅助线 */
+  /** 是否显示辅助线 (通常指Y轴网格线) */
   showGuideLine?: boolean;
   /** 辅助线样式 */
   guideLineStyle?: 'solid' | 'dashed';
@@ -49,6 +49,36 @@ export interface LineSpecificOptions {
   guideLineColor?: string;
   /** 辅助线宽度 */
   guideLineWidth?: number;
+  /** 线条宽度 */
+  lineWidth?: number;
+  /** 线条样式 */
+  lineStyle?: 'solid' | 'dashed';
+  /** 是否显示数据点 */
+  showPoints?: boolean;
+  /** 数据点样式 */
+  pointStyle?: 'circle' | 'square' | 'triangle';
+  /** 数据点大小 */
+  pointSize?: number;
+  /** 数据点颜色 (如果未指定，通常跟随线条颜色) */
+  pointColor?: string;
+  /** 数据点边框颜色 */
+  pointBorderColor?: string;
+  /** 数据点边框宽度 */
+  pointBorderWidth?: number;
+  /** 是否平滑曲线 (例如使用贝塞尔曲线) */
+  smoothLine?: boolean;
+  /** 是否填充线下区域 */
+  areaFill?: boolean;
+  /** 填充区域颜色 (如果未指定，通常基于线条颜色并带有透明度) */
+  areaFillColor?: string;
+  /** 填充区域透明度 */
+  areaFillOpacity?: number;
+  /** X轴标签旋转角度 */
+  xAxisLabelRotation?: number;
+  /** 是否显示X轴刻度线 */
+  showXAxisTicks?: boolean;
+  /** 是否显示Y轴刻度线 */
+  showYAxisTicks?: boolean;
 }
 
 /** 柱状图特有配置 */

@@ -9,6 +9,19 @@
 
 <div class="chart-docs-grid">
   <!-- 基本用法 -->
+  <app-doc-box title="基本折线图" [sourceCode]="basicChartCode">
+    <div demo>
+      <lib-button (click)="refreshData()">刷新数据</lib-button>
+      <lib-chart [data]="basicData" [options]="basicLineOptions"></lib-chart>
+    </div>
+    <div description>
+      <p>最基本的折线图用法，展示一组数据的比较。</p>
+      <p>只需提供 <code>data</code> 数组，每个数据项包含 <code>name</code> 和 <code>value</code>，并将 <code>chartType</code> 设置为 <code>'bar'</code>。</p>
+    </div>
+  </app-doc-box>
+
+
+  <!-- 基本用法 -->
   <app-doc-box title="基本柱状图" [sourceCode]="basicChartCode">
     <div demo>
       <lib-button (click)="refreshData()">刷新数据</lib-button>

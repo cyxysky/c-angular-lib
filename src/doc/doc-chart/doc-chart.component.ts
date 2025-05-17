@@ -1473,6 +1473,11 @@ export class ChartDemoComponent {
     title: '基本柱状图'
   };
 
+  basicLineOptions: ChartOptions = {
+    chartType: 'line',
+    title: '基本折线图'
+  };
+
   multiSeriesBarOptions: ChartOptions = {
     chartType: 'bar',
     title: '多系列柱状图'

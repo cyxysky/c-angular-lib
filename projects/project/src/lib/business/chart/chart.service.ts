@@ -180,6 +180,58 @@ export class ChartService {
     ctx.fillText(title, margin.left + chartAreaWidth / 2, margin.top / 2);
   }
 
-
-
+  /**
+   * Converts a color string (hex, rgb) to rgba with specified opacity.
+   * @param color The input color string (e.g., '#FF0000', 'rgb(255,0,0)').
+   * @param opacity The desired opacity (0 to 1).
+   * @returns The color string in rgba format.
+   */
+  public colorWithOpacity(color: string, opacity: number): string {
+    if (color.startsWith('rgba')) {
+      // If already rgba, just replace the opacity part
+      return color.replace(/[^,]+(?=\))/, opacity.toString());
+    }
+    if (color.startsWith('rgb')) {
+      // If rgb, convert to rgba
+      return color.replace('rgb', 'rgba').replace(')', `,${opacity})`);
+    }
+    if (color.startsWith('#')) {
+      let r = 0, g = 0, b = 0;
+      if (color.length === 4) { // #RGB format
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+      } else if (color.length === 7) { // #RRGGBB format
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+      }
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    // Fallback for named colors or other formats (less accurate without a full parsing library)
+    console.warn('Unsupported color format for direct opacity adjustment, returning color as is with attempted rgba conversion for common cases or if parsing fails:', color);
+    // Attempt to draw the color to a temporary canvas to get its RGBA value (browser environment only)
+    try {
+      const tempCtx = document.createElement('canvas').getContext('2d');
+      if (tempCtx) {
+        tempCtx.fillStyle = color;
+        const parsedColor = tempCtx.fillStyle; // Browser converts to a standard format, often rgb or rgba hex
+        //This is a bit of a hack, if it's a hex (e.g. #RRGGBB) returned by browser, re-evaluate
+        if (parsedColor.startsWith('#')) { // if browser returned hex, re-call to convert that hex
+            let r = 0, g = 0, b = 0;
+            if (parsedColor.length === 7){
+                r = parseInt(parsedColor.slice(1,3), 16);
+                g = parseInt(parsedColor.slice(3,5), 16);
+                b = parseInt(parsedColor.slice(5,7), 16);
+                 return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+            }
+        } else if (parsedColor.startsWith('rgb(')) { //e.g. rgb(r, g, b)
+             return parsedColor.replace('rgb', 'rgba').replace(')', `,${opacity})`);
+        } else if (parsedColor.startsWith('rgba(')) { // already rgba
+            return parsedColor.replace(/[^,]+(?=\))/, opacity.toString());
+        }
+      }
+    } catch (e) { /* Fall through if canvas trick fails (e.g. non-browser env) */ }
+    return `rgba(0, 0, 0, ${opacity})`; // Ultimate fallback to black with opacity
+  }
 }

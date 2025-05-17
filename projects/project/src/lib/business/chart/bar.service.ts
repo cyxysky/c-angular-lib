@@ -21,20 +21,20 @@ export class BarService {
     animate: true,
 
     legend: { position: 'top', align: 'center' },
-    hoverEffect: { 
-      enabled: true, 
-      showTooltip: true, 
-      tooltipHoverable: false 
+    hoverEffect: {
+      enabled: true,
+      showTooltip: true,
+      tooltipHoverable: false
     },
     bar: {
       borderRadius: 4,
       showValues: true,
       showGrid: true,
       margin: { top: 40, right: 20, bottom: 50, left: 50 },
-      showGuideLine: true, 
-      guideLineStyle: 'dashed', 
-      guideLineColor: '#666', 
-      guideLineWidth: 1, 
+      showGuideLine: true,
+      guideLineStyle: 'dashed',
+      guideLineColor: '#666',
+      guideLineWidth: 1,
     }
   };
   private animationFrameId: number | null = null;
@@ -293,7 +293,7 @@ export class BarService {
             ctx.font = DEFAULT_LABEL_FONT;
             ctx.textBaseline = 'alphabetic'; // Or 'middle' depending on desired alignment inside
             // Position text inside the bar, near the top, adjusted by approximateTextHeight
-            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2); 
+            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2);
           }
         }
       });
@@ -696,32 +696,16 @@ export class BarService {
     if (groupIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
     const groupNames = this.getGroupNames();
     if (groupIndex >= groupNames.length) return this.getGroupColor(groupIndex);
-
     const groupName = groupNames[groupIndex];
     const categories = this.getCategories(this.getVisibleData());
     if (dataIndex >= categories.length) return this.getGroupColor(groupIndex);
     const categoryName = categories[dataIndex];
-
     const groupItem = this.processedData.find(item => item.name === groupName && item.children);
     if (groupItem && groupItem.children) {
       const childItem = groupItem.children.find(child => child.name === categoryName);
       if (childItem && childItem.color) return childItem.color;
-    } else if (!this.processedData.some(it => it.children && it.children.length > 0)) {
-      // Flat data structure
-      const flatItem = this.processedData.find(it => it.name === categoryName);
-      if (flatItem && flatItem.color) return flatItem.color;
     }
-
     return this.getGroupColor(groupIndex);
-  }
-
-  /**
-   * 获取当前悬浮柱子的颜色
-   * @returns 颜色字符串，如果没有悬浮则为空字符串
-   */
-  public getHoveredBarColor(): string {
-    if (this.hoveredBarIndex < 0 || this.hoveredGroupIndex < 0) return '';
-    return this.getDataColor(this.hoveredGroupIndex, this.hoveredBarIndex);
   }
 
   /**
@@ -778,6 +762,10 @@ export class BarService {
     this.animationFrameId = null;
   }
 
+  /**
+   * 获取图表的边距
+   * @returns 图表的边距
+   */
   public getMargin(): any {
     return this.mergedOptions?.bar?.margin! || { top: 40, right: 20, bottom: 50, left: 50 };
   }
