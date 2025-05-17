@@ -128,7 +128,6 @@ export interface PieSpecificOptions {
   sliceHoverEffect?: {
     shadowColor?: string;
     shadowBlur?: number;
-    // expandRadius 已经在 hoverEffect.expandRadius 中定义
   };
   /** 是否展开扇区 */
   expandSlice?: boolean;
