@@ -81,16 +81,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.destroyComponentSubscriptions();
       this.removeCanvasEventListeners();
       const previousChartType = changes['options']?.previousValue?.chartType;
-      switch (previousChartType) {
-        case 'bar':
-          this.barService.destroy();
-          break;
-        case 'pie':
-          this.pieService.destroy();
-          break;
-        case 'line':
-          this.lineService.destroy();
-          break;
+      const previousService = this.getChartServiceByType(previousChartType);
+      if (previousService && typeof previousService.destroy === 'function') {
+        previousService.destroy();
       }
       this.initializeChart(false);
     } else if ((changes['data'] || (changes['options'] && !reinitialize)) && this.isCanvasReady()) {
@@ -105,16 +98,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     }
     this.destroyComponentSubscriptions();
     this.removeCanvasEventListeners();
-    switch (this.options?.chartType) {
-      case 'bar':
-        this.barService.destroy();
-        break;
-      case 'pie':
-        this.pieService.destroy();
-        break;
-      case 'line':
-        this.lineService.destroy();
-        break;
+    const activeService = this.getActiveChartService();
+    if (activeService && typeof activeService.destroy === 'function') {
+      activeService.destroy();
     }
   }
 
@@ -132,28 +118,43 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.isTooltipDisplayed = update.isVisible;
       this.tooltipData = (this.isTooltipDisplayed && update.data) ? update.data : undefined;
       this.tooltipBorderColor = (this.isTooltipDisplayed && update.borderColor) ? update.borderColor : undefined;
+
       if (this.isTooltipDisplayed && update.position) {
-        const mouseXRelativeToContainer = update.position.x;
-        const mouseYRelativeToContainer = update.position.y;
         const tooltipEl = this.chartTooltipElementRef.nativeElement;
         const containerEl = this.containerRef.nativeElement;
-        const tooltipRect = tooltipEl.getBoundingClientRect();
-        const tooltipWidth = tooltipRect.width;
-        let targetLeft = mouseXRelativeToContainer + 0;
-        let targetTop = mouseYRelativeToContainer;
-        const containerClientWidth = containerEl.clientWidth;
-        if (targetLeft + tooltipWidth > containerClientWidth) {
-          targetLeft = (mouseXRelativeToContainer + 5) - tooltipWidth;
-        }
-        if (targetLeft < 0) {
-          targetLeft = 0;
-        }
-        this.tooltipStylePosition = { left: `${targetLeft}px`, top: `${targetTop}px` };
+        this.tooltipStylePosition = this.calculateTooltipPosition(update.position, tooltipEl, containerEl);
       }
+
       if (this.cdr) {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private calculateTooltipPosition(
+    mousePositionInContainer: { x: number; y: number },
+    tooltipEl: HTMLElement,
+    containerEl: HTMLElement
+  ): { left: string; top: string } {
+    const tooltipRect = tooltipEl.getBoundingClientRect();
+    const tooltipWidth = tooltipRect.width;
+    // 使用传入的鼠标位置（相对于容器）
+    let targetLeft = mousePositionInContainer.x; // x 偏移可以根据需要调整，例如 + 10
+    let targetTop = mousePositionInContainer.y;  // y 偏移也可以调整
+
+    const containerClientWidth = containerEl.clientWidth;
+
+    // 如果tooltip超出容器右边界，则调整位置到鼠标左侧
+    if (targetLeft + tooltipWidth > containerClientWidth) {
+      targetLeft = (mousePositionInContainer.x - 5) - tooltipWidth; // 5是鼠标与tooltip的间隙
+    }
+
+    // 确保tooltip不会超出容器左边界
+    if (targetLeft < 0) {
+      targetLeft = 0;
+    }
+    // 未来可以添加对上下边界的检查和调整
+    return { left: `${targetLeft}px`, top: `${targetTop}px` };
   }
 
   private validateOptions(): void {
@@ -263,11 +264,15 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const logicalCanvasX = cssMouseX_onCanvas * scaleX;
     const logicalCanvasY = cssMouseY_onCanvas * scaleY;
 
-    if (this.options.chartType === 'bar') {
+    const activeService = this.getActiveChartService();
+    if (!activeService) return;
+
+    const chartType = this.options.chartType;
+    if (chartType === 'bar') {
       this.handleBarMouseMove(logicalCanvasX, logicalCanvasY, mouseX_forTooltip, mouseY_forTooltip, event);
-    } else if (this.options.chartType === 'pie') {
+    } else if (chartType === 'pie') {
       this.handlePieMouseMove(logicalCanvasX, logicalCanvasY, mouseX_forTooltip, mouseY_forTooltip, event);
-    } else if (this.options.chartType === 'line') {
+    } else if (chartType === 'line') {
       this.handleLineMouseMove(logicalCanvasX, logicalCanvasY, mouseX_forTooltip, mouseY_forTooltip, event);
     }
   }
@@ -421,11 +426,16 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       return;
     }
     const isTrulyLeavingCanvas = !relatedTarget || (relatedTarget !== this.canvasRef.nativeElement && !this.canvasRef.nativeElement.contains(relatedTarget));
-    if (this.options.chartType === 'bar') {
+    
+    const activeService = this.getActiveChartService();
+    if (!activeService) return;
+
+    const chartType = this.options.chartType;
+    if (chartType === 'bar') {
       this.handleBarMouseOut(isTrulyLeavingCanvas, event);
-    } else if (this.options.chartType === 'pie') {
+    } else if (chartType === 'pie') {
       this.handlePieMouseOut(isTrulyLeavingCanvas, event);
-    } else if (this.options.chartType === 'line') {
+    } else if (chartType === 'line') {
       this.handleLineMouseOut(isTrulyLeavingCanvas, event);
     }
   }
@@ -448,11 +458,8 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.tooltipUpdateSubject.next({ isVisible: false });
     } else {
       if (!this.options.hoverEffect?.tooltipHoverable) {
-        const canvas = this.canvasRef.nativeElement;
-        const rect = canvas.getBoundingClientRect();
-        const canvasX = (event.clientX - rect.left) * (canvas.width / this.componentDevicePixelRatio / rect.width);
-        const canvasY = (event.clientY - rect.top) * (canvas.height / this.componentDevicePixelRatio / rect.height);
-        const hoveredBarInfo = this.barService.findHoveredBar(canvasX, canvasY);
+        const { logicalCanvasX, logicalCanvasY } = this.getCanvasXYConfig(event);
+        const hoveredBarInfo = this.barService.findHoveredBar(logicalCanvasX, logicalCanvasY);
         if (hoveredBarInfo.dataIndex === -1 && hoveredBarInfo.groupIndex === -1 && this.isTooltipDisplayed) {
           this.tooltipUpdateSubject.next({ isVisible: false });
         }
@@ -521,12 +528,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
   private onCanvasClick(event: MouseEvent): void {
     if (!this.canvasRef || !this.canvasRef.nativeElement) return;
     const { logicalCanvasX, logicalCanvasY } = this.getCanvasXYConfig(event);
-    if (this.options.chartType === 'bar') {
-      this.barService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
-    } else if (this.options.chartType === 'pie') {
-      this.pieService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
-    } else if (this.options.chartType === 'line') {
-      this.lineService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
+    const activeService = this.getActiveChartService();
+    if (activeService && typeof activeService.processCanvasClick === 'function') {
+      activeService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
     }
   }
 
@@ -556,37 +560,16 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const canvasSetup = this.setupCanvasAndGetContext();
     if (!canvasSetup) return;
     const { ctx, logicalWidth, logicalHeight, devicePixelRatio } = canvasSetup;
-    switch (this.options.chartType) {
-      case 'bar':
-        this.barService.init(
-          ctx,
-          logicalWidth,
-          logicalHeight,
-          this.data,
-          this.options,
-          skipAnimation
-        );
-        break;
-      case 'pie':
-        this.pieService.init(
-          ctx,
-          logicalWidth,
-          logicalHeight,
-          this.data,
-          this.options,
-          skipAnimation
-        );
-        break;
-      case 'line':
-        this.lineService.init(
-          ctx,
-          logicalWidth,
-          logicalHeight,
-          this.data,
-          this.options,
-          skipAnimation
-        );
-        break;
+    const activeService = this.getActiveChartService();
+    if (activeService && typeof activeService.init === 'function') {
+      activeService.init(
+        ctx,
+        logicalWidth,
+        logicalHeight,
+        this.data,
+        this.options,
+        skipAnimation
+      );
     }
     this.setupCanvasEventListeners();
     this.initializeChartDependentSubscriptions();
@@ -599,16 +582,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   private updateChart(): void {
     if (!this.options || !this.isCanvasReady()) return;
-    switch (this.options.chartType) {
-      case 'bar':
-        this.barService.update(this.data, this.options, this.componentCanvasLogicalWidth, this.componentCanvasLogicalHeight);
-        break;
-      case 'pie':
-        this.pieService.update(this.data, this.options, this.componentCanvasLogicalWidth, this.componentCanvasLogicalHeight);
-        break;
-      case 'line':
-        this.lineService.update(this.data, this.options, this.componentCanvasLogicalWidth, this.componentCanvasLogicalHeight);
-        break;
+    const activeService = this.getActiveChartService();
+    if (activeService && typeof activeService.update === 'function') {
+      activeService.update(this.data, this.options, this.componentCanvasLogicalWidth, this.componentCanvasLogicalHeight);
     }
     this.updateLegendItems();
     this.cdr.detectChanges();
@@ -619,16 +595,9 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   private updateLegendItems(): void {
     if (!this.options) return;
-    switch (this.options.chartType) {
-      case 'bar':
-        this.legendItems = this.barService.getLegendItems();
-        break;
-      case 'pie':
-        this.legendItems = this.pieService.getLegendItems();
-        break;
-      case 'line':
-        this.legendItems = this.lineService.getLegendItems();
-        break;
+    const activeService = this.getActiveChartService();
+    if (activeService && typeof activeService.getLegendItems === 'function') {
+      this.legendItems = activeService.getLegendItems();
     }
   }
 
@@ -662,12 +631,16 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   public toggleLegendItem(index: number): void {
     if (!this.options) return;
-    if (this.options.chartType === 'bar') {
-      this.barService.toggleGroupVisibility(index);
-    } else if (this.options.chartType === 'pie') {
-      this.pieService.toggleSliceSelection(index);
-    } else if (this.options.chartType === 'line') {
-      this.lineService.toggleGroupVisibility(index);
+    const activeService = this.getActiveChartService();
+    if (activeService) {
+      const chartType = this.options.chartType;
+      if (chartType === 'bar' && 'toggleGroupVisibility' in activeService) {
+        (activeService as BarService).toggleGroupVisibility(index);
+      } else if (chartType === 'pie' && 'toggleSliceSelection' in activeService) {
+        (activeService as PieService).toggleSliceSelection(index);
+      } else if (chartType === 'line' && 'toggleGroupVisibility' in activeService) {
+        (activeService as LineService).toggleGroupVisibility(index);
+      }
     }
     this.updateLegendItems();
     this.cdr.detectChanges();
@@ -679,13 +652,10 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   public handleCanvasMouseLeave(event: MouseEvent): void {
     if (!this.options) return;
-    let activeService: any = null;
-    switch (this.options.chartType) {
-      case 'bar': activeService = this.barService; break;
-      case 'pie': activeService = this.pieService; break;
-      case 'line': activeService = this.lineService; break;
-    }
+    let activeService = this.getActiveChartService();
+
     if (!activeService || typeof activeService.hideAllTooltipsAndRedraw !== 'function') return;
+
     const tooltipEl = this.chartTooltipElementRef.nativeElement;
     if (tooltipEl.contains(event.relatedTarget as Node) && this.options.hoverEffect?.tooltipHoverable) {
       return;
@@ -709,5 +679,34 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       }
       this.resizeTimeout = null;
     });
+  }
+
+  private getActiveChartService(): BarService | PieService | LineService | undefined {
+    if (!this.options || !this.options.chartType) {
+      return undefined;
+    }
+    switch (this.options.chartType) {
+      case 'bar':
+        return this.barService;
+      case 'pie':
+        return this.pieService;
+      case 'line':
+        return this.lineService;
+      default:
+        return undefined;
+    }
+  }
+
+  private getChartServiceByType(chartType: string): BarService | PieService | LineService | undefined {
+    switch (chartType) {
+      case 'bar':
+        return this.barService;
+      case 'pie':
+        return this.pieService;
+      case 'line':
+        return this.lineService;
+      default:
+        return undefined;
+    }
   }
 }
