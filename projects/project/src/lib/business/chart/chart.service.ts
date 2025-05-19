@@ -257,6 +257,16 @@ export class ChartService {
     return (totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0') + '%';
   }
 
+  /** 
+   * 格式化百分比
+   * @param value 当前值
+   * @param totalValue 总值
+   * @returns 百分比字符串 (例如 "25.0%")
+   */
+  public formatPercentage(value: number | undefined): string {
+    return value !== undefined ? value.toFixed(1) + '%' : '0%';
+  }
+  
   /**
    * 绘制标题
    */

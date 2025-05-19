@@ -293,11 +293,7 @@ export class PieService {
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, animatedEndAngle, item.startAngle, true); // 逆时针绘制内圆弧
         this.ctx.closePath();
       } else { // 非甜甜圈图
-        const angleDiff = animatedEndAngle - item.startAngle;
-        // 使用一个小的容差值来判断是否接近完整的圆
-        const isFullCircle = Math.abs(angleDiff - (Math.PI * 2)) < 1e-6;
-
-        if (isFullCircle) {
+        if (numberOfVisibleSlices === 1) {
           // 如果是完整的圆，只绘制圆弧本身，确保从0到2*PI以避免潜在的微小间隙问题
           this.ctx.arc(this.centerX, this.centerY, this.outerRadius, 0, Math.PI * 2);
           this.ctx.closePath(); // 虽然arc(0, 2PI)本身是闭合的，但显式调用closePath保持路径定义完整
@@ -352,7 +348,6 @@ export class PieService {
    */
   private drawLabels(): void {
     const numberOfVisibleSlices = this.processedData.filter((_, i) => this.sliceVisibility[i]).length;
-
     this.processedData.forEach((item, index) => {
       if (!this.sliceVisibility[index]) return; // 不绘制不可见切片的标签
       const isDonut = this.innerRadius > 0;
@@ -395,7 +390,7 @@ export class PieService {
       let labelText = '';
       // 使用 originalPercentage 进行显示
       if (this.mergedOptions?.pie?.showPercentage && item.originalPercentage !== undefined) {
-        labelText = `${this.formatPercentage(item.originalPercentage)}`;
+        labelText = `${this.chartService.formatPercentage(item.originalPercentage)}`;
       }
       if (this.mergedOptions?.pie?.showLabels && item.data !== undefined) {
         const valueText = this.formatValue(item.data);
@@ -511,7 +506,7 @@ export class PieService {
       }
       this.ngZone.run(() => this.draw()); // 在Angular Zone内重绘
     } finally {
-      setTimeout(() => this._isToggling = false, 50); // 短暂延迟后重置标志
+      this._isToggling = false
     }
   }
 
@@ -526,7 +521,7 @@ export class PieService {
       visible: this.isSliceVisible(i),
       active: this.hoveredIndex === i, // 是否为当前悬浮的切片
       // 使用 originalPercentage 进行显示
-      percentageText: (this.mergedOptions?.pie?.showPercentage && item.originalPercentage !== undefined) ? this.formatPercentage(item.originalPercentage) : undefined,
+      percentageText: (this.mergedOptions?.pie?.showPercentage && item.originalPercentage !== undefined) ? this.chartService.formatPercentage(item.originalPercentage) : undefined,
       numberText: (this.mergedOptions?.pie?.showLabels && item.data !== undefined) ? this.formatValue(item.data) : undefined
     }));
   }
@@ -557,15 +552,6 @@ export class PieService {
   public formatValue(value: number | undefined): string {
     if (typeof value === 'number') return this.chartService.formatNumber(value);
     return '0';
-  }
-
-  /**
-   * 格式化百分比值
-   * @param percentage 百分比数值 (0-100)
-   * @returns 格式化后的百分比字符串 (例如 "25.0")，无效则为 '0'
-   */
-  public formatPercentage(percentage: number | undefined): string {
-    return percentage !== undefined ? percentage.toFixed(1) + '%' : '0%';
   }
 
   /**

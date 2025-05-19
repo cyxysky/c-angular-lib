@@ -51,7 +51,8 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     private pieService: PieService,
     private lineService: LineService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private chartService: ChartService
   ) { }
 
   ngOnInit(): void {
@@ -354,7 +355,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           title: item.name,
           rows: [
             { label: '数值', value: this.pieService.formatValue(item.data) },
-            { label: '占比', value: `${this.pieService.formatPercentage(item.percentage)}` }
+            { label: '占比', value: `${this.chartService.formatPercentage(item.percentage)}` }
           ],
           item: item
         };
@@ -393,7 +394,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         const tooltipPayload = {
           title: `${group.name} - ${item.name}`,
           rows: [
-            { label: '数值', value: this.lineService.formatValue(item.data!) }
+            { label: '数值', value: this.lineService.formatValue(item.data!) },
           ],
           item: item
         };
