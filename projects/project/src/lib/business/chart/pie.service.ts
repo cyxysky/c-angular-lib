@@ -355,11 +355,10 @@ export class PieService {
 
     this.processedData.forEach((item, index) => {
       if (!this.sliceVisibility[index]) return; // 不绘制不可见切片的标签
-
+      const isDonut = this.innerRadius > 0;
       let x: number;
       let y: number;
-
-      if (numberOfVisibleSlices === 1) {
+      if (numberOfVisibleSlices === 1 && !isDonut) {
         // 如果只有一个可见切片（100%），标签位于圆心且不移动
         x = this.centerX;
         y = this.centerY;

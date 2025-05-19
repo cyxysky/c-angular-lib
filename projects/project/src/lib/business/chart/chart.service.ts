@@ -124,11 +124,11 @@ export class ChartService {
               adjustedPercentages[i] = newPercentage;
             }
           } else if (Math.abs(currentSum) < TOLERANCE && numSlices > 0) { // 总和为零，但存在条目
-             const equalPercent = 100.0 / numSlices;
-             for(let i=0; i<numSlices; i++) {
-                 if(Math.abs(adjustedPercentages[i] - equalPercent) > TOLERANCE) modifiedInIteration = true;
-                 adjustedPercentages[i] = equalPercent;
-             }
+            const equalPercent = 100.0 / numSlices;
+            for (let i = 0; i < numSlices; i++) {
+              if (Math.abs(adjustedPercentages[i] - equalPercent) > TOLERANCE) modifiedInIteration = true;
+              adjustedPercentages[i] = equalPercent;
+            }
           }
           if (!modifiedInIteration) {
             break; // 已收敛
@@ -139,9 +139,9 @@ export class ChartService {
     // 最后一步确保总和由于潜在的浮点误差正好是100
     const finalSum = adjustedPercentages.reduce((sum, p) => sum + p, 0);
     if (Math.abs(finalSum - 100.0) > 1e-9 && Math.abs(finalSum) > 1e-9) {
-        for (let i = 0; i < adjustedPercentages.length; i++) {
-            adjustedPercentages[i] = (adjustedPercentages[i] / finalSum) * 100.0;
-        }
+      for (let i = 0; i < adjustedPercentages.length; i++) {
+        adjustedPercentages[i] = (adjustedPercentages[i] / finalSum) * 100.0;
+      }
     }
 
     const resultWithAngles: ChartDataWithAngles[] = [];
@@ -161,18 +161,18 @@ export class ChartService {
     });
     // 由于浮点运算，最后一个切片的endAngle可能不完全是2*PI。如果需要，进行调整。
     if (resultWithAngles.length > 0) {
-        const lastSlice = resultWithAngles[resultWithAngles.length - 1];
-        if (Math.abs(lastSlice.endAngle - Math.PI * 2) > 1e-9 && Math.abs(lastSlice.endAngle) > 1e-9) { // 如果不是已经是2PI
-            // 如果currentAngle与2*PI略有偏差，调整最后一个切片
-            if (Math.abs(currentAngle - Math.PI*2) > 1e-9) {
-                 lastSlice.endAngle = Math.PI * 2;
-            }
+      const lastSlice = resultWithAngles[resultWithAngles.length - 1];
+      if (Math.abs(lastSlice.endAngle - Math.PI * 2) > 1e-9 && Math.abs(lastSlice.endAngle) > 1e-9) { // 如果不是已经是2PI
+        // 如果currentAngle与2*PI略有偏差，调整最后一个切片
+        if (Math.abs(currentAngle - Math.PI * 2) > 1e-9) {
+          lastSlice.endAngle = Math.PI * 2;
         }
-         // 如果只有一个切片且角度略有偏差，确保第一个切片从0开始
-        if (resultWithAngles.length === 1 && Math.abs(resultWithAngles[0].startAngle) > 1e-9) {
-            resultWithAngles[0].endAngle = Math.PI * 2 - resultWithAngles[0].startAngle;
-            resultWithAngles[0].startAngle = 0;
-        }
+      }
+      // 如果只有一个切片且角度略有偏差，确保第一个切片从0开始
+      if (resultWithAngles.length === 1 && Math.abs(resultWithAngles[0].startAngle) > 1e-9) {
+        resultWithAngles[0].endAngle = Math.PI * 2 - resultWithAngles[0].startAngle;
+        resultWithAngles[0].startAngle = 0;
+      }
     }
     return resultWithAngles;
   }
@@ -307,17 +307,17 @@ export class ChartService {
         const parsedColor = tempCtx.fillStyle; // Browser converts to a standard format, often rgb or rgba hex
         //This is a bit of a hack, if it's a hex (e.g. #RRGGBB) returned by browser, re-evaluate
         if (parsedColor.startsWith('#')) { // if browser returned hex, re-call to convert that hex
-            let r = 0, g = 0, b = 0;
-            if (parsedColor.length === 7){
-                r = parseInt(parsedColor.slice(1,3), 16);
-                g = parseInt(parsedColor.slice(3,5), 16);
-                b = parseInt(parsedColor.slice(5,7), 16);
-                 return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-            }
+          let r = 0, g = 0, b = 0;
+          if (parsedColor.length === 7) {
+            r = parseInt(parsedColor.slice(1, 3), 16);
+            g = parseInt(parsedColor.slice(3, 5), 16);
+            b = parseInt(parsedColor.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          }
         } else if (parsedColor.startsWith('rgb(')) { //e.g. rgb(r, g, b)
-             return parsedColor.replace('rgb', 'rgba').replace(')', `,${opacity})`);
+          return parsedColor.replace('rgb', 'rgba').replace(')', `,${opacity})`);
         } else if (parsedColor.startsWith('rgba(')) { // already rgba
-            return parsedColor.replace(/[^,]+(?=\))/, opacity.toString());
+          return parsedColor.replace(/[^,]+(?=\))/, opacity.toString());
         }
       }
     } catch (e) { /* Fall through if canvas trick fails (e.g. non-browser env) */ }
