@@ -92,7 +92,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
           this.lineService.destroy();
           break;
       }
-      this.initializeChart(true);
+      this.initializeChart(false);
     } else if ((changes['data'] || (changes['options'] && !reinitialize)) && this.isCanvasReady()) {
       this.updateChart();
     }
@@ -308,7 +308,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
             const tooltipPayload = {
               title: `${groupName} - ${item.name}`,
               rows: [
-                { label: '数值', value: this.barService.formatValue(item.data) },
+                { label: '数值', value: this.chartService.formatNumber(item.data) },
                 { label: '占比', value: `${this.barService.calculatePercentage(item.data)}` }
               ],
               item: item
@@ -394,7 +394,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
         const tooltipPayload = {
           title: `${group.name} - ${item.name}`,
           rows: [
-            { label: '数值', value: this.lineService.formatValue(item.data!) },
+            { label: '数值', value: this.chartService.formatNumber(item.data!) },
           ],
           item: item
         };
@@ -420,9 +420,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (this.chartTooltipElementRef && this.chartTooltipElementRef.nativeElement.contains(relatedTarget) && this.options.hoverEffect?.tooltipHoverable) {
       return;
     }
-
     const isTrulyLeavingCanvas = !relatedTarget || (relatedTarget !== this.canvasRef.nativeElement && !this.canvasRef.nativeElement.contains(relatedTarget));
-
     if (this.options.chartType === 'bar') {
       this.handleBarMouseOut(isTrulyLeavingCanvas, event);
     } else if (this.options.chartType === 'pie') {
@@ -480,15 +478,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.tooltipUpdateSubject.next({ isVisible: false });
     } else {
       if (!this.options.hoverEffect?.tooltipHoverable) {
-        const canvas = this.canvasRef.nativeElement;
-        const rect = canvas.getBoundingClientRect();
-        const cssMouseX_onCanvas = event.clientX - rect.left;
-        const cssMouseY_onCanvas = event.clientY - rect.top;
-        const scaleX = rect.width === 0 ? 1 : this.componentCanvasLogicalWidth / rect.width;
-        const scaleY = rect.height === 0 ? 1 : this.componentCanvasLogicalHeight / rect.height;
-        const logicalCanvasX = cssMouseX_onCanvas * scaleX;
-        const logicalCanvasY = cssMouseY_onCanvas * scaleY;
-
+        const { logicalCanvasX, logicalCanvasY } = this.getCanvasXYConfig(event);
         const hoveredSliceIndex = this.pieService.findHoveredSlice(logicalCanvasX, logicalCanvasY);
         if (hoveredSliceIndex === -1 && this.isTooltipDisplayed) {
           this.tooltipUpdateSubject.next({ isVisible: false });
@@ -497,6 +487,11 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     }
   }
 
+  /**
+   * 处理折线图鼠标离开画布事件
+   * @param isTrulyLeavingCanvas 是否真正离开画布
+   * @param event 鼠标事件
+   */
   private handleLineMouseOut(isTrulyLeavingCanvas: boolean, event: MouseEvent): void {
     if (isTrulyLeavingCanvas) {
       if (this.lineService.hoveredPointInfo.groupIndex !== -1 || this.lineService.hoveredPointInfo.dataIndex !== -1) {
@@ -510,14 +505,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
       this.tooltipUpdateSubject.next({ isVisible: false });
     } else {
       if (!this.options.hoverEffect?.tooltipHoverable) {
-        const canvas = this.canvasRef.nativeElement;
-        const rect = canvas.getBoundingClientRect();
-        const cssMouseX_onCanvas = event.clientX - rect.left;
-        const cssMouseY_onCanvas = event.clientY - rect.top;
-        const scaleX = rect.width === 0 ? 1 : this.componentCanvasLogicalWidth / rect.width;
-        const scaleY = rect.height === 0 ? 1 : this.componentCanvasLogicalHeight / rect.height;
-        const logicalCanvasX = cssMouseX_onCanvas * scaleX;
-        const logicalCanvasY = cssMouseY_onCanvas * scaleY;
+        const { logicalCanvasX, logicalCanvasY } = this.getCanvasXYConfig(event);
         const { point: hoveredPoint } = this.lineService.findHoveredPoint(logicalCanvasX, logicalCanvasY);
         if (!hoveredPoint && this.isTooltipDisplayed) {
           this.tooltipUpdateSubject.next({ isVisible: false });
@@ -532,6 +520,22 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
    */
   private onCanvasClick(event: MouseEvent): void {
     if (!this.canvasRef || !this.canvasRef.nativeElement) return;
+    const { logicalCanvasX, logicalCanvasY } = this.getCanvasXYConfig(event);
+    if (this.options.chartType === 'bar') {
+      this.barService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
+    } else if (this.options.chartType === 'pie') {
+      this.pieService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
+    } else if (this.options.chartType === 'line') {
+      this.lineService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
+    }
+  }
+
+  /**
+   * 获取画布XY配置
+   * @param event 鼠标事件
+   * @returns 画布XY配置
+   */
+  private getCanvasXYConfig(event: MouseEvent) {
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
     const cssMouseX_onCanvas = event.clientX - rect.left;
@@ -540,14 +544,7 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     const scaleY = rect.height === 0 ? 1 : this.componentCanvasLogicalHeight / rect.height;
     const logicalCanvasX = cssMouseX_onCanvas * scaleX;
     const logicalCanvasY = cssMouseY_onCanvas * scaleY;
-
-    if (this.options.chartType === 'bar') {
-      this.barService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
-    } else if (this.options.chartType === 'pie') {
-      this.pieService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
-    } else if (this.options.chartType === 'line') {
-      this.lineService.processCanvasClick(logicalCanvasX, logicalCanvasY, event);
-    }
+    return { logicalCanvasX, logicalCanvasY };
   }
 
   /**
@@ -684,65 +681,19 @@ export class ChartComponent implements OnInit, OnChanges, AfterViewInit, OnDestr
     if (!this.options) return;
     let activeService: any = null;
     switch (this.options.chartType) {
-        case 'bar': activeService = this.barService; break;
-        case 'pie': activeService = this.pieService; break;
-        case 'line': activeService = this.lineService; break;
+      case 'bar': activeService = this.barService; break;
+      case 'pie': activeService = this.pieService; break;
+      case 'line': activeService = this.lineService; break;
     }
-
     if (!activeService || typeof activeService.hideAllTooltipsAndRedraw !== 'function') return;
-
     const tooltipEl = this.chartTooltipElementRef.nativeElement;
     if (tooltipEl.contains(event.relatedTarget as Node) && this.options.hoverEffect?.tooltipHoverable) {
       return;
     }
     activeService.hideAllTooltipsAndRedraw();
-    if(this.options.chartType === 'line'){
-        this.updateLegendItems();
-        this.cdr.detectChanges();
-    }
-  }
-
-  /**
-   * 处理文档鼠标离开事件
-   * @param event 鼠标事件
-   */
-  @HostListener('document:mouseleave', ['$event'])
-  onDocumentMouseLeave(event: MouseEvent) {
-    if (!this.options) return;
-    let activeService: any = null;
-    switch (this.options.chartType) {
-        case 'bar': activeService = this.barService; break;
-        case 'pie': activeService = this.pieService; break;
-        case 'line': activeService = this.lineService; break;
-    }
-    if (activeService && typeof activeService.hideAllTooltipsAndRedraw === 'function') {
-      activeService.hideAllTooltipsAndRedraw();
-       if(this.options.chartType === 'line'){
-            this.updateLegendItems();
-            this.cdr.detectChanges();
-       }
-    }
-  }
-
-  /**
-   * 处理窗口失去焦点事件
-   * @param event 事件
-   */
-  @HostListener('window:blur', ['$event'])
-  onWindowBlur(event: Event) {
-    if (!this.options) return;
-    let activeService: any = null;
-    switch (this.options.chartType) {
-        case 'bar': activeService = this.barService; break;
-        case 'pie': activeService = this.pieService; break;
-        case 'line': activeService = this.lineService; break;
-    }
-    if (activeService && typeof activeService.hideAllTooltipsAndRedraw === 'function') {
-      activeService.hideAllTooltipsAndRedraw();
-      if(this.options.chartType === 'line'){
-            this.updateLegendItems();
-            this.cdr.detectChanges();
-      }
+    if (this.options.chartType === 'line') {
+      this.updateLegendItems();
+      this.cdr.detectChanges();
     }
   }
 

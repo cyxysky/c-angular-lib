@@ -1,3 +1,52 @@
+/** 文本颜色 */
+export const DEFAULT_TEXT_COLOR = '#333333';
+/** 次要文本颜色 */
+export const DEFAULT_MUTED_TEXT_COLOR = '#666666';
+/** 背景文本颜色 */
+export const DEFAULT_BACKGROUND_TEXT_COLOR = '#ffffff';
+/** 标题字体 */
+export const DEFAULT_TITLE_FONT = 'bold 16px Arial';
+/** 标签字体 */
+export const DEFAULT_LABEL_FONT = '12px Arial';
+/** 饼图标签字体 */
+export const DEFAULT_PIE_LABEL_FONT = 'bold 13px Arial, sans-serif';
+/** 饼图标签颜色 */
+export const DEFAULT_PIE_LABEL_COLOR = '#fff';
+/** 网格线颜色 */
+export const DEFAULT_GRID_LINE_COLOR = '#e0e0e0';
+/** 网格线宽度 */
+export const DEFAULT_GRID_LINE_WIDTH = 0.5;
+/** 轴线颜色 */
+export const DEFAULT_AXIS_LINE_COLOR = '#333333';
+/** 轴线宽度 */
+export const DEFAULT_AXIS_LINE_WIDTH = 1;
+/** 饼图扇区边框颜色 */
+export const DEFAULT_PIE_SLICE_BORDER_COLOR = 'rgba(255, 255, 255, 0.7)';
+/** 饼图扇区边框宽度 */
+export const DEFAULT_PIE_SLICE_BORDER_WIDTH = 1;
+/** 悬停时饼图扇区边框颜色 */
+export const HOVER_PIE_SLICE_BORDER_COLOR = '#fff';
+/** 悬停时饼图扇区边框宽度 */
+export const HOVER_PIE_SLICE_BORDER_WIDTH = 2;
+/** 悬停时饼图扇区阴影颜色 */
+export const HOVER_PIE_SHADOW_COLOR = 'rgba(0, 0, 0, 0.3)';
+/** 悬停时饼图扇区阴影模糊 */
+export const HOVER_PIE_SHADOW_BLUR = 8;
+/** 饼图环形文本阴影颜色 */
+export const DEFAULT_DONUT_TEXT_SHADOW_COLOR = 'rgba(0, 0, 0, 0.1)';
+/** 饼图环形文本阴影模糊 */
+export const DEFAULT_DONUT_TEXT_SHADOW_BLUR = 4;
+/** 饼图扇区标签阴影颜色 */
+export const DEFAULT_SLICE_LABEL_SHADOW_COLOR = 'rgba(0, 0, 0, 0.4)';
+/** 饼图扇区标签阴影模糊 */
+export const DEFAULT_SLICE_LABEL_SHADOW_BLUR = 3;
+/** 饼图扇区标签对比色边框颜色 */
+export const DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR = 'rgba(0, 0, 0, 0.7)';
+/** 饼图扇区标签对比色边框宽度 */
+export const DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH = 3;
+/** 图表边距 */
+export const DEFAULT_MARGIN = { top: 40, right: 40, bottom: 40, left: 40 };
+
 /** 图表数据 */
 export interface ChartData {
   /** 名称 */
@@ -9,7 +58,6 @@ export interface ChartData {
   /** 子数据 */
   children?: ChartData[];
 }
-
 
 /** 处理后的带角度信息的图表数据 (主要用于饼图内部) */
 export type ChartDataWithAngles = ChartData & {
@@ -216,3 +264,12 @@ export interface LegendItem {
   numberText?: string;
 }
 
+/** 坐标轴刻度 */
+export interface Scale {
+	minPoint: number;
+	maxPoint: number;
+	tickSpacing: number;
+	niceMin: number;
+	niceMax: number;
+	range: number;
+}

@@ -105,6 +105,7 @@ export class DocChartComponent {
 
   // 图表切换数据和选项
   toggleChartData: ChartData[] = [...this.salesData];
+  togglePieData: ChartData[] = [...this.salesData];
 
   isBarChart: boolean = true;
 
@@ -385,13 +386,11 @@ export class DocChartComponent {
     }));
   }
 
-  togglePieData: any;
+
 
   // 修改图表类型切换实现，使用ChartService
   toggleChartType(): void {
     this.isBarChart = !this.isBarChart;
-
-
   }
 
   // 计算饼图的总值

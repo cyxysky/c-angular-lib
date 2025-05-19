@@ -1,9 +1,21 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ChartData, ChartOptions, TooltipUpdate, BarSpecificOptions } from './chart.interface';
 import {
-  ChartService, DEFAULT_TEXT_COLOR, DEFAULT_MUTED_TEXT_COLOR, DEFAULT_BACKGROUND_TEXT_COLOR,
-  DEFAULT_LABEL_FONT, DEFAULT_GRID_LINE_COLOR, DEFAULT_GRID_LINE_WIDTH,
-  DEFAULT_AXIS_LINE_COLOR, DEFAULT_AXIS_LINE_WIDTH
+  ChartData,
+  ChartOptions,
+  TooltipUpdate,
+  BarSpecificOptions,
+  DEFAULT_TEXT_COLOR,
+  DEFAULT_MUTED_TEXT_COLOR,
+  DEFAULT_BACKGROUND_TEXT_COLOR,
+  DEFAULT_LABEL_FONT,
+  DEFAULT_GRID_LINE_COLOR,
+  DEFAULT_GRID_LINE_WIDTH,
+  DEFAULT_AXIS_LINE_COLOR,
+  DEFAULT_AXIS_LINE_WIDTH,
+  DEFAULT_MARGIN
+} from './chart.interface';
+import {
+  ChartService
 } from './chart.service';
 
 @Injectable()
@@ -30,7 +42,7 @@ export class BarService {
       borderRadius: 4,
       showValues: true,
       showGrid: true,
-      margin: { top: 40, right: 20, bottom: 50, left: 50 },
+      margin: { top: 40, right: 40, bottom: 40, left: 40 },
       showGuideLine: true,
       guideLineStyle: 'dashed',
       guideLineColor: '#666',
@@ -104,24 +116,26 @@ export class BarService {
    * @param inputData 原始输入的图表数据
    */
   private processDataInput(inputData: ChartData[]): void {
-    this.processedData = [];
-    if (!inputData || inputData.length === 0) return;
+    if (!inputData || inputData.length === 0) {
+      this.processedData = [];
+      this.groupVisibility = [];
+      return;
+    }
+
     try {
-      const hasChildren = inputData.some(item => item.children && item.children.length > 0);
-      if (hasChildren) {
-        this.processedData = [...inputData];
+      const hasExplicitGroups = inputData.some(item => item.children && item.children.length > 0);
+
+      if (hasExplicitGroups) {
+        this.processedData = inputData.map(group => ({
+          ...group,
+          children: group.children?.filter(child => child && child.name !== undefined) || []
+        }));
       } else {
         this.processedData = [{
           name: this.mergedOptions.title || '数据系列',
-          children: [...inputData]
+          children: inputData.filter(item => item && item.name !== undefined)
         }];
       }
-      this.processedData = this.processedData.map(item => {
-        if (item.children) {
-          return { ...item, children: item.children.filter(child => child && child.name !== undefined) };
-        }
-        return item;
-      });
       this.groupVisibility = this.getGroupNames().map(() => true);
     } catch (e) {
       console.error('处理数据时出错:', e);
@@ -177,11 +191,11 @@ export class BarService {
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     ctx.fillStyle = this.mergedOptions.backgroundColor!;
     ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
-    const margin = this.getMargin();
+    const margin = this.mergedOptions?.bar?.margin! || DEFAULT_MARGIN;
     const chartWidth = this.displayWidth - margin.left - margin.right;
     const chartHeight = this.displayHeight - margin.top - margin.bottom;
     const visibleData = this.getVisibleData();
-    const maxValue = this.getMaxCategoryValue();
+    const maxValue = this.chartService.getMaxValue(visibleData);
     const categories = this.getCategories(visibleData);
     let categoryCount = categories.length;
     this.chartService.drawTitle(ctx, this.mergedOptions.title, margin, chartWidth);
@@ -250,54 +264,28 @@ export class BarService {
     const ctx = this.ctx;
     const groupNames = this.getGroupNames().filter((_, i) => this.groupVisibility[i]);
     const categories = this.getCategories(visibleData);
+
     categories.forEach((category, categoryIdx) => {
-      let cumulativeHeight = 0;
       groupNames.forEach((groupName, groupIdxInGroup) => {
         const originalGroupIndex = this.getGroupNames().indexOf(groupName);
         const dataItems = this.getDataItemsByGroupName(groupName);
         const item = dataItems.find(d => d.name === category);
         if (!item) return;
-        const itemValue = this.getItemValue(item);
+
+        const itemValue = item.data || 0;
         const groupLeft = margin.left + categoryIdx * groupWidth;
         const x = groupLeft + barSpacing + groupIdxInGroup * (barWidth + barSpacing);
         const barH = (itemValue / maxValue) * chartHeight * animationProgress;
-        const y = margin.top + chartHeight - barH - cumulativeHeight;
+        const y = margin.top + chartHeight - barH;
         this.barPositions.push({ x, y, width: barWidth, height: barH, data: item, groupIndex: originalGroupIndex });
         const barColor = this.getDataColor(originalGroupIndex, categoryIdx);
-        ctx.fillStyle = barColor;
         if (itemValue > 0) {
-          if (this.mergedOptions?.bar?.borderRadius && this.mergedOptions.bar.borderRadius > 0) {
-            const effectiveRadius = Math.min(this.mergedOptions.bar.borderRadius, barH, barWidth / 2);
-            this.roundRect(ctx, x, y, barWidth, barH, effectiveRadius, true, false);
-          } else {
-            ctx.fillRect(x, y, barWidth, barH);
-          }
+          this.drawSingleBarShape(ctx, x, y, barWidth, barH, barColor, this.mergedOptions?.bar?.borderRadius || 0);
         }
         if (this.mergedOptions?.bar?.showValues && animationProgress > 0.9 && itemValue > 0) {
-          ctx.textAlign = 'center';
-          const formattedValue = this.formatValue(item.data);
-          const valueY = y - 5;
-          // Use DEFAULT_LABEL_FONT to determine approximateTextHeight for consistency
-          const approximateTextHeight = parseInt(DEFAULT_LABEL_FONT.substring(DEFAULT_LABEL_FONT.search(/\d/)), 10) || 12;
-
-          // Original title clearance logic, ensuring it uses a defined title font if title exists
-          const titleClearance = this.mergedOptions.title ? (margin.top / 2 + approximateTextHeight / 2 + 5) : (approximateTextHeight);
-
-          if (valueY > titleClearance) {
-            ctx.fillStyle = DEFAULT_TEXT_COLOR;
-            ctx.font = DEFAULT_LABEL_FONT;
-            ctx.textBaseline = 'bottom'; // Ensure text is properly aligned above the baseline
-            ctx.fillText(formattedValue, x + barWidth / 2, valueY);
-          } else if (barH > approximateTextHeight + 10) { // If bar is tall enough for text inside
-            ctx.fillStyle = DEFAULT_BACKGROUND_TEXT_COLOR;
-            ctx.font = DEFAULT_LABEL_FONT;
-            ctx.textBaseline = 'alphabetic'; // Or 'middle' depending on desired alignment inside
-            // Position text inside the bar, near the top, adjusted by approximateTextHeight
-            ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2);
-          }
+          this.drawBarValueText(ctx, item, x, y, barWidth, barH, margin);
         }
       });
-      // Draw category labels after all bars in a category group are drawn
       if (groupNames.length > 0 && categories.length > 0 && categoryIdx < categories.length) {
         ctx.fillStyle = DEFAULT_MUTED_TEXT_COLOR;
         ctx.font = DEFAULT_LABEL_FONT;
@@ -307,6 +295,64 @@ export class BarService {
         ctx.fillText(categories[categoryIdx], groupLeft + groupWidth / 2, margin.top + chartHeight + 20);
       }
     });
+  }
+
+  /**
+   * 绘制单个柱子
+   * @param ctx Canvas 2D 上下文
+   * @param x 矩形左上角 x 坐标
+   * @param y 矩形左上角 y 坐标
+   * @param width 矩形宽度
+   * @param height 矩形高度
+   * @param color 柱子颜色
+   * @param borderRadius 圆角半径
+   */
+  private drawSingleBarShape(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, color: string, borderRadius: number): void {
+    ctx.fillStyle = color;
+    const effectiveRadius = borderRadius > 0 ? Math.min(borderRadius, height / 2, width / 2) : 0;
+    if (effectiveRadius > 0) {
+      this.roundRect(ctx, x, y, width, height, effectiveRadius, true, false);
+    } else {
+      ctx.fillRect(x, y, width, height);
+    }
+  }
+
+  /**
+   * 绘制柱子值文本
+   * @param ctx Canvas 2D 上下文
+   * @param item 数据项
+   * @param x 矩形左上角 x 坐标 
+   * @param y 矩形左上角 y 坐标
+   * @param barWidth 矩形宽度
+   * @param barHeight 矩形高度
+   * @param margin 图表边距
+   */
+  private drawBarValueText(ctx: CanvasRenderingContext2D, item: ChartData, x: number, y: number, barWidth: number, barHeight: number, margin: any): void {
+    ctx.textAlign = 'center';
+    const formattedValue = this.chartService.formatNumber(item.data);
+    const valueTextY = y - 5; // Position above the bar
+    const approximateTextHeight = parseInt(DEFAULT_LABEL_FONT.substring(DEFAULT_LABEL_FONT.search(/\d+/)), 10) || 12;
+    const titlePresent = !!this.mergedOptions.title;
+    const titleSpace = titlePresent ? (margin.top / 2) : 0;
+    const spaceAboveChartContent = margin.top - titleSpace;
+    if (valueTextY - approximateTextHeight > 0 && barHeight > 0) { // Ensure text is within canvas and bar exists
+      if (valueTextY > margin.top - spaceAboveChartContent + approximateTextHeight) { // Check if text fits above bar (simplified check)
+        ctx.fillStyle = DEFAULT_TEXT_COLOR;
+        ctx.font = DEFAULT_LABEL_FONT;
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(formattedValue, x + barWidth / 2, valueTextY);
+      } else if (barHeight > approximateTextHeight + 10) { // If bar is tall enough for text inside
+        ctx.fillStyle = DEFAULT_BACKGROUND_TEXT_COLOR;
+        ctx.font = DEFAULT_LABEL_FONT;
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2); // Position text inside the bar
+      }
+    } else if (barHeight > approximateTextHeight + 10) { // Fallback: If no space above, but bar is tall enough for text inside
+      ctx.fillStyle = DEFAULT_BACKGROUND_TEXT_COLOR;
+      ctx.font = DEFAULT_LABEL_FONT;
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(formattedValue, x + barWidth / 2, y + approximateTextHeight + 2); // Position text inside the bar
+    }
   }
 
   /**
@@ -441,36 +487,41 @@ export class BarService {
     if (!this.mergedOptions.onClick) return;
 
     const clickedBarInfo = this.findHoveredBar(canvasX, canvasY);
-    if (clickedBarInfo.dataIndex !== -1 && clickedBarInfo.groupIndex !== -1) {
-      const groupNames = this.getGroupNames();
-      if (clickedBarInfo.groupIndex >= groupNames.length) return;
-      const groupName = groupNames[clickedBarInfo.groupIndex];
 
-      const categories = this.getCategories(this.getVisibleData());
-      if (clickedBarInfo.dataIndex >= categories.length) return;
-      const category = categories[clickedBarInfo.dataIndex];
+    if (clickedBarInfo.dataIndex === -1 || clickedBarInfo.groupIndex === -1) return;
+    if (clickedBarInfo.groupIndex >= this.processedData.length) return;
 
-      const dataItems = this.getDataItemsByGroupName(groupName);
-      const item = dataItems.find(d => d.name === category);
-      if (!item) return;
+    const group = this.processedData[clickedBarInfo.groupIndex];
+    const categories = this.getCategories(this.getVisibleData());
 
-      const barPosition = this.barPositions.find(
-        bar => bar.groupIndex === clickedBarInfo.groupIndex && bar.data?.name === item.name
-      );
+    if (clickedBarInfo.dataIndex >= categories.length) return;
+    const categoryName = categories[clickedBarInfo.dataIndex];
 
-      if (barPosition) {
-        this.ngZone.run(() => {
-          this.mergedOptions.onClick!({
-            item: item,
-            index: clickedBarInfo.dataIndex,
-            groupIndex: clickedBarInfo.groupIndex,
-            data: this.processedData,
-            options: this.mergedOptions,
-            event: event,
-            position: { x: barPosition.x, y: barPosition.y, width: barPosition.width, height: barPosition.height }
-          });
+    const item = group.children?.find(child => child.name === categoryName);
+    if (!item) return;
+
+    // Find the barPosition for the exact clicked bar to get its screen coordinates and dimensions
+    const barPosition = this.barPositions.find(
+      bar => bar.groupIndex === clickedBarInfo.groupIndex && bar.data === item // Compare by object reference if item is from processedData
+    );
+
+    if (barPosition) {
+      this.ngZone.run(() => {
+        this.mergedOptions.onClick!({
+          item: item, // The actual data item clicked
+          index: clickedBarInfo.dataIndex, // Index within the categories array
+          groupIndex: clickedBarInfo.groupIndex, // Index of the group in processedData
+          data: this.processedData, // All processed data
+          options: this.mergedOptions, // Current chart options
+          event: event, // Original mouse event
+          position: { // Position and dimensions of the clicked bar
+            x: barPosition.x,
+            y: barPosition.y,
+            width: barPosition.width,
+            height: barPosition.height
+          }
         });
-      }
+      });
     }
   }
 
@@ -486,16 +537,7 @@ export class BarService {
    * @returns 分组名称数组
    */
   public getGroupNames(): string[] {
-    const groupNames: string[] = [];
-    this.processedData.forEach(item => {
-      if (item.children && item.children.length > 0 && item.name && !groupNames.includes(item.name)) {
-        groupNames.push(item.name);
-      }
-    });
-    if (groupNames.length === 0 && this.processedData.length > 0 && !this.processedData.some(item => item.children && item.children.length > 0)) {
-      groupNames.push(this.processedData[0].name || '默认分组');
-    }
-    return groupNames;
+    return this.chartService.getGroupNames(this.processedData);
   }
 
   /**
@@ -505,9 +547,8 @@ export class BarService {
    */
   public getCategories(data: ChartData[]): string[] {
     const categories = new Set<string>();
-    data.forEach(item => {
-      if (item.children) item.children.forEach(child => { if (child.name) categories.add(child.name); });
-      else if (item.name) categories.add(item.name);
+    data.forEach(group => {
+      group.children?.forEach(child => child.name && categories.add(child.name));
     });
     return Array.from(categories);
   }
@@ -518,14 +559,8 @@ export class BarService {
    * @returns 该分组下的数据项数组
    */
   public getDataItemsByGroupName(groupName: string): ChartData[] {
-    const group = this.processedData.find(item => item.name === groupName && item.children && item.children.length > 0);
-    if (group && group.children) {
-      return group.children;
-    }
-    if (!this.processedData.some(item => item.children && item.children.length > 0)) {
-      return this.processedData.filter(item => item.name === groupName);
-    }
-    return [];
+    const group = this.processedData.find(item => item.name === groupName);
+    return group?.children || [];
   }
 
   /**
@@ -533,25 +568,8 @@ export class BarService {
    * @returns 可见数据数组
    */
   public getVisibleData(): ChartData[] {
-    const visibleGroupNames = this.getGroupNames().filter((_, i) => this.groupVisibility[i]);
-    if (!visibleGroupNames.length) return [];
-
-    return this.processedData.filter(item => {
-      if (item.children && item.children.length > 0) {
-        return visibleGroupNames.includes(item.name);
-      }
-      // If no children, it means it's a flat structure considered as a single group.
-      // The visibility of this single group is controlled by the first entry in groupVisibility.
-      return !item.children && visibleGroupNames.length > 0 && this.groupVisibility[0];
-    }).map(item => {
-      if (item.children) {
-        // For items with children (actual groups), return as is if the group name is visible
-        return item;
-      }
-      // For flat data (considered as one group), this mapping is mainly to ensure structure.
-      // The filtering is already done.
-      return item;
-    });
+    // processedData contains groups. We filter these groups based on groupVisibility.
+    return this.processedData.filter((group, index) => this.groupVisibility[index]);
   }
 
   /**
@@ -564,109 +582,13 @@ export class BarService {
   }
 
   /**
-   * 获取Y轴的最大值 (基于每个类别的总和，用于堆叠或分组柱状图的正确缩放)
-   * @returns Y轴最大值
-   */
-  private getMaxCategoryValue(): number {
-    const visibleData = this.getVisibleData();
-    if (visibleData.length === 0) return 0;
-
-    const allCategories = new Set<string>();
-    visibleData.forEach(item => {
-      if (item.children) item.children.forEach(child => allCategories.add(child.name));
-      else if (item.name) allCategories.add(item.name);
-    });
-
-    if (allCategories.size === 0) return 0;
-
-    const categoryTotals: Record<string, number> = {};
-    Array.from(allCategories).forEach(category => categoryTotals[category] = 0);
-
-    visibleData.forEach(item => {
-      if (item.children) {
-        item.children.forEach(child => {
-          if (categoryTotals[child.name] !== undefined) categoryTotals[child.name] += (child.data || 0);
-        });
-      } else if (item.name && categoryTotals[item.name] !== undefined) {
-        categoryTotals[item.name] += (item.data || 0);
-      }
-    });
-    return Object.values(categoryTotals).length > 0 ? this.safeArrayMax(Object.values(categoryTotals)) : 0;
-  }
-
-  /**
-   * 计算总值，可选按分组计算
-   * @param groupIndex 可选，分组索引。如果提供，则计算该分组的总值
-   * @returns 总数值
-   */
-  private calculateTotalValue(groupIndex?: number): number {
-    const groupNames = this.getGroupNames();
-    if (groupIndex !== undefined && groupIndex >= 0 && groupIndex < groupNames.length) {
-      const groupName = groupNames[groupIndex];
-      let total = 0;
-      const groupItem = this.processedData.find(item => item.name === groupName && item.children);
-      if (groupItem && groupItem.children) {
-        groupItem.children.forEach(child => total += (child.data || 0));
-      } else if (!this.processedData.some(it => it.children && it.children.length > 0)) {
-        // Flat data, sum all items if groupIndex is 0 (representing the single group)
-        if (groupIndex === 0) {
-          this.processedData.forEach(child => total += (child.data || 0));
-        }
-      }
-      return total;
-    } else {
-      let total = 0;
-      this.processedData.forEach(item => {
-        if (item.children) {
-          item.children.forEach(child => total += (child.data || 0));
-        } else {
-          total += (item.data || 0); // For flat data structure
-        }
-      });
-      return total;
-    }
-  }
-
-  /**
-   * 获取单个数据项的值
-   * @param item 数据项
-   * @returns 数值，如果无效则为 0
-   */
-  private getItemValue(item: ChartData): number {
-    return (item.data || 0);
-  }
-
-  /**
-   * 安全地获取数组中的最大值
-   * @param arr 数字数组
-   * @param defaultValue 如果数组无效或为空，返回的默认值
-   * @returns 最大值或默认值
-   */
-  private safeArrayMax(arr: number[], defaultValue: number = 0): number {
-    if (!arr || arr.length === 0) return defaultValue;
-    const validValues = arr.filter(val => !isNaN(val) && typeof val === 'number' && isFinite(val));
-    if (validValues.length === 0) return defaultValue;
-    return Math.max(...validValues);
-  }
-
-  /**
-   * 格式化数值 (例如，添加千位分隔符)
-   * @param value 要格式化的数值
-   * @returns 格式化后的字符串
-   */
-  public formatValue(value: number | undefined): string {
-    if (typeof value === 'number') return this.chartService.formatNumber(value);
-    return '0';
-  }
-
-  /**
    * 计算并格式化百分比
    * @param value 当前值
    * @param groupIndex 可选，分组索引，用于计算该分组的总值作为基数
    * @returns 百分比字符串 (例如 "25.0")
    */
   public calculatePercentage(value: number | undefined, groupIndex?: number): string {
-    const totalValue = this.calculateTotalValue(groupIndex);
+    const totalValue = this.chartService.getTotalValue(this.processedData, groupIndex, true);
     const numValue = typeof value === 'number' ? value : 0;
     return (totalValue > 0 ? (numValue / totalValue * 100).toFixed(1) : '0') + '%';
   }
@@ -677,12 +599,9 @@ export class BarService {
    * @returns 颜色字符串 (HEX, RGB, etc.)
    */
   public getGroupColor(groupIndex: number): string {
-    if (groupIndex < 0 || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
-    const groupNames = this.getGroupNames();
-    if (groupIndex >= groupNames.length) return '';
-    const groupName = groupNames[groupIndex];
-    const groupItem = this.processedData.find(item => item.name === groupName);
-    if (groupItem && groupItem.color) return groupItem.color;
+    if (groupIndex < 0 || groupIndex >= this.processedData.length || !this.mergedOptions.colors || this.mergedOptions.colors.length === 0) return '';
+    const groupItem = this.processedData[groupIndex];
+    if (groupItem?.color) return groupItem.color;
     return this.mergedOptions.colors[groupIndex % this.mergedOptions.colors.length];
   }
 
@@ -693,19 +612,17 @@ export class BarService {
    * @returns 颜色字符串
    */
   public getDataColor(groupIndex: number, dataIndex: number): string {
-    if (groupIndex < 0 || dataIndex < 0 || !this.mergedOptions.colors) return '';
-    const groupNames = this.getGroupNames();
-    if (groupIndex >= groupNames.length) return this.getGroupColor(groupIndex);
-    const groupName = groupNames[groupIndex];
+    const defaultGroupColor = this.getGroupColor(groupIndex);
+    if (groupIndex < 0 || groupIndex >= this.processedData.length || dataIndex < 0) return defaultGroupColor;
+    const group = this.processedData[groupIndex];
     const categories = this.getCategories(this.getVisibleData());
-    if (dataIndex >= categories.length) return this.getGroupColor(groupIndex);
+    if (dataIndex >= categories.length) return defaultGroupColor;
     const categoryName = categories[dataIndex];
-    const groupItem = this.processedData.find(item => item.name === groupName && item.children);
-    if (groupItem && groupItem.children) {
-      const childItem = groupItem.children.find(child => child.name === categoryName);
-      if (childItem && childItem.color) return childItem.color;
+    if (group?.children) {
+      const childItem = group.children.find(child => child.name === categoryName);
+      if (childItem?.color) return childItem.color;
     }
-    return this.getGroupColor(groupIndex);
+    return defaultGroupColor;
   }
 
   /**
@@ -718,8 +635,8 @@ export class BarService {
       color: this.getGroupColor(i),
       visible: this.isGroupVisible(i),
       active: this.hoveredGroupIndex === i,
-      percentageText: this.calculatePercentage(this.calculateTotalValue(i)),
-      numberText: this.calculateTotalValue(i).toString()
+      percentageText: this.calculatePercentage(this.chartService.getTotalValue(this.processedData, i, true)),
+      numberText: this.chartService.getTotalValue(this.processedData, i, true).toString()
     }));
   }
 
@@ -758,15 +675,6 @@ export class BarService {
    * 销毁服务，清理资源 (例如取消动画帧)
    */
   public destroy(): void {
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    this.animationFrameId = null;
-  }
-
-  /**
-   * 获取图表的边距
-   * @returns 图表的边距
-   */
-  public getMargin(): any {
-    return this.mergedOptions?.bar?.margin! || { top: 40, right: 20, bottom: 50, left: 50 };
+    this.animationFrameId = this.chartService.cancelAnimationFrameHelper(this.animationFrameId);
   }
 }

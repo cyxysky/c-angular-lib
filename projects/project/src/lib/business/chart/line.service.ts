@@ -1,15 +1,19 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ChartData, ChartOptions, LineSpecificOptions } from './chart.interface';
-import { ChartService, DEFAULT_GRID_LINE_COLOR, DEFAULT_GRID_LINE_WIDTH, DEFAULT_LABEL_FONT, DEFAULT_MUTED_TEXT_COLOR, DEFAULT_AXIS_LINE_COLOR, DEFAULT_AXIS_LINE_WIDTH, DEFAULT_TEXT_COLOR } from './chart.service';
-
-interface NiceScale {
-	minPoint: number;
-	maxPoint: number;
-	tickSpacing: number;
-	niceMin: number;
-	niceMax: number;
-	range: number;
-}
+import {
+	ChartData,
+	ChartOptions,
+	LineSpecificOptions,
+	DEFAULT_GRID_LINE_COLOR,
+	DEFAULT_GRID_LINE_WIDTH,
+	DEFAULT_LABEL_FONT,
+	DEFAULT_MUTED_TEXT_COLOR,
+	DEFAULT_AXIS_LINE_COLOR,
+	DEFAULT_AXIS_LINE_WIDTH,
+	DEFAULT_TEXT_COLOR,
+	Scale,
+	DEFAULT_MARGIN
+} from './chart.interface';
+import { ChartService } from './chart.service';
 
 @Injectable()
 export class LineService {
@@ -32,7 +36,7 @@ export class LineService {
 			tooltipHoverable: false
 		},
 		line: {
-			margin: { top: 40, right: 40, bottom: 70, left: 60 },
+			margin: { top: 40, right: 40, bottom: 40, left: 40 },
 			showValues: true,
 			showGuideLine: true,
 			guideLineStyle: 'dashed',
@@ -122,7 +126,7 @@ export class LineService {
 					children: inputData.filter(item => typeof item.data === 'number')
 				}];
 			}
-			this.groupVisibility = this.getGroupNames().map(() => true);
+			this.groupVisibility = this.chartService.getGroupNames(this.processedData).map(() => true);
 		} catch (e) {
 			console.error('Error processing line chart data:', e);
 			this.processedData = [];
@@ -181,7 +185,7 @@ export class LineService {
 		ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
 
 		// 计算图表区域
-		const margin: Required<LineSpecificOptions>['margin'] = this.getMargin();
+		const margin: Required<LineSpecificOptions>['margin'] = this.mergedOptions?.line?.margin! || DEFAULT_MARGIN;
 		const chartAreaWidth = this.displayWidth - margin.left - margin.right;
 		const chartAreaHeight = this.displayHeight - margin.top - margin.bottom;
 
@@ -527,9 +531,9 @@ export class LineService {
 	/**
 	 * 计算合适的刻度范围
 	 */
-	private calculateNiceScale(minVal: number, maxVal: number, maxTicks: number = 5): NiceScale {
-		let range = this.niceNum(maxVal - minVal, false);
-		let tickSpacing = this.niceNum(range / (maxTicks - 1), true);
+	private calculateNiceScale(minVal: number, maxVal: number, maxTicks: number = 5): Scale {
+		let range = this.calculateScaleGap(maxVal - minVal, false);
+		let tickSpacing = this.calculateScaleGap(range / (maxTicks - 1), true);
 		let niceMin = Math.floor(minVal / tickSpacing) * tickSpacing;
 		let niceMax = Math.ceil(maxVal / tickSpacing) * tickSpacing;
 
@@ -541,7 +545,7 @@ export class LineService {
 				range = niceMax - niceMin;
 			} else {
 				const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(minVal))));
-				tickSpacing = this.niceNum(magnitude / (maxTicks > 1 ? 2 : 1), true);
+				tickSpacing = this.calculateScaleGap(magnitude / (maxTicks > 1 ? 2 : 1), true);
 				niceMin = Math.floor(minVal / tickSpacing) * tickSpacing - tickSpacing;
 				niceMax = Math.ceil(maxVal / tickSpacing) * tickSpacing + tickSpacing;
 				if (niceMin >= minVal) niceMin -= tickSpacing;
@@ -577,7 +581,7 @@ export class LineService {
 	/**
 	 * 计算合适的刻度间隔
 	 */
-	private niceNum(localRange: number, round: boolean): number {
+	private calculateScaleGap(localRange: number, round: boolean): number {
 		if (localRange === 0) return 0;
 		const exponent = Math.floor(Math.log10(localRange));
 		const fraction = localRange / Math.pow(10, exponent);
@@ -594,20 +598,6 @@ export class LineService {
 			else niceFraction = 10;
 		}
 		return niceFraction * Math.pow(10, exponent);
-	}
-
-	/**
-	 * 获取图表边距
-	 */
-	public getMargin(): Required<LineSpecificOptions>['margin'] {
-		return this.mergedOptions.line.margin;
-	}
-
-	/**
-	 * 获取组名称
-	 */
-	public getGroupNames(): string[] {
-		return this.processedData.map(item => item.name).filter(name => name !== undefined) as string[];
 	}
 
 	/**
@@ -635,14 +625,6 @@ export class LineService {
 	 */
 	public getVisibleData(): ChartData[] {
 		return this.processedData.filter((_, i) => this.groupVisibility[i]);
-	}
-
-	/**
-	 * 格式化数值
-	 */
-	public formatValue(value: number | undefined): string {
-		if (typeof value === 'number') return this.chartService.formatNumber(value);
-		return '0';
 	}
 
 	/**
@@ -677,15 +659,14 @@ export class LineService {
 	 * 销毁图表
 	 */
 	public destroy(): void {
-		if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-		this.animationFrameId = null;
+		this.animationFrameId = this.chartService.cancelAnimationFrameHelper(this.animationFrameId);
 	}
 
 	/**
 	 * 获取图例项
 	 */
 	public getLegendItems(): Array<{ name: string; color: string; visible: boolean; active: boolean }> {
-		return this.getGroupNames().map((name, i) => ({
+		return this.chartService.getGroupNames(this.processedData).map((name, i) => ({
 			name,
 			color: this.getLineColor(i),
 			visible: this.groupVisibility[i],

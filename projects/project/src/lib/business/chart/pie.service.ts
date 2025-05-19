@@ -1,12 +1,28 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ChartData, ChartOptions, ChartDataWithAngles, TooltipUpdate, PieSpecificOptions } from './chart.interface';
 import {
-  ChartService,
+  ChartData, 
+  ChartOptions, 
+  ChartDataWithAngles, 
   DEFAULT_PIE_LABEL_FONT,
   DEFAULT_SLICE_LABEL_SHADOW_COLOR,
   DEFAULT_SLICE_LABEL_SHADOW_BLUR,
   DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR,
-  DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH
+  DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH,
+  HOVER_PIE_SLICE_BORDER_COLOR,
+  DEFAULT_PIE_SLICE_BORDER_COLOR,
+  HOVER_PIE_SHADOW_BLUR,
+  HOVER_PIE_SLICE_BORDER_WIDTH,
+  DEFAULT_PIE_SLICE_BORDER_WIDTH,
+  HOVER_PIE_SHADOW_COLOR,
+  DEFAULT_DONUT_TEXT_SHADOW_BLUR,
+  DEFAULT_DONUT_TEXT_SHADOW_COLOR,
+  DEFAULT_TEXT_COLOR,
+  DEFAULT_TITLE_FONT,
+  DEFAULT_PIE_LABEL_COLOR
+} from './chart.interface';
+import {
+  ChartService,
+
 } from './chart.service';
 
 @Injectable()
@@ -260,10 +276,12 @@ export class PieService {
 
     // 绘制标题
     if (this.mergedOptions.title) {
-      this.ctx.fillStyle = '#333';
-      this.ctx.textAlign = 'center';
-      this.ctx.font = 'bold 16px Arial';
-      this.ctx.fillText(this.mergedOptions.title, this.centerX, 25); // 标题位置可调整
+      this.chartService.drawTitle(this.ctx, this.mergedOptions.title, {
+        top: 40,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }, this.initialDisplayWidth);
     }
 
     const isDonut = this.innerRadius > 0;
@@ -310,13 +328,13 @@ export class PieService {
 
       // 设置边框和阴影（悬浮时效果更明显）
       if (isHovered) {
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 8;
-        this.ctx.strokeStyle = '#fff'; // 悬浮时使用更清晰的白色边框
-        this.ctx.lineWidth = 2;
+        this.ctx.shadowColor = HOVER_PIE_SHADOW_COLOR;
+        this.ctx.shadowBlur = HOVER_PIE_SHADOW_BLUR;
+        this.ctx.strokeStyle = HOVER_PIE_SLICE_BORDER_COLOR; // 悬浮时使用更清晰的白色边框
+        this.ctx.lineWidth = HOVER_PIE_SLICE_BORDER_WIDTH;
       } else {
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; // 默认半透明白色边框
-        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = DEFAULT_PIE_SLICE_BORDER_COLOR; // 默认半透明白色边框
+        this.ctx.lineWidth = DEFAULT_PIE_SLICE_BORDER_WIDTH;
       }
       this.ctx.stroke(); // 描边
       this.ctx.restore(); // 恢复上下文状态
@@ -333,12 +351,12 @@ export class PieService {
   private drawDonutText(): void {
     if (!this.mergedOptions?.pie?.donutText) return;
     this.ctx.save();
-    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'; // 轻微阴影
-    this.ctx.shadowBlur = 4;
-    this.ctx.fillStyle = '#333'; // 文本颜色
+    this.ctx.shadowColor = DEFAULT_DONUT_TEXT_SHADOW_COLOR; // 轻微阴影
+    this.ctx.shadowBlur = DEFAULT_DONUT_TEXT_SHADOW_BLUR;
+    this.ctx.fillStyle = DEFAULT_TEXT_COLOR; // 文本颜色
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.font = 'bold 16px Arial'; // 文本样式
+    this.ctx.font = DEFAULT_TITLE_FONT; // 文本样式
     this.ctx.fillText(this.mergedOptions?.pie?.donutText, this.centerX, this.centerY);
     this.ctx.restore();
   }
@@ -401,7 +419,7 @@ export class PieService {
       }
 
       this.ctx.font = DEFAULT_PIE_LABEL_FONT; // 标签字体
-      this.ctx.fillStyle = '#fff'; // 标签文字颜色 (白色，通常在彩色背景上较好)
+      this.ctx.fillStyle = DEFAULT_PIE_LABEL_COLOR; // 标签文字颜色 (白色，通常在彩色背景上较好)
       // 为白色文字添加黑色描边以增强对比度
       this.ctx.strokeStyle = DEFAULT_SLICE_LABEL_CONTRAST_STROKE_COLOR;
       this.ctx.lineWidth = DEFAULT_SLICE_LABEL_CONTRAST_STROKE_WIDTH; // 描边宽度
@@ -550,8 +568,7 @@ export class PieService {
    * @returns 格式化后的字符串，无效则为 '0'
    */
   public formatValue(value: number | undefined): string {
-    if (typeof value === 'number') return this.chartService.formatNumber(value);
-    return '0';
+    return this.chartService.formatNumber(value);
   }
 
   /**
@@ -642,6 +659,7 @@ export class PieService {
    * 销毁服务，清理资源 (例如取消动画帧)
    */
   public destroy(): void {
-    this.cancelAllAnimations();
+    this.animationFrameId = this.chartService.cancelAnimationFrameHelper(this.animationFrameId);
+    this.cancelAllSliceAnimations();
   }
 }
