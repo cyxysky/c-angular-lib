@@ -80,8 +80,6 @@ export class InputComponent implements ControlValueAccessor {
   public paddingLeft = signal<number>(12);
   /** 右内边距 */
   public paddingRight = signal<number>(12);
-  /** 错误信息 */
-  public error = '';
   /** 内部数据 */
   public _data: any = '';
 
@@ -139,16 +137,12 @@ export class InputComponent implements ControlValueAccessor {
       const pattern = this.pattern;
       if (typeof pattern === 'function' && !pattern(value)) {
         // 自定义验证函数失败
-        this.error = '输入不符合规则';
         return;
       } else if (pattern instanceof RegExp && !pattern.test(value)) {
         // 正则表达式验证失败
-        this.error = '输入不符合规则';
         return;
       }
     }
-    // 清除错误
-    this.error = '';
     this._data = value;
     this.onChange(value);
   }

@@ -4,7 +4,7 @@
   [class.c-lib-input-lg]="size === 'large'"
   [class.c-lib-input-disabled]="disabled"
   [class.c-lib-input-borderless]="!bordered"
-  [class.c-lib-input-status-error]="status === 'error' || error"
+  [class.c-lib-input-status-error]="status === 'error'"
   [class.c-lib-input-status-warning]="status === 'warning'"
   [class.c-lib-input-focused]="hasFocus()">
   <div class="c-lib-input-prefix" *ngIf="prefix || prefixIcon">
@@ -42,4 +42,3 @@
     </div>
   </div>
 </div>
-<div class="c-lib-input-error" *ngIf="error">{{ error }}</div>
