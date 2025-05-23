@@ -124,16 +124,15 @@ lib-select {
     display: flex;
     align-items: center;
     overflow: hidden;
-    box-shadow: 0 2px 0 fade(@black, 1.5%);
     box-sizing: border-box;
 
     &:hover {
-        border: 1px solid fade(@blue-base, 40%);
+        border-color: @primary-color;
     }
 
     &.c-lib-select-basic-box-active {
-        border: 1px solid fade(@blue-base, 60%);
-        box-shadow: 0 0 0 2px @blue-base-outline;
+        border-color: @primary-color;
+        box-shadow: 0 0 0 2px @primary-color-outline;
         outline: none;
     }
 
