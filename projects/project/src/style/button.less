@@ -9,7 +9,7 @@ lib-button:has(.c-lib-button-block) {
 .c-lib-button-ripple {
     position: absolute;
     background: @ripple-color;
-    border-radius: 50%;
+    border-radius: @border-radius-round;
     pointer-events: none;
     transform: scale(0);
 }
@@ -20,20 +20,20 @@ lib-button:has(.c-lib-button-block) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: @button-font-weight;
+    font-size: @button-font-size-medium;
     letter-spacing: 0.06em;
     white-space: nowrap;
-    box-shadow: 2px 2px @shadow-color-lightest;
+    box-shadow: @button-shadow;
     cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: @button-transition;
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
-    height: 32px;
-    padding: 4px 15px;
-    border: 1px solid @border-color-base;
-    border-radius: 4px;
+    height: @button-height-medium;
+    padding: @button-padding-medium;
+    border: @base-border-width solid @border-color-base;
+    border-radius: @button-border-radius;
     box-sizing: border-box;
 }
 
@@ -98,33 +98,33 @@ lib-button:has(.c-lib-button-block) {
 }
 
 .c-lib-button-large {
-    padding: 6.4px 15px;
-    font-size: 16px;
-    height: 40px;
+    padding: @button-padding-large;
+    font-size: @button-font-size-large;
+    height: @button-height-large;
 }
 
 .c-lib-button-disabled {
-    color: @text-color-disabled;
+    color: @disabled-color;
     border-color: @border-color-base;
-    background: @background-color-disabled;
+    background: @disabled-bg;
 }
 
 .c-lib-button-icon {
-    margin-right: 4px;
+    margin-right: @button-icon-spacing;
 }
 
 .c-lib-button-small {
-    padding: 0 7px;
-    font-size: 12px;
-    height: 24px;
+    padding: @button-padding-small;
+    font-size: @button-font-size-small;
+    height: @button-height-small;
 }
 
 .c-lib-button-circle {
-    border-radius: 40px;
+    border-radius: @button-height-large;
 }
 
 .c-lib-button-round {
-    border-radius: 90px;
+    border-radius: @button-border-radius-round;
 }
 
 .c-lib-button-dashed {

@@ -1,13 +1,13 @@
 .c-lib-popover {
     position: relative;
-    min-width: 150px;
-    border-radius: 4px;
+    min-width: @popover-min-width;
+    border-radius: @popover-border-radius;
     box-shadow: @shadow-1-down;
     transform: scale(0.1);
     opacity: 0;
-    transition: all @visible-animation-duration ease;
+    transition: @popover-transition;
     background-color: @text-color-inverse;
-    font-size: 14px;
+    font-size: @popover-font-size;
 
     &.c-lib-popover-visible {
         opacity: 1;
@@ -15,18 +15,18 @@
     }
 
     .c-lib-popover-content {
-        min-height: 48px;
-        padding: 12px 16px;
+        min-height: @popover-content-min-height;
+        padding: @popover-content-padding;
         overflow-wrap: break-word;
         word-wrap: break-word;
     }
 
     .c-lib-popover-title {
         margin: 0;
-        padding: 5px 16px 4px;
+        padding: @popover-title-padding;
         color: @text-color;
-        font-weight: 600;
-        border-bottom: 1px solid fade(@black, 10%);
+        font-weight: @popover-title-font-weight;
+        border-bottom: @base-border-width solid fade(@black, 10%);
     }
 
     .c-lib-popover-arrow {
@@ -38,147 +38,147 @@
     // 基础方向
     &.c-lib-popover-top {
         .c-lib-popover-arrow {
-            bottom: -8px;
+            bottom: -@popover-arrow-size;
             left: 50%;
-            margin-left: -8px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px 3px 2px @shadow-color);
+            margin-left: -@popover-arrow-size;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-top: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px @popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-bottom {
         .c-lib-popover-arrow {
-            top: -8px;
+            top: -@popover-arrow-size;
             left: 50%;
-            margin-left: -8px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px -3px 2px @shadow-color);
+            margin-left: -@popover-arrow-size;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px -@popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-left {
         .c-lib-popover-arrow {
             top: 50%;
-            right: -8px;
-            margin-top: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid @text-color-inverse;
-            filter: drop-shadow(3px 0 2px @shadow-color);
+            right: -@popover-arrow-size;
+            margin-top: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-left: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-right {
         .c-lib-popover-arrow {
             top: 50%;
-            left: -8px;
-            margin-top: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid @text-color-inverse;
-            filter: drop-shadow(-3px 0 2px @shadow-color);
+            left: -@popover-arrow-size;
+            margin-top: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(-@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     // 左侧系列
     &.c-lib-popover-left-top {
         .c-lib-popover-arrow {
-            top: 12px;
-            right: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid @text-color-inverse;
-            filter: drop-shadow(3px 0 2px @shadow-color);
+            top: @popover-arrow-offset;
+            right: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-left: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-left-bottom {
         .c-lib-popover-arrow {
-            bottom: 12px;
-            right: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid @text-color-inverse;
-            filter: drop-shadow(3px 0 2px @shadow-color);
+            bottom: @popover-arrow-offset;
+            right: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-left: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     // 右侧系列
     &.c-lib-popover-right-top {
         .c-lib-popover-arrow {
-            top: 12px;
-            left: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid @text-color-inverse;
-            filter: drop-shadow(-3px 0 2px @shadow-color);
+            top: @popover-arrow-offset;
+            left: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(-@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-right-bottom {
         .c-lib-popover-arrow {
-            bottom: 12px;
-            left: -8px;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid @text-color-inverse;
-            filter: drop-shadow(-3px 0 2px @shadow-color);
+            bottom: @popover-arrow-offset;
+            left: -@popover-arrow-size;
+            border-top: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(-@popover-arrow-shadow-offset 0 @shadow-level-1 @shadow-color);
         }
     }
 
     // 顶部系列
     &.c-lib-popover-top-left {
         .c-lib-popover-arrow {
-            bottom: -8px;
-            left: 12px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px 3px 2px @shadow-color);
+            bottom: -@popover-arrow-size;
+            left: @popover-arrow-offset;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-top: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px @popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-top-right {
         .c-lib-popover-arrow {
-            bottom: -8px;
-            right: 12px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px 3px 2px @shadow-color);
+            bottom: -@popover-arrow-size;
+            right: @popover-arrow-offset;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-top: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px @popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 
     // 底部系列
     &.c-lib-popover-bottom-left {
         .c-lib-popover-arrow {
-            top: -8px;
-            left: 12px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px -3px 2px @shadow-color);
+            top: -@popover-arrow-size;
+            left: @popover-arrow-offset;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px -@popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 
     &.c-lib-popover-bottom-right {
         .c-lib-popover-arrow {
-            top: -8px;
-            right: 12px;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 8px solid @text-color-inverse;
-            filter: drop-shadow(0px -3px 2px @shadow-color);
+            top: -@popover-arrow-size;
+            right: @popover-arrow-offset;
+            border-left: @popover-arrow-size solid transparent;
+            border-right: @popover-arrow-size solid transparent;
+            border-bottom: @popover-arrow-size solid @text-color-inverse;
+            filter: drop-shadow(0px -@popover-arrow-shadow-offset @shadow-level-1 @shadow-color);
         }
     }
 }
 
 .c-lib-popover-footer {
     display: flex;
-    gap: 8px;
-    padding: 4px;
+    gap: @popover-footer-gap;
+    padding: @popover-footer-padding;
 }

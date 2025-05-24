@@ -1,15 +1,15 @@
 // 表格样式
 .c-lib-table-wrapper {
   background: @text-color-inverse;
-  border-radius: 2px;
-  box-shadow: 0 1px 4px 0 fade(@black, 10%);
+  border-radius: @table-border-radius;
+  box-shadow: @table-shadow;
 }
 
 // 表格工具栏样式
 .c-lib-table-toolbar {
   display: flex;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: @table-toolbar-padding;
 }
 
 .c-lib-table-toolbar-default {
@@ -20,22 +20,22 @@
 }
 
 .c-lib-table-toolbar-title {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: @table-toolbar-title-font-size;
+  font-weight: @table-toolbar-title-font-weight;
 }
 
 .c-lib-table-toolbar-actions {
   display: flex;
-  gap: 16px;
+  gap: @table-toolbar-gap;
 }
 
 .c-lib-table {
   position: relative;
   width: 100%;
   overflow: hidden;
-  font-size: 14px;
+  font-size: @table-font-size;
   background: @text-color-inverse;
-  border-radius: 2px;
+  border-radius: @table-border-radius;
 
   table {
     width: 100%;
@@ -48,10 +48,10 @@
   // 表头
   .c-lib-table-thead>tr>th {
     color: @text-color;
-    font-weight: 500;
+    font-weight: @table-header-font-weight;
     background: @table-header-bg;
-    border-bottom: 1px solid @border-color-split;
-    padding: 16px 16px;
+    border-bottom: @base-border-width solid @border-color-split;
+    padding: @table-cell-padding;
     position: relative;
     transition: background 0.3s ease;
   }
@@ -68,9 +68,9 @@
     position: absolute;
     right: 0;
     top: 50%;
-    width: 16px;
-    height: 16px;
-    margin-top: -8px;
+    width: @table-sorter-size;
+    height: @table-sorter-size;
+    margin-top: -@spacing-sm;
     text-align: center;
     cursor: pointer;
     transition: color 0.3s;
@@ -88,7 +88,7 @@
 
   .c-lib-table-sorter-up,
   .c-lib-table-sorter-down {
-    font-size: 10px;
+    font-size: @table-sorter-icon-size;
     opacity: 0.5;
     color: @gray-5;
     transition: color 0.3s, opacity 0.3s;
@@ -129,17 +129,17 @@
     position: absolute;
     right: 0;
     top: 100%;
-    min-width: 120px;
+    min-width: @table-filter-dropdown-min-width;
     background-color: @text-color-inverse;
-    border-radius: 2px;
+    border-radius: @table-border-radius;
     box-shadow: @shadow-2;
     z-index: 10;
-    margin-top: 4px;
-    padding: 8px 0;
+    margin-top: @table-filter-dropdown-margin;
+    padding: @table-filter-dropdown-padding;
   }
 
   .c-lib-table-filter-dropdown-list {
-    max-height: 300px;
+    max-height: @table-filter-dropdown-max-height;
     overflow-y: auto;
     margin: 0;
     padding: 0;
@@ -147,7 +147,7 @@
   }
 
   .c-lib-table-filter-dropdown-item {
-    padding: 0 12px;
+    padding: @table-filter-item-padding;
 
     &:hover {
       background-color: @background-color-hover;
@@ -157,25 +157,25 @@
   .c-lib-table-filter-dropdown-item-label {
     display: flex;
     align-items: center;
-    padding: 7px 0;
+    padding: @table-filter-item-inner-padding;
     width: 100%;
     cursor: pointer;
 
     input {
-      margin-right: 8px;
+      margin-right: @spacing-sm;
     }
   }
 
   .c-lib-table-filter-dropdown-btns {
     display: flex;
     justify-content: space-between;
-    padding: 7px 8px 7px 8px;
-    border-top: 1px solid @border-color-split;
+    padding: @table-filter-button-padding;
+    border-top: @base-border-width solid @border-color-split;
   }
 
   .c-lib-table-filter-dropdown-link {
     color: @text-color;
-    font-size: 12px;
+    font-size: @table-filter-button-font-size;
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -192,8 +192,8 @@
 
   // 表格内容
   .c-lib-table-tbody>tr>td {
-    border-bottom: 1px solid @border-color-split;
-    padding: 16px 16px;
+    border-bottom: @base-border-width solid @border-color-split;
+    padding: @table-cell-padding;
     background-color: @text-color-inverse;
     // transition: all 0.3s;
   }
@@ -204,10 +204,10 @@
 
   // 无数据状态
   .c-lib-table-empty {
-    padding: 40px 0;
+    padding: @table-empty-padding;
     text-align: center;
     color: @text-color-disabled;
-    font-size: 14px;
+    font-size: @table-empty-font-size;
   }
 
   // 加载状态
@@ -241,20 +241,20 @@
     transform: translate(-50%, -50%);
     z-index: 1000;
     background-color: transparent;
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
+    width: @table-loading-container-size;
+    height: @table-loading-container-size;
+    border-radius: @table-loading-container-border-radius;
     display: flex;
     align-items: center;
     justify-content: center;
 
     .c-lib-table-loading-spinner {
       display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 3px solid fade(@background-color-light, 10%);
+      width: @table-loading-spinner-size;
+      height: @table-loading-spinner-size;
+      border: @table-loading-spinner-border solid fade(@background-color-light, 10%);
       border-top-color: @blue-base;
-      border-radius: 50%;
+      border-radius: @table-loading-spinner-border-radius;
       animation: spin 1s infinite linear;
     }
   }
@@ -302,7 +302,7 @@
 
     .c-lib-table-thead>tr>th,
     .c-lib-table-tbody>tr>td {
-      padding: 12px 16px;
+      padding: @table-cell-padding-middle;
     }
   }
 
@@ -311,20 +311,20 @@
 
     .c-lib-table-thead>tr>th,
     .c-lib-table-tbody>tr>td {
-      padding: 8px 16px;
+      padding: @table-cell-padding-small;
     }
   }
 
   // 带边框的表格
   &.c-lib-table-bordered {
-    border: 1px solid @border-color-split;
+    border: @base-border-width solid @border-color-split;
 
     .c-lib-table-thead>tr>th {
-      border-right: 1px solid @border-color-split;
+      border-right: @base-border-width solid @border-color-split;
     }
 
     .c-lib-table-tbody>tr>td {
-      border-right: 1px solid @border-color-split;
+      border-right: @base-border-width solid @border-color-split;
     }
   }
 
@@ -390,11 +390,11 @@
 
 // 表格标题
 .c-lib-table-title {
-  padding: 16px 16px;
-  border-radius: 2px 2px 0 0;
-  border: 1px solid @border-color-split;
+  padding: @table-cell-padding;
+  border-radius: @table-border-radius @table-border-radius 0 0;
+  border: @base-border-width solid @border-color-split;
   border-bottom: 0;
-  font-weight: 500;
+  font-weight: @table-header-font-weight;
 }
 
 // 表格底部

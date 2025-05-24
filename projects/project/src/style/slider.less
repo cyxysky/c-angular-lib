@@ -1,52 +1,52 @@
 .c-lib-slider {
   &-container {
     position: relative;
-    height: 12px;
-    margin: 14px 6px 10px;
-    padding: 4px 0;
+    height: @slider-container-height;
+    margin: @slider-container-margin;
+    padding: @slider-container-padding;
     cursor: pointer;
   }
 
   &-rail {
     position: absolute;
     width: 100%;
-    height: 4px;
+    height: @slider-rail-height;
     background-color: @slider-rail-bg;
-    border-radius: 2px;
+    border-radius: @slider-rail-border-radius;
     transition: background-color 0.3s;
   }
 
   &-track {
     position: absolute;
-    height: 4px;
+    height: @slider-track-height;
     background-color: @slider-track-bg;
-    border-radius: 2px;
+    border-radius: @slider-track-border-radius;
   }
 
   &-handle {
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: @slider-handle-size;
+    height: @slider-handle-size;
     margin-top: -5px;
     background-color: @text-color-inverse;
     z-index: 3;
-    border: 2px solid @slider-track-bg;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px @shadow-color-light;
+    border: @slider-handle-border-width solid @slider-track-bg;
+    border-radius: @slider-handle-border-radius;
+    box-shadow: @slider-handle-shadow @shadow-color-light;
     cursor: pointer;
-    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transition: @slider-handle-transition;
     transform: translateX(-50%);
 
     &:hover,
     &:active {
       border-color: @slider-track-bg;
-      box-shadow: 0 0 0 5px fade(@blue-base, 12%);
+      box-shadow: @slider-handle-hover-shadow fade(@blue-base, 12%);
     }
   }
 
   &-marks {
     position: absolute;
-    top: 14px;
+    top: @slider-marks-top;
     left: 0;
     width: 100%;
   }
@@ -61,11 +61,11 @@
       top: -12px;
       left: 50%;
       z-index: 1;
-      width: 8px;
-      height: 8px;
+      width: @slider-mark-size;
+      height: @slider-mark-size;
       background-color: @text-color-inverse;
-      border: 1px solid @border-color-base;
-      border-radius: 50%;
+      border: @slider-mark-border-width solid @border-color-base;
+      border-radius: @slider-handle-border-radius;
       transform: translateX(-50%);
     }
 
@@ -78,12 +78,12 @@
       white-space: nowrap;
       transform: translateX(-50%);
       user-select: none;
-      font-size: 12px;
-      margin-top: 10px;
+      font-size: @slider-mark-text-font-size;
+      margin-top: @slider-mark-text-margin-top;
     }
   }
 
   &-with-marks {
-    margin-bottom: 28px;
+    margin-bottom: @slider-with-marks-margin;
   }
 }

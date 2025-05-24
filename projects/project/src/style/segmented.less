@@ -4,10 +4,10 @@
     display: inline-flex;
     align-items: center;
     background-color: @background-color-light;
-    border-radius: 6px;
-    padding: 2px;
+    border-radius: @segmented-border-radius;
+    padding: @segmented-padding;
     max-width: 100%;
-    gap: 4px;
+    gap: @segmented-gap;
 
     &-container {
         position: relative;
@@ -41,14 +41,14 @@
     &-item {
         position: relative;
         color: @text-color-secondary;
-        height: 28px;
-        padding: 0 12px;
+        height: @segmented-item-height;
+        padding: @segmented-item-padding;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: color 0.3s;
+        transition: @segmented-item-transition;
         flex: 0 0 auto;
         z-index: 2;
 
@@ -61,7 +61,7 @@
         }
 
         &-icon {
-            margin-right: 6px;
+            margin-right: @segmented-item-icon-margin;
         }
 
         &-selected {
@@ -77,11 +77,10 @@
     &-thumb {
         position: absolute;
         background-color: @text-color-inverse;
-        border-radius: 4px;
+        border-radius: @segmented-thumb-border-radius;
         box-shadow: @shadow-1-down;
-        transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
-            width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-        height: 28px;
+        transition: @segmented-thumb-transition;
+        height: @segmented-thumb-height;
         top: 0;
         left: 0;
         z-index: 1;
@@ -91,18 +90,18 @@
     }
 
     &-nav {
-        flex: 0 0 28px;
-        height: 28px;
+        flex: 0 0 @segmented-nav-size;
+        height: @segmented-nav-size;
         display: flex;
         align-items: center;
         justify-content: center;
         background-color: @text-color-inverse;
-        border-radius: 4px;
+        border-radius: @segmented-nav-border-radius;
         cursor: pointer;
         z-index: 3;
-        transition: all 0.3s;
+        transition: @segmented-nav-transition;
         color: @text-color-tertiary;
-        box-shadow: 0 2px 5px @shadow-color-light;
+        box-shadow: 0 @shadow-level-1 5px @shadow-color-light;
 
         &:hover {
             background-color: @background-color-lighter;
@@ -131,14 +130,14 @@
 
     &-prev {
         .c-lib-segmented-nav-icon {
-            border-width: 4px 6px 4px 0;
+            border-width: @segmented-nav-arrow-size 6px @segmented-nav-arrow-size 0;
             border-color: transparent currentColor transparent transparent;
         }
     }
 
     &-next {
         .c-lib-segmented-nav-icon {
-            border-width: 4px 0 4px 6px;
+            border-width: @segmented-nav-arrow-size 0 @segmented-nav-arrow-size 6px;
             border-color: transparent transparent transparent currentColor;
         }
     }
@@ -157,54 +156,54 @@
     }
 
     &-lg {
-        padding: 3px;
+        padding: @segmented-large-padding;
 
         .c-lib-segmented-item {
-            height: 40px;
-            font-size: 16px;
+            height: @segmented-large-item-height;
+            font-size: @segmented-large-font-size;
         }
 
         .c-lib-segmented-nav {
-            height: 40px;
-            flex-basis: 32px;
+            height: @segmented-large-item-height;
+            flex-basis: @segmented-large-nav-size;
 
             &-icon {
-                border-width: 5px 7px 5px 0;
+                border-width: @segmented-large-arrow-size 0;
             }
         }
 
         .c-lib-segmented-next .c-lib-segmented-nav-icon {
-            border-width: 5px 0 5px 7px;
+            border-width: @segmented-large-arrow-size 0;
         }
 
         .c-lib-segmented-thumb {
-            height: 40px;
+            height: @segmented-large-item-height;
         }
     }
 
     &-sm {
-        padding: 1px;
+        padding: @segmented-small-padding;
 
         .c-lib-segmented-item {
-            height: 24px;
-            font-size: 12px;
+            height: @segmented-small-item-height;
+            font-size: @segmented-small-font-size;
         }
 
         .c-lib-segmented-nav {
-            height: 24px;
-            flex-basis: 24px;
+            height: @segmented-small-item-height;
+            flex-basis: @segmented-small-nav-size;
 
             &-icon {
-                border-width: 3px 5px 3px 0;
+                border-width: @segmented-small-arrow-size 0;
             }
         }
 
         .c-lib-segmented-next .c-lib-segmented-nav-icon {
-            border-width: 3px 0 3px 5px;
+            border-width: @segmented-small-arrow-size 0;
         }
 
         .c-lib-segmented-thumb {
-            height: 24px;
+            height: @segmented-small-item-height;
         }
     }
 

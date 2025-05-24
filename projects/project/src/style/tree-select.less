@@ -2,12 +2,12 @@
 .c-lib-tree-select-dropdown {
     background-color: @select-dropdown-bg;
     box-shadow: @shadow-2;
-    border-radius: 4px;
+    border-radius: @tree-select-dropdown-border-radius;
     transform-origin: 0 0;
-    transition: all @visible-animation-duration;
+    transition: @tree-select-dropdown-transition;
     opacity: 0;
     transform: scaleY(0.1);
-    z-index: 1000;
+    z-index: @tree-select-dropdown-z-index;
 
     &.c-lib-tree-select-dropdown-visible {
         opacity: 1;

@@ -1,0 +1,192 @@
+// ============================================================================
+// 暗色主题配置文件
+// 定义格式：主题变量名称: 基础变量
+// ============================================================================
+
+@import './base.less';
+
+// ===== 基础色板 =====
+@blue-base: #177ddc;
+@blue-hover: #69c0ff;
+@blue-active: #0958d9;
+@blue-light: #111b26;
+
+@green-base: #49aa19;
+@red-base: #dc4446;
+@yellow-base: #d89614;
+@orange-base: #d46b08;
+@purple-base: #9254de;
+
+@gray-1: #1f1f1f;
+@gray-2: #262626;
+@gray-3: #434343;
+@gray-4: #595959;
+@gray-5: #8c8c8c;
+@gray-6: #bfbfbf;
+@gray-7: #d9d9d9;
+@gray-8: #f0f0f0;
+@gray-9: #f5f5f5;
+@gray-10: #fafafa;
+
+@white: #000000;
+@black: #ffffff;
+
+// ===== 主色系 =====
+@primary-color: @blue-base;
+@primary-color-hover: @blue-hover;
+@primary-color-active: @blue-active;
+@primary-color-outline: fade(@primary-color, 35%);
+@primary-color-bg: @blue-light;
+@primary-color-bg-hover: fade(@primary-color, 15%);
+
+// ===== 功能色系 =====
+@success-color: @green-base;
+@warning-color: @yellow-base;
+@error-color: @red-base;
+@info-color: @blue-base;
+
+@success-color-hover: fade(@success-color, 80%);
+@warning-color-hover: fade(@warning-color, 80%);
+@error-color-hover: fade(@error-color, 80%);
+@info-color-hover: fade(@info-color, 80%);
+
+@success-color-outline: fade(@success-color, 35%);
+@warning-color-outline: fade(@warning-color, 35%);
+@error-color-outline: fade(@error-color, 35%);
+@info-color-outline: fade(@info-color, 35%);
+
+@success-color-bg: fade(@success-color, 15%);
+@warning-color-bg: fade(@warning-color, 15%);
+@error-color-bg: fade(@error-color, 15%);
+@info-color-bg: fade(@info-color, 15%);
+
+// ===== 语义色系 =====
+@secondary-color: #177ddc;
+@tertiary-color: #9254de;
+@danger-color: #a61d24;
+@dark-color: #d9d9d9;
+@medium-color: #8c8c8c;
+@light-color: #262626;
+
+// ===== 文本颜色 =====
+@text-color: fade(@black, @opacity-high);
+@text-color-secondary: fade(@black, @opacity-medium);
+@text-color-tertiary: fade(@black, @opacity-light);
+@text-color-disabled: fade(@black, @opacity-disabled);
+@text-color-inverse: @white;
+
+// 暗色模式特有文本颜色
+@text-color-dark-mode: fade(@black, @opacity-medium);
+@text-color-dark-mode-active: @black;
+@text-color-dark-mode-disabled: fade(@black, 35%);
+
+// ===== 背景颜色 =====
+@background-color-base: @gray-2;
+@background-color-light: @gray-3;
+@background-color-lighter: @gray-1;
+@background-color-disabled: @gray-3;
+@background-color-hover: @gray-3;
+@background-color-active: @gray-4;
+@background-color-selected: @primary-color-bg;
+
+// 暗色模式背景
+@background-color-dark: #001529;
+@background-color-dark-deep: #000c17;
+
+// 遮罩背景
+@background-color-mask: fade(@black, 70%);
+@background-color-mask-light: fade(@black, 15%);
+@background-color-mask-lighter: fade(@black, 8%);
+@background-color-dark-mask: fade(@white, 10%);
+
+// ===== 边框颜色 =====
+@border-color-base: @gray-4;
+@border-color-split: @gray-3;
+@border-color-primary: @primary-color;
+@border-color-hover: @primary-color;
+@border-color-focus: @primary-color;
+@border-color-error: @error-color;
+@border-color-warning: @warning-color;
+@border-color-success: @success-color;
+
+// ===== 阴影颜色 =====
+@shadow-color: fade(@black, 25%);
+@shadow-color-light: fade(@black, 20%);
+@shadow-color-lighter: fade(@black, 15%);
+@shadow-color-lightest: fade(@black, 10%);
+
+// 阴影效果
+@shadow-1-up: 0 -@shadow-level-1 @shadow-level-3 fade(@black, 15%);
+@shadow-1-down: 0 @shadow-level-1 @shadow-level-3 @shadow-color;
+@shadow-1-left: -@shadow-level-1 0 @shadow-level-3 fade(@black, 15%);
+@shadow-1-right: @shadow-level-1 0 @shadow-level-3 fade(@black, 15%);
+@shadow-2: 0 3px 6px -4px fade(@black, 20%), 0 6px @shadow-level-4 0 fade(@black, 15%);
+@shadow-3: 0 3px 6px -4px fade(@black, 20%), 0 6px @shadow-level-4 0 fade(@black, 15%), 0 9px 28px @shadow-level-3 fade(@black, 10%);
+
+// ===== 组件特定颜色 =====
+// Tooltip
+@tooltip-bg: fade(@gray-8, 75%);
+@tooltip-color: @gray-1;
+
+// Popover
+@popover-bg: @gray-2;
+@popover-color: @text-color;
+
+// Select
+@select-dropdown-bg: @gray-2;
+@select-item-selected-bg: @primary-color-bg;
+
+// Menu
+@menu-bg: @gray-2;
+@menu-item-color: @text-color;
+@menu-item-hover-bg: @background-color-hover;
+@menu-item-active-bg: @primary-color-bg;
+@menu-item-active-color: @primary-color;
+@menu-dark-bg: @background-color-dark;
+@menu-dark-submenu-bg: @background-color-dark-deep;
+
+// Table
+@table-header-bg: @gray-3;
+@table-row-hover-bg: @gray-3;
+@table-border-color: @border-color-split;
+
+// Modal
+@modal-bg: @gray-2;
+@modal-mask-bg: @background-color-mask;
+
+// Drawer
+@drawer-bg: @gray-2;
+@drawer-shadow: 0 0 10px fade(@black, 35%);
+
+// Form Controls
+@disabled-bg: @gray-3;
+@disabled-color: @text-color-disabled;
+
+// Checkbox & Radio
+@checkbox-checked-color: @primary-color;
+@checkbox-checked-bg: @primary-color;
+@checkbox-inner-color: @gray-1;
+@radio-dot-color: @primary-color;
+@radio-bg: @gray-2;
+
+// Slider
+@slider-track-bg: @primary-color-hover;
+@slider-rail-bg: @gray-3;
+@slider-handle-color: @primary-color;
+
+// Switch
+@switch-bg: fade(@gray-5, 50%);
+@switch-checked-bg: @primary-color;
+
+// Tabs
+@tabs-active-color: @primary-color;
+@tabs-hover-color: @primary-color-hover;
+@tabs-bg: @gray-2;
+
+// Tree
+@tree-node-selected-bg: fade(@blue-base, 15%);
+@tree-node-hover-bg: @background-color-hover;
+
+// 其他效果
+@ripple-color: fade(@gray-6, 60%);
+@focus-outline-color: @primary-color-outline; 

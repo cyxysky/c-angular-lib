@@ -2,15 +2,15 @@
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  min-width: 44px;
-  height: 22px;
-  line-height: 22px;
+  min-width: @switch-min-width;
+  height: @switch-height;
+  line-height: @switch-height;
   vertical-align: middle;
   background-color: @switch-bg;
   border: 0;
-  border-radius: 100px;
+  border-radius: @switch-border-radius;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: @switch-transition;
   user-select: none;
   padding: 0;
   outline: none;
@@ -20,7 +20,7 @@
   }
 
   &-focused {
-    box-shadow: 0 0 0 2px @primary-color-outline;
+    box-shadow: @switch-focus-shadow @primary-color-outline;
   }
 
   &-checked {
@@ -29,23 +29,23 @@
 
   &-disabled {
     cursor: not-allowed;
-    opacity: 0.4;
+    opacity: @switch-disabled-opacity;
   }
 
   &-handle {
     position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 18px;
-    height: 18px;
-    transition: all 0.2s;
-    border-radius: 100%;
+    top: @switch-handle-margin;
+    left: @switch-handle-margin;
+    width: @switch-handle-size;
+    height: @switch-handle-size;
+    transition: @switch-transition;
+    border-radius: @switch-border-radius;
     background-color: @text-color-inverse;
-    box-shadow: 0 2px 4px 0 fade(@black, 20%);
+    box-shadow: @switch-handle-shadow;
   }
 
   &-checked &-handle {
-    left: calc(100% - 22px + 2px);
+    left: calc(100% - @switch-height + @switch-handle-margin);
   }
 
   &-loading-icon {
@@ -60,9 +60,9 @@
   }
 
   &-inner {
-    margin: 0 7px 0 24px;
+    margin: @switch-inner-margin;
     color: @text-color-inverse;
-    font-size: 12px;
+    font-size: @switch-inner-font-size;
     transition: margin 0.2s;
   }
 
@@ -72,23 +72,23 @@
   }
 
   &-small {
-    min-width: 28px;
-    height: 16px;
-    line-height: 16px;
+    min-width: @switch-small-min-width;
+    height: @switch-small-height;
+    line-height: @switch-small-height;
 
     .c-lib-switch-handle {
-      width: 12px;
-      height: 12px;
+      width: @switch-small-handle-size;
+      height: @switch-small-handle-size;
     }
 
     &.c-lib-switch-checked .c-lib-switch-handle {
-      left: calc(100% - 16px + 2px);
+      left: calc(100% - @switch-small-height + @switch-handle-margin);
     }
 
     .c-lib-switch-inner {
       margin-left: 18px;
       margin-right: 5px;
-      font-size: 12px;
+      font-size: @switch-inner-font-size;
     }
 
     &.c-lib-switch-checked .c-lib-switch-inner {

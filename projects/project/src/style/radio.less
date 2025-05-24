@@ -1,7 +1,7 @@
 .c-lib-radio-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: @radio-group-gap;
 
     &.c-lib-radio-group-vertical {
         flex-direction: column;
@@ -11,17 +11,17 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        margin-right: 16px;
+        margin-right: @radio-spacing;
 
         &.c-lib-radio-disabled {
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: @radio-disabled-opacity;
         }
 
         .c-lib-radio {
             position: relative;
             display: inline-block;
-            margin-right: 8px;
+            margin-right: @radio-input-spacing;
             white-space: nowrap;
             outline: none;
 
@@ -39,28 +39,28 @@
             .c-lib-radio-inner {
                 position: relative;
                 display: block;
-                width: 16px;
-                height: 16px;
+                width: @radio-size;
+                height: @radio-size;
                 background-color: @radio-bg;
-                border: 1px solid @border-color-base;
+                border: @radio-border-width solid @border-color-base;
                 color: @radio-dot-color;
-                border-radius: 50%;
-                transition: all 0.3s;
+                border-radius: @border-radius-round;
+                transition: @radio-transition;
 
                 &::after {
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     display: block;
-                    width: 8px;
-                    height: 8px;
+                    width: @radio-dot-size;
+                    height: @radio-dot-size;
                     margin-top: -4px;
                     margin-left: -4px;
                     background-color: currentColor;
-                    border-radius: 50%;
+                    border-radius: @border-radius-round;
                     transform: scale(0);
                     opacity: 0;
-                    transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+                    transition: all @animation-duration-normal cubic-bezier(0.78, 0.14, 0.15, 0.86);
                     content: '';
                 }
             }
@@ -76,7 +76,7 @@
         }
 
         .c-lib-radio-label {
-            padding: 0 8px;
+            padding: @radio-label-padding;
         }
     }
 }

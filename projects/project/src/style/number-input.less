@@ -12,7 +12,7 @@ lib-number-input {
 
     &.c-lib-number-input-focused {
         border-color: @error-color;
-        box-shadow: 0 0 0 2px @error-color-outline;
+        box-shadow: @number-input-focus-shadow @error-color-outline;
     }
 }
 
@@ -25,7 +25,7 @@ lib-number-input {
 
     &.c-lib-number-input-focused {
         border-color: @warning-color;
-        box-shadow: 0 0 0 2px @warning-color-outline;
+        box-shadow: @number-input-focus-shadow @warning-color-outline;
     }
 }
 
@@ -33,13 +33,13 @@ lib-number-input {
     position: relative;
     display: flex;
     align-items: stretch;
-    padding: 0 9px;
-    border: 1px solid @border-color-base;
-    border-radius: 2px;
-    transition: all 0.3s;
+    padding: @number-input-container-padding;
+    border: @number-input-container-border-width solid @border-color-base;
+    border-radius: @number-input-container-border-radius;
+    transition: @number-input-container-transition;
     box-sizing: border-box;
-    height: 32px;
-    font-size: 14px;
+    height: @number-input-container-height;
+    font-size: @number-input-container-font-size;
 
     &:hover {
         border-color: @primary-color;
@@ -47,7 +47,7 @@ lib-number-input {
 
     &.c-lib-number-input-focused {
         border-color: @primary-color;
-        box-shadow: 0 0 0 2px @primary-color-outline;
+        box-shadow: @number-input-focus-shadow @primary-color-outline;
     }
 
     &.c-lib-number-input-disabled {
@@ -75,7 +75,7 @@ lib-number-input {
     border: none;
     outline: none;
     padding: 0;
-    font-size: 14px;
+    font-size: @number-input-font-size;
     background: transparent;
     height: 100%;
 
@@ -91,18 +91,18 @@ lib-number-input {
     display: flex;
     flex: none;
     align-items: center;
-    padding-right: 2px;
+    padding-right: @number-input-prefix-suffix-padding;
     color: @text-color-secondary;
 }
 
 
 .c-lib-number-input-suffix {
-    margin-left: 4px;
-    margin-right: 16px;
+    margin-left: @number-input-suffix-margin-left;
+    margin-right: @number-input-suffix-margin-right;
 }
 
 .c-lib-number-input-content {
-    width: calc(100% - 16px);
+    width: @number-input-content-width;
     height: 100%;
     display: flex;
     align-items: center;
@@ -113,9 +113,9 @@ lib-number-input {
     position: absolute;
     top: 0;
     right: 0;
-    width: 22px;
+    width: @number-input-handler-wrap-width;
     height: 100%;
-    border-left: 1px solid @border-color-base;
+    border-left: @number-input-handler-wrap-border-width solid @border-color-base;
     display: flex;
     flex-direction: column;
 }
@@ -130,7 +130,7 @@ lib-number-input {
     background: transparent;
     padding: 0;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: @number-input-handler-transition;
     outline: none;
 
     &:hover {
@@ -159,26 +159,26 @@ lib-number-input {
 }
 
 .c-lib-number-input-handler-up {
-    border-bottom: 1px solid @border-color-base;
+    border-bottom: @number-input-handler-up-border-width solid @border-color-base;
 }
 
 /* 正确的三角形方向 */
 .c-lib-number-input-handler-up-inner {
     width: 0;
     height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
+    border-left: @number-input-handler-arrow-size solid transparent;
+    border-right: @number-input-handler-arrow-size solid transparent;
     border-top: 0;
-    border-bottom: 4px solid @text-color-tertiary;
+    border-bottom: @number-input-handler-arrow-size solid @text-color-tertiary;
     display: inline-block;
 }
 
 .c-lib-number-input-handler-down-inner {
     width: 0;
     height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
+    border-left: @number-input-handler-arrow-size solid transparent;
+    border-right: @number-input-handler-arrow-size solid transparent;
     border-bottom: 0;
-    border-top: 4px solid @text-color-tertiary;
+    border-top: @number-input-handler-arrow-size solid @text-color-tertiary;
     display: inline-block;
 }

@@ -4,12 +4,12 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1000;
+    z-index: @modal-z-index;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: auto;
-    padding: 20px 0;
+    padding: @modal-container-padding;
 }
 
 .c-lib-modal-mask {
@@ -25,23 +25,23 @@
 .c-lib-modal-content {
     position: relative;
     background-color: @text-color-inverse;
-    border-radius: 4px;
+    border-radius: @modal-border-radius;
     box-shadow: @shadow-3;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    max-width: 90vw;
-    max-height: 90vh;
+    max-width: @modal-max-width;
+    max-height: @modal-max-height;
 
     .c-lib-modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 16px 24px;
+        padding: @modal-header-padding;
         color: @text-color;
         background: @text-color-inverse;
-        border-bottom: 1px solid @border-color-split;
-        border-radius: 4px 4px 0 0;
+        border-bottom: @base-border-width solid @border-color-split;
+        border-radius: @modal-border-radius @modal-border-radius 0 0;
 
         .c-lib-modal-draggable {
             cursor: move;
@@ -56,7 +56,7 @@
     .c-lib-modal-body {
         display: flex;
         flex-direction: column;
-        padding: 24px;
+        padding: @modal-body-padding;
         overflow: auto;
         flex: 1;
     }
@@ -64,18 +64,18 @@
     .c-lib-modal-footer {
         display: flex;
         justify-content: flex-end;
-        padding: 10px 16px;
+        padding: @modal-footer-padding;
         background: @text-color-inverse;
-        border-top: 1px solid @border-color-split;
-        border-radius: 0 0 4px 4px;
+        border-top: @base-border-width solid @border-color-split;
+        border-radius: 0 0 @modal-border-radius @modal-border-radius;
     }
 
     .c-lib-modal-close {
         z-index: 10;
         color: @text-color-tertiary;
-        font-weight: 700;
+        font-weight: @modal-close-font-weight;
         cursor: pointer;
-        transition: color 0.3s;
+        transition: @modal-close-transition;
 
         &:hover {
             color: @text-color-secondary;

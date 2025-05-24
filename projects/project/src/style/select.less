@@ -4,15 +4,15 @@
 }
 
 .c-lib-select-option-base() {
-    padding: 8px 12px;
+    padding: @select-option-padding;
     display: flex;
     align-items: center;
-    height: 36px;
+    height: @select-option-height;
     cursor: pointer;
-    font-size: 14px;
+    font-size: @select-option-font-size;
     color: @text-color;
-    border-radius: 2px;
-    transition: all 0.2s ease;
+    border-radius: @select-option-border-radius;
+    transition: @select-option-transition;
 
     &:hover,
     &.c-lib-select-option-active {
@@ -38,7 +38,7 @@
 
 .c-lib-select-option-selected-base() {
     background-color: fade(@blue-base, 6%) !important;
-    font-weight: 500;
+    font-weight: @select-option-font-weight-selected;
     color: fade(@blue-base, 67%);
 }
 
@@ -48,16 +48,16 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 32px 0;
+    padding: @select-empty-padding;
 
     .c-lib-select-empty-icon {
-        margin-bottom: 16px;
+        margin-bottom: @select-empty-icon-margin;
         color: fade(@black, 15%);
     }
 
     .c-lib-select-empty-text {
         color: @text-color-tertiary;
-        font-size: 14px;
+        font-size: @select-empty-font-size;
     }
 }
 
@@ -65,13 +65,13 @@
     background: @text-color-inverse;
     box-shadow: @shadow-2;
     width: 100%;
-    margin: 5px 0px;
-    border-radius: 4px;
+    margin: @select-dropdown-margin;
+    border-radius: @select-dropdown-border-radius;
     overflow: hidden;
     transform-origin: 0 0;
     opacity: 0;
     transform: scaleY(0.1);
-    transition: all @visible-animation-duration;
+    transition: @select-dropdown-transition;
 
     &.c-lib-select-dropdown-visible {
         opacity: 1;
@@ -84,7 +84,7 @@
         align-items: center;
         height: 100%;
         color: @text-color-disabled;
-        font-size: 14px;
+        font-size: @select-empty-font-size;
     }
 
     .c-lib-select-empty-container {
@@ -95,7 +95,7 @@
 .c-lib-select-option-list {
     flex-grow: 1;
     overflow: auto;
-    max-height: 400px;
+    max-height: @select-option-list-max-height;
 
     .c-lib-select-option-option {
         .c-lib-select-option {
@@ -119,11 +119,11 @@
 }
 
 .c-lib-select-group-title {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: @select-group-title-padding;
+    font-size: @select-group-title-font-size;
     color: @text-color-tertiary;
     background-color: @background-color-mask-lighter;
-    font-weight: 500;
+    font-weight: @select-group-title-font-weight;
 }
 
 .c-lib-select-virtual-scroll-container {
@@ -142,19 +142,19 @@
     will-change: scroll-position;
 
     .c-lib-select-option {
-        padding: 8px 12px;
+        padding: @select-option-padding;
         display: grid;
         align-items: center;
         max-width: 100%;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        height: 36px;
+        height: @select-option-height;
         cursor: pointer;
-        font-size: 14px;
+        font-size: @select-option-font-size;
         color: @text-color;
-        border-radius: 2px;
-        transition: all 0.2s ease;
+        border-radius: @select-option-border-radius;
+        transition: @select-option-transition;
 
         .c-lib-select-option-text {
             max-width: 100%;
@@ -187,7 +187,7 @@
 }
 
 .c-lib-select-padding-left-8 {
-    padding-left: 4px;
+    padding-left: @select-padding-left;
 }
 
 
@@ -195,7 +195,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
+    height: @select-loading-height;
 
     .c-lib-select-loading-text {
         color: @text-color-tertiary;

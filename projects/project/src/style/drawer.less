@@ -9,7 +9,7 @@
 
 .c-lib-drawer {
     position: fixed;
-    z-index: 1000;
+    z-index: @drawer-z-index;
     pointer-events: auto;
     background-color: @text-color-inverse;
     box-shadow: @drawer-shadow;
@@ -56,8 +56,8 @@
 }
 
 .c-lib-drawer-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid @border-color-split;
+    padding: @drawer-header-padding;
+    border-bottom: @drawer-header-border-width solid @border-color-split;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -66,10 +66,10 @@
 
 .c-lib-drawer-title {
     margin: 0;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: @drawer-title-font-size;
+    font-weight: @drawer-title-font-weight;
     color: @text-color;
-    line-height: 22px;
+    line-height: @drawer-title-line-height;
     flex: 1;
 }
 
@@ -78,10 +78,10 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
+    font-size: @drawer-close-font-size;
+    line-height: @drawer-close-line-height;
     color: @text-color-tertiary;
-    transition: color 0.3s;
+    transition: @drawer-close-transition;
 
     &:hover {
         color: @text-color;
@@ -91,12 +91,12 @@
 .c-lib-drawer-close-x {
     display: block;
     font-style: normal;
-    font-size: 18px;
+    font-size: @drawer-close-x-font-size;
     line-height: 1;
 }
 
 .c-lib-drawer-body {
     flex: 1;
-    padding: 24px;
+    padding: @drawer-body-padding;
     overflow: auto;
 }

@@ -8,7 +8,7 @@ lib-select {
 }
 
 .c-lib-select-basic-search-box {
-    margin-left: 4px;
+    margin-left: @select-basic-search-box-margin;
     max-width: 100%;
     position: relative;
 
@@ -26,7 +26,7 @@ lib-select {
         border: none;
         outline: none;
         appearance: none;
-        width: 4px;
+        width: @select-basic-search-input-width;
     }
 }
 
@@ -36,17 +36,17 @@ lib-select {
     max-width: 100%;
     background-color: fade(@blue-base, 6%);
     color: fade(@blue-base, 67%);
-    border-radius: 2px;
+    border-radius: @select-basic-tag-border-radius;
     cursor: default;
     box-sizing: border-box;
-    transition: all 0.2s ease;
-    border: 1px solid fade(@blue-base, 12%);
-    box-shadow: 0 1px 2px fade(@black, 2%);
+    transition: @select-basic-tag-transition;
+    border: @select-basic-tag-border-width solid fade(@blue-base, 12%);
+    box-shadow: 0 @base-border-width @shadow-level-1 fade(@black, 2%);
     white-space: nowrap;
     overflow: hidden;
 
     .c-lib-select-basic-tag-text-box {
-        padding-right: 4px;
+        padding-right: @select-basic-tag-text-padding;
         line-height: normal;
         display: flex;
         align-items: center;
@@ -67,8 +67,8 @@ lib-select {
         justify-content: center;
         cursor: pointer;
         pointer-events: all;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        border-radius: @select-basic-tag-close-border-radius;
+        transition: @select-basic-tag-close-transition;
         flex: 0 0 auto;
 
         &:hover {
@@ -82,43 +82,43 @@ lib-select {
 }
 
 .c-lib-select-basic-tag-base {
-    padding: 0 4px 0 8px;
-    height: 24px;
+    padding: @select-basic-tag-base-padding;
+    height: @select-basic-tag-base-height;
 
     .c-lib-select-basic-tag-close-icon {
-        width: 16px;
-        height: 16px;
+        width: @select-basic-tag-base-close-size;
+        height: @select-basic-tag-base-close-size;
     }
 }
 
 .c-lib-select-basic-tag-sm {
-    padding: 0 2px 0 6px;
-    height: 16px;
-    border-radius: 2px;
+    padding: @select-basic-tag-sm-padding;
+    height: @select-basic-tag-sm-height;
+    border-radius: @select-basic-tag-border-radius;
 
     .c-lib-select-basic-tag-close-icon {
-        width: 12px;
-        height: 12px;
+        width: @select-basic-tag-sm-close-size;
+        height: @select-basic-tag-sm-close-size;
     }
 }
 
 .c-lib-select-basic-tag-lg {
-    padding: 0 6px 0 10px;
-    height: 32px;
+    padding: @select-basic-tag-lg-padding;
+    height: @select-basic-tag-lg-height;
 
     .c-lib-select-basic-tag-close-icon {
-        width: 24px;
-        height: 24px;
+        width: @select-basic-tag-lg-close-size;
+        height: @select-basic-tag-lg-close-size;
     }
 }
 
 .c-lib-select-basic-box {
     background-color: @text-color-inverse;
-    border: 1px solid @border-color-base;
-    border-radius: 2px;
-    transition: all 0.2s ease;
-    min-height: 32px;
-    font-size: 14px;
+    border: @select-basic-box-border-width solid @border-color-base;
+    border-radius: @select-basic-box-border-radius;
+    transition: @select-basic-box-transition;
+    min-height: @select-basic-box-min-height;
+    font-size: @select-basic-box-font-size;
     cursor: pointer;
     line-height: normal;
     display: flex;
@@ -132,58 +132,58 @@ lib-select {
 
     &.c-lib-select-basic-box-active {
         border-color: @primary-color;
-        box-shadow: 0 0 0 2px @primary-color-outline;
+        box-shadow: @select-basic-box-focus-shadow @primary-color-outline;
         outline: none;
     }
 
     .c-lib-select-basic-search-input {
-        height: 28px;
+        height: @select-basic-box-search-height;
     }
 
     &.c-lib-select-basic-box-lg {
-        min-height: 40px;
-        font-size: 16px;
+        min-height: @select-basic-box-lg-min-height;
+        font-size: @select-basic-box-lg-font-size;
 
         .c-lib-select-basic-box-content {
-            min-height: 36px;
+            min-height: @select-basic-box-lg-content-min-height;
         }
 
         .c-lib-select-basic-box-placeholder,
         .c-lib-select-basic-box-singal-data {
-            font-size: 16px;
-            padding-left: 4px;
+            font-size: @select-basic-box-lg-font-size;
+            padding-left: @select-basic-box-lg-placeholder-padding;
         }
 
         .c-lib-select-basic-search-input {
-            height: 36px;
+            height: @select-basic-box-lg-search-height;
         }
     }
 
     &.c-lib-select-basic-box-sm {
-        min-height: 24px;
-        font-size: 14px;
+        min-height: @select-basic-box-sm-min-height;
+        font-size: @select-basic-box-font-size;
 
         .c-lib-select-basic-box-content {
-            min-height: 20px;
+            min-height: @select-basic-box-sm-content-min-height;
         }
 
         .c-lib-select-basic-box-placeholder,
         .c-lib-select-basic-box-singal-data {
-            font-size: 14px;
-            padding-left: 4px;
+            font-size: @select-basic-box-font-size;
+            padding-left: @select-basic-box-lg-placeholder-padding;
         }
 
         .c-lib-select-basic-box-suffix {
-            min-width: 24px;
-            max-width: 24px;
+            min-width: @select-basic-box-sm-suffix-size;
+            max-width: @select-basic-box-sm-suffix-size;
             height: 100%;
         }
 
         .c-lib-select-basic-search-box {
-            margin-left: 4px;
+            margin-left: @select-basic-box-sm-search-margin;
 
             .c-lib-select-basic-search-input {
-                height: 16px;
+                height: @select-basic-box-sm-search-height;
             }
         }
     }
@@ -194,20 +194,20 @@ lib-select {
     }
 
     &.c-lib-select-basic-box-error {
-        border: 1px solid @error-color;
+        border: @select-basic-box-border-width solid @error-color;
 
         &.c-lib-select-basic-box-active {
-            border: 1px solid @error-color;
-            box-shadow: 0 0 0 2px @error-color-outline;
+            border: @select-basic-box-border-width solid @error-color;
+            box-shadow: @select-basic-box-focus-shadow @error-color-outline;
         }
     }
 
     &.c-lib-select-basic-box-warning {
-        border: 1px solid @warning-color;
+        border: @select-basic-box-border-width solid @warning-color;
 
         &.c-lib-select-basic-box-active {
-            border: 1px solid @warning-color;
-            box-shadow: 0 0 0 2px @warning-color-outline;
+            border: @select-basic-box-border-width solid @warning-color;
+            box-shadow: @select-basic-box-focus-shadow @warning-color-outline;
         }
     }
 
@@ -215,12 +215,12 @@ lib-select {
         flex-grow: 1;
         display: flex;
         flex-wrap: wrap;
-        padding: 1px 4px;
-        min-height: 28px;
+        padding: @select-basic-box-content-padding;
+        min-height: @select-basic-box-content-min-height;
         position: relative;
         gap: 0px;
         align-items: center;
-        max-width: calc(100% - 30px);
+        max-width: @select-basic-box-content-max-width;
         overflow: hidden;
     }
 
@@ -230,15 +230,15 @@ lib-select {
         justify-content: center;
         flex-grow: 0;
         flex-shrink: 0;
-        min-width: 30px;
-        max-width: 30px;
+        min-width: @select-basic-box-suffix-min-width;
+        max-width: @select-basic-box-suffix-max-width;
         height: 100%;
         margin-left: auto;
 
         .c-lib-select-basic-box-clear-icon {
             display: none;
             color: @text-color-tertiary;
-            transition: all 0.2s ease;
+            transition: @select-basic-tag-transition;
 
             &:hover {
                 color: @text-color-secondary;
@@ -246,7 +246,7 @@ lib-select {
         }
 
         .c-lib-select-basic-box-icon {
-            transition: all 0.3s ease-in-out;
+            transition: @select-basic-box-icon-transition;
             color: @text-color-secondary;
         }
 
@@ -282,12 +282,12 @@ lib-select {
 .c-lib-select-basic-box-placeholder {
     display: flex;
     align-items: center;
-    padding-left: 4px;
+    padding-left: @select-basic-placeholder-padding;
     color: @text-color-tertiary;
     position: absolute;
     height: 100%;
     line-height: normal;
-    max-width: calc(100% - 8px);
+    max-width: @select-basic-placeholder-max-width;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -300,7 +300,7 @@ lib-select {
 }
 
 .c-lib-select-basic-box-singal-data {
-    padding-left: 4px;
+    padding-left: @select-basic-placeholder-padding;
     color: @text-color;
     position: absolute;
     max-width: 100%;
@@ -344,6 +344,6 @@ lib-select {
 
 .c-lib-select-basic-box-tag-component {
     display: inline-flex;
-    margin: 2px 4px 2px 0px;
+    margin: @select-basic-tag-component-margin;
     max-width: 100%;
 }

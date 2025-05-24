@@ -1,13 +1,13 @@
 .c-lib-checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: @checkbox-spacing-vertical;
 
     &.c-lib-checkbox-horizontal {
         .c-lib-checkbox-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: @checkbox-spacing-horizontal;
         }
     }
 
@@ -15,7 +15,7 @@
         .c-lib-checkbox-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: @checkbox-spacing-vertical;
         }
     }
 }
@@ -28,7 +28,7 @@
 
     &.c-lib-checkbox-disabled {
         cursor: not-allowed;
-        opacity: 0.6;
+        opacity: @checkbox-disabled-opacity;
 
         .c-lib-checkbox-label {
             color: @text-color-disabled;
@@ -38,7 +38,7 @@
     .c-lib-checkbox-input {
         position: relative;
         display: inline-flex;
-        margin-right: 8px;
+        margin-right: @checkbox-input-spacing;
         align-items: center;
 
         input[type="checkbox"] {
@@ -47,7 +47,6 @@
             right: 0;
             bottom: 0;
             left: 0;
-            z-index: 1;
             width: 100%;
             height: 100%;
             cursor: pointer;
@@ -60,8 +59,8 @@
     }
 
     .c-lib-checkbox-label {
-        font-size: 14px;
-        line-height: 1.5;
+        font-size: @checkbox-label-font-size;
+        line-height: @checkbox-label-line-height;
     }
 }
 
@@ -71,16 +70,15 @@
 }
 
 .c-lib-checkbox-box {
-    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
-    border: 1px solid @border-color-base;
-    border-radius: 2px;
+    width: @checkbox-size;
+    height: @checkbox-size;
+    border: @checkbox-border-width solid @border-color-base;
+    border-radius: @checkbox-border-radius;
     background-color: @text-color-inverse;
-    transition: all 0.3s;
+    transition: @checkbox-transition;
     cursor: pointer;
 
     &.c-lib-checkbox-checked {
@@ -88,24 +86,8 @@
         border-color: @checkbox-checked-bg;
 
         .c-lib-checkbox-inner {
-            position: relative;
-            display: inline-block;
-            left: -2px;
-            width: 6px;
-            height: 8px;
-
-            &::after {
-                animation: checkbox-bounce 0.3s cubic-bezier(0.12, 0.4, 0.29, 1.86) forwards;
-                content: '';
-                position: absolute;
-                top: 3px;
-                width: 6px;
-                height: 10px;
-                border: 2px solid @checkbox-inner-color;
-                border-left: 0;
-                border-top: 0;
-                transform: rotate(45deg);
-            }
+            opacity: 1;
+            transform: scale(1);
         }
     }
 
@@ -114,21 +96,16 @@
         border-color: @checkbox-checked-color;
 
         .c-lib-checkbox-inner {
-            position: relative;
-            display: inline-block;
+            opacity: 1;
+            transform: scale(0.8);
 
             &::after {
-                content: '';
-                position: absolute;
-                left: -4px;
-                top: -4px;
-                background-color: var(--before-color);
-                box-sizing: border-box;
                 width: 8px;
                 height: 8px;
-                border: 1px solid var(--before-color);
-                border-radius: 2px;
-                animation: indeterminate-animation 0.3s cubic-bezier(0.12, 0.4, 0.29, 1.86) forwards;
+                background-color: var(--before-color);
+                border: @base-border-width solid var(--before-color);
+                border-radius: @checkbox-border-radius;
+                transform: translate(-2px, -1px);
             }
         }
     }
@@ -146,22 +123,23 @@
     }
 }
 
-@keyframes indeterminate-animation {
-    0% {
-        transform: scale(0);
-    }
+.c-lib-checkbox-inner {
+    position: relative;
+    display: inline-block;
+    width: @checkbox-inner-width;
+    height: @checkbox-inner-height;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity @animation-duration-normal, transform @animation-duration-normal cubic-bezier(0.12, 0.4, 0.29, 1.86);
 
-    100% {
-        transform: scale(1);
-    }
-}
-
-@keyframes checkbox-bounce {
-    0% {
-        transform: rotate(45deg) scale(0) translate(-50%, -50%);
-    }
-
-    100% {
-        transform: rotate(45deg) scale(1) translate(-50%, -50%);
+    &::after {
+        content: '';
+        display: block;
+        width: @checkbox-inner-width;
+        height: @checkbox-inner-height;
+        border: @checkbox-inner-border-width solid @checkbox-inner-color;
+        border-left: 0;
+        border-top: 0;
+        transform: rotate(45deg) translate(-2px, -1px);
     }
 }

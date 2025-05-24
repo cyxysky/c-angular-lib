@@ -108,7 +108,6 @@ export class AppComponent {
 
   ngOnInit() {
     of(true).pipe(delay(2000)).subscribe((data) => {
-      console.log(data)
       this.show.set(data)
     })
 

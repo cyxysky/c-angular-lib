@@ -11,19 +11,19 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    margin: 0 0 16px 0;
-    gap: 8px;
+    margin: @tabs-nav-margin;
+    gap: @tabs-nav-gap;
   }
 
   &-bottom {
     .c-lib-tabs-nav-wrapper {
       order: 1;
-      margin-top: 16px;
+      margin-top: @spacing-lg;
       margin-bottom: 0;
     }
 
     .c-lib-tabs-nav {
-      border-top: 1px solid @border-color-base;
+      border-top: @base-border-width solid @border-color-base;
       border-bottom: none;
     }
 
@@ -35,7 +35,7 @@
 
   &-top {
     .c-lib-tabs-nav {
-      border-bottom: 1px solid @border-color-base;
+      border-bottom: @base-border-width solid @border-color-base;
     }
   }
 
@@ -77,11 +77,11 @@
     }
 
     &-arrow {
-      flex: 0 0 32px;
-      min-width: 32px;
-      max-width: 32px;
-      width: 32px;
-      height: 32px;
+      flex: 0 0 @tabs-arrow-size;
+      min-width: @tabs-arrow-size;
+      max-width: @tabs-arrow-size;
+      width: @tabs-arrow-size;
+      height: @tabs-arrow-size;
       position: relative;
       display: flex;
       align-items: center;
@@ -94,8 +94,8 @@
       color: @text-color-tertiary;
       transition: color @visible-animation-duration;
       z-index: 10;
-      box-shadow: 0 1px 3px @shadow-color-lightest;
-      border-radius: 50%;
+      box-shadow: 0 @base-border-width 3px @shadow-color-lightest;
+      border-radius: @tabs-arrow-border-radius;
 
       &:hover {
         color: @text-color-secondary;
@@ -105,7 +105,7 @@
         color: @text-color-disabled;
         cursor: not-allowed;
         pointer-events: none;
-        opacity: 0.5;
+        opacity: @tabs-disabled-opacity;
       }
 
       &-icon {
@@ -117,16 +117,16 @@
     }
 
     &-prev {
-      margin-right: 8px;
+      margin-right: @tabs-arrow-margin;
 
       .c-lib-tabs-nav-arrow-icon {
-        border-width: 6px 8px 6px 0;
+        border-width: @tabs-arrow-icon-size;
         border-color: transparent currentColor transparent transparent;
       }
     }
 
     &-next {
-      margin-left: 8px;
+      margin-left: @tabs-arrow-margin;
 
       .c-lib-tabs-nav-arrow-icon {
         border-width: 6px 0 6px 8px;
@@ -140,14 +140,14 @@
     display: flex;
     flex: none;
     align-items: center;
-    margin-right: 32px;
-    padding: 12px 0;
-    font-size: 14px;
+    margin-right: @tabs-tab-margin;
+    padding: @tabs-tab-padding;
+    font-size: @tabs-tab-font-size;
     background: transparent;
     border: 0;
     outline: none;
     cursor: pointer;
-    transition: color @visible-animation-duration cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: @tabs-transition;
 
     &:last-of-type {
       margin-right: 0;
@@ -161,8 +161,8 @@
     }
 
     &-icon {
-      margin-right: 8px;
-      font-size: 14px;
+      margin-right: @tabs-icon-spacing;
+      font-size: @tabs-icon-font-size;
 
       i {
         display: inline-block;
@@ -185,9 +185,9 @@
     }
 
     &-close {
-      margin-left: 8px;
+      margin-left: @tabs-close-spacing;
       padding: 0;
-      font-size: 12px;
+      font-size: @tabs-close-font-size;
       background: transparent;
       border: 0;
       outline: none;

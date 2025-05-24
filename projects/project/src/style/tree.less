@@ -3,7 +3,7 @@
         width: 100%;
         max-height: 100%;
         overflow: hidden;
-        font-size: 14px;
+        font-size: @tree-font-size;
         color: @text-color;
     }
 
@@ -12,19 +12,19 @@
     }
 
     &-search {
-        padding: 8px;
-        margin-bottom: 8px;
+        padding: @tree-search-padding;
+        margin-bottom: @tree-search-margin;
 
         &-input {
             width: 100%;
-            padding: 4px 8px;
-            border: 1px solid @border-color-base;
-            border-radius: 2px;
-            transition: all @visible-animation-duration;
+            padding: @tree-search-input-padding;
+            border: @base-border-width solid @border-color-base;
+            border-radius: @tree-search-input-border-radius;
+            transition: @tree-search-input-transition;
 
             &:focus {
                 border-color: @primary-color;
-                box-shadow: 0 0 0 2px @primary-color-outline;
+                box-shadow: @tree-search-input-focus-shadow @primary-color-outline;
                 outline: none;
             }
         }
@@ -32,7 +32,7 @@
 
     &-node {
         &-container {
-            padding: 0 4px;
+            padding: @tree-node-container-padding;
         }
 
         &-hidden {
@@ -50,11 +50,11 @@
             position: relative;
             display: flex;
             align-items: center;
-            padding: 0 4px;
-            height: 24px;
-            border-radius: 2px;
+            padding: @tree-node-content-padding;
+            height: @tree-node-content-height;
+            border-radius: @tree-node-content-border-radius;
             cursor: pointer;
-            transition: all @visible-animation-duration;
+            transition: @tree-node-content-transition;
 
             &-disabled {
                 color: @text-color-disabled;
@@ -75,7 +75,7 @@
 
     &-indent {
         display: inline-block;
-        height: 24px;
+        height: @tree-indent-height;
         position: relative;
     }
 
@@ -83,12 +83,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
-        margin-right: 2px;
+        width: @tree-switcher-size;
+        height: @tree-switcher-size;
+        margin-right: @tree-switcher-margin;
         cursor: pointer;
-        z-index: 1;
-        transition: all @visible-animation-duration;
+        transition: @tree-switcher-transition;
 
         &-expanded {
             .c-lib-tree-switcher-icon {
@@ -108,8 +107,8 @@
         .c-lib-tree-switcher-icon {
             position: relative;
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: @tree-switcher-icon-size;
+            height: @tree-switcher-icon-size;
 
             &::before {
                 content: '';
@@ -119,88 +118,15 @@
                 width: 0;
                 height: 0;
                 border-style: solid;
-                border-width: 5px 0 5px 6px;
+                border-width: @tree-switcher-icon-border-width;
                 border-color: transparent transparent transparent currentColor;
             }
         }
     }
 
-    &-checkbox {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-        border: 1px solid @border-color-base;
-        border-radius: 2px;
-        background-color: @radio-bg;
-        transition: all @visible-animation-duration;
-        cursor: pointer;
-
-        &-checked {
-            background-color: @checkbox-checked-bg;
-            border-color: @checkbox-checked-color;
-
-            .c-lib-tree-checkbox-inner {
-                position: relative;
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    left: 1px;
-                    top: -2px;
-                    width: 6px;
-                    height: 10px;
-                    border: 2px solid @checkbox-inner-color;
-                    border-left: 0;
-                    border-top: 0;
-                    transform: rotate(45deg);
-                }
-            }
-        }
-
-        &-indeterminate {
-            background-color: @radio-bg;
-            border-color: @checkbox-checked-color;
-
-            .c-lib-tree-checkbox-inner {
-                position: relative;
-                display: inline-block;
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    left: -4px;
-                    top: -4px;
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 2px;
-                    background-color: @checkbox-checked-color;
-                }
-            }
-        }
-
-        &-disabled {
-            background-color: @disabled-bg;
-            border-color: @border-color-base;
-            cursor: not-allowed;
-
-            .c-lib-tree-checkbox-inner {
-                &::after {
-                    border-color: @text-color-disabled;
-                }
-            }
-        }
-    }
-
     &-icon {
-        margin-right: 4px;
-        font-size: 14px;
+        margin-right: @tree-icon-margin;
+        font-size: @tree-icon-font-size;
 
         .c-lib-tree-icon {
             &.file-icon::before {
@@ -225,8 +151,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 2px 0px;
-        transition: all @visible-animation-duration;
+        padding: @tree-title-padding;
+        transition: @tree-title-transition;
 
         &:not(.c-lib-tree-title-disabled):hover {
             background-color: @background-color-hover;
@@ -239,8 +165,8 @@
 
     &-empty-state {
         text-align: center;
-        padding: 50px;
-        font-weight: 600;
+        padding: @tree-empty-padding;
+        font-weight: @tree-empty-font-weight;
     }
 }
 
@@ -252,7 +178,7 @@
         position: absolute;
         top: -50%;
         left: 50%;
-        width: 1px;
+        width: @tree-line-width;
         height: 150%;
         background-color: @border-color-base;
     }
@@ -266,7 +192,7 @@
         position: absolute;
         top: -50%;
         left: 50%;
-        width: 1px;
+        width: @tree-line-width;
         height: 100%;
         background-color: @border-color-base;
     }
@@ -277,19 +203,17 @@
 
     &::before {
         content: '';
-        z-index: 0;
         position: absolute;
         top: 50%;
         left: -50%;
         width: 100%;
-        height: 1px;
+        height: @tree-line-width;
         background-color: @border-color-base;
     }
 }
 
 .c-lib-tree-children {
     position: relative;
-    will-change: height, opacity;
 }
 
 
@@ -297,15 +221,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin-right: 2px;
+    width: @tree-loading-size;
+    height: @tree-loading-size;
+    margin-right: @tree-loading-margin;
 
     .c-lib-tree-loading-svg {
         animation: rotate 1.2s linear infinite;
         color: @primary-color;
-        width: 16px;
-        height: 16px;
+        width: @tree-loading-icon-size;
+        height: @tree-loading-icon-size;
     }
 }
 

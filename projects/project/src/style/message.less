@@ -3,39 +3,39 @@
     margin: 0;
     padding: 0;
     color: @text-color;
-    font-size: 14px;
-    line-height: 1.5715;
+    font-size: @message-font-size;
+    line-height: @message-line-height;
     display: block;
     width: 100%;
     text-align: center;
 }
 
 .c-lib-message-item {
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: @message-item-padding;
+    border-radius: @message-item-border-radius;
     box-shadow: @shadow-3;
     background: @text-color-inverse;
     pointer-events: auto;
     display: inline-block;
-    max-width: calc(100vw - 48px);
-    min-width: 150px;
+    max-width: @message-item-max-width;
+    min-width: @message-item-min-width;
 }
 
 .c-lib-message-content {
     display: flex;
     align-items: baseline;
     position: relative;
-    gap: 12px;
+    gap: @message-content-gap;
 }
 
 .c-lib-message-icon {
     display: flex;
     align-items: flex-start;
-    font-size: 16px;
+    font-size: @message-icon-font-size;
 }
 
 .c-lib-message-text {
-    font-size: 14px;
+    font-size: @message-text-font-size;
     display: flex;
     align-items: center;
 }
@@ -52,14 +52,14 @@
 // 消息容器样式
 .c-lib-message-container {
     pointer-events: none;
-    z-index: 1010;
+    z-index: @message-container-z-index;
 }
 
 
 // 消息包装容器样式
 .c-lib-message-wrapper {
     pointer-events: auto;
-    margin-bottom: 16px;
+    margin-bottom: @message-wrapper-margin;
     width: 100%;
     display: flex;
     justify-content: center;
